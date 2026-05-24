@@ -16,18 +16,18 @@
 /* --- Design Tokens --- */
 :root {
   /* Colors */
-  --color-deep-ocean: #0B1D3A;
-  --color-midnight: #0F172A;
-  --color-cyan: #00D4FF;
-  --color-cyan-glow: #00D4FF33;
-  --color-cyan-bright: #33DDFF;
-  --color-coral: #FF6B6B;
-  --color-coral-soft: #FF8A8A;
+  --color-deep-ocean: #1A2F4B;
+  --color-midnight: #162640;
+  --color-cyan: #5B9BD5;
+  --color-cyan-glow: #5B9BD533;
+  --color-cyan-bright: #6DAEE0;
+  --color-coral: #C4A35A;
+  --color-coral-soft: #D4B978;
 
-  /* Costa Rica Heritage Accents (🇨🇷 Blue, White, Red) */
-  --color-cr-blue: #002B7F;
-  --color-cr-red: #CE1126;
-  --color-cr-white: #FFFFFF;
+  /* Lake Jeanette Brand Accents */
+  --color-lj-blue: #4A7FB5;
+  --color-lj-gray: #8C8C8C;
+  --color-lj-gold: #C4A35A;
   --color-snow: #FAFBFC;
   --color-white: #FFFFFF;
   --color-ink: #1E293B;
@@ -37,14 +37,14 @@
   --color-surface: #F1F5F9;
   --color-glass: rgba(255, 255, 255, 0.08);
   --color-glass-border: rgba(255, 255, 255, 0.12);
-  --color-overlay: rgba(11, 29, 58, 0.7);
+  --color-overlay: rgba(26, 47, 75, 0.7);
 
   /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #0B1D3A 0%, #162a4a 50%, #0B1D3A 100%);
-  --gradient-cyan: linear-gradient(135deg, #00D4FF 0%, #0098B3 100%);
-  --gradient-coral: linear-gradient(135deg, #FF6B6B 0%, #FF8A8A 100%);
-  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,212,255,0.03) 100%);
-  --gradient-text: linear-gradient(135deg, #00D4FF 0%, #FF6B6B 100%);
+  --gradient-hero: linear-gradient(135deg, #1A2F4B 0%, #24405E 50%, #1A2F4B 100%);
+  --gradient-cyan: linear-gradient(135deg, #5B9BD5 0%, #4A7FB5 100%);
+  --gradient-coral: linear-gradient(135deg, #C4A35A 0%, #D4B978 100%);
+  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(91,155,213,0.03) 100%);
+  --gradient-text: linear-gradient(135deg, #5B9BD5 0%, #C4A35A 100%);
 
   /* Typography */
   --font-heading: 'Outfit', sans-serif;
@@ -87,8 +87,8 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
   --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
-  --shadow-glow: 0 0 40px rgba(0,212,255,0.15);
-  --shadow-glow-strong: 0 0 60px rgba(0,212,255,0.25);
+  --shadow-glow: 0 0 40px rgba(91,155,213,0.15);
+  --shadow-glow-strong: 0 0 60px rgba(91,155,213,0.25);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -302,7 +302,7 @@ p { line-height: 1.7; }
   height: 64px;
   width: auto;
   transition: filter var(--transition-base);
-  filter: brightness(0) invert(1) brightness(1.1);
+  filter: brightness(0) invert(1);
 }
 
 .scrolled .logo img {
@@ -1301,27 +1301,16 @@ p { line-height: 1.7; }
   position: relative;
 }
 
-/* Costa Rica heritage accent stripe — subtle nod to Dr. Brenes' roots */
+/* Lake Jeanette brand accent stripe */
 .site-footer::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, 
-    var(--color-cr-blue) 0%, 
-    var(--color-cr-blue) 20%, 
-    var(--color-cr-white) 20%, 
-    var(--color-cr-white) 35%, 
-    var(--color-cr-red) 35%, 
-    var(--color-cr-red) 65%, 
-    var(--color-cr-white) 65%, 
-    var(--color-cr-white) 80%, 
-    var(--color-cr-blue) 80%, 
-    var(--color-cr-blue) 100%
-  );
-  opacity: 0.7;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-lj-blue), var(--color-lj-gold));
+  opacity: 0.8;
 }
 
 .footer-grid {
