@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immersive Family Dentistry | Precision Care, Visualized — Greensboro, NC</title>
+  <meta name="description" content="Immersive Family Dentistry in Greensboro, NC. Dr. Christian Brenes brings digital twin technology, 3D scanning, AI diagnostics, and immersive patient experiences to modern family and implant dentistry.">
+  <meta name="keywords" content="digital dentistry, dental implants, prosthodontist, Greensboro NC, 3D scanning, digital twin, family dentistry, cosmetic dentistry">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Immersive Family Dentistry | Precision Care, Visualized">
+  <meta property="og:description" content="Where technology meets family care. Experience the future of dentistry with Dr. Christian Brenes.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/hero-1.png">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dentist",
+    "name": "Immersive Family Dentistry",
+    "image": "images/logo.png",
+    "telephone": "(336) 545-4281",
+    "email": "contact@ljfamilydentist.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "3810 North Elm Street, Suite 201",
+      "addressLocality": "Greensboro",
+      "addressRegion": "NC",
+      "postalCode": "27455"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "36.1262",
+      "longitude": "-79.8197"
+    },
+    "openingHoursSpecification": [
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday"], "opens": "08:00", "closes": "17:00"},
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": "Thursday", "opens": "08:00", "closes": "15:00"}
+    ],
+    "priceRange": "$$",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.7",
+      "reviewCount": "20"
+    }
+  }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/logo.png">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================
+       HEADER / NAVIGATION
+       ============================ -->
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <img src="images/logo.png" alt="Immersive Family Dentistry logo">
+        <div class="logo-tagline">Pura Vida Smiles</div>
+      </a>
+      
+      <nav>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#technology">Technology</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#contact" class="btn btn-primary">Book Now</a></li>
+        </ul>
+      </nav>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================
+       HERO SECTION
+       ============================ -->
+  <section class="hero" id="hero">
+    <div class="hero-slides">
+      <div class="hero-slide active">
+        <img src="images/ar-patient.png" alt="Patient wearing AR glasses viewing holographic 3D model of their teeth">
+      </div>
+      <div class="hero-slide">
+        <img src="images/warm-operatory.png" alt="Futuristic warm dental operatory with ambient lighting">
+      </div>
+      <div class="hero-slide">
+        <img src="images/teeth-model.png" alt="High-fidelity 3D digital twin of dental anatomy">
+      </div>
+      <div class="hero-slide">
+        <img src="images/hero-3.png" alt="Confident patient smile">
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="hero-particles"></div>
+
+    <div class="hero-content">
+      <div class="hero-label">Immersive Family Dentistry</div>
+      <div class="hero-sublabel">Greensboro's Premier Digital Dental Experience</div>
+      <h1>Where <em>Technology</em> Meets Family Care</h1>
+      <p class="hero-description">
+        Step into the future of dentistry. We use 3D digital twins, AI diagnostics, and immersive visualization so you can see, understand, and co-design your perfect smile — before treatment even begins.
+      </p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">Book Your Experience</a>
+        <a href="#technology" class="btn btn-secondary">Explore Our Technology →</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="stat-value" data-target="9" data-suffix="+">0</div>
+          <div class="stat-label">Years University Faculty</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-value" data-target="4.7" data-decimal="true">0</div>
+          <div class="stat-label">Patient Rating</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-value" data-target="112" data-suffix="K+">0</div>
+          <div class="stat-label">Educational Video Views</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-value" data-target="6" data-suffix="+">0</div>
+          <div class="stat-label">KOL Partnerships</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="arrow"></div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TRUST BAR
+       ============================ -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-items">
+        <div class="trust-item reveal">
+          <div class="trust-icon">🎓</div>
+          <div>
+            <div class="trust-value">Prosthodontist</div>
+            <div class="trust-label">Board-Certified Specialist</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-1">
+          <div class="trust-icon">🏛️</div>
+          <div>
+            <div class="trust-value">UNC Chapel Hill</div>
+            <div class="trust-label">Master's in Prosthodontics</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-2">
+          <div class="trust-icon">🔬</div>
+          <div>
+            <div class="trust-value">Digital Pioneer</div>
+            <div class="trust-label">Founding Director, HPU Digital Dentistry</div>
+          </div>
+        </div>
+        <div class="trust-item reveal reveal-delay-3">
+          <div class="trust-icon">🌐</div>
+          <div>
+            <div class="trust-value">Global Speaker</div>
+            <div class="trust-label">International Key Opinion Leader</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       ABOUT DR. BRENES
+       ============================ -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-wrapper reveal">
+          <img src="images/dr-brenes.jpg" alt="Dr. Christian Brenes, Prosthodontist">
+        </div>
+        <div class="about-content reveal reveal-delay-2">
+          <span class="section-label" style="display:block; font-family:var(--font-accent); font-size:var(--text-sm); font-weight:600; text-transform:uppercase; letter-spacing:0.15em; color:var(--color-cyan); margin-bottom:var(--space-md);">Meet Your Doctor</span>
+          <h2>Dr. Christian Brenes</h2>
+          <p style="color:var(--color-cyan); font-weight:600; margin-bottom:var(--space-lg); font-family:var(--font-accent);">DDS, MS — Prosthodontist</p>
+          <p style="color:var(--color-slate); margin-bottom:var(--space-lg);">
+            Born and raised in <strong style="color:var(--color-cr-blue);">Costa Rica</strong> <span style="font-size:var(--text-lg);">🇨🇷</span>, Dr. Brenes is a dedicated prosthodontist specializing in esthetics and advanced dental implant solutions. As the Founding Director of Digital Dentistry at High Point University's Workman School of Dental Medicine, he bridges the gap between cutting-edge research and everyday patient care.
+          </p>
+          <p style="color:var(--color-slate); margin-bottom:var(--space-lg);">
+            His philosophy is simple: every treatment should be meticulously planned and designed — not to achieve a "perfect smile," but rather a <strong>natural, custom smile</strong> that is uniquely yours.
+          </p>
+          <ul class="credential-list">
+            <li>🇨🇷 <strong>Born & raised in Costa Rica</strong> — bilingual in English & Spanish</li>
+            <li><strong>Founding Director</strong> of Digital Dentistry, HPU Workman School of Dental Medicine</li>
+            <li><strong>Former Director</strong>, Digital Dentistry Master's Program, MUSC</li>
+            <li><strong>Key Opinion Leader</strong> for Medit, SprintRay, Exocad, BlueSkyBio</li>
+            <li><strong>Co-creator</strong> of the open-source Brenes-Farley Tooth Library</li>
+            <li><strong>9+ years</strong> as university faculty across 3 institutions</li>
+            <li><strong>International speaker</strong> on digital workflows and implant dentistry</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       SERVICES
+       ============================ -->
+  <section class="section section-alt" id="services">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">What We Offer</span>
+        <h2>Comprehensive Digital Dental Care</h2>
+        <p>From routine family care to complex full-mouth rehabilitations, every treatment is powered by precision technology and artistry.</p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-icon">🦷</div>
+          <h3>Dental Implants</h3>
+          <p>Computer-guided implant placement for single teeth, multiple teeth, and full-arch All-on-4 solutions. Predictable, minimally invasive, and designed digitally before surgery.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-1">
+          <div class="service-icon">✨</div>
+          <h3>Digital Smile Design</h3>
+          <p>See your new smile before treatment begins. We use AI-powered 3D models to simulate results, so you approve the design before we ever pick up an instrument.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-2">
+          <div class="service-icon">🔄</div>
+          <h3>Full-Mouth Rehabilitation</h3>
+          <p>Complex cases are our specialty. Dr. Brenes restores function and beauty for patients with severe wear, missing teeth, or failed prior dental work.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-3">
+          <div class="service-icon">💎</div>
+          <h3>Veneers & Cosmetics</h3>
+          <p>Custom porcelain veneers and cosmetic enhancements designed with digital precision. Each restoration is shaped to complement your unique facial features.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-4">
+          <div class="service-icon">👨‍👩‍👧‍👦</div>
+          <h3>Family Dentistry</h3>
+          <p>Preventive care, cleanings, and restorations for the whole family. Our AI-powered diagnostics detect potential issues earlier than traditional methods.</p>
+        </div>
+        <div class="service-card reveal reveal-delay-5">
+          <div class="service-icon">⚡</div>
+          <h3>Same-Day Restorations</h3>
+          <p>In-house 3D printing and milling means many crowns, bridges, and temporaries can be designed, fabricated, and placed in a single visit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TECHNOLOGY SHOWCASE
+       ============================ -->
+  <section class="section section-dark" id="technology">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Our Technology</span>
+        <h2>The Immersive Difference</h2>
+        <p>We don't just use digital tools — we've built an integrated platform that fuses 3D scanning, AI diagnostics, and spatial computing into a seamless experience.</p>
+      </div>
+
+      <div class="tech-grid">
+        <div class="tech-card reveal">
+          <img src="images/tech-scanner.png" alt="Intraoral 3D scanner capturing digital impressions">
+          <div class="tech-card-overlay">
+            <span class="tech-badge">Core System</span>
+            <h3>3D Intraoral Scanning</h3>
+            <p>High-resolution digital impressions replace traditional molds. Faster, more comfortable, and incredibly precise.</p>
+          </div>
+        </div>
+        <div class="tech-card reveal reveal-delay-1">
+          <img src="images/teeth-model.png" alt="High-fidelity 3D rendered digital twin of teeth with diagnostic overlays">
+          <div class="tech-card-overlay">
+            <span class="tech-badge">AI-Powered</span>
+            <h3>Digital Twin Technology</h3>
+            <p>A living 3D replica of your oral anatomy that evolves with you — enabling "what-if" treatment simulations in real time.</p>
+          </div>
+        </div>
+        <div class="tech-card reveal reveal-delay-2">
+          <img src="images/ar-patient.png" alt="Patient using AR glasses to view holographic dental diagnostics">
+          <div class="tech-card-overlay">
+            <span class="tech-badge">Spatial Computing</span>
+            <h3>AR Visualization</h3>
+            <p>Augmented reality glasses let you see your dental anatomy as a holographic 3D model — making every diagnosis transparent and understandable.</p>
+          </div>
+        </div>
+        <div class="tech-card reveal reveal-delay-3">
+          <img src="images/warm-operatory.png" alt="Modern warm dental operatory with 3D screen and ambient lighting">
+          <div class="tech-card-overlay">
+            <span class="tech-badge">Environment</span>
+            <h3>Spa-Like Clinical Spaces</h3>
+            <p>Our operatories blend cutting-edge technology with warm wood tones, ambient lighting, and living plants for a calming, luxury experience.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       INTERACTIVE 3D MODEL
+       ============================ -->
+  <section class="section" id="digital-twin-demo">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Interactive Demo</span>
+        <h2>Explore a Digital Twin</h2>
+        <p>This is what your dental digital twin looks like. Click and drag to rotate. Scroll to zoom. This is the level of detail we capture for every patient.</p>
+      </div>
+
+      <div class="sketchfab-embed-wrapper reveal" style="position:relative; width:100%; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-xl);">
+        <iframe 
+          title="Human mouth detailed" 
+          frameborder="0" 
+          allowfullscreen 
+          mozallowfullscreen="true" 
+          webkitallowfullscreen="true" 
+          allow="autoplay; fullscreen; xr-spatial-tracking" 
+          xr-spatial-tracking 
+          execution-while-out-of-viewport 
+          execution-while-not-rendered 
+          web-share 
+          style="width:100%; height:550px; border-radius:var(--radius-lg);"
+          src="https://sketchfab.com/models/522eda0ec0e3413a914b1b298a791320/embed?autostart=1&transparent=1&ui_theme=dark&dnt=1">
+        </iframe>
+        <p style="font-size: 12px; font-weight: normal; margin: 8px 0 0; color: var(--color-slate); text-align:center;">
+          <a href="https://sketchfab.com/3d-models/human-mouth-detailed-522eda0ec0e3413a914b1b298a791320" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Human mouth detailed</a> by 
+          <a href="https://sketchfab.com/Mince" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Mince</a> on 
+          <a href="https://sketchfab.com" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Sketchfab</a>
+        </p>
+      </div>
+
+      <div style="display:flex; justify-content:center; gap:var(--space-lg); margin-top:var(--space-2xl); flex-wrap:wrap;">
+        <div class="reveal" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
+          <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">🖱️</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Click + Drag</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">Rotate the model</div>
+        </div>
+        <div class="reveal reveal-delay-1" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
+          <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">🔍</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Scroll</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">Zoom in and out</div>
+        </div>
+        <div class="reveal reveal-delay-2" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
+          <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">👆</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Right-Click + Drag</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">Pan the view</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       THE IMMERSIVE EXPERIENCE
+       ============================ -->
+  <section class="section" id="experience">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Your Journey</span>
+        <h2>The Immersive Patient Experience</h2>
+        <p>We've reimagined every step of the dental visit to be transparent, comfortable, and empowering.</p>
+      </div>
+
+      <div class="experience-steps">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <h3>Digital Intake & Welcome</h3>
+          <p>Complete forms digitally. Your medical history and lifestyle data feed into your personal digital twin, providing context for long-term oral health predictions.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-1">
+          <div class="step-number">2</div>
+          <h3>AI-Assisted Scan & Cleaning</h3>
+          <p>Our hygienists wear smart glasses that continuously record and analyze your session. While they clean and examine, AI is mapping your oral landscape in real time — flagging areas of concern, measuring pocket depths, and building a comprehensive diagnostic profile.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-2">
+          <div class="step-number">3</div>
+          <h3>3D Digital Twin Creation</h3>
+          <p>We capture high-resolution 3D scans and CBCT data. Combined with the AI insights from your cleaning session, your complete digital twin is assembled — a living 3D replica of your mouth with color-coded diagnostics overlaid.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-3">
+          <div class="step-number">4</div>
+          <h3>AI-Powered Doctor Review</h3>
+          <p>Before you sit with Dr. Brenes, our AI has already compiled its findings — highlighting concerns, recommending treatment options, and generating visual simulations. When Dr. Brenes reviews your case, he's armed with machine-level analysis combined with his clinical expertise.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-4">
+          <div class="step-number">5</div>
+          <h3>Co-Design Your Treatment</h3>
+          <p>Dr. Brenes walks you through the AI-generated insights on your digital twin. Together, you explore "what-if" treatment simulations, approve the design in 3D, and begin — often the same day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       SMILE GALLERY (Before & After)
+       ============================ -->
+  <section class="section section-dark" id="gallery">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Smile Gallery</span>
+        <h2>Real Results, Digitally Designed</h2>
+        <p>Every transformation starts with a digital blueprint. Drag the slider to see the before &amp; after.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Case 1: Interactive Before/After Slider -->
+        <div class="gallery-case reveal">
+          <div class="ba-slider" id="ba-slider-1">
+            <div class="ba-after">
+              <img src="images/smile-after-1.png" alt="After: Beautiful smile with porcelain veneers">
+            </div>
+            <div class="ba-before">
+              <img src="images/smile-before-1.png" alt="Before: Original smile">
+            </div>
+            <div class="ba-handle">
+              <div class="ba-handle-line"></div>
+              <div class="ba-handle-circle">
+                <span>◀ ▶</span>
+              </div>
+              <div class="ba-handle-line"></div>
+            </div>
+          </div>
+          <div class="gallery-case-info">
+            <h4>Digital Smile Design</h4>
+            <p>Full upper arch porcelain veneers — designed digitally, approved by the patient in 3D before placement.</p>
+          </div>
+        </div>
+
+        <!-- Case 2: Featured Photo -->
+        <div class="gallery-case reveal reveal-delay-2">
+          <div class="gallery-featured-img">
+            <img src="images/dr-patient-scan.png" alt="Dr. Brenes showing a patient their 3D scan and clear aligner">
+          </div>
+          <div class="gallery-case-info">
+            <h4>See It Before You Start</h4>
+            <p>Dr. Brenes reviews the 3D digital model with every patient — so you understand and approve your treatment before we begin.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:var(--space-2xl);">
+        <a href="https://www.instagram.com/lakejeanettedentistry/" target="_blank" class="btn btn-outline" style="border-color:var(--color-cyan); color:var(--color-cyan);">View More Cases on Instagram →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TEAM
+       ============================ -->
+  <section class="section section-alt" id="team">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Our Team</span>
+        <h2>The People Behind Your Smile</h2>
+        <p>A dedicated team of professionals committed to your comfort and exceptional care.</p>
+      </div>
+
+      <div class="team-grid">
+        <div class="team-card reveal">
+          <img src="images/dr-brenes.jpg" alt="Dr. Christian Brenes">
+          <h4>Dr. Christian Brenes</h4>
+          <div class="team-role">Prosthodontist & Founder</div>
+        </div>
+        <div class="team-card reveal reveal-delay-1">
+          <img src="images/team-1.jpg" alt="Team member">
+          <h4>Clinical Team</h4>
+          <div class="team-role">Dental Hygienist</div>
+        </div>
+        <div class="team-card reveal reveal-delay-2">
+          <img src="images/team-2.jpg" alt="Team member">
+          <h4>Clinical Team</h4>
+          <div class="team-role">Dental Assistant</div>
+        </div>
+        <div class="team-card reveal reveal-delay-3">
+          <img src="images/team-3.jpg" alt="Team member">
+          <h4>Clinical Team</h4>
+          <div class="team-role">Dental Assistant</div>
+        </div>
+        <div class="team-card reveal reveal-delay-4">
+          <img src="images/team-4.jpg" alt="Team member">
+          <h4>Clinical Team</h4>
+          <div class="team-role">Office Manager</div>
+        </div>
+        <div class="team-card reveal reveal-delay-5">
+          <img src="images/team-5.jpg" alt="Team member">
+          <h4>Clinical Team</h4>
+          <div class="team-role">Patient Coordinator</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TESTIMONIALS
+       ============================ -->
+  <section class="section section-dark" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Patient Stories</span>
+        <h2>What Our Patients Say</h2>
+        <p>Real experiences from real patients who chose the immersive approach to their dental care.</p>
+      </div>
+
+      <div class="testimonial-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote>"I cannot say enough great things about the practice! From the moment you walk in, the staff is so warm and welcoming, making you feel at ease right away!"</blockquote>
+          <div class="testimonial-author">— Happy Patient</div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote>"Seeing my treatment plan in 3D before we started was incredible. I knew exactly what to expect and felt totally confident in my decision."</blockquote>
+          <div class="testimonial-author">— Implant Patient</div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote>"The technology here is unlike anything I've ever experienced at a dentist. Dr. Brenes showed me a simulation of my new smile and it looked exactly like the final result."</blockquote>
+          <div class="testimonial-author">— Cosmetic Patient</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FAQ
+       ============================ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Questions & Answers</span>
+        <h2>Frequently Asked Questions</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question" id="faq-q1">
+            What is a prosthodontist?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>A prosthodontist is a dental specialist who has completed an additional 3 years of advanced training beyond dental school, focusing on the restoration and replacement of teeth. Dr. Brenes is one of the most trained dental specialists you can visit — with expertise in dental implants, full-mouth rehabilitation, veneers, and complex cosmetic cases.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal reveal-delay-1">
+          <button class="faq-question" id="faq-q2">
+            What is a dental digital twin?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>A dental digital twin is a dynamic, evolving virtual replica of your mouth's anatomy — including teeth, gums, bone, and jaw structure. Unlike a simple 3D scan, your digital twin integrates data from multiple sources (intraoral scans, CBCT, AI diagnostics) and can simulate how treatments will look and function before we begin. It's like having a flight simulator for your dental care.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal reveal-delay-2">
+          <button class="faq-question" id="faq-q3">
+            Do you accept dental insurance?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! We accept all insurance plans that allow out-of-network providers, including PPO plans. We also offer flexible financing through CareCredit and Sunbit, as well as in-house membership plans for patients without insurance. Our goal is to make advanced dental care accessible to everyone.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal reveal-delay-3">
+          <button class="faq-question" id="faq-q4">
+            What can I expect during my first visit?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Your first visit is a thorough, unhurried experience lasting about one hour. We'll capture 3D digital scans and X-rays of your teeth and jaw, perform a comprehensive exam, and create a customized treatment plan. You'll see your own oral anatomy in 3D and understand exactly where you stand and what options are available.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal reveal-delay-4">
+          <button class="faq-question" id="faq-q5">
+            How can I make dental implants more affordable?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>We offer multiple payment options to make implants accessible: CareCredit and Sunbit financing with flexible monthly plans, in-house membership discounts, and we work with your insurance to maximize your PPO out-of-network benefits. During your consultation, we'll walk through all available options.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       CONTACT
+       ============================ -->
+  <section class="section section-alt" id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Get In Touch</span>
+        <h2>Start Your Immersive Experience</h2>
+        <p>Ready to see what modern dentistry feels like? We'd love to welcome you.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <div class="contact-item">
+            <div class="contact-item-icon">📍</div>
+            <div>
+              <h4>Location</h4>
+              <p>3810 North Elm Street, Suite 201<br>Greensboro, NC 27455</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📞</div>
+            <div>
+              <h4>Phone</h4>
+              <a href="tel:3365454281">(336) 545-4281</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">✉️</div>
+            <div>
+              <h4>Email</h4>
+              <a href="mailto:contact@ljfamilydentist.com">contact@ljfamilydentist.com</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">🕐</div>
+            <div>
+              <h4>Office Hours</h4>
+              <p>Monday – Wednesday: 8:00 AM – 5:00 PM<br>Thursday: 8:00 AM – 3:00 PM<br>Friday – Sunday: Closed</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">💳</div>
+            <div>
+              <h4>Payment Options</h4>
+              <p>CareCredit · Sunbit · Cash · Credit Card<br>In-House Membership Plans · PPO Insurance</p>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:var(--space-md); margin-top:var(--space-md);">
+            <a href="tel:3365454281" class="btn btn-primary">Call Now</a>
+            <a href="https://www.instagram.com/lakejeanettedentistry/" target="_blank" class="btn btn-outline">Follow Us</a>
+          </div>
+        </div>
+
+        <div class="contact-map reveal reveal-delay-2">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3228.5!2d-79.8197!3d36.1262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDA3JzM0LjMiTiA3OcKwNDknMTAuOSJX!5e0!3m2!1sen!2sus!4v1"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Immersive Family Dentistry Location Map">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FOOTER
+       ============================ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo" style="filter:none;">
+            <img src="images/logo.png" alt="Immersive Family Dentistry" style="height:44px; filter:brightness(0) invert(1);">
+            <div class="logo-tagline" style="color:rgba(255,255,255,0.45);">Pura Vida Smiles</div>
+          </div>
+          <p>Pura Vida Smiles — Precision care, visualized. We bring the future of dentistry to your family through digital twins, AI diagnostics, and immersive technology.</p>
+          <div class="footer-social">
+            <a href="https://www.instagram.com/lakejeanettedentistry/" target="_blank" aria-label="Instagram">📷</a>
+            <a href="https://www.facebook.com/people/Lake-Jeanette-Family-Implant-Dentistry/61581722487055/" target="_blank" aria-label="Facebook">📘</a>
+            <a href="https://www.tiktok.com/@lake.jeanette.dent" target="_blank" aria-label="TikTok">🎵</a>
+            <a href="https://www.youtube.com/@christianbrenes6377" target="_blank" aria-label="YouTube">▶️</a>
+          </div>
+        </div>
+
+        <div class="footer-column">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="#services">Dental Implants</a></li>
+            <li><a href="#services">Digital Smile Design</a></li>
+            <li><a href="#services">Full-Mouth Rehab</a></li>
+            <li><a href="#services">Veneers</a></li>
+            <li><a href="#services">Family Dentistry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Technology</h4>
+          <ul>
+            <li><a href="#technology">3D Scanning</a></li>
+            <li><a href="#technology">Digital Twin</a></li>
+            <li><a href="#technology">CBCT Imaging</a></li>
+            <li><a href="#technology">3D Printing</a></li>
+            <li><a href="#technology">AI Diagnostics</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#about">About Dr. Brenes</a></li>
+            <li><a href="#experience">Patient Experience</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Immersive Family Dentistry. All rights reserved.</p>
+        <p>3810 North Elm Street, Suite 201, Greensboro, NC 27455 · (336) 545-4281</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+</body>
+</html>
