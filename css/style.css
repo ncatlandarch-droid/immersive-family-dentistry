@@ -299,7 +299,7 @@ p { line-height: 1.7; }
 }
 
 .logo img {
-  height: 64px;
+  height: 72px;
   width: auto;
   transition: filter var(--transition-base);
   filter: brightness(0) invert(1);
