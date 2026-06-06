@@ -126,6 +126,59 @@ exports.handler = async (event) => {
             };
         }
 
+        // ─── Load Live Practice Settings from Database ───
+        let practiceContext = '';
+        const dbUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+        if (dbUrl) {
+            try {
+                const { neon } = require('@neondatabase/serverless');
+                const sql = neon(dbUrl);
+                const rows = await sql`SELECT key, value FROM practice_settings`;
+                const settings = {};
+                for (const row of rows) settings[row.key] = row.value;
+
+                if (settings.pricing) {
+                    practiceContext += '\n\nCURRENT PRICING (use these exact prices):\n';
+                    for (const item of settings.pricing) {
+                        practiceContext += `- ${item.name}: $${item.price}\n`;
+                    }
+                }
+                if (settings.office_hours) {
+                    practiceContext += '\nCURRENT OFFICE HOURS:\n';
+                    for (const [day, hrs] of Object.entries(settings.office_hours)) {
+                        practiceContext += hrs.closed
+                            ? `- ${day}: Closed\n`
+                            : `- ${day}: ${hrs.open} – ${hrs.close}\n`;
+                    }
+                }
+                if (settings.insurance) {
+                    practiceContext += `\nACCEPTED INSURANCE: ${settings.insurance.join(', ')}\n`;
+                }
+                if (settings.contact) {
+                    practiceContext += `\nCONTACT: Phone: ${settings.contact.phone}, Email: ${settings.contact.email}\n`;
+                }
+            } catch (dbErr) {
+                console.warn('Could not load practice settings:', dbErr.message);
+            }
+        }
+
+        // ─── Enhanced System Prompt with Live Data ───
+        const enhancedPrompt = SYSTEM_PROMPT + practiceContext + `
+
+APPOINTMENT BOOKING SYSTEM:
+You can ACTUALLY book appointments now! When you have collected ALL the required info from a patient (name, phone/email, reason, preferred date/time), include this special tag at the END of your response:
+
+[BOOK_APPOINTMENT]
+name: Patient Full Name
+phone: their phone
+email: their email
+reason: what they need
+preferred_date: when they want
+insurance: their insurance or None
+[/BOOK_APPOINTMENT]
+
+This will automatically save the appointment to our system. ALWAYS confirm the details with the patient BEFORE including this tag. After booking, tell them their appointment request has been received and the front desk will confirm within 1 business day.`;
+
         // Build conversation contents for Gemini
         const contents = [];
 
@@ -146,7 +199,7 @@ exports.handler = async (event) => {
 
         // Call Gemini API with timeout
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+        const timeout = setTimeout(() => controller.abort(), 9000); // 9s timeout
 
         try {
             const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -155,7 +208,7 @@ exports.handler = async (event) => {
                 signal: controller.signal,
                 body: JSON.stringify({
                     system_instruction: {
-                        parts: [{ text: SYSTEM_PROMPT }],
+                        parts: [{ text: enhancedPrompt }],
                     },
                     contents,
                     generationConfig: {
@@ -188,15 +241,61 @@ exports.handler = async (event) => {
             }
 
             const data = await response.json();
-            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+            let reply = data.candidates?.[0]?.content?.parts?.[0]?.text
                 || (lang === 'es'
                     ? 'Disculpa, no pude procesar tu solicitud. ¿Puedes intentar de nuevo?'
                     : 'I apologize, I couldn\'t process that. Could you try again?');
 
+            // ─── Detect & Process Appointment Booking ───
+            let appointmentId = null;
+            const bookingMatch = reply.match(/\[BOOK_APPOINTMENT\]([\s\S]*?)\[\/BOOK_APPOINTMENT\]/);
+            if (bookingMatch && dbUrl) {
+                try {
+                    const bookingText = bookingMatch[1];
+                    const getField = (field) => {
+                        const match = bookingText.match(new RegExp(`${field}:\\s*(.+)`, 'i'));
+                        return match ? match[1].trim() : '';
+                    };
+
+                    const { neon } = require('@neondatabase/serverless');
+                    const sql = neon(dbUrl);
+                    const result = await sql`
+                        INSERT INTO appointments (
+                            patient_name, patient_phone, patient_email,
+                            reason, preferred_date, insurance_provider,
+                            source, lang, status
+                        ) VALUES (
+                            ${getField('name')},
+                            ${getField('phone')},
+                            ${getField('email')},
+                            ${getField('reason')},
+                            ${getField('preferred_date')},
+                            ${getField('insurance') || 'None'},
+                            'paloma-chat',
+                            ${lang},
+                            'pending'
+                        )
+                        RETURNING id
+                    `;
+                    appointmentId = result[0].id;
+                    console.log('PALOMA booked appointment #' + appointmentId);
+
+                    // Strip the booking tag from the visible reply
+                    reply = reply.replace(/\[BOOK_APPOINTMENT\][\s\S]*?\[\/BOOK_APPOINTMENT\]/, '').trim();
+                    // Append confirmation
+                    reply += `\n\n✅ **Appointment Request #${appointmentId} confirmed!** Our front desk will reach out within 1 business day to finalize your time.`;
+                } catch (bookErr) {
+                    console.error('Booking save error:', bookErr.message);
+                }
+            } else if (bookingMatch) {
+                // Strip tag even if no DB
+                reply = reply.replace(/\[BOOK_APPOINTMENT\][\s\S]*?\[\/BOOK_APPOINTMENT\]/, '').trim();
+            }
+
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ reply }),
+                body: JSON.stringify({ reply, appointmentId }),
             };
 
         } catch (fetchError) {

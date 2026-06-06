@@ -14,10 +14,646 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
+    <style>
+    /* ═══════════════════════════════════════════════════════════
+       Admin Dashboard — Dark Glassmorphism Theme
+       Lake Jeanette Family & Implant Dentistry
+       ═══════════════════════════════════════════════════════════ */
 
-    <link rel="stylesheet" href="admin.css">
+    :root {
+        --admin-bg: #0B0F19;
+        --admin-bg-secondary: #111827;
+        --admin-surface: rgba(17, 24, 39, 0.7);
+        --admin-surface-solid: #111827;
+        --admin-surface-alt: rgba(30, 41, 59, 0.5);
+        --admin-glass: rgba(255, 255, 255, 0.03);
+        --admin-glass-border: rgba(255, 255, 255, 0.06);
+        --admin-border: rgba(255, 255, 255, 0.08);
+        --admin-text: #F1F5F9;
+        --admin-text-secondary: #CBD5E1;
+        --admin-muted: #64748B;
+        --admin-teal: #14B8A6;
+        --admin-teal-dark: #0D9488;
+        --admin-teal-glow: rgba(20, 184, 166, 0.15);
+        --admin-blue: #3B82F6;
+        --admin-blue-glow: rgba(59, 130, 246, 0.15);
+        --admin-gold: #F59E0B;
+        --admin-gold-glow: rgba(245, 158, 11, 0.15);
+        --admin-green: #10B981;
+        --admin-green-glow: rgba(16, 185, 129, 0.15);
+        --admin-amber: #F59E0B;
+        --admin-red: #EF4444;
+        --admin-red-glow: rgba(239, 68, 68, 0.15);
+        --admin-purple: #8B5CF6;
+        --admin-radius: 14px;
+        --admin-radius-sm: 8px;
+        --admin-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+        --admin-shadow-lg: 0 12px 40px rgba(0,0,0,0.4);
+        --admin-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        --sidebar-width: 250px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--admin-bg);
+        color: var(--admin-text);
+        min-height: 100vh;
+    }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
+    a { color: var(--admin-teal); text-decoration: none; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ═══ Scrollbar ═══ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    /* ═══ Auth Gate ═══ */
+    .auth-gate {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0B0F19 0%, #1a1f2e 50%, #0B0F19 100%);
+        padding: 24px;
+    }
+
+    .auth-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: 24px;
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: var(--admin-shadow-lg);
+        text-align: center;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-ring {
+        0% { transform: scale(0.95); opacity: 0.5; }
+        50% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0.95); opacity: 0.5; }
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-icon { font-size: 44px; margin-bottom: 16px; }
+    .auth-title { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: var(--admin-teal); }
+    .auth-subtitle { font-size: 13px; color: var(--admin-muted); margin-bottom: 28px; }
+    .auth-form { display: flex; flex-direction: column; gap: 14px; }
+    .auth-input {
+        padding: 13px 18px; border: 1px solid var(--admin-border); border-radius: 12px;
+        font-size: 14px; outline: none; transition: var(--admin-transition);
+        background: rgba(255,255,255,0.04); color: var(--admin-text);
+    }
+    .auth-input::placeholder { color: var(--admin-muted); }
+    .auth-input:focus { border-color: var(--admin-teal); box-shadow: 0 0 0 3px var(--admin-teal-glow); }
+    .auth-btn {
+        padding: 13px; border-radius: 12px; background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
+        color: white; font-size: 15px; font-weight: 600; margin-top: 4px; transition: var(--admin-transition);
+    }
+    .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--admin-teal-glow); }
+    .auth-error { color: var(--admin-red); font-size: 13px; min-height: 18px; }
+
+    /* ═══ Dashboard Layout ═══ */
+    .dashboard { display: flex; min-height: 100vh; }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: rgba(17, 24, 39, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid var(--admin-border);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        z-index: 100;
+        transition: var(--admin-transition);
+    }
+
+    .sidebar-brand {
+        padding: 22px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid var(--admin-border);
+    }
+
+    .sidebar-logo { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
+    .sidebar-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; }
+    .sidebar-subtitle { font-size: 10px; opacity: 0.5; }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 16px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow-y: auto;
+    }
+
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.55);
+        transition: var(--admin-transition);
+        text-align: left;
+        width: 100%;
+    }
+
+    .sidebar-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+    .sidebar-item.active { background: var(--admin-teal-glow); color: var(--admin-teal); font-weight: 600; }
+    .sidebar-item span { width: 22px; text-align: center; font-size: 16px; }
+
+    .sidebar-divider { height: 1px; background: var(--admin-border); margin: 8px 14px; }
+
+    .sidebar-footer {
+        padding: 16px 14px;
+        border-top: 1px solid var(--admin-border);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sidebar-link { font-size: 13px; color: rgba(255,255,255,0.45); }
+    .sidebar-link:hover { color: var(--admin-teal); }
+    .sidebar-logout {
+        padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 500;
+        color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1);
+        transition: var(--admin-transition);
+    }
+    .sidebar-logout:hover { color: var(--admin-red); border-color: var(--admin-red-glow); }
+
+    /* ─── Main Content ─── */
+    .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        display: flex;
+        flex-direction: column;
+        background: var(--admin-bg);
+    }
+
+    /* ─── Top Bar ─── */
+    .topbar {
+        background: rgba(17, 24, 39, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--admin-border);
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-toggle { display: none; font-size: 20px; color: var(--admin-muted); }
+    .topbar-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--admin-text); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-date { font-size: 13px; color: var(--admin-muted); }
+    .topbar-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--admin-teal), var(--admin-blue));
+        color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center;
+        justify-content: center;
+    }
+
+    /* ─── Views ─── */
+    .view { display: none; padding: 28px; animation: fadeIn 0.3s ease-out; }
+    .view.active { display: block; }
+    .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .view-header h2 { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; }
+    .view-select, .view-search {
+        padding: 9px 14px; border: 1px solid var(--admin-border); border-radius: 10px;
+        font-size: 13px; outline: none; background: var(--admin-surface-solid); color: var(--admin-text);
+    }
+    .view-search { width: 260px; }
+    .view-search::placeholder { color: var(--admin-muted); }
+
+    /* ─── Glass Card ─── */
+    .glass-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius);
+        box-shadow: var(--admin-shadow);
+        transition: var(--admin-transition);
+    }
+    .glass-card:hover { border-color: rgba(255,255,255,0.1); }
+
+    /* ─── KPI Cards ─── */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .kpi-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        padding: 22px;
+        border: 1px solid var(--admin-glass-border);
+        box-shadow: var(--admin-shadow);
+        transition: var(--admin-transition);
+    }
+
+    .kpi-card:hover { box-shadow: var(--admin-shadow-lg); transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+    .kpi-card__icon { font-size: 26px; margin-bottom: 10px; }
+    .kpi-card__label { font-size: 11px; color: var(--admin-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .kpi-card__value { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 700; margin-top: 4px; }
+    .kpi-card__trend { font-size: 12px; margin-top: 4px; font-weight: 500; }
+    .kpi-card__trend.up { color: var(--admin-green); }
+    .kpi-card__trend.down { color: var(--admin-red); }
+
+    /* ─── Charts ─── */
+    .charts-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .chart-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        padding: 22px;
+        border: 1px solid var(--admin-glass-border);
+        box-shadow: var(--admin-shadow);
+    }
+
+    .chart-card h3 { font-size: 14px; font-weight: 600; color: var(--admin-muted); margin-bottom: 16px; }
+
+    /* ─── Data Tables ─── */
+    .data-table-container {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        border: 1px solid var(--admin-glass-border);
+        overflow-x: auto;
+        box-shadow: var(--admin-shadow);
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .data-table th {
+        text-align: left; padding: 14px 16px; font-size: 10.5px; text-transform: uppercase;
+        letter-spacing: 0.06em; color: var(--admin-muted); font-weight: 600;
+        background: rgba(255,255,255,0.02);
+        border-bottom: 1px solid var(--admin-border);
+        white-space: nowrap;
+    }
+    .data-table td { padding: 13px 16px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-secondary); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ─── Badges ─── */
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        white-space: nowrap;
+    }
+    .badge-green { background: var(--admin-green-glow); color: var(--admin-green); }
+    .badge-amber { background: var(--admin-gold-glow); color: var(--admin-amber); }
+    .badge-red { background: var(--admin-red-glow); color: var(--admin-red); }
+    .badge-blue { background: var(--admin-blue-glow); color: var(--admin-blue); }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--admin-purple); }
+    .badge-muted { background: rgba(100, 116, 139, 0.15); color: var(--admin-muted); }
+
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge-green .badge-dot { background: var(--admin-green); }
+    .badge-amber .badge-dot { background: var(--admin-amber); }
+    .badge-red .badge-dot { background: var(--admin-red); }
+    .badge-blue .badge-dot { background: var(--admin-blue); }
+
+    .table-link { font-size: 13px; font-weight: 500; }
+    .info-note {
+        padding: 18px; background: var(--admin-surface-alt); border-radius: var(--admin-radius);
+        font-size: 13px; color: var(--admin-muted); margin-top: 16px; line-height: 1.7;
+        border: 1px solid var(--admin-border);
+    }
+    .info-note code { background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 5px; font-size: 12px; color: var(--admin-teal); }
+
+    /* ─── Stats Grid ─── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .stat-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        padding: 18px;
+        border: 1px solid var(--admin-glass-border);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-card__icon { font-size: 30px; }
+    .stat-card__label { font-size: 12px; color: var(--admin-muted); }
+    .stat-card__value { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; }
+
+    /* ─── Schedule Grid ─── */
+    .schedule-grid { display: flex; flex-direction: column; gap: 8px; }
+
+    .schedule-slot {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        padding: 16px 20px;
+        border: 1px solid var(--admin-glass-border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: var(--admin-transition);
+    }
+
+    .schedule-slot:hover { box-shadow: var(--admin-shadow-lg); border-color: rgba(255,255,255,0.1); }
+    .schedule-slot__time { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; width: 70px; color: var(--admin-teal); }
+    .schedule-slot__patient { font-weight: 600; font-size: 14px; }
+    .schedule-slot__procedure { font-size: 13px; color: var(--admin-muted); }
+    .schedule-slot__status { margin-left: auto; }
+
+    /* ─── Data Editor ─── */
+    .editor-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+
+    .editor-tab {
+        padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+        color: var(--admin-muted); border: 1px solid var(--admin-border); transition: var(--admin-transition);
+    }
+    .editor-tab.active { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+    .editor-tab:hover { border-color: var(--admin-teal); color: var(--admin-teal); }
+
+    .editor-container {
+        background: var(--admin-surface);
+        border-radius: var(--admin-radius);
+        border: 1px solid var(--admin-glass-border);
+        overflow: hidden;
+    }
+
+    .editor-textarea {
+        width: 100%; min-height: 400px; padding: 20px; border: none; outline: none;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.7;
+        resize: vertical; background: rgba(0,0,0,0.3); color: var(--admin-teal);
+    }
+
+    .editor-actions {
+        padding: 14px 20px; display: flex; gap: 8px; align-items: center;
+        background: rgba(255,255,255,0.02); border-top: 1px solid var(--admin-border);
+    }
+
+    .btn-primary {
+        padding: 9px 18px; border-radius: 10px;
+        background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
+        color: white; font-size: 13px; font-weight: 600; transition: var(--admin-transition);
+        border: none;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px var(--admin-teal-glow); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+        padding: 9px 18px; border-radius: 10px; border: 1px solid var(--admin-border);
+        font-size: 13px; font-weight: 500; color: var(--admin-muted); transition: var(--admin-transition);
+        background: transparent;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--admin-text); }
+
+    .btn-danger {
+        padding: 9px 18px; border-radius: 10px;
+        background: var(--admin-red-glow); color: var(--admin-red);
+        font-size: 13px; font-weight: 600; transition: var(--admin-transition); border: 1px solid transparent;
+    }
+    .btn-danger:hover { background: var(--admin-red); color: white; }
+
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+    .btn-icon {
+        width: 32px; height: 32px; border-radius: 8px; display: inline-flex;
+        align-items: center; justify-content: center; font-size: 14px;
+        border: 1px solid var(--admin-border); transition: var(--admin-transition);
+        background: transparent;
+    }
+    .btn-icon:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); }
+
+    .editor-status { font-size: 12px; color: var(--admin-green); margin-left: auto; }
+
+    /* ─── Settings ─── */
+    .settings-section {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        padding: 24px;
+        border: 1px solid var(--admin-glass-border);
+        margin-bottom: 16px;
+    }
+
+    .settings-section h3 { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--admin-text); }
+
+    .setting-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 12px 0; border-bottom: 1px solid var(--admin-border);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-row label { font-size: 14px; color: var(--admin-text-secondary); }
+    .setting-row select {
+        padding: 7px 14px; border: 1px solid var(--admin-border); border-radius: 8px;
+        font-size: 13px; background: var(--admin-surface-solid); color: var(--admin-text);
+    }
+    .setting-row input[type="checkbox"] {
+        width: 18px; height: 18px; accent-color: var(--admin-teal);
+    }
+
+    /* ═══ APPOINTMENT QUEUE ═══ */
+    .appt-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .appt-header h2 { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; }
+    .appt-header-actions { display: flex; gap: 10px; align-items: center; }
+
+    .filter-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-tab {
+        padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 500;
+        color: var(--admin-muted); border: 1px solid var(--admin-border);
+        transition: var(--admin-transition); background: transparent;
+    }
+    .filter-tab.active { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+    .filter-tab:hover { border-color: var(--admin-teal); color: var(--admin-teal); }
+    .filter-tab .count {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 20px; height: 20px; border-radius: 10px;
+        background: rgba(255,255,255,0.1); font-size: 11px; font-weight: 700;
+        margin-left: 6px; padding: 0 6px;
+    }
+    .filter-tab.active .count { background: rgba(255,255,255,0.2); }
+
+    .appt-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .appt-actions button { white-space: nowrap; }
+
+    .appt-note { font-size: 12px; color: var(--admin-muted); margin-top: 4px; font-style: italic; }
+    .appt-source { font-size: 12px; }
+
+    /* ═══ PRACTICE SETTINGS EDITOR ═══ */
+    .settings-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+    .settings-tab {
+        padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 500;
+        color: var(--admin-muted); border: 1px solid var(--admin-border);
+        transition: var(--admin-transition); background: transparent;
+    }
+    .settings-tab.active { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+    .settings-tab:hover { border-color: var(--admin-teal); color: var(--admin-teal); }
+
+    .settings-form { display: flex; flex-direction: column; gap: 16px; }
+    .settings-form-section {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius);
+        padding: 24px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 12px; color: var(--admin-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 6px; }
+    .form-input {
+        width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border);
+        border-radius: 10px; font-size: 14px; background: rgba(0,0,0,0.2);
+        color: var(--admin-text); outline: none; transition: var(--admin-transition);
+    }
+    .form-input:focus { border-color: var(--admin-teal); box-shadow: 0 0 0 3px var(--admin-teal-glow); }
+    .form-input::placeholder { color: var(--admin-muted); }
+    textarea.form-input { min-height: 80px; resize: vertical; line-height: 1.6; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    .hours-grid { display: flex; flex-direction: column; gap: 8px; }
+    .hours-row {
+        display: grid; grid-template-columns: 100px 1fr 1fr auto; gap: 12px; align-items: center;
+        padding: 10px 0; border-bottom: 1px solid var(--admin-border);
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .hours-day { font-weight: 600; font-size: 14px; text-transform: capitalize; }
+
+    .pricing-row {
+        display: grid; grid-template-columns: 2fr 100px 1fr auto; gap: 12px; align-items: center;
+        padding: 8px 0; border-bottom: 1px solid var(--admin-border);
+    }
+    .pricing-row:last-child { border-bottom: none; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-item {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 14px; border-radius: 20px; font-size: 13px;
+        background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border);
+        color: var(--admin-text-secondary);
+    }
+    .tag-remove {
+        width: 18px; height: 18px; border-radius: 50%; font-size: 14px;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: var(--admin-muted); transition: var(--admin-transition);
+    }
+    .tag-remove:hover { color: var(--admin-red); background: var(--admin-red-glow); }
+
+    .staff-card {
+        background: rgba(255,255,255,0.02); border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius); padding: 20px; margin-bottom: 12px;
+        position: relative;
+    }
+    .staff-card:last-child { margin-bottom: 0; }
+    .staff-card-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; }
+
+    .section-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--admin-border); }
+
+    /* ═══ LOADING SPINNER ═══ */
+    .spinner-overlay {
+        display: flex; align-items: center; justify-content: center;
+        padding: 60px; gap: 12px;
+    }
+    .spinner {
+        width: 28px; height: 28px; border: 3px solid var(--admin-border);
+        border-top-color: var(--admin-teal); border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    .spinner-text { font-size: 14px; color: var(--admin-muted); }
+
+    /* ═══ TOAST ═══ */
+    .toast-container {
+        position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+        padding: 14px 20px; border-radius: 12px; font-size: 13.5px; font-weight: 500;
+        backdrop-filter: blur(20px); border: 1px solid var(--admin-glass-border);
+        box-shadow: var(--admin-shadow-lg); animation: slideUp 0.3s ease-out;
+        display: flex; align-items: center; gap: 10px; min-width: 280px;
+    }
+    .toast-success { background: rgba(16, 185, 129, 0.15); color: var(--admin-green); border-color: rgba(16,185,129,0.2); }
+    .toast-error { background: rgba(239, 68, 68, 0.15); color: var(--admin-red); border-color: rgba(239,68,68,0.2); }
+    .toast-info { background: rgba(59, 130, 246, 0.15); color: var(--admin-blue); border-color: rgba(59,130,246,0.2); }
+
+    /* ═══ Auto-refresh indicator ═══ */
+    .refresh-indicator {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; color: var(--admin-muted); font-weight: 500;
+    }
+    .refresh-dot {
+        width: 6px; height: 6px; border-radius: 50%; background: var(--admin-green);
+        animation: pulse-ring 2s ease-in-out infinite;
+    }
+
+    /* ═══ Empty State ═══ */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--admin-muted); }
+    .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state-text { font-size: 15px; }
+
+    /* ═══ Responsive ═══ */
+    @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); }
+        .main-content { margin-left: 0; }
+        .topbar-toggle { display: block; }
+        .charts-row { grid-template-columns: 1fr; }
+        .kpi-row { grid-template-columns: repeat(2, 1fr); }
+        .hours-row { grid-template-columns: 1fr; gap: 8px; }
+        .pricing-row { grid-template-columns: 1fr; gap: 8px; }
+        .form-row { grid-template-columns: 1fr; }
+        .form-row-3 { grid-template-columns: 1fr; }
+        .view { padding: 16px; }
+        .appt-header { flex-direction: column; align-items: flex-start; }
+    }
+    </style>
 </head>
 <body>
+    <!-- ═══ Toast Container ═══ -->
+    <div class="toast-container" id="toast-container"></div>
+
     <!-- ═══ Auth Gate ═══ -->
     <div id="auth-gate" class="auth-gate">
         <div class="auth-card">
@@ -45,6 +681,13 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
+                <button class="sidebar-item" data-view="appointments">
+                    <span>📋</span> Appointments
+                </button>
+                <button class="sidebar-item" data-view="practice-settings">
+                    <span>🏥</span> Practice Settings
+                </button>
+                <div class="sidebar-divider"></div>
                 <button class="sidebar-item active" data-view="overview">
                     <span>📊</span> Overview
                 </button>
@@ -87,14 +730,62 @@
                 </div>
             </header>
 
-            <!-- View: Overview -->
-            <div id="view-overview" class="view active">
-                <!-- KPI Row -->
-                <div class="kpi-row" id="kpi-row">
-                    <!-- Populated by JS -->
+            <!-- ═══ View: Appointments ═══ -->
+            <div id="view-appointments" class="view">
+                <div class="appt-header">
+                    <h2>📋 Appointment Queue</h2>
+                    <div class="appt-header-actions">
+                        <div class="refresh-indicator" id="auto-refresh-indicator">
+                            <span class="refresh-dot"></span>
+                            <span>Auto-refresh: 30s</span>
+                        </div>
+                        <button class="btn-secondary" id="appt-refresh-btn" onclick="loadAppointments()">
+                            🔄 Refresh
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Charts Row -->
+                <div class="filter-tabs" id="appt-filter-tabs">
+                    <button class="filter-tab active" data-status="all">All <span class="count" id="count-all">0</span></button>
+                    <button class="filter-tab" data-status="pending">Pending <span class="count" id="count-pending">0</span></button>
+                    <button class="filter-tab" data-status="confirmed">Confirmed <span class="count" id="count-confirmed">0</span></button>
+                    <button class="filter-tab" data-status="completed">Completed <span class="count" id="count-completed">0</span></button>
+                    <button class="filter-tab" data-status="cancelled">Cancelled <span class="count" id="count-cancelled">0</span></button>
+                </div>
+
+                <div id="appt-content">
+                    <div class="spinner-overlay">
+                        <div class="spinner"></div>
+                        <span class="spinner-text">Loading appointments…</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ View: Practice Settings ═══ -->
+            <div id="view-practice-settings" class="view">
+                <div class="view-header">
+                    <h2>🏥 Practice Settings</h2>
+                </div>
+
+                <div class="settings-tabs" id="ps-tabs">
+                    <button class="settings-tab active" data-section="hours">🕐 Office Hours</button>
+                    <button class="settings-tab" data-section="pricing">💲 Treatment Pricing</button>
+                    <button class="settings-tab" data-section="insurance">🛡️ Insurance</button>
+                    <button class="settings-tab" data-section="staff">👨‍⚕️ Staff</button>
+                    <button class="settings-tab" data-section="contact">📞 Contact Info</button>
+                </div>
+
+                <div id="ps-content">
+                    <div class="spinner-overlay">
+                        <div class="spinner"></div>
+                        <span class="spinner-text">Loading settings…</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ View: Overview ═══ -->
+            <div id="view-overview" class="view active">
+                <div class="kpi-row" id="kpi-row"></div>
                 <div class="charts-row">
                     <div class="chart-card">
                         <h3>Monthly Production</h3>
@@ -105,8 +796,6 @@
                         <canvas id="chart-collections"></canvas>
                     </div>
                 </div>
-
-                <!-- Second Charts Row -->
                 <div class="charts-row">
                     <div class="chart-card">
                         <h3>New Patients</h3>
@@ -117,11 +806,7 @@
                         <canvas id="chart-acceptance"></canvas>
                     </div>
                 </div>
-
-                <!-- Quick Stats -->
-                <div class="stats-grid" id="stats-grid">
-                    <!-- Populated by JS -->
-                </div>
+                <div class="stats-grid" id="stats-grid"></div>
             </div>
 
             <!-- View: Production -->
@@ -175,7 +860,7 @@
                                 <td><strong>Chris Harrison</strong></td>
                                 <td>May 14, 2026</td>
                                 <td>Sep 10, 2026</td>
-                                <td><span class="badge badge-green">Active</span></td>
+                                <td><span class="badge badge-green"><span class="badge-dot"></span> Active</span></td>
                                 <td><a href="/portal/patient.html" class="table-link">🦷 View 3D Scan</a></td>
                                 <td><a href="/portal/patient.html" class="table-link">Full Portal →</a></td>
                             </tr>
@@ -192,9 +877,7 @@
                 <div class="view-header">
                     <h2>🕊️ PALOMA Analytics</h2>
                 </div>
-                <div class="kpi-row" id="paloma-kpis">
-                    <!-- Populated by JS -->
-                </div>
+                <div class="kpi-row" id="paloma-kpis"></div>
                 <div class="charts-row">
                     <div class="chart-card">
                         <h3>Conversations by Language</h3>
@@ -216,9 +899,7 @@
                     <h2>📅 Today's Schedule</h2>
                     <span class="view-date" id="schedule-date"></span>
                 </div>
-                <div class="schedule-grid" id="schedule-grid">
-                    <!-- Populated by JS -->
-                </div>
+                <div class="schedule-grid" id="schedule-grid"></div>
             </div>
 
             <!-- View: Data Editor -->
@@ -271,9 +952,7 @@
                 </div>
                 <div class="settings-section">
                     <h3>Integration Status</h3>
-                    <div id="integration-status">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="integration-status"></div>
                 </div>
                 <div class="settings-section">
                     <h3>Deployment</h3>
@@ -286,6 +965,949 @@
         </main>
     </div>
 
-    <script src="admin.js"></script>
+    <script>
+    /* ═══════════════════════════════════════════════════════════
+       Admin Dashboard — Complete JavaScript
+       Appointments Queue, Practice Settings, Charts, Analytics
+       ═══════════════════════════════════════════════════════════ */
+
+    // ─── State ───
+    let financialData = null;
+    let siteConfig = null;
+    let integrationMap = null;
+    let allAppointments = [];
+    let currentFilter = 'all';
+    let practiceSettings = {};
+    let currentPSSection = 'hours';
+    let apptAutoRefresh = null;
+
+    // ─── DOM ───
+    const authGate = document.getElementById('auth-gate');
+    const dashboard = document.getElementById('dashboard');
+    const loginForm = document.getElementById('login-form');
+
+    // ─── Toast System ───
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            toast.style.transition = '0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    // ─── Simple Demo Auth ───
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        authGate.style.display = 'none';
+        dashboard.style.display = 'flex';
+        initDashboard();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        if (apptAutoRefresh) clearInterval(apptAutoRefresh);
+        dashboard.style.display = 'none';
+        authGate.style.display = 'flex';
+    });
+
+    // ─── Init ───
+    async function initDashboard() {
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+        });
+        document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+        });
+
+        await loadData();
+        initNavigation();
+        renderOverview();
+        renderProduction();
+        renderPalomaAnalytics();
+        renderSchedule();
+        initDataEditor();
+        initSettings();
+        initAppointmentFilters();
+        initPracticeSettingsTabs();
+
+        // Auto-refresh appointments every 30s
+        loadAppointments();
+        apptAutoRefresh = setInterval(loadAppointments, 30000);
+    }
+
+    // ─── Load Data ───
+    async function loadData() {
+        try {
+            const [finRes, configRes, intRes] = await Promise.all([
+                fetch('/data/financial-summary.json').then(r => r.ok ? r.json() : null),
+                fetch('/data/site-config.json').then(r => r.ok ? r.json() : null),
+                fetch('/data/integration-map.json').then(r => r.ok ? r.json() : null),
+            ]);
+            financialData = finRes;
+            siteConfig = configRes;
+            integrationMap = intRes;
+        } catch (e) {
+            console.warn('Admin: Using fallback data');
+            financialData = generateFallbackFinancials();
+        }
+        if (!financialData) financialData = generateFallbackFinancials();
+    }
+
+    function generateFallbackFinancials() {
+        const months = ['Jul 2025','Aug 2025','Sep 2025','Oct 2025','Nov 2025','Dec 2025',
+                        'Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026','Jun 2026'];
+        return {
+            monthly: months.map((m) => ({
+                month: m,
+                production: 85000 + Math.floor(Math.random() * 35000),
+                collections: 78000 + Math.floor(Math.random() * 30000),
+                collectionRate: 91 + Math.floor(Math.random() * 6),
+                newPatients: 12 + Math.floor(Math.random() * 10),
+                caseAcceptanceRate: 65 + Math.floor(Math.random() * 20),
+                recallRate: 75 + Math.floor(Math.random() * 15),
+                avgProductionPerPatient: 280 + Math.floor(Math.random() * 120),
+            }))
+        };
+    }
+
+    // ─── Navigation ───
+    function initNavigation() {
+        document.querySelectorAll('.sidebar-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const view = btn.dataset.view;
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(`view-${view}`).classList.add('active');
+                document.getElementById('page-title').textContent = btn.textContent.trim();
+
+                // Load data when switching to these views
+                if (view === 'appointments') loadAppointments();
+                if (view === 'practice-settings') loadPracticeSettings();
+            });
+        });
+
+        const sidebar = document.getElementById('sidebar');
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  APPOINTMENT QUEUE
+    // ═══════════════════════════════════════════════════════════
+
+    function initAppointmentFilters() {
+        document.querySelectorAll('#appt-filter-tabs .filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('#appt-filter-tabs .filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.status;
+                renderAppointments();
+            });
+        });
+    }
+
+    async function loadAppointments() {
+        const container = document.getElementById('appt-content');
+        try {
+            const res = await fetch('/.netlify/functions/appointment-list');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            allAppointments = data.appointments || [];
+            updateFilterCounts();
+            renderAppointments();
+        } catch (err) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <p class="empty-state-text">Could not load appointments</p>
+                    <p style="color:var(--admin-muted);font-size:12px;margin-top:8px;">${err.message}</p>
+                    <button class="btn-primary" style="margin-top:16px" onclick="loadAppointments()">Retry</button>
+                </div>`;
+        }
+    }
+
+    function updateFilterCounts() {
+        document.getElementById('count-all').textContent = allAppointments.length;
+        document.getElementById('count-pending').textContent = allAppointments.filter(a => a.status === 'pending').length;
+        document.getElementById('count-confirmed').textContent = allAppointments.filter(a => a.status === 'confirmed').length;
+        document.getElementById('count-completed').textContent = allAppointments.filter(a => a.status === 'completed').length;
+        document.getElementById('count-cancelled').textContent = allAppointments.filter(a => a.status === 'cancelled').length;
+    }
+
+    function renderAppointments() {
+        const container = document.getElementById('appt-content');
+        const filtered = currentFilter === 'all'
+            ? allAppointments
+            : allAppointments.filter(a => a.status === currentFilter);
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p class="empty-state-text">${currentFilter === 'all' ? 'No appointments yet' : `No ${currentFilter} appointments`}</p>
+                </div>`;
+            return;
+        }
+
+        const statusBadge = (status) => {
+            const map = {
+                pending: 'badge-amber',
+                confirmed: 'badge-green',
+                cancelled: 'badge-red',
+                completed: 'badge-blue',
+            };
+            return `<span class="badge ${map[status] || 'badge-muted'}"><span class="badge-dot"></span> ${status}</span>`;
+        };
+
+        const sourceLabel = (src) => {
+            const map = { 'paloma-chat': '🕊️ PALOMA', 'phone': '📞 Phone', 'walkin': '🚶 Walk-in' };
+            return `<span class="appt-source">${map[src] || src || '—'}</span>`;
+        };
+
+        const formatDate = (d) => {
+            if (!d) return '—';
+            try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+            catch { return d; }
+        };
+
+        container.innerHTML = `
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Patient</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Reason</th>
+                            <th>Preferred Date</th>
+                            <th>Insurance</th>
+                            <th>Source</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filtered.map(a => `
+                            <tr>
+                                <td>${statusBadge(a.status)}</td>
+                                <td><strong style="color:var(--admin-text)">${a.patient_name || '—'}</strong>${a.notes ? `<div class="appt-note">📝 ${a.notes}</div>` : ''}</td>
+                                <td>${a.patient_phone || '—'}</td>
+                                <td>${a.patient_email || '—'}</td>
+                                <td>${a.reason || '—'}</td>
+                                <td>${a.preferred_date || '—'}</td>
+                                <td>${a.insurance_provider || 'None'}</td>
+                                <td>${sourceLabel(a.source)}</td>
+                                <td style="white-space:nowrap">${formatDate(a.created_at)}</td>
+                                <td>
+                                    <div class="appt-actions">
+                                        ${a.status === 'pending' ? `<button class="btn-primary btn-sm" onclick="updateApptStatus(${a.id},'confirmed')">✓ Confirm</button>` : ''}
+                                        ${a.status === 'confirmed' ? `<button class="btn-primary btn-sm" style="background:var(--admin-blue)" onclick="updateApptStatus(${a.id},'completed')">✓ Complete</button>` : ''}
+                                        ${a.status !== 'cancelled' && a.status !== 'completed' ? `<button class="btn-danger btn-sm" onclick="updateApptStatus(${a.id},'cancelled')">✗ Cancel</button>` : ''}
+                                        <button class="btn-secondary btn-sm" onclick="addApptNote(${a.id})">📝 Note</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
+    async function updateApptStatus(id, status) {
+        try {
+            const res = await fetch('/.netlify/functions/appointment-update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            showToast(`Appointment ${status} successfully`, 'success');
+            await loadAppointments();
+        } catch (err) {
+            showToast(`Failed to update: ${err.message}`, 'error');
+        }
+    }
+
+    async function addApptNote(id) {
+        const note = prompt('Enter a note for this appointment:');
+        if (note === null || note.trim() === '') return;
+        try {
+            const res = await fetch('/.netlify/functions/appointment-update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, notes: note.trim() }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            showToast('Note added successfully', 'success');
+            await loadAppointments();
+        } catch (err) {
+            showToast(`Failed to add note: ${err.message}`, 'error');
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  PRACTICE SETTINGS EDITOR
+    // ═══════════════════════════════════════════════════════════
+
+    function initPracticeSettingsTabs() {
+        document.querySelectorAll('#ps-tabs .settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('#ps-tabs .settings-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentPSSection = tab.dataset.section;
+                renderPracticeSettingsSection();
+            });
+        });
+    }
+
+    async function loadPracticeSettings() {
+        const container = document.getElementById('ps-content');
+        container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading settings…</span></div>`;
+        try {
+            const res = await fetch('/.netlify/functions/practice-settings');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            practiceSettings = await res.json();
+            // Parse JSON strings if needed
+            for (const key of Object.keys(practiceSettings)) {
+                if (typeof practiceSettings[key] === 'string') {
+                    try { practiceSettings[key] = JSON.parse(practiceSettings[key]); } catch {}
+                }
+            }
+            renderPracticeSettingsSection();
+        } catch (err) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <p class="empty-state-text">Could not load settings</p>
+                    <p style="color:var(--admin-muted);font-size:12px;margin-top:8px">${err.message}</p>
+                    <button class="btn-primary" style="margin-top:16px" onclick="loadPracticeSettings()">Retry</button>
+                </div>`;
+        }
+    }
+
+    async function savePracticeSetting(key, value) {
+        try {
+            const res = await fetch('/.netlify/functions/practice-settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            practiceSettings[key] = value;
+            showToast(`${key.replace(/_/g, ' ')} saved successfully`, 'success');
+            return true;
+        } catch (err) {
+            showToast(`Failed to save: ${err.message}`, 'error');
+            return false;
+        }
+    }
+
+    function renderPracticeSettingsSection() {
+        const container = document.getElementById('ps-content');
+        const section = currentPSSection;
+
+        switch (section) {
+            case 'hours': renderHoursSection(container); break;
+            case 'pricing': renderPricingSection(container); break;
+            case 'insurance': renderInsuranceSection(container); break;
+            case 'staff': renderStaffSection(container); break;
+            case 'contact': renderContactSection(container); break;
+        }
+    }
+
+    // ─── Office Hours ───
+    function renderHoursSection(container) {
+        const hours = practiceSettings.office_hours || {
+            monday: { open: '8:00 AM', close: '5:00 PM', closed: false },
+            tuesday: { open: '8:00 AM', close: '5:00 PM', closed: false },
+            wednesday: { open: '8:00 AM', close: '5:00 PM', closed: false },
+            thursday: { open: '8:00 AM', close: '3:00 PM', closed: false },
+            friday: { open: '', close: '', closed: true },
+            saturday: { open: '', close: '', closed: true },
+            sunday: { open: '', close: '', closed: true },
+        };
+
+        const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        container.innerHTML = `
+            <div class="settings-form-section">
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Office Hours</h3>
+                <div class="hours-grid">
+                    ${days.map(day => {
+                        const d = hours[day] || { open: '', close: '', closed: true };
+                        return `
+                            <div class="hours-row">
+                                <span class="hours-day">${day}</span>
+                                <input type="text" class="form-input" id="hours-${day}-open" value="${d.open || ''}" placeholder="8:00 AM" ${d.closed ? 'disabled' : ''} />
+                                <input type="text" class="form-input" id="hours-${day}-close" value="${d.close || ''}" placeholder="5:00 PM" ${d.closed ? 'disabled' : ''} />
+                                <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--admin-muted);white-space:nowrap">
+                                    <input type="checkbox" id="hours-${day}-closed" ${d.closed ? 'checked' : ''} onchange="toggleDayClosed('${day}')" />
+                                    Closed
+                                </label>
+                            </div>`;
+                    }).join('')}
+                </div>
+                <div class="section-actions">
+                    <button class="btn-primary" onclick="saveHours()">💾 Save Hours</button>
+                </div>
+            </div>`;
+    }
+
+    function toggleDayClosed(day) {
+        const closed = document.getElementById(`hours-${day}-closed`).checked;
+        document.getElementById(`hours-${day}-open`).disabled = closed;
+        document.getElementById(`hours-${day}-close`).disabled = closed;
+        if (closed) {
+            document.getElementById(`hours-${day}-open`).value = '';
+            document.getElementById(`hours-${day}-close`).value = '';
+        }
+    }
+
+    async function saveHours() {
+        const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        const hours = {};
+        days.forEach(day => {
+            hours[day] = {
+                open: document.getElementById(`hours-${day}-open`).value.trim(),
+                close: document.getElementById(`hours-${day}-close`).value.trim(),
+                closed: document.getElementById(`hours-${day}-closed`).checked,
+            };
+        });
+        await savePracticeSetting('office_hours', hours);
+    }
+
+    // ─── Treatment Pricing ───
+    function renderPricingSection(container) {
+        const pricing = Array.isArray(practiceSettings.pricing) ? [...practiceSettings.pricing] : [];
+
+        container.innerHTML = `
+            <div class="settings-form-section">
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Treatment Pricing</h3>
+                <div class="data-table-container" style="margin-bottom:0">
+                    <table class="data-table" id="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Treatment Name</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pricing-tbody">
+                            ${pricing.map((p, i) => `
+                                <tr data-idx="${i}">
+                                    <td><input type="text" class="form-input" value="${p.name || ''}" data-field="name" /></td>
+                                    <td><input type="number" class="form-input" value="${p.price || 0}" data-field="price" style="width:100px" /></td>
+                                    <td><input type="text" class="form-input" value="${p.category || ''}" data-field="category" /></td>
+                                    <td><button class="btn-icon" onclick="removePricingRow(${i})" title="Remove">🗑️</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="section-actions">
+                    <button class="btn-secondary" onclick="addPricingRow()">+ Add Treatment</button>
+                    <button class="btn-primary" onclick="savePricing()">💾 Save Pricing</button>
+                </div>
+            </div>`;
+    }
+
+    function addPricingRow() {
+        const pricing = collectPricingData();
+        pricing.push({ name: '', price: 0, category: 'General' });
+        practiceSettings.pricing = pricing;
+        renderPricingSection(document.getElementById('ps-content'));
+        // Focus the last new row
+        const inputs = document.querySelectorAll('#pricing-tbody tr:last-child input');
+        if (inputs[0]) inputs[0].focus();
+    }
+
+    function removePricingRow(idx) {
+        const pricing = collectPricingData();
+        pricing.splice(idx, 1);
+        practiceSettings.pricing = pricing;
+        renderPricingSection(document.getElementById('ps-content'));
+    }
+
+    function collectPricingData() {
+        const rows = document.querySelectorAll('#pricing-tbody tr');
+        return Array.from(rows).map(row => ({
+            name: row.querySelector('[data-field="name"]').value.trim(),
+            price: parseFloat(row.querySelector('[data-field="price"]').value) || 0,
+            category: row.querySelector('[data-field="category"]').value.trim(),
+        }));
+    }
+
+    async function savePricing() {
+        const pricing = collectPricingData();
+        await savePracticeSetting('pricing', pricing);
+    }
+
+    // ─── Insurance Providers ───
+    function renderInsuranceSection(container) {
+        const insurance = Array.isArray(practiceSettings.insurance) ? [...practiceSettings.insurance] : [];
+
+        container.innerHTML = `
+            <div class="settings-form-section">
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Insurance Providers</h3>
+                <div class="tag-list" id="insurance-tags">
+                    ${insurance.map((ins, i) => `
+                        <div class="tag-item">
+                            <span>${ins}</span>
+                            <button class="tag-remove" onclick="removeInsurance(${i})">×</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="display:flex;gap:8px;margin-top:16px">
+                    <input type="text" class="form-input" id="new-insurance" placeholder="Add insurance provider…" style="flex:1" onkeydown="if(event.key==='Enter'){addInsurance()}" />
+                    <button class="btn-secondary" onclick="addInsurance()">+ Add</button>
+                </div>
+                <div class="section-actions">
+                    <button class="btn-primary" onclick="saveInsurance()">💾 Save Insurance</button>
+                </div>
+            </div>`;
+    }
+
+    function addInsurance() {
+        const input = document.getElementById('new-insurance');
+        const val = input.value.trim();
+        if (!val) return;
+        if (!Array.isArray(practiceSettings.insurance)) practiceSettings.insurance = [];
+        practiceSettings.insurance.push(val);
+        renderInsuranceSection(document.getElementById('ps-content'));
+    }
+
+    function removeInsurance(idx) {
+        practiceSettings.insurance.splice(idx, 1);
+        renderInsuranceSection(document.getElementById('ps-content'));
+    }
+
+    async function saveInsurance() {
+        await savePracticeSetting('insurance', practiceSettings.insurance || []);
+    }
+
+    // ─── Staff Directory ───
+    function renderStaffSection(container) {
+        const staff = Array.isArray(practiceSettings.staff) ? [...practiceSettings.staff] : [];
+
+        container.innerHTML = `
+            <div class="settings-form-section">
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Staff Directory</h3>
+                <div id="staff-list">
+                    ${staff.map((s, i) => `
+                        <div class="staff-card">
+                            <div class="staff-card-actions">
+                                <button class="btn-icon" onclick="removeStaff(${i})" title="Remove">🗑️</button>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-input staff-name" value="${s.name || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <input type="text" class="form-input staff-role" value="${s.role || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-input staff-bio">${s.bio || ''}</textarea>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="section-actions">
+                    <button class="btn-secondary" onclick="addStaff()">+ Add Staff Member</button>
+                    <button class="btn-primary" onclick="saveStaff()">💾 Save Staff</button>
+                </div>
+            </div>`;
+    }
+
+    function addStaff() {
+        if (!Array.isArray(practiceSettings.staff)) practiceSettings.staff = [];
+        practiceSettings.staff.push({ name: '', role: '', bio: '' });
+        renderStaffSection(document.getElementById('ps-content'));
+        // Focus the last card
+        const inputs = document.querySelectorAll('.staff-card:last-child .staff-name');
+        if (inputs[0]) inputs[0].focus();
+    }
+
+    function removeStaff(idx) {
+        practiceSettings.staff.splice(idx, 1);
+        renderStaffSection(document.getElementById('ps-content'));
+    }
+
+    function collectStaffData() {
+        const cards = document.querySelectorAll('.staff-card');
+        return Array.from(cards).map(card => ({
+            name: card.querySelector('.staff-name').value.trim(),
+            role: card.querySelector('.staff-role').value.trim(),
+            bio: card.querySelector('.staff-bio').value.trim(),
+        }));
+    }
+
+    async function saveStaff() {
+        const staff = collectStaffData();
+        await savePracticeSetting('staff', staff);
+    }
+
+    // ─── Contact Info ───
+    function renderContactSection(container) {
+        const contact = practiceSettings.contact || {};
+
+        container.innerHTML = `
+            <div class="settings-form-section">
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Contact Information</h3>
+                <div class="form-row-3" style="margin-bottom:14px">
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-input" id="contact-phone" value="${contact.phone || ''}" placeholder="(336) 545-4281" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="contact-email" value="${contact.email || ''}" placeholder="contact@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Website</label>
+                        <input type="url" class="form-input" id="contact-website" value="${contact.website || ''}" placeholder="https://..." />
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:14px">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-input" id="contact-address" value="${contact.address || ''}" placeholder="Office address" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Emergency Message</label>
+                    <textarea class="form-input" id="contact-emergency">${contact.emergency || ''}</textarea>
+                </div>
+                <div class="section-actions">
+                    <button class="btn-primary" onclick="saveContact()">💾 Save Contact Info</button>
+                </div>
+            </div>`;
+    }
+
+    async function saveContact() {
+        const contact = {
+            phone: document.getElementById('contact-phone').value.trim(),
+            email: document.getElementById('contact-email').value.trim(),
+            website: document.getElementById('contact-website').value.trim(),
+            address: document.getElementById('contact-address').value.trim(),
+            emergency: document.getElementById('contact-emergency').value.trim(),
+        };
+        await savePracticeSetting('contact', contact);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  OVERVIEW
+    // ═══════════════════════════════════════════════════════════
+
+    function renderOverview() {
+        const data = financialData.monthly;
+        const latest = data[data.length - 1];
+        const prev = data[data.length - 2];
+
+        const kpis = [
+            { icon: '💰', label: 'Monthly Production', value: `$${(latest.production / 1000).toFixed(0)}K`,
+              trend: calcTrend(latest.production, prev.production) },
+            { icon: '📈', label: 'Collections', value: `$${(latest.collections / 1000).toFixed(0)}K`,
+              trend: calcTrend(latest.collections, prev.collections) },
+            { icon: '📊', label: 'Collection Rate', value: `${latest.collectionRate}%`,
+              trend: calcTrend(latest.collectionRate, prev.collectionRate) },
+            { icon: '👥', label: 'New Patients', value: latest.newPatients,
+              trend: calcTrend(latest.newPatients, prev.newPatients) },
+            { icon: '✅', label: 'Case Acceptance', value: `${latest.caseAcceptanceRate}%`,
+              trend: calcTrend(latest.caseAcceptanceRate, prev.caseAcceptanceRate) },
+            { icon: '🔄', label: 'Recall Rate', value: `${latest.recallRate}%`,
+              trend: calcTrend(latest.recallRate, prev.recallRate) },
+        ];
+
+        document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+            <div class="kpi-card">
+                <div class="kpi-card__icon">${k.icon}</div>
+                <div class="kpi-card__label">${k.label}</div>
+                <div class="kpi-card__value">${k.value}</div>
+                <div class="kpi-card__trend ${k.trend >= 0 ? 'up' : 'down'}">${k.trend >= 0 ? '↑' : '↓'} ${Math.abs(k.trend)}% vs last month</div>
+            </div>
+        `).join('');
+
+        // Charts
+        const labels = data.slice(-6).map(d => d.month.split(' ')[0]);
+        const tealRGB = '20, 184, 166';
+        const goldRGB = '245, 158, 11';
+        const blueRGB = '59, 130, 246';
+
+        Chart.defaults.color = '#64748B';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+
+        new Chart(document.getElementById('chart-production'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Production',
+                    data: data.slice(-6).map(d => d.production),
+                    backgroundColor: `rgba(${tealRGB}, 0.6)`,
+                    borderRadius: 8,
+                }, {
+                    label: 'Collections',
+                    data: data.slice(-6).map(d => d.collections),
+                    backgroundColor: `rgba(${goldRGB}, 0.6)`,
+                    borderRadius: 8,
+                }]
+            },
+            options: chartOptions('$')
+        });
+
+        new Chart(document.getElementById('chart-collections'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Collection Rate %',
+                    data: data.slice(-6).map(d => d.collectionRate),
+                    borderColor: `rgb(${tealRGB})`,
+                    backgroundColor: `rgba(${tealRGB}, 0.08)`,
+                    fill: true, tension: 0.4, pointRadius: 5,
+                    pointBackgroundColor: `rgb(${tealRGB})`,
+                }]
+            },
+            options: chartOptions('%', 80, 100)
+        });
+
+        new Chart(document.getElementById('chart-patients'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'New Patients',
+                    data: data.slice(-6).map(d => d.newPatients),
+                    backgroundColor: `rgba(${blueRGB}, 0.6)`,
+                    borderRadius: 8,
+                }]
+            },
+            options: chartOptions('')
+        });
+
+        new Chart(document.getElementById('chart-acceptance'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Acceptance Rate %',
+                    data: data.slice(-6).map(d => d.caseAcceptanceRate),
+                    borderColor: `rgb(${goldRGB})`,
+                    backgroundColor: `rgba(${goldRGB}, 0.08)`,
+                    fill: true, tension: 0.4, pointRadius: 5,
+                    pointBackgroundColor: `rgb(${goldRGB})`,
+                }]
+            },
+            options: chartOptions('%', 50, 100)
+        });
+
+        // Quick Stats
+        const totalProduction = data.reduce((sum, d) => sum + d.production, 0);
+        const totalPatients = data.reduce((sum, d) => sum + d.newPatients, 0);
+        const avgAcceptance = Math.round(data.reduce((sum, d) => sum + d.caseAcceptanceRate, 0) / data.length);
+
+        document.getElementById('stats-grid').innerHTML = `
+            <div class="stat-card"><div class="stat-card__icon">🏆</div><div><div class="stat-card__label">Annual Production</div><div class="stat-card__value">$${(totalProduction / 1000).toFixed(0)}K</div></div></div>
+            <div class="stat-card"><div class="stat-card__icon">👥</div><div><div class="stat-card__label">Total New Patients (12mo)</div><div class="stat-card__value">${totalPatients}</div></div></div>
+            <div class="stat-card"><div class="stat-card__icon">📊</div><div><div class="stat-card__label">Avg Case Acceptance</div><div class="stat-card__value">${avgAcceptance}%</div></div></div>
+            <div class="stat-card"><div class="stat-card__icon">🦷</div><div><div class="stat-card__label">Avg Production/Patient</div><div class="stat-card__value">$${latest.avgProductionPerPatient}</div></div></div>
+        `;
+    }
+
+    function chartOptions(prefix = '', sugMin, sugMax) {
+        return {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 12 }, color: '#94A3B8' } } },
+            scales: {
+                y: {
+                    beginAtZero: prefix !== '%',
+                    suggestedMin: sugMin, suggestedMax: sugMax,
+                    ticks: {
+                        callback: (v) => prefix === '$' ? `$${(v/1000).toFixed(0)}K` : prefix === '%' ? `${v}%` : v,
+                        font: { size: 11 }, color: '#64748B'
+                    },
+                    grid: { color: 'rgba(255,255,255,0.04)' }
+                },
+                x: { ticks: { font: { size: 11 }, color: '#64748B' }, grid: { display: false } }
+            }
+        };
+    }
+
+    function calcTrend(current, previous) {
+        if (!previous) return 0;
+        return Math.round(((current - previous) / previous) * 100);
+    }
+
+    // ─── Production Table ───
+    function renderProduction() {
+        const tbody = document.getElementById('production-tbody');
+        const data = financialData.monthly;
+        tbody.innerHTML = data.map(d => `
+            <tr>
+                <td><strong style="color:var(--admin-text)">${d.month}</strong></td>
+                <td>$${d.production.toLocaleString()}</td>
+                <td>$${d.collections.toLocaleString()}</td>
+                <td><span class="badge ${d.collectionRate >= 95 ? 'badge-green' : d.collectionRate >= 90 ? 'badge-amber' : 'badge-red'}">${d.collectionRate}%</span></td>
+                <td>${d.newPatients}</td>
+                <td>${d.caseAcceptanceRate}%</td>
+                <td>$${d.avgProductionPerPatient}</td>
+            </tr>
+        `).join('');
+    }
+
+    // ─── PALOMA Analytics ───
+    function renderPalomaAnalytics() {
+        const palomaKPIs = [
+            { icon: '💬', label: 'Total Conversations', value: '347' },
+            { icon: '🌐', label: 'Spanish Sessions', value: '38%' },
+            { icon: '📅', label: 'Booking Referrals', value: '62' },
+            { icon: '⭐', label: 'Satisfaction', value: '4.8/5' },
+        ];
+
+        document.getElementById('paloma-kpis').innerHTML = palomaKPIs.map(k => `
+            <div class="kpi-card">
+                <div class="kpi-card__icon">${k.icon}</div>
+                <div class="kpi-card__label">${k.label}</div>
+                <div class="kpi-card__value">${k.value}</div>
+            </div>
+        `).join('');
+
+        new Chart(document.getElementById('chart-paloma-lang'), {
+            type: 'doughnut',
+            data: {
+                labels: ['English', 'Spanish'],
+                datasets: [{
+                    data: [62, 38],
+                    backgroundColor: ['rgba(20,184,166,0.7)', 'rgba(245,158,11,0.7)'],
+                    borderWidth: 0, borderRadius: 4,
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8' } } } }
+        });
+
+        new Chart(document.getElementById('chart-paloma-topics'), {
+            type: 'bar',
+            data: {
+                labels: ['Services', 'Insurance', 'Booking', 'Post-Op', 'Emergency', 'Technology'],
+                datasets: [{
+                    label: 'Questions',
+                    data: [89, 72, 62, 45, 31, 48],
+                    backgroundColor: 'rgba(20,184,166,0.6)',
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748B' } },
+                    y: { grid: { display: false }, ticks: { color: '#94A3B8' } }
+                }
+            }
+        });
+    }
+
+    // ─── Schedule ───
+    function renderSchedule() {
+        const slots = [
+            { time: '8:00 AM', patient: 'Johnson, Maria', procedure: 'Cleaning & Exam', status: 'badge-green', statusText: 'Confirmed' },
+            { time: '9:00 AM', patient: 'Williams, James', procedure: 'Crown Prep #14', status: 'badge-green', statusText: 'Confirmed' },
+            { time: '10:30 AM', patient: 'Harrison, Chris', procedure: 'AI Scan Review', status: 'badge-amber', statusText: 'Pending' },
+            { time: '11:30 AM', patient: 'Rodriguez, Ana', procedure: 'Implant Consult (ES)', status: 'badge-green', statusText: 'Confirmed' },
+            { time: '1:00 PM', patient: 'Thompson, David', procedure: 'Root Canal #19', status: 'badge-green', statusText: 'Confirmed' },
+            { time: '2:30 PM', patient: 'Chen, Lisa', procedure: 'Veneer Delivery', status: 'badge-amber', statusText: 'Pending' },
+            { time: '3:30 PM', patient: '— Open Slot —', procedure: '', status: '', statusText: '' },
+        ];
+
+        document.getElementById('schedule-grid').innerHTML = slots.map(s => `
+            <div class="schedule-slot">
+                <div class="schedule-slot__time">${s.time}</div>
+                <div>
+                    <div class="schedule-slot__patient">${s.patient}</div>
+                    <div class="schedule-slot__procedure">${s.procedure}</div>
+                </div>
+                ${s.statusText ? `<div class="schedule-slot__status"><span class="badge ${s.status}"><span class="badge-dot"></span> ${s.statusText}</span></div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    // ─── Data Editor ───
+    function initDataEditor() {
+        const textarea = document.getElementById('data-editor-textarea');
+        const status = document.getElementById('editor-status');
+        let currentFile = 'site-config';
+
+        async function loadFile(filename) {
+            try {
+                const res = await fetch(`/data/${filename}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    textarea.value = JSON.stringify(data, null, 2);
+                } else {
+                    textarea.value = `// File not found: /data/${filename}.json\n// Create this file to populate data.`;
+                }
+            } catch (e) {
+                textarea.value = `// Error loading /data/${filename}.json\n// ${e.message}`;
+            }
+            status.textContent = '';
+            currentFile = filename;
+        }
+
+        document.querySelectorAll('.editor-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                loadFile(tab.dataset.file);
+            });
+        });
+
+        document.getElementById('editor-save').addEventListener('click', () => {
+            try {
+                JSON.parse(textarea.value);
+                status.textContent = '✓ Valid JSON — In production, this would save to the server.';
+                status.style.color = 'var(--admin-green)';
+            } catch (e) {
+                status.textContent = `✗ Invalid JSON: ${e.message}`;
+                status.style.color = 'var(--admin-red)';
+            }
+        });
+
+        document.getElementById('editor-reset').addEventListener('click', () => loadFile(currentFile));
+        loadFile('site-config');
+    }
+
+    // ─── Settings ───
+    function initSettings() {
+        const integrationEl = document.getElementById('integration-status');
+        if (integrationMap?.systems) {
+            integrationEl.innerHTML = integrationMap.systems.map(sys => `
+                <div class="setting-row">
+                    <label>${sys.name}</label>
+                    <span class="badge ${sys.status === 'connected' ? 'badge-green' : sys.status === 'planned' ? 'badge-amber' : 'badge-red'}">
+                        <span class="badge-dot"></span> ${sys.status || 'Not Connected'}
+                    </span>
+                </div>
+            `).join('');
+        } else {
+            const systems = ['Medit Link', 'Dentrix', 'Pearl AI', 'SprintRay', 'Exocad', 'Google Calendar'];
+            integrationEl.innerHTML = systems.map(name => `
+                <div class="setting-row">
+                    <label>${name}</label>
+                    <span class="badge badge-amber"><span class="badge-dot"></span> Planned</span>
+                </div>
+            `).join('');
+        }
+    }
+    </script>
 </body>
 </html>
