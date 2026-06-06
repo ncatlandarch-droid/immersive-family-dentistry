@@ -3,8 +3,6 @@
    Run once: GET /.netlify/functions/db-setup
    ═══════════════════════════════════════════════════════════ */
 
-const { getSQL } = require('./db-helper');
-
 exports.handler = async (event) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -17,9 +15,36 @@ exports.handler = async (event) => {
 
     let sql;
     try {
-        sql = getSQL();
+        // Method 1: @netlify/database (built-in, auto-connects)
+        const { getDatabase } = require('@netlify/database');
+        const db = getDatabase();
+        sql = db.httpClient || db.pool;
+        console.log('[db-setup] Connected via @netlify/database, driver:', db.driver);
+        if (db.driver === 'serverless') {
+            sql = db.httpClient;
+        } else {
+            // Wrap pool for tagged template usage
+            const pool = db.pool;
+            sql = async (strings, ...values) => {
+                const text = strings.reduce((prev, curr, i) => prev + '$' + i + curr);
+                const res = await pool.query(text, values);
+                return res.rows;
+            };
+        }
     } catch (e) {
-        return { statusCode: 500, headers, body: JSON.stringify({ error: e.message, env_keys: Object.keys(process.env).filter(k => k.includes('DB') || k.includes('NEON') || k.includes('NETLIFY_D') || k.includes('DATABASE')) }) };
+        console.log('[db-setup] @netlify/database error:', e.message);
+        // Method 2: direct env var
+        const dbUrl = process.env.NETLIFY_DB_URL || process.env.DATABASE_URL;
+        if (dbUrl) {
+            const { neon } = require('@neondatabase/serverless');
+            sql = neon(dbUrl);
+        } else {
+            const allEnv = Object.keys(process.env).sort().join(', ');
+            return { statusCode: 500, headers, body: JSON.stringify({ 
+                error: e.message,
+                all_env_keys: allEnv
+            })};
+        }
     }
 
     try {
