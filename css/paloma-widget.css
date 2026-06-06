@@ -25,29 +25,28 @@
     --paloma-transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Floating Button ─── */
+/* ─── Mascot Floating Widget ─── */
 .paloma-fab {
     position: fixed;
     bottom: 28px;
     right: 28px;
     z-index: 9999;
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    background: transparent;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 20px var(--paloma-teal-glow), 0 2px 8px rgba(0,0,0,0.12);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--paloma-transition);
-    overflow: hidden;
+    overflow: visible;
+    padding: 0;
 }
 
 .paloma-fab:hover {
-    transform: scale(1.08);
-    box-shadow: 0 8px 30px var(--paloma-teal-glow), 0 4px 12px rgba(0,0,0,0.15);
+    transform: scale(1.06);
 }
 
 .paloma-fab:active {
@@ -55,14 +54,29 @@
 }
 
 .paloma-fab img {
-    width: 42px;
-    height: 42px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     object-fit: cover;
+    object-position: center 15%;
+    border: 3px solid var(--paloma-teal);
+    box-shadow: 0 4px 24px var(--paloma-teal-glow), 0 2px 10px rgba(0,0,0,0.15);
+    transition: var(--paloma-transition);
+}
+
+.paloma-fab:hover img {
+    border-color: var(--paloma-gold);
+    box-shadow: 0 6px 30px rgba(196,163,90,0.25), 0 4px 14px rgba(0,0,0,0.18);
 }
 
 .paloma-fab--close img {
     display: none;
+}
+
+.paloma-fab--close {
+    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    width: 64px;
+    height: 64px;
 }
 
 .paloma-fab--close::after {
@@ -72,15 +86,90 @@
     font-weight: 300;
 }
 
-/* Pulse ring animation */
+/* Name label under the bubble */
+.paloma-fab-label {
+    position: fixed;
+    bottom: 12px;
+    right: 24px;
+    z-index: 9998;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--paloma-teal);
+    text-align: center;
+    width: 80px;
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+    transition: opacity 0.3s;
+}
+
+.paloma-fab--close ~ .paloma-fab-label {
+    opacity: 0;
+}
+
+/* Voice badge on the bubble */
+.paloma-fab-voice {
+    position: fixed;
+    bottom: 88px;
+    right: 24px;
+    z-index: 10000;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--paloma-teal);
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: var(--paloma-transition);
+}
+
+.paloma-fab-voice:hover {
+    transform: scale(1.15);
+    background: var(--paloma-teal-light);
+}
+
+/* Notification badge */
+.paloma-fab-notif {
+    position: fixed;
+    bottom: 88px;
+    right: 56px;
+    z-index: 10000;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--paloma-emerald);
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+    animation: paloma-notif-pop 0.5s ease-out;
+}
+
+@keyframes paloma-notif-pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Pulse ring animation around the mascot */
 .paloma-fab::before {
     content: '';
     position: absolute;
-    inset: -4px;
+    inset: -6px;
     border-radius: 50%;
     border: 2px solid var(--paloma-teal);
     opacity: 0;
     animation: paloma-pulse 3s ease-in-out infinite;
+    pointer-events: none;
 }
 
 @keyframes paloma-pulse {

@@ -78,12 +78,41 @@ class PalomaWidget {
 
     // ─── Render ───
     render() {
-        // FAB button
+        // Mascot bubble — large portrait
         this.fab = document.createElement('button');
         this.fab.className = 'paloma-fab';
-        this.fab.setAttribute('aria-label', 'Open PALOMA chat');
+        this.fab.setAttribute('aria-label', 'Chat with PALOMA');
         this.fab.id = 'paloma-fab';
-        this.fab.innerHTML = `<img src="${PALOMA_CONFIG.avatarPath}" alt="PALOMA" />`;
+        this.fab.innerHTML = `<img src="/images/paloma/paloma-hero.png" alt="PALOMA" />`;
+
+        // Name label under the bubble
+        this.fabLabel = document.createElement('div');
+        this.fabLabel.className = 'paloma-fab-label';
+        this.fabLabel.textContent = 'PALOMA';
+
+        // Voice badge
+        this.fabVoice = document.createElement('span');
+        this.fabVoice.className = 'paloma-fab-voice paloma-voice-badge';
+        const voiceMuted = typeof PALOMA_VOICE !== 'undefined' ? PALOMA_VOICE.isMuted() : true;
+        this.fabVoice.textContent = voiceMuted ? '🔇' : '🔊';
+        this.fabVoice.title = voiceMuted ? 'Enable voice' : 'Mute voice';
+        this.fabVoice.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (typeof PALOMA_VOICE !== 'undefined') {
+                const isNowOn = PALOMA_VOICE.toggleMute();
+                if (isNowOn) {
+                    const greeting = this.lang === 'es'
+                        ? 'Hola, soy Paloma. Ahora puedo hablarte. ¿En qué puedo ayudarte?'
+                        : 'Hi, I\'m Paloma. I can talk to you now! How can I help?';
+                    PALOMA_VOICE.speak(greeting, this.lang);
+                }
+            }
+        });
+
+        // Notification badge
+        this.fabNotif = document.createElement('span');
+        this.fabNotif.className = 'paloma-fab-notif';
+        this.fabNotif.textContent = '1';
 
         // Chat panel
         this.panel = document.createElement('div');
@@ -95,6 +124,9 @@ class PalomaWidget {
 
         document.body.appendChild(this.panel);
         document.body.appendChild(this.fab);
+        document.body.appendChild(this.fabLabel);
+        document.body.appendChild(this.fabVoice);
+        document.body.appendChild(this.fabNotif);
 
         // Cache DOM refs
         this.messagesEl = this.panel.querySelector('.paloma-messages');
@@ -211,6 +243,12 @@ class PalomaWidget {
         this.isOpen = !this.isOpen;
         this.panel.classList.toggle('paloma-panel--open', this.isOpen);
         this.fab.classList.toggle('paloma-fab--close', this.isOpen);
+
+        // Hide mascot extras when panel is open
+        const extrasDisplay = this.isOpen ? 'none' : '';
+        this.fabLabel.style.display = extrasDisplay;
+        this.fabVoice.style.display = extrasDisplay;
+        this.fabNotif.style.display = 'none'; // Always hide after first open
 
         if (this.isOpen) {
             this.inputEl.focus();
