@@ -76,6 +76,42 @@
           <li><a href="#learn">Learn</a></li>
           <li><a href="#merch">Shop</a></li>
           <li><a href="#contact" class="btn btn-primary">Book Now</a></li>
+          <li class="nav-login-wrap">
+            <button class="btn-login" id="login-toggle" aria-label="Login">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Login
+            </button>
+            <div class="login-dropdown" id="login-dropdown">
+              <div class="login-dropdown__header">
+                <span class="login-dropdown__badge">DEMO MODE</span>
+                <p>Select a role to explore the platform</p>
+              </div>
+              <a href="/portal/patient" class="login-dropdown__role" data-role="patient">
+                <span class="login-dropdown__icon">🧑‍⚕️</span>
+                <div>
+                  <strong>Patient View</strong>
+                  <small>MouthMap, chat with PALOMA, dental records</small>
+                </div>
+              </a>
+              <a href="/staff/" class="login-dropdown__role" data-role="staff">
+                <span class="login-dropdown__icon">👩‍💼</span>
+                <div>
+                  <strong>Staff View</strong>
+                  <small>Patient queue, schedules, clinical tools</small>
+                </div>
+              </a>
+              <a href="/admin/" class="login-dropdown__role" data-role="admin">
+                <span class="login-dropdown__icon">🔧</span>
+                <div>
+                  <strong>Admin Dashboard</strong>
+                  <small>Analytics, PALOMA insights, practice metrics</small>
+                </div>
+              </a>
+              <div class="login-dropdown__footer">
+                <small>🔒 Production will use secure authentication</small>
+              </div>
+            </div>
+          </li>
         </ul>
       </nav>
 
@@ -962,5 +998,28 @@
   <script src="js/modules/paloma-voice.js?v=2"></script>
   <!-- PALOMA AI Chat Widget 🕊️ -->
   <script src="js/modules/paloma-widget.js?v=3"></script>
+  <!-- Login Dropdown Toggle -->
+  <script>
+    (function() {
+      const toggle = document.getElementById('login-toggle');
+      const dropdown = document.getElementById('login-dropdown');
+      if (!toggle || !dropdown) return;
+
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+          dropdown.classList.remove('active');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') dropdown.classList.remove('active');
+      });
+    })();
+  </script>
 </body>
 </html>
