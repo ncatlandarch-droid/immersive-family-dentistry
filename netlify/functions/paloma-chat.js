@@ -128,7 +128,7 @@ exports.handler = async (event) => {
 
         // ─── Load Live Practice Settings from Database ───
         let practiceContext = '';
-        const dbUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+        const dbUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
         if (dbUrl) {
             try {
                 const { neon } = require('@neondatabase/serverless');

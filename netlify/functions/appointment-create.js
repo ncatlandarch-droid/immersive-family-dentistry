@@ -22,7 +22,7 @@ exports.handler = async (event) => {
         return { statusCode: 405, headers, body: JSON.stringify({ error: 'POST only' }) };
     }
 
-    const dbUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+    const dbUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
     if (!dbUrl) {
         return { statusCode: 500, headers, body: JSON.stringify({ error: 'Database not configured' }) };
     }
