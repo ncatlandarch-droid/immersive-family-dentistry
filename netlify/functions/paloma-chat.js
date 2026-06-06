@@ -5,7 +5,7 @@
    Environment variable required: GEMINI_API_KEY
    ═══════════════════════════════════════════════════════════ */
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 // PALOMA's system prompt — her personality and rules
 const SYSTEM_PROMPT = `You are PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant), the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry in Greensboro, NC. You were created by Think! Design and Planning, LLC as part of the MouthMap platform.
@@ -151,7 +151,14 @@ exports.handler = async (event) => {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Gemini API error:', response.status, errorText);
-            throw new Error(`Gemini API error: ${response.status}`);
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    reply: `I'm having a moment — please try again, or call us directly at (336) 545-4281! 🕊️`,
+                    debug: `API ${response.status}`
+                }),
+            };
         }
 
         const data = await response.json();
@@ -167,12 +174,13 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error('PALOMA function error:', error);
+        console.error('PALOMA function error:', error.message, error.stack);
         return {
-            statusCode: 500,
+            statusCode: 200,
             headers,
             body: JSON.stringify({
                 reply: 'I\'m having a moment — please try again, or call us directly at (336) 545-4281! 🕊️',
+                debug: error.message
             }),
         };
     }
