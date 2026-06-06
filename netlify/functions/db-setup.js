@@ -15,12 +15,12 @@ exports.handler = async (event) => {
         return { statusCode: 405, headers, body: JSON.stringify({ error: 'GET only' }) };
     }
 
-    const dbUrl = process.env.NETLIFY_DB_URL || process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
-    if (!dbUrl) {
-        return { statusCode: 500, headers, body: JSON.stringify({ error: 'No DATABASE_URL configured' }) };
+    let sql;
+    try {
+        sql = getSQL();
+    } catch (e) {
+        return { statusCode: 500, headers, body: JSON.stringify({ error: e.message, env_keys: Object.keys(process.env).filter(k => k.includes('DB') || k.includes('NEON') || k.includes('NETLIFY_D') || k.includes('DATABASE')) }) };
     }
-
-    const sql = neon(dbUrl);
 
     try {
         // ─── Practice Settings Table ───
