@@ -166,7 +166,7 @@ class PalomaWidget {
         const voiceMuted = typeof PALOMA_VOICE !== 'undefined' ? PALOMA_VOICE.isMuted() : true;
         return `
             <div class="paloma-header">
-                <img class="paloma-header__avatar" src="${PALOMA_CONFIG.avatarPath}" alt="PALOMA" />
+                <img class="paloma-header__avatar" src="${PALOMA_CONFIG.iconPath}" alt="PALOMA" />
                 <div class="paloma-header__info">
                     <p class="paloma-header__name">${s.name}</p>
                     <p class="paloma-header__subtitle">${s.subtitle}</p>
