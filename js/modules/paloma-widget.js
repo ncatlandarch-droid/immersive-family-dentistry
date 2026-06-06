@@ -113,6 +113,7 @@ class PalomaWidget {
 
     buildPanelHTML() {
         const s = this.strings;
+        const voiceMuted = typeof PALOMA_VOICE !== 'undefined' ? PALOMA_VOICE.isMuted() : true;
         return `
             <div class="paloma-header">
                 <img class="paloma-header__avatar" src="${PALOMA_CONFIG.avatarPath}" alt="PALOMA" />
@@ -120,9 +121,12 @@ class PalomaWidget {
                     <p class="paloma-header__name">${s.name}</p>
                     <p class="paloma-header__subtitle">${s.subtitle}</p>
                 </div>
-                <div class="paloma-header__lang">
-                    <button class="${this.lang === 'en' ? 'active' : ''}" data-lang="en">EN</button>
-                    <button class="${this.lang === 'es' ? 'active' : ''}" data-lang="es">ES</button>
+                <div class="paloma-header__actions">
+                    <button class="paloma-voice-toggle paloma-voice-badge" title="${voiceMuted ? 'Enable PALOMA voice' : 'Mute PALOMA voice'}">${voiceMuted ? '🔇' : '🔊'}</button>
+                    <div class="paloma-header__lang">
+                        <button class="${this.lang === 'en' ? 'active' : ''}" data-lang="en">EN</button>
+                        <button class="${this.lang === 'es' ? 'active' : ''}" data-lang="es">ES</button>
+                    </div>
                 </div>
             </div>
             <div class="paloma-disclaimer">${s.disclaimer}</div>
@@ -171,6 +175,31 @@ class PalomaWidget {
             btn.addEventListener('click', () => this.setLanguage(btn.dataset.lang));
         });
 
+        // Voice toggle
+        this.panel.querySelector('.paloma-voice-toggle')?.addEventListener('click', () => {
+            if (typeof PALOMA_VOICE !== 'undefined') {
+                const isNowOn = PALOMA_VOICE.toggleMute();
+                if (isNowOn) {
+                    // First voice interaction — speak a greeting
+                    const greeting = this.lang === 'es'
+                        ? 'Hola, soy Paloma. Ahora puedo hablarte. ¿En qué puedo ayudarte?'
+                        : 'Hi, I\'m Paloma. I can talk to you now! How can I help?';
+                    PALOMA_VOICE.speak(greeting, this.lang);
+                }
+            }
+        });
+
+        // Speaking animation listener
+        document.addEventListener('paloma-speaking', (e) => {
+            if (e.detail.speaking) {
+                this.avatarEl?.classList.add('paloma-header__avatar--speaking');
+                this.fab?.classList.add('paloma-fab--speaking');
+            } else {
+                this.avatarEl?.classList.remove('paloma-header__avatar--speaking');
+                this.fab?.classList.remove('paloma-fab--speaking');
+            }
+        });
+
         // Escape to close
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen) this.toggle();
@@ -186,6 +215,20 @@ class PalomaWidget {
         if (this.isOpen) {
             this.inputEl.focus();
             this.scrollToBottom();
+
+            // Speak welcome greeting on first open (user click satisfies Chrome autoplay)
+            if (!this._hasGreeted && typeof PALOMA_VOICE !== 'undefined' && !PALOMA_VOICE.isMuted()) {
+                this._hasGreeted = true;
+                const welcome = this.lang === 'es'
+                    ? 'Hola! Bienvenido a Lake Jeanette Family and Implant Dentistry. Soy Paloma, tu guía de salud dental. ¿En qué puedo ayudarte hoy?'
+                    : 'Hi! Welcome to Lake Jeanette Family and Implant Dentistry. I\'m Paloma, your dental health guide. How can I help you today?';
+                PALOMA_VOICE.speak(welcome, this.lang);
+            }
+        } else {
+            // Stop speaking when panel closes
+            if (typeof PALOMA_VOICE !== 'undefined') {
+                PALOMA_VOICE.stop();
+            }
         }
     }
 
@@ -292,11 +335,16 @@ class PalomaWidget {
         this.saveHistory();
         this.scrollToBottom();
 
-        // Brief speaking animation
-        this.avatarEl.classList.add('paloma-header__avatar--speaking');
-        setTimeout(() => {
-            this.avatarEl.classList.remove('paloma-header__avatar--speaking');
-        }, 2000);
+        // Speak the response if voice is enabled
+        if (typeof PALOMA_VOICE !== 'undefined' && !PALOMA_VOICE.isMuted()) {
+            PALOMA_VOICE.speak(text, this.lang);
+        } else {
+            // Brief visual speaking animation (fallback when voice is off)
+            this.avatarEl.classList.add('paloma-header__avatar--speaking');
+            setTimeout(() => {
+                this.avatarEl.classList.remove('paloma-header__avatar--speaking');
+            }, 2000);
+        }
     }
 
     renderMessage(msg) {
