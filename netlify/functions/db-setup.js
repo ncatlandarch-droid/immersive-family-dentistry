@@ -1,7 +1,10 @@
 /* ═══════════════════════════════════════════════════════════
-   DB Setup — Initialize Neon PostgreSQL tables
+   DB Setup — Initialize PostgreSQL tables (V2 Function)
    Run once: GET /.netlify/functions/db-setup
+   Uses @netlify/database for auto-connection
    ═══════════════════════════════════════════════════════════ */
+
+const { getDatabase } = require('@netlify/database');
 
 exports.handler = async (event) => {
     const headers = {
@@ -15,34 +18,37 @@ exports.handler = async (event) => {
 
     let sql;
     try {
-        // Method 1: @netlify/database (built-in, auto-connects)
-        const { getDatabase } = require('@netlify/database');
         const db = getDatabase();
-        sql = db.httpClient || db.pool;
-        console.log('[db-setup] Connected via @netlify/database, driver:', db.driver);
-        if (db.driver === 'serverless') {
+        console.log('[db-setup] Driver:', db.driver, 'Has connectionString:', !!db.connectionString);
+        
+        if (db.driver === 'serverless' && db.httpClient) {
             sql = db.httpClient;
-        } else {
-            // Wrap pool for tagged template usage
-            const pool = db.pool;
+        } else if (db.pool) {
+            // Use pool.query for server driver
             sql = async (strings, ...values) => {
-                const text = strings.reduce((prev, curr, i) => prev + '$' + i + curr);
-                const res = await pool.query(text, values);
+                const parts = [];
+                strings.forEach((str, i) => {
+                    parts.push(str);
+                    if (i < values.length) parts.push('$' + (i + 1));
+                });
+                const text = parts.join('');
+                const res = await db.pool.query(text, values);
                 return res.rows;
             };
+        } else {
+            throw new Error('No usable SQL interface from database');
         }
     } catch (e) {
-        console.log('[db-setup] @netlify/database error:', e.message);
-        // Method 2: direct env var
-        const dbUrl = process.env.NETLIFY_DB_URL || process.env.DATABASE_URL;
+        console.log('[db-setup] Database error:', e.message);
+        // Fallback: try direct env var
+        const dbUrl = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
         if (dbUrl) {
             const { neon } = require('@neondatabase/serverless');
             sql = neon(dbUrl);
         } else {
-            const allEnv = Object.keys(process.env).sort().join(', ');
             return { statusCode: 500, headers, body: JSON.stringify({ 
                 error: e.message,
-                all_env_keys: allEnv
+                hint: 'Ensure Netlify Database is provisioned and deployed'
             })};
         }
     }
