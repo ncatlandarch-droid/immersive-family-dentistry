@@ -602,32 +602,176 @@
 }
 
 /* ─── Mobile Responsive ─── */
-@media (max-width: 480px) {
-    .paloma-panel {
-        bottom: 0;
-        right: 0;
-        left: 0;
-        width: 100%;
-        max-height: 100vh;
-        max-height: 100dvh;
-        border-radius: var(--paloma-radius) var(--paloma-radius) 0 0;
-    }
 
-    .paloma-messages {
-        max-height: calc(100dvh - 260px);
-    }
-
-    .paloma-fab {
-        bottom: 20px;
-        right: 20px;
-        width: 56px;
-        height: 56px;
-    }
-}
-
+/* Tablet */
 @media (max-width: 768px) {
     .paloma-panel {
         width: min(400px, calc(100vw - 24px));
         right: 12px;
+        bottom: 90px;
+    }
+    .paloma-fab, .paloma-fab img {
+        width: 140px;
+        height: 140px;
+    }
+    .paloma-fab-tooltip {
+        right: 160px;
+        bottom: 100px;
+        font-size: 14px;
+    }
+    .paloma-fab-voice {
+        bottom: 150px;
+        right: 16px;
+    }
+    .paloma-fab-notif {
+        bottom: 150px;
+        right: 130px;
     }
 }
+
+/* Phone — Full-screen chat experience */
+@media (max-width: 480px) {
+    .paloma-fab {
+        bottom: 16px;
+        right: 16px;
+        width: 72px;
+        height: 72px;
+    }
+
+    .paloma-fab img {
+        width: 72px;
+        height: 72px;
+        border-width: 3px;
+    }
+
+    .paloma-fab--close {
+        width: 56px;
+        height: 56px;
+    }
+
+    .paloma-fab::before {
+        inset: -6px;
+    }
+
+    .paloma-fab-tooltip {
+        right: auto;
+        left: 16px;
+        bottom: 100px;
+        font-size: 13px;
+        white-space: normal;
+        max-width: calc(100vw - 110px);
+    }
+    .paloma-fab-tooltip::after {
+        display: none;
+    }
+
+    .paloma-fab-voice {
+        bottom: 80px;
+        right: 14px;
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .paloma-fab-notif {
+        bottom: 80px;
+        right: 70px;
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+    }
+
+    /* Full-screen panel */
+    .paloma-panel {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: 0;
+        z-index: 10001;
+    }
+
+    .paloma-header {
+        padding: 14px 16px;
+        padding-top: max(14px, env(safe-area-inset-top));
+    }
+
+    .paloma-header__avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    .paloma-header__name {
+        font-size: 15px;
+    }
+
+    .paloma-messages {
+        flex: 1;
+        min-height: 0;
+        max-height: none;
+        padding: 12px;
+    }
+
+    .paloma-msg {
+        max-width: 90%;
+        font-size: 15px;
+        padding: 10px 14px;
+    }
+
+    .paloma-suggestions {
+        padding: 8px 12px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .paloma-chip {
+        flex-shrink: 0;
+        font-size: 13px;
+        padding: 8px 16px;
+    }
+
+    .paloma-input-area {
+        padding: 10px 12px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        gap: 8px;
+    }
+
+    .paloma-mic {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+
+    .paloma-input {
+        font-size: 16px; /* prevents iOS zoom on focus */
+        padding: 12px 16px;
+    }
+
+    .paloma-send {
+        width: 44px;
+        height: 44px;
+    }
+
+    .paloma-footer {
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
+    }
+
+    .paloma-disclaimer {
+        font-size: 8px;
+        padding: 4px 12px;
+    }
+
+    /* Prevent body scroll when chat is open */
+    body.paloma-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+}
+

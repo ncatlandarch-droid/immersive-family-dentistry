@@ -128,14 +128,13 @@ exports.handler = async (event) => {
 
         // ─── Load Live Practice Settings from Database ───
         let practiceContext = '';
-        const dbUrl = process.env.NETLIFY_DB_URL || process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
-        if (dbUrl) {
-            try {
-                const { neon } = require('@neondatabase/serverless');
-                const sql = neon(dbUrl);
-                const rows = await sql`SELECT key, value FROM practice_settings`;
-                const settings = {};
-                for (const row of rows) settings[row.key] = row.value;
+        let dbSql = null;
+        try {
+            const { getSQL } = require('./db-helper');
+            dbSql = getSQL();
+            const rows = await dbSql`SELECT key, value FROM practice_settings`;
+            const settings = {};
+            for (const row of rows) settings[row.key] = row.value;
 
                 if (settings.pricing) {
                     practiceContext += '\n\nCURRENT PRICING (use these exact prices):\n';
@@ -157,9 +156,8 @@ exports.handler = async (event) => {
                 if (settings.contact) {
                     practiceContext += `\nCONTACT: Phone: ${settings.contact.phone}, Email: ${settings.contact.email}\n`;
                 }
-            } catch (dbErr) {
-                console.warn('Could not load practice settings:', dbErr.message);
-            }
+        } catch (dbErr) {
+            console.warn('Could not load practice settings:', dbErr.message);
         }
 
         // ─── Enhanced System Prompt with Live Data ───
@@ -249,7 +247,7 @@ This will automatically save the appointment to our system. ALWAYS confirm the d
             // ─── Detect & Process Appointment Booking ───
             let appointmentId = null;
             const bookingMatch = reply.match(/\[BOOK_APPOINTMENT\]([\s\S]*?)\[\/BOOK_APPOINTMENT\]/);
-            if (bookingMatch && dbUrl) {
+            if (bookingMatch && dbSql) {
                 try {
                     const bookingText = bookingMatch[1];
                     const getField = (field) => {
@@ -257,9 +255,7 @@ This will automatically save the appointment to our system. ALWAYS confirm the d
                         return match ? match[1].trim() : '';
                     };
 
-                    const { neon } = require('@neondatabase/serverless');
-                    const sql = neon(dbUrl);
-                    const result = await sql`
+                    const result = await dbSql`
                         INSERT INTO appointments (
                             patient_name, patient_phone, patient_email,
                             reason, preferred_date, insurance_provider,

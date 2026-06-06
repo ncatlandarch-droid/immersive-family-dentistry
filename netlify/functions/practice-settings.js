@@ -4,7 +4,7 @@
    PUT  — Update a setting (admin)
    ═══════════════════════════════════════════════════════════ */
 
-const { neon } = require('@neondatabase/serverless');
+const { getSQL } = require('./db-helper');
 
 exports.handler = async (event) => {
     const headers = {

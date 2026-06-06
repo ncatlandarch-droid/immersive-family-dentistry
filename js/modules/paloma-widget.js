@@ -320,6 +320,7 @@ class PalomaWidget {
         this.isOpen = !this.isOpen;
         this.panel.classList.toggle('paloma-panel--open', this.isOpen);
         this.fab.classList.toggle('paloma-fab--close', this.isOpen);
+        document.body.classList.toggle('paloma-open', this.isOpen);
 
         // Hide mascot extras when panel is open
         const extrasDisplay = this.isOpen ? 'none' : '';

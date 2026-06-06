@@ -4,7 +4,7 @@
    Body: { id, status?, notes? }
    ═══════════════════════════════════════════════════════════ */
 
-const { neon } = require('@neondatabase/serverless');
+const { getSQL } = require('./db-helper');
 
 exports.handler = async (event) => {
     const headers = {
