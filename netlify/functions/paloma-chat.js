@@ -110,8 +110,9 @@ exports.handler = async (event) => {
         // Build conversation contents for Gemini
         const contents = [];
 
-        // Add conversation history
-        for (const msg of history.slice(-10)) {
+        // Add conversation history (exclude the current message if it got included)
+        for (const msg of history.slice(-8)) {
+            if (msg.content === message && msg.role === 'user') continue; // Skip duplicate
             contents.push({
                 role: msg.role === 'user' ? 'user' : 'model',
                 parts: [{ text: msg.content }],
@@ -124,54 +125,79 @@ exports.handler = async (event) => {
             parts: [{ text: message }],
         });
 
-        // Call Gemini API
-        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system_instruction: {
-                    parts: [{ text: SYSTEM_PROMPT }],
-                },
-                contents,
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.9,
-                    topK: 40,
-                    maxOutputTokens: 500,
-                },
-                safetySettings: [
-                    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                ],
-            }),
-        });
+        // Call Gemini API with timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Gemini API error:', response.status, errorText);
+        try {
+            const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
+                body: JSON.stringify({
+                    system_instruction: {
+                        parts: [{ text: SYSTEM_PROMPT }],
+                    },
+                    contents,
+                    generationConfig: {
+                        temperature: 0.7,
+                        topP: 0.9,
+                        topK: 40,
+                        maxOutputTokens: 400,
+                    },
+                    safetySettings: [
+                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                    ],
+                }),
+            });
+            clearTimeout(timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Gemini API error:', response.status, errorText);
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({
+                        reply: `I'm having a moment — please try again, or call us directly at (336) 545-4281! 🕊️`,
+                        debug: `API ${response.status}`
+                    }),
+                };
+            }
+
+            const data = await response.json();
+            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+                || (lang === 'es'
+                    ? 'Disculpa, no pude procesar tu solicitud. ¿Puedes intentar de nuevo?'
+                    : 'I apologize, I couldn\'t process that. Could you try again?');
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ reply }),
+            };
+
+        } catch (fetchError) {
+            clearTimeout(timeout);
+            if (fetchError.name === 'AbortError') {
+                console.error('Gemini API timeout after 8s');
+            } else {
+                console.error('Gemini fetch error:', fetchError.message);
+            }
             return {
                 statusCode: 200,
                 headers,
                 body: JSON.stringify({
-                    reply: `I'm having a moment — please try again, or call us directly at (336) 545-4281! 🕊️`,
-                    debug: `API ${response.status}`
+                    reply: lang === 'es'
+                        ? 'Disculpa, estoy tardando un poco. ¿Puedes intentar de nuevo? O llámanos al (336) 545-4281. 🕊️'
+                        : 'I took a little too long there — please try again! Or call us at (336) 545-4281. 🕊️',
+                    debug: fetchError.name === 'AbortError' ? 'timeout' : fetchError.message
                 }),
             };
         }
-
-        const data = await response.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
-            || (lang === 'es'
-                ? 'Disculpa, no pude procesar tu solicitud. ¿Puedes intentar de nuevo?'
-                : 'I apologize, I couldn\'t process that. Could you try again?');
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ reply }),
-        };
 
     } catch (error) {
         console.error('PALOMA function error:', error.message, error.stack);
