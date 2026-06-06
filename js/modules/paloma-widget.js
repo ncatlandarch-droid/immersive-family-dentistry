@@ -11,12 +11,14 @@
    - HIPAA disclaimer
    ═══════════════════════════════════════════════════════════ */
 
+const PALOMA_VERSION = '2.1'; // Increment to clear stale localStorage
+
 const PALOMA_CONFIG = {
-    apiEndpoint: '/.netlify/functions/paloma-chat',
-    avatarPath: '/images/paloma/paloma-avatar.png',
+    avatarPath: '/images/paloma/paloma-hero.png',
     iconPath: '/images/paloma/paloma-icon.png',
-    maxHistory: 20,
-    storageKey: 'paloma-history',
+    apiEndpoint: '/.netlify/functions/paloma-chat',
+    storageKey: 'paloma-chat-history',
+    versionKey: 'paloma-version',
     langKey: 'paloma-lang',
 };
 
@@ -353,26 +355,32 @@ class PalomaWidget {
 
     // ─── API Call ───
     async callAPI(message) {
-        const history = this.messages.slice(-PALOMA_CONFIG.maxHistory).map(m => ({
-            role: m.role,
-            content: m.content,
-        }));
+        // Build clean history — strip emojis and limit content length
+        const history = this.messages
+            .filter(m => m.role === 'user' || m.role === 'assistant')
+            .slice(-PALOMA_CONFIG.maxHistory)
+            .map(m => ({
+                role: m.role,
+                content: (m.content || '').substring(0, 500),
+            }));
+
+        let body;
+        try {
+            body = JSON.stringify({ message, history, lang: this.lang });
+        } catch (e) {
+            // If history can't be serialized, send without it
+            console.warn('PALOMA: History serialization failed, sending without history');
+            body = JSON.stringify({ message, history: [], lang: this.lang });
+        }
 
         const response = await fetch(PALOMA_CONFIG.apiEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message,
-                history,
-                lang: this.lang,
-            }),
+            body,
         });
 
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
         const data = await response.json();
+        if (data.debug) console.warn('PALOMA debug:', data.debug);
         return data.reply || this.strings.errorMsg;
     }
 
@@ -475,9 +483,22 @@ class PalomaWidget {
 
     loadHistory() {
         try {
+            // Version check — clear stale data from old versions
+            const storedVersion = localStorage.getItem(PALOMA_CONFIG.versionKey);
+            if (storedVersion !== PALOMA_VERSION) {
+                console.log('PALOMA: Clearing stale data (version mismatch)');
+                localStorage.removeItem(PALOMA_CONFIG.storageKey);
+                localStorage.removeItem('paloma-history'); // Old key cleanup
+                localStorage.setItem(PALOMA_CONFIG.versionKey, PALOMA_VERSION);
+                this.messages = [];
+                return;
+            }
+
             const stored = localStorage.getItem(PALOMA_CONFIG.storageKey);
             this.messages = stored ? JSON.parse(stored) : [];
         } catch (e) {
+            console.warn('PALOMA: Failed to load history, starting fresh');
+            localStorage.removeItem(PALOMA_CONFIG.storageKey);
             this.messages = [];
         }
     }
