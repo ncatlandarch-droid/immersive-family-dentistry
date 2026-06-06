@@ -157,7 +157,7 @@ exports.handler = async (event) => {
                         temperature: 0.7,
                         topP: 0.9,
                         topK: 40,
-                        maxOutputTokens: 400,
+                        maxOutputTokens: 800,
                     },
                     safetySettings: [
                         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
