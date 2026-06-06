@@ -484,7 +484,7 @@ class PalomaWidget {
 }
 
 // ─── Initialize ───
-export function initPaloma() {
+function initPaloma() {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => new PalomaWidget());
     } else {
