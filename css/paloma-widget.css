@@ -498,6 +498,38 @@
     background: var(--paloma-white);
 }
 
+/* 🎤 Mic Button */
+.paloma-mic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--paloma-surface);
+    border: 1px solid var(--paloma-border);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--paloma-transition);
+    flex-shrink: 0;
+}
+
+.paloma-mic:hover {
+    background: var(--paloma-teal-glow);
+    border-color: var(--paloma-teal);
+}
+
+.paloma-mic--active {
+    background: #ff4444;
+    border-color: #ff4444;
+    animation: paloma-mic-pulse 1s ease-in-out infinite;
+}
+
+@keyframes paloma-mic-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 68, 68, 0); }
+}
+
 .paloma-input {
     flex: 1;
     border: 1px solid var(--paloma-border);

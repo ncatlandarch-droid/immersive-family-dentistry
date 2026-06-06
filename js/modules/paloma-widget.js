@@ -187,6 +187,7 @@ class PalomaWidget {
                 ${s.suggestions.map(text => `<button class="paloma-chip">${text}</button>`).join('')}
             </div>
             <div class="paloma-input-area">
+                <button class="paloma-mic" aria-label="Speak to PALOMA" title="Tap to speak">🎤</button>
                 <input class="paloma-input" type="text" placeholder="${s.placeholder}" aria-label="${s.placeholder}" />
                 <button class="paloma-send" aria-label="${s.sendAria}">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -251,6 +252,62 @@ class PalomaWidget {
                 this.fab?.classList.remove('paloma-fab--speaking');
             }
         });
+
+        // 🎤 Microphone — Speech-to-Text
+        const micBtn = this.panel.querySelector('.paloma-mic');
+        if (micBtn) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                this.recognition = new SpeechRecognition();
+                this.recognition.continuous = false;
+                this.recognition.interimResults = true;
+                this.recognition.lang = this.lang === 'es' ? 'es-US' : 'en-US';
+                this.isListening = false;
+
+                micBtn.addEventListener('click', () => {
+                    if (this.isListening) {
+                        this.recognition.stop();
+                        return;
+                    }
+                    this.recognition.lang = this.lang === 'es' ? 'es-US' : 'en-US';
+                    this.recognition.start();
+                    this.isListening = true;
+                    micBtn.classList.add('paloma-mic--active');
+                    micBtn.textContent = '🔴';
+                    this.inputEl.placeholder = this.lang === 'es' ? 'Escuchando...' : 'Listening...';
+                });
+
+                this.recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    this.inputEl.value = transcript;
+                };
+
+                this.recognition.onend = () => {
+                    this.isListening = false;
+                    micBtn.classList.remove('paloma-mic--active');
+                    micBtn.textContent = '🎤';
+                    this.inputEl.placeholder = this.strings.placeholder;
+                    // Auto-send if there's text
+                    if (this.inputEl.value.trim()) {
+                        this.sendMessage();
+                    }
+                };
+
+                this.recognition.onerror = (event) => {
+                    console.warn('Speech recognition error:', event.error);
+                    this.isListening = false;
+                    micBtn.classList.remove('paloma-mic--active');
+                    micBtn.textContent = '🎤';
+                    this.inputEl.placeholder = this.strings.placeholder;
+                };
+            } else {
+                // Browser doesn't support speech recognition
+                micBtn.style.display = 'none';
+            }
+        }
 
         // Escape to close
         document.addEventListener('keydown', (e) => {
