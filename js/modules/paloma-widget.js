@@ -128,6 +128,24 @@ class PalomaWidget {
         document.body.appendChild(this.fabVoice);
         document.body.appendChild(this.fabNotif);
 
+        // Welcome tooltip — friendly first-visit greeting
+        if (!sessionStorage.getItem('paloma-tooltip-shown')) {
+            this.fabTooltip = document.createElement('div');
+            this.fabTooltip.className = 'paloma-fab-tooltip';
+            this.fabTooltip.innerHTML = 'Hi! I\'m <strong>PALOMA</strong> 🕊️ Can I help?';
+            document.body.appendChild(this.fabTooltip);
+            sessionStorage.setItem('paloma-tooltip-shown', 'true');
+
+            // Auto-hide after 6 seconds
+            setTimeout(() => {
+                if (this.fabTooltip && this.fabTooltip.parentNode) {
+                    this.fabTooltip.style.transition = 'opacity 0.5s';
+                    this.fabTooltip.style.opacity = '0';
+                    setTimeout(() => this.fabTooltip?.remove(), 500);
+                }
+            }, 6000);
+        }
+
         // Cache DOM refs
         this.messagesEl = this.panel.querySelector('.paloma-messages');
         this.inputEl = this.panel.querySelector('.paloma-input');
@@ -249,6 +267,7 @@ class PalomaWidget {
         this.fabLabel.style.display = extrasDisplay;
         this.fabVoice.style.display = extrasDisplay;
         this.fabNotif.style.display = 'none'; // Always hide after first open
+        if (this.fabTooltip) this.fabTooltip.remove();
 
         if (this.isOpen) {
             this.inputEl.focus();

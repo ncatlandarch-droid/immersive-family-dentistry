@@ -29,10 +29,10 @@
 .paloma-fab {
     position: fixed;
     bottom: 28px;
-    right: 28px;
+    right: 24px;
     z-index: 9999;
-    width: 72px;
-    height: 72px;
+    width: 82px;
+    height: 82px;
     border-radius: 50%;
     background: transparent;
     border: none;
@@ -54,8 +54,8 @@
 }
 
 .paloma-fab img {
-    width: 72px;
-    height: 72px;
+    width: 82px;
+    height: 82px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center 15%;
@@ -89,15 +89,15 @@
 /* Name label under the bubble */
 .paloma-fab-label {
     position: fixed;
-    bottom: 12px;
-    right: 24px;
+    bottom: 10px;
+    right: 20px;
     z-index: 9998;
     font-family: 'Outfit', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--paloma-teal);
     text-align: center;
-    width: 80px;
+    width: 90px;
     pointer-events: none;
     text-shadow: 0 1px 3px rgba(255,255,255,0.8);
     transition: opacity 0.3s;
@@ -107,14 +107,49 @@
     opacity: 0;
 }
 
+/* Welcome tooltip */
+.paloma-fab-tooltip {
+    position: fixed;
+    bottom: 70px;
+    right: 115px;
+    z-index: 9999;
+    background: white;
+    color: var(--paloma-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    white-space: nowrap;
+    animation: paloma-tooltip-in 0.5s ease-out 1.5s both;
+    pointer-events: none;
+}
+
+.paloma-fab-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-left-color: white;
+    border-right: none;
+}
+
+@keyframes paloma-tooltip-in {
+    0% { opacity: 0; transform: translateX(10px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
 /* Voice badge on the bubble */
 .paloma-fab-voice {
     position: fixed;
-    bottom: 88px;
-    right: 24px;
+    bottom: 98px;
+    right: 20px;
     z-index: 10000;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--paloma-teal);
     border: 2px solid white;
@@ -135,8 +170,8 @@
 /* Notification badge */
 .paloma-fab-notif {
     position: fixed;
-    bottom: 88px;
-    right: 56px;
+    bottom: 98px;
+    right: 60px;
     z-index: 10000;
     width: 22px;
     height: 22px;
