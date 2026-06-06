@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "provider": {
+    "id": "prov-001",
+    "prefix": "Dr.",
+    "firstName": "Christian",
+    "lastName": "Brenes",
+    "suffix": "DDS, MS",
+    "displayName": "Dr. Christian Brenes",
+    "role": "Owner / Lead Prosthodontist",
+    "title": "Doctor of Dental Surgery, Master of Science in Prosthodontics",
+    "npi": "DEMO-1234567890",
+    "stateLicense": "NC-DEMO-29481",
+    "photo": "/images/dr-brenes.jpg",
+    "email": "dr.brenes@ljfamilydentist.com",
+    "bio": {
+      "en": "Dr. Christian Brenes is a board-eligible prosthodontist and the founder of Lake Jeanette Family & Implant Dentistry. After earning his Doctor of Dental Surgery degree, he completed a rigorous three-year residency in Prosthodontics, gaining advanced expertise in dental implants, full-mouth rehabilitation, complex restorative cases, and digital dentistry workflows. Dr. Brenes is passionate about leveraging cutting-edge technology — including intraoral scanning, 3D printing, AI-assisted diagnostics, and CAD/CAM design — to deliver predictable, beautiful results for every patient. As a Key Opinion Leader for Medit, SprintRay, Exocad, and BlueSkyBio, he regularly lectures nationally and internationally on digital dentistry workflows and implant prosthodontics. His philosophy centers on precision, patient education, and making advanced dental care accessible to the Greensboro community.",
+      "es": "El Dr. Christian Brenes es un prostodoncista y fundador de Lake Jeanette Family & Implant Dentistry. Después de obtener su título de Doctor en Cirugía Dental, completó una rigurosa residencia de tres años en Prostodoncia, adquiriendo experiencia avanzada en implantes dentales, rehabilitación oral completa, casos restaurativos complejos y flujos de trabajo de odontología digital. El Dr. Brenes es apasionado por aprovechar la tecnología de vanguardia — incluyendo escaneo intraoral, impresión 3D, diagnósticos asistidos por IA y diseño CAD/CAM — para ofrecer resultados predecibles y hermosos a cada paciente. Como Líder de Opinión Clave para Medit, SprintRay, Exocad y BlueSkyBio, dicta conferencias regularmente a nivel nacional e internacional sobre flujos de trabajo de odontología digital y prostodoncia sobre implantes."
+    },
+    "education": [
+      {
+        "degree": "Master of Science (MS) — Prosthodontics",
+        "institution": "University of North Carolina at Chapel Hill, Adams School of Dentistry",
+        "year": 2019,
+        "honors": "Chief Resident"
+      },
+      {
+        "degree": "Doctor of Dental Surgery (DDS)",
+        "institution": "Universidad de Costa Rica, Facultad de Odontología",
+        "year": 2015,
+        "honors": "Magna Cum Laude"
+      },
+      {
+        "degree": "Advanced Education in General Dentistry (AEGD)",
+        "institution": "University of North Carolina at Chapel Hill",
+        "year": 2016
+      }
+    ],
+    "boardCertifications": [
+      {
+        "board": "American Board of Prosthodontics",
+        "status": "Board-Eligible",
+        "note": "Actively pursuing board certification"
+      }
+    ],
+    "professionalMemberships": [
+      "American College of Prosthodontists (ACP)",
+      "American Dental Association (ADA)",
+      "North Carolina Dental Society (NCDS)",
+      "Academy of Osseointegration (AO)",
+      "International Team for Implantology (ITI)",
+      "Greensboro Dental Society",
+      "Digital Dentistry Society (DDS)"
+    ],
+    "kolAffiliations": [
+      {
+        "company": "Medit",
+        "role": "Key Opinion Leader",
+        "product": "Medit i700 Intraoral Scanner",
+        "since": 2021,
+        "activities": ["National and international lectures", "Clinical workflow beta testing", "Social media education content"]
+      },
+      {
+        "company": "SprintRay",
+        "role": "Key Opinion Leader",
+        "product": "SprintRay Pro 95S 3D Printer",
+        "since": 2022,
+        "activities": ["Chairside printing workflow development", "Material evaluation", "Case presentations"]
+      },
+      {
+        "company": "Exocad",
+        "role": "Key Opinion Leader",
+        "product": "Exocad DentalCAD / ChairsideCAD",
+        "since": 2022,
+        "activities": ["Digital design workflow optimization", "Live design demonstrations", "Clinical case documentation"]
+      },
+      {
+        "company": "BlueSkyBio",
+        "role": "Key Opinion Leader",
+        "product": "BlueSkyBio Implant Planning & Guided Surgery",
+        "since": 2023,
+        "activities": ["Guided surgery protocol development", "Implant planning case studies"]
+      }
+    ],
+    "publications": [
+      {
+        "title": "Digital Workflow for Immediate Implant Placement and Provisionalization: A Case Series",
+        "journal": "Journal of Prosthodontics",
+        "year": 2023,
+        "type": "Case Series"
+      },
+      {
+        "title": "Accuracy of 3D-Printed Surgical Guides for Guided Implant Surgery: A Comparative Study",
+        "journal": "International Journal of Oral & Maxillofacial Implants",
+        "year": 2022,
+        "type": "Research Article"
+      },
+      {
+        "title": "Integration of AI-Assisted Radiographic Analysis in Implant Treatment Planning",
+        "journal": "Clinical Oral Implants Research",
+        "year": 2024,
+        "type": "Review Article"
+      }
+    ],
+    "lectureTopics": [
+      "Full-Arch Implant Rehabilitation: From Planning to Delivery",
+      "The Complete Digital Workflow: Scan, Design, Print, Deliver",
+      "AI in Dentistry: Clinical Applications of Pearl and Overjet",
+      "Same-Day Dentistry: Leveraging Chairside CAD/CAM",
+      "Predictable Esthetics with Digital Smile Design"
+    ],
+    "specialInterests": [
+      "Full-mouth rehabilitation",
+      "Implant prosthodontics",
+      "Digital smile design",
+      "Same-day restorations",
+      "Complex esthetic cases",
+      "Digital workflow optimization"
+    ],
+    "languages": ["English", "Spanish"],
+    "personalNote": {
+      "en": "Originally from Costa Rica, Dr. Brenes brings a warm, international perspective to patient care. He is fluent in both English and Spanish, and is committed to making every patient feel welcome and informed. Outside the office, he enjoys spending time with his family, exploring the Triad food scene, and staying at the forefront of dental technology.",
+      "es": "Originario de Costa Rica, el Dr. Brenes aporta una perspectiva cálida e internacional al cuidado de sus pacientes. Es bilingüe en inglés y español, y está comprometido a hacer que cada paciente se sienta bienvenido e informado. Fuera de la oficina, disfruta pasar tiempo con su familia, explorar la escena gastronómica del Triad y mantenerse a la vanguardia de la tecnología dental."
+    }
+  },
+  "team": [
+    {
+      "id": "staff-001",
+      "firstName": "Missie",
+      "lastName": "",
+      "role": "Lead Dental Assistant",
+      "title": "Certified Dental Assistant (CDA)",
+      "photo": "/images/team-1.jpg",
+      "yearsWithPractice": 5,
+      "bio": {
+        "en": "Missie is our Lead Dental Assistant and has been with Dr. Brenes since the practice opened. With over 12 years of experience in clinical dentistry, she is a master of chairside efficiency and patient comfort. Missie specializes in implant surgery assistance, digital scanning, and 3D printing operations. She's known for putting nervous patients at ease with her calm, reassuring presence and genuine warmth.",
+        "es": "Missie es nuestra Asistente Dental Principal y ha estado con el Dr. Brenes desde que se abrió la práctica. Con más de 12 años de experiencia en odontología clínica, es experta en eficiencia al lado del sillón y comodidad del paciente. Missie se especializa en asistencia en cirugía de implantes, escaneo digital y operaciones de impresión 3D. Es conocida por tranquilizar a los pacientes nerviosos con su presencia calmada y reconfortante."
+      },
+      "specialties": ["Implant surgery assistance", "Digital scanning (Medit i700)", "3D printing operations", "Patient comfort management"],
+      "certifications": ["Certified Dental Assistant (CDA)", "CPR/BLS Certified", "Radiology Certified"],
+      "funFact": {
+        "en": "Missie can complete a full-arch digital scan in under 3 minutes — faster than most dentists!",
+        "es": "¡Missie puede completar un escaneo digital de arco completo en menos de 3 minutos — más rápido que la mayoría de los dentistas!"
+      }
+    },
+    {
+      "id": "staff-002",
+      "firstName": "Logan",
+      "lastName": "",
+      "role": "Dental Assistant / Digital Workflow Specialist",
+      "title": "Registered Dental Assistant (RDA)",
+      "photo": "/images/team-2.jpg",
+      "yearsWithPractice": 3,
+      "bio": {
+        "en": "Logan serves as both a skilled dental assistant and the practice's digital workflow specialist. He manages the SprintRay 3D printer operations, Exocad design queue, and ensures seamless integration between our digital systems. Logan's technical aptitude and attention to detail make him invaluable for complex cases requiring same-day restorations and surgical guide fabrication.",
+        "es": "Logan sirve como asistente dental hábil y especialista en flujo de trabajo digital de la práctica. Gestiona las operaciones de la impresora 3D SprintRay, la cola de diseño de Exocad, y asegura la integración perfecta entre nuestros sistemas digitales. La aptitud técnica y atención al detalle de Logan lo hacen invaluable para casos complejos que requieren restauraciones el mismo día y fabricación de guías quirúrgicas."
+      },
+      "specialties": ["SprintRay 3D printer operations", "Exocad CAD design assistance", "Digital workflow management", "Surgical guide fabrication"],
+      "certifications": ["Registered Dental Assistant (RDA)", "CPR/BLS Certified", "SprintRay Certified Operator"],
+      "funFact": {
+        "en": "Logan built a custom 3D-printed organizer for all our dental burs — it's color-coded and everything.",
+        "es": "Logan construyó un organizador personalizado impreso en 3D para todas nuestras fresas dentales — con código de colores y todo."
+      }
+    },
+    {
+      "id": "staff-003",
+      "firstName": "Emily",
+      "lastName": "",
+      "role": "Dental Assistant / Patient Coordinator",
+      "title": "Expanded Duties Dental Assistant (EDDA)",
+      "photo": "/images/team-3.jpg",
+      "yearsWithPractice": 2,
+      "bio": {
+        "en": "Emily wears two hats with grace — she's both a clinically skilled dental assistant and a patient experience coordinator. She manages treatment presentations, helps patients understand their insurance benefits, and coordinates complex multi-visit treatment plans. Emily's bilingual skills in English and Spanish make her an essential bridge for our Spanish-speaking patients and families.",
+        "es": "Emily cumple dos roles con gracia — es tanto una asistente dental clínicamente hábil como coordinadora de experiencia del paciente. Gestiona presentaciones de tratamiento, ayuda a los pacientes a entender sus beneficios de seguro, y coordina planes de tratamiento complejos de múltiples visitas. Sus habilidades bilingües en inglés y español la convierten en un puente esencial para nuestros pacientes y familias hispanohablantes."
+      },
+      "specialties": ["Treatment presentation", "Insurance coordination", "Bilingual patient communication", "Multi-visit case management"],
+      "certifications": ["Expanded Duties Dental Assistant (EDDA)", "CPR/BLS Certified", "Bilingual Patient Communication Certificate"],
+      "languages": ["English", "Spanish"],
+      "funFact": {
+        "en": "Emily volunteers as a dental health educator at local elementary schools every quarter.",
+        "es": "Emily es voluntaria como educadora de salud dental en escuelas primarias locales cada trimestre."
+      }
+    },
+    {
+      "id": "staff-004",
+      "firstName": "Michelle",
+      "lastName": "",
+      "role": "Dental Assistant / Sterilization Coordinator",
+      "title": "Certified Dental Assistant (CDA)",
+      "photo": "/images/team-4.jpg",
+      "yearsWithPractice": 4,
+      "bio": {
+        "en": "Michelle is the backbone of our clinical operations — ensuring every instrument is perfectly sterilized, every operatory is immaculately prepared, and every infection control protocol is followed to the letter. With a background in healthcare compliance, she also manages our OSHA and HIPAA compliance programs. Patients love Michelle for her warm smile and her ability to explain even the most complex procedures in simple, comforting terms.",
+        "es": "Michelle es la columna vertebral de nuestras operaciones clínicas — asegurando que cada instrumento esté perfectamente esterilizado, cada operatorio esté impecablemente preparado, y cada protocolo de control de infecciones se siga al pie de la letra. Con experiencia en cumplimiento sanitario, también gestiona nuestros programas de cumplimiento OSHA e HIPAA. Los pacientes adoran a Michelle por su cálida sonrisa y su capacidad para explicar incluso los procedimientos más complejos en términos simples y reconfortantes."
+      },
+      "specialties": ["Sterilization protocols", "Infection control management", "OSHA/HIPAA compliance", "Operatory preparation"],
+      "certifications": ["Certified Dental Assistant (CDA)", "CPR/BLS Certified", "OSHA Compliance Officer Certification", "Infection Control Certified"],
+      "funFact": {
+        "en": "Michelle maintains a 100% compliance rate on every infection control audit the practice has ever had.",
+        "es": "Michelle mantiene una tasa de cumplimiento del 100% en cada auditoría de control de infecciones que la práctica ha tenido."
+      }
+    },
+    {
+      "id": "staff-005",
+      "firstName": "Cameron",
+      "lastName": "",
+      "role": "Dental Assistant / Social Media Coordinator",
+      "title": "Registered Dental Assistant (RDA)",
+      "photo": "/images/team-5.jpg",
+      "yearsWithPractice": 1,
+      "bio": {
+        "en": "Cameron is the newest member of our team but has quickly become an integral part of the Lake Jeanette family. In addition to providing excellent chairside assistance, Cameron manages the practice's social media presence — capturing behind-the-scenes content, patient smile reveals (with consent!), and educational posts about digital dentistry. His energy and creativity bring a fresh perspective to the practice.",
+        "es": "Cameron es el miembro más nuevo de nuestro equipo pero rápidamente se ha convertido en parte integral de la familia Lake Jeanette. Además de proporcionar excelente asistencia al lado del sillón, Cameron gestiona la presencia en redes sociales de la práctica — capturando contenido detrás de cámaras, revelaciones de sonrisas de pacientes (¡con consentimiento!) y publicaciones educativas sobre odontología digital. Su energía y creatividad traen una perspectiva fresca a la práctica."
+      },
+      "specialties": ["Chairside assistance", "Social media content creation", "Patient photography", "Practice marketing"],
+      "certifications": ["Registered Dental Assistant (RDA)", "CPR/BLS Certified"],
+      "funFact": {
+        "en": "Cameron's TikTok video of Dr. Brenes 3D-printing a crown got over 500K views!",
+        "es": "¡El video de TikTok de Cameron donde el Dr. Brenes imprime una corona en 3D obtuvo más de 500K vistas!"
+      }
+    }
+  ],
+  "teamCulture": {
+    "values": [
+      "Patient-first mentality in every interaction",
+      "Continuous learning and technology adoption",
+      "Warm, family-like team environment",
+      "Excellence in clinical outcomes and patient experience",
+      "Community involvement and dental health education"
+    ],
+    "trainingCommitment": "All team members complete a minimum of 30 hours of continuing education annually, with emphasis on digital dentistry workflows, patient communication, and clinical excellence.",
+    "teamSize": 6,
+    "hiringPhilosophy": "We hire for heart and train for skill. Every team member must share our passion for patient care and commitment to excellence."
+  }
+}

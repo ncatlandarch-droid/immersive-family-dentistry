@@ -1,0 +1,933 @@
+/* ═══════════════════════════════════════════════════════════
+   My MouthMap — Patient Portal Styles
+   Premium dental health portal with 3-panel layout
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Variables ─── */
+:root {
+    --portal-bg: #F8FAFC;
+    --portal-surface: #FFFFFF;
+    --portal-surface-alt: #F1F5F9;
+    --portal-border: #E2E8F0;
+    --portal-text: #1E293B;
+    --portal-muted: #64748B;
+    --portal-teal: #0D4F4F;
+    --portal-teal-light: #1A6B6B;
+    --portal-teal-glow: rgba(13, 79, 79, 0.12);
+    --portal-blue: #4A7FB5;
+    --portal-gold: #C4A35A;
+    --portal-green: #10B981;
+    --portal-amber: #F59E0B;
+    --portal-red: #EF4444;
+    --portal-radius: 16px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --portal-shadow-lg: 0 10px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --portal-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--portal-bg);
+    color: var(--portal-text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+a { color: var(--portal-teal); text-decoration: none; }
+
+/* ═══ Auth Gate ═══ */
+.auth-gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0D4F4F 0%, #1A2F4B 50%, #0D4F4F 100%);
+    padding: 24px;
+}
+
+.auth-card {
+    background: var(--portal-surface);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: authFadeIn 0.6s ease-out;
+}
+
+@keyframes authFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--portal-teal-glow);
+    margin-bottom: 20px;
+    object-fit: cover;
+}
+
+.auth-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--portal-teal);
+    margin-bottom: 4px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: var(--portal-muted);
+    margin-bottom: 16px;
+}
+
+.auth-desc {
+    font-size: 14px;
+    color: var(--portal-muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-input {
+    padding: 14px 18px;
+    border: 1px solid var(--portal-border);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--portal-text);
+    background: var(--portal-surface-alt);
+    transition: var(--portal-transition);
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: var(--portal-teal);
+    box-shadow: 0 0 0 3px var(--portal-teal-glow);
+    background: var(--portal-surface);
+}
+
+.auth-btn {
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--portal-teal), var(--portal-teal-light));
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    transition: var(--portal-transition);
+    margin-top: 4px;
+}
+
+.auth-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px var(--portal-teal-glow);
+}
+
+.auth-error {
+    color: var(--portal-red);
+    font-size: 13px;
+    min-height: 18px;
+}
+
+.auth-footer {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--portal-muted);
+    line-height: 2;
+}
+
+/* ═══ Portal Layout ═══ */
+.portal {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── Header ─── */
+.portal-header {
+    background: var(--portal-surface);
+    border-bottom: 1px solid var(--portal-border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--portal-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.portal-header__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.portal-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.portal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--portal-teal);
+}
+
+.portal-subtitle {
+    font-size: 12px;
+    color: var(--portal-muted);
+}
+
+.portal-header__right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.portal-header__lang {
+    display: flex;
+    gap: 4px;
+}
+
+.lang-btn {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--portal-muted);
+    border: 1px solid var(--portal-border);
+    transition: var(--portal-transition);
+}
+
+.lang-btn.active {
+    background: var(--portal-teal);
+    color: white;
+    border-color: var(--portal-teal);
+}
+
+.portal-logout {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--portal-muted);
+    border: 1px solid var(--portal-border);
+    transition: var(--portal-transition);
+}
+
+.portal-logout:hover {
+    border-color: var(--portal-red);
+    color: var(--portal-red);
+}
+
+/* ─── 3-Panel Layout ─── */
+.portal-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 200px 1fr 340px;
+    gap: 0;
+    height: calc(100vh - 65px - 64px);
+}
+
+/* ─── Left Nav ─── */
+.portal-nav {
+    background: var(--portal-surface);
+    border-right: 1px solid var(--portal-border);
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--portal-muted);
+    transition: var(--portal-transition);
+    text-align: left;
+    width: 100%;
+}
+
+.nav-item:hover {
+    background: var(--portal-surface-alt);
+    color: var(--portal-text);
+}
+
+.nav-item.active {
+    background: var(--portal-teal-glow);
+    color: var(--portal-teal);
+    font-weight: 600;
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+/* ─── Main View ─── */
+.portal-main {
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.portal-view {
+    display: none;
+    animation: viewFadeIn 0.3s ease-out;
+}
+
+.portal-view.active {
+    display: block;
+}
+
+@keyframes viewFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.portal-view h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--portal-text);
+    margin-bottom: 20px;
+}
+
+/* ─── 3D Viewer ─── */
+.view-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--portal-muted);
+    border: 1px solid var(--portal-border);
+    transition: var(--portal-transition);
+}
+
+.toolbar-btn:hover {
+    border-color: var(--portal-teal);
+    color: var(--portal-teal);
+}
+
+.mouth-viewer-container {
+    width: 100%;
+    height: 420px;
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    border: 1px solid var(--portal-border);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--portal-shadow);
+}
+
+.viewer-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--portal-muted);
+    font-size: 14px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--portal-border);
+    border-top-color: var(--portal-teal);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Tooth Info Panel */
+.tooth-info {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background: var(--portal-surface);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--portal-shadow-lg);
+    border: 1px solid var(--portal-border);
+    animation: slideUp 0.3s ease-out;
+    z-index: 10;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tooth-info__close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 16px;
+    color: var(--portal-muted);
+    padding: 4px;
+}
+
+.tooth-info h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.tooth-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.tooth-badge.green { background: #D1FAE5; color: #065F46; }
+.tooth-badge.yellow { background: #FEF3C7; color: #92400E; }
+.tooth-badge.red { background: #FEE2E2; color: #991B1B; }
+.tooth-badge.gray { background: #F1F5F9; color: #475569; }
+
+.tooth-findings {
+    font-size: 13px;
+    color: var(--portal-muted);
+    line-height: 1.6;
+}
+
+/* ─── Health Summary Cards ─── */
+.health-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.health-card {
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    padding: 20px;
+    border: 1px solid var(--portal-border);
+    box-shadow: var(--portal-shadow);
+}
+
+.health-card__icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.health-card__label {
+    font-size: 12px;
+    color: var(--portal-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.health-card__value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.health-card__value.good { color: var(--portal-green); }
+.health-card__value.monitor { color: var(--portal-amber); }
+.health-card__value.attention { color: var(--portal-red); }
+
+/* ─── Health Chart Grid ─── */
+.health-chart {
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    padding: 24px;
+    border: 1px solid var(--portal-border);
+}
+
+.dental-grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.dental-grid__tooth {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--portal-transition);
+    border: 2px solid transparent;
+}
+
+.dental-grid__tooth:hover {
+    transform: scale(1.15);
+    border-color: var(--portal-teal);
+}
+
+.dental-grid__tooth.green { background: #D1FAE5; color: #065F46; }
+.dental-grid__tooth.yellow { background: #FEF3C7; color: #92400E; }
+.dental-grid__tooth.red { background: #FEE2E2; color: #991B1B; }
+.dental-grid__tooth.gray { background: #F1F5F9; color: #94A3B8; }
+.dental-grid__tooth.extracted { background: #F1F5F9; color: #CBD5E1; text-decoration: line-through; }
+
+/* ─── Timeline ─── */
+.timeline {
+    position: relative;
+    padding-left: 32px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--portal-border);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    border: 1px solid var(--portal-border);
+    box-shadow: var(--portal-shadow);
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -27px;
+    top: 20px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--portal-teal);
+    border: 3px solid var(--portal-surface);
+    box-shadow: 0 0 0 2px var(--portal-teal);
+}
+
+.timeline-item.upcoming::before {
+    background: var(--portal-surface);
+    border-color: var(--portal-border);
+    box-shadow: 0 0 0 2px var(--portal-border);
+}
+
+.timeline-item__date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--portal-teal);
+    margin-bottom: 4px;
+}
+
+.timeline-item__title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.timeline-item__desc {
+    font-size: 13px;
+    color: var(--portal-muted);
+    line-height: 1.5;
+}
+
+/* ─── Cost Center ─── */
+.cost-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cost-card {
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    padding: 20px;
+    border: 1px solid var(--portal-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cost-card__procedure {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.cost-card__detail {
+    font-size: 13px;
+    color: var(--portal-muted);
+}
+
+.cost-card__amounts {
+    text-align: right;
+}
+
+.cost-card__total {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--portal-text);
+}
+
+.cost-card__insurance {
+    font-size: 12px;
+    color: var(--portal-green);
+    font-weight: 500;
+}
+
+.cost-card__patient {
+    font-size: 12px;
+    color: var(--portal-muted);
+}
+
+/* ─── Treatment Plan ─── */
+.plan-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.plan-card {
+    background: var(--portal-surface);
+    border-radius: var(--portal-radius);
+    padding: 20px;
+    border: 1px solid var(--portal-border);
+    border-left: 4px solid var(--portal-teal);
+}
+
+.plan-card.urgent { border-left-color: var(--portal-red); }
+.plan-card.moderate { border-left-color: var(--portal-amber); }
+.plan-card.routine { border-left-color: var(--portal-green); }
+
+.plan-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.plan-card__title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.plan-card__priority {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.plan-card__body {
+    font-size: 13px;
+    color: var(--portal-muted);
+    line-height: 1.6;
+}
+
+/* ─── Right Panel: PALOMA Personal ─── */
+.portal-paloma {
+    background: var(--portal-surface);
+    border-left: 1px solid var(--portal-border);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 65px - 64px);
+}
+
+.paloma-personal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--portal-teal), var(--portal-teal-light));
+    color: white;
+}
+
+.paloma-personal-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    object-fit: cover;
+}
+
+.paloma-personal-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.paloma-personal-subtitle {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.paloma-personal-disclaimer {
+    padding: 8px 16px;
+    font-size: 10px;
+    color: var(--portal-muted);
+    background: var(--portal-surface-alt);
+    border-bottom: 1px solid var(--portal-border);
+    line-height: 1.4;
+}
+
+.paloma-personal-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.paloma-personal-messages::-webkit-scrollbar { width: 4px; }
+.paloma-personal-messages::-webkit-scrollbar-thumb { background: var(--portal-border); border-radius: 4px; }
+
+.portal-msg {
+    max-width: 90%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    animation: viewFadeIn 0.3s ease-out;
+}
+
+.portal-msg--bot {
+    background: var(--portal-surface-alt);
+    color: var(--portal-text);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.portal-msg--user {
+    background: linear-gradient(135deg, var(--portal-teal), var(--portal-teal-light));
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+.paloma-personal-suggestions {
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--portal-border);
+}
+
+.paloma-personal-suggestions .paloma-chip {
+    padding: 5px 10px;
+    border-radius: 16px;
+    border: 1px solid var(--portal-border);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--portal-teal);
+    transition: var(--portal-transition);
+    background: white;
+}
+
+.paloma-personal-suggestions .paloma-chip:hover {
+    background: var(--portal-teal);
+    color: white;
+    border-color: var(--portal-teal);
+}
+
+.paloma-personal-input {
+    padding: 12px 14px;
+    border-top: 1px solid var(--portal-border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.paloma-personal-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--portal-border);
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+    background: var(--portal-surface-alt);
+    transition: var(--portal-transition);
+    color: var(--portal-text);
+}
+
+.paloma-personal-input input:focus {
+    border-color: var(--portal-teal);
+    box-shadow: 0 0 0 2px var(--portal-teal-glow);
+    background: white;
+}
+
+.paloma-personal-input .paloma-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--portal-teal), var(--portal-teal-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--portal-transition);
+}
+
+.paloma-personal-input .paloma-send:hover {
+    transform: scale(1.05);
+}
+
+.paloma-personal-input .paloma-send svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ─── Bottom Timeline Bar ─── */
+.portal-timeline-bar {
+    background: var(--portal-surface);
+    border-top: 1px solid var(--portal-border);
+    padding: 12px 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+}
+
+.timeline-bar-track {
+    flex: 1;
+    height: 4px;
+    background: var(--portal-border);
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+}
+
+.timeline-bar-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--portal-surface);
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    transition: var(--portal-transition);
+}
+
+.timeline-bar-dot.past { background: var(--portal-teal); box-shadow: 0 0 0 2px var(--portal-teal); }
+.timeline-bar-dot.upcoming { background: var(--portal-surface); box-shadow: 0 0 0 2px var(--portal-border); }
+.timeline-bar-dot:hover { transform: scale(1.3); }
+
+.timeline-bar-dot__label {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--portal-muted);
+    white-space: nowrap;
+}
+
+/* ─── Messages Container ─── */
+.messages-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--portal-muted);
+    font-size: 15px;
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 1024px) {
+    .portal-layout {
+        grid-template-columns: 60px 1fr 300px;
+    }
+
+    .nav-label { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .nav-icon { font-size: 22px; }
+}
+
+@media (max-width: 768px) {
+    .portal-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .portal-nav {
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid var(--portal-border);
+        overflow-x: auto;
+        padding: 8px;
+        gap: 2px;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px 12px;
+        font-size: 11px;
+        min-width: max-content;
+    }
+
+    .nav-label { display: block; }
+    .nav-icon { font-size: 18px; }
+
+    .portal-paloma {
+        border-left: none;
+        border-top: 1px solid var(--portal-border);
+        height: 400px;
+    }
+
+    .portal-timeline-bar {
+        display: none;
+    }
+
+    .mouth-viewer-container {
+        height: 300px;
+    }
+}

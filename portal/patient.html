@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My MouthMap — Chris Harrison | Lake Jeanette Dentistry</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/STLLoader.js"></script>
+
+    <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+    <!-- ═══ Portal (No Auth Gate — Demo Mode) ═══ -->
+    <div id="portal" class="portal" style="display: flex;">
+
+        <!-- Left Panel: Navigation + Info -->
+        <aside class="portal-sidebar" id="portal-sidebar">
+            <div class="portal-brand">
+                <a href="/portal/" class="portal-back-link">← Portals</a>
+                <h2 class="portal-logo">🦷 My MouthMap</h2>
+                <p class="portal-subtitle">Demo Patient: Chris Harrison</p>
+            </div>
+
+            <nav class="portal-nav" id="portal-nav">
+                <button class="nav-item active" data-view="scan">
+                    <span>🔬</span> My Scan
+                </button>
+                <button class="nav-item" data-view="health">
+                    <span>❤️</span> Health Summary
+                </button>
+                <button class="nav-item" data-view="timeline">
+                    <span>📅</span> Timeline
+                </button>
+                <button class="nav-item" data-view="costs">
+                    <span>💰</span> Cost Center
+                </button>
+                <button class="nav-item" data-view="plan">
+                    <span>📋</span> Treatment Plan
+                </button>
+                <button class="nav-item" data-view="messages">
+                    <span>💬</span> Messages
+                </button>
+            </nav>
+
+            <div class="portal-user">
+                <div class="portal-user__avatar">CH</div>
+                <div>
+                    <p id="patient-welcome" class="portal-user__name">Welcome, Chris! 🕊️</p>
+                    <div class="portal-lang-toggle">
+                        <button class="lang-btn active" data-lang="en">EN</button>
+                        <button class="lang-btn" data-lang="es">ES</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Panel: Content -->
+        <main class="portal-main">
+            <!-- View: 3D Scan -->
+            <div id="view-scan" class="portal-view active">
+                <div class="viewer-container">
+                    <div id="mouth-viewer" class="mouth-viewer"></div>
+                    <div id="viewer-loading" class="viewer-loading">
+                        <div class="viewer-spinner"></div>
+                        <p>Loading 3D Model...</p>
+                    </div>
+                    <div class="viewer-controls">
+                        <button id="reset-view-btn" class="viewer-btn">↺ Reset View</button>
+                    </div>
+                    <!-- Tooth Info Panel -->
+                    <div id="tooth-info" class="tooth-info" style="display:none;">
+                        <button id="tooth-info-close" class="tooth-info__close">✕</button>
+                        <h3 id="tooth-name" class="tooth-info__name"></h3>
+                        <span id="tooth-status" class="tooth-badge"></span>
+                        <div id="tooth-findings" class="tooth-info__findings"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Health Summary -->
+            <div id="view-health" class="portal-view">
+                <h2 class="view-title">❤️ Health Summary</h2>
+                <div id="health-cards" class="health-cards"></div>
+                <div id="health-chart" class="health-chart"></div>
+            </div>
+
+            <!-- View: Timeline -->
+            <div id="view-timeline" class="portal-view">
+                <h2 class="view-title">📅 Visit Timeline</h2>
+                <div id="timeline-container" class="timeline"></div>
+            </div>
+
+            <!-- View: Cost Center -->
+            <div id="view-costs" class="portal-view">
+                <h2 class="view-title">💰 Cost Center</h2>
+                <div id="cost-summary" class="cost-summary"></div>
+            </div>
+
+            <!-- View: Treatment Plan -->
+            <div id="view-plan" class="portal-view">
+                <h2 class="view-title">📋 Treatment Plan</h2>
+                <div id="plan-container" class="plan-container"></div>
+            </div>
+
+            <!-- View: Messages -->
+            <div id="view-messages" class="portal-view">
+                <h2 class="view-title">💬 Messages</h2>
+                <div class="messages-placeholder">
+                    <p>🚧 Secure messaging coming soon!</p>
+                    <p style="font-size:13px;color:var(--portal-muted);">In the meantime, chat with PALOMA on the right →</p>
+                </div>
+            </div>
+
+            <!-- Bottom Timeline Bar -->
+            <div id="portal-timeline-bar" class="portal-timeline-bar"></div>
+        </main>
+
+        <!-- Right Panel: PALOMA Chat -->
+        <aside class="portal-chat">
+            <div class="portal-chat__header">
+                <img src="/images/paloma/paloma-avatar.png" alt="PALOMA" class="paloma-avatar" />
+                <div>
+                    <h3>PALOMA</h3>
+                    <p>Your dental health guide</p>
+                </div>
+            </div>
+            <div id="portal-chat-messages" class="portal-chat__messages"></div>
+            <div id="portal-chat-suggestions" class="portal-chat__suggestions">
+                <button class="paloma-chip">What does tooth #30 mean?</button>
+                <button class="paloma-chip">Explain my treatment plan</button>
+                <button class="paloma-chip">How much will I owe?</button>
+                <button class="paloma-chip">¿Hablas español?</button>
+            </div>
+            <div class="portal-chat__input">
+                <input type="text" id="portal-chat-input" placeholder="Ask PALOMA about your dental health..." />
+                <button id="portal-chat-send" class="portal-chat__send">🕊️</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="patient-portal.js" type="module"></script>
+</body>
+</html>

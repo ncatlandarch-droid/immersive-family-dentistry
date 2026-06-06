@@ -1,0 +1,189 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "dataType": "DEMO",
+  "disclaimer": "This is simulated patient data for PALOMA development. Not from actual clinical records.",
+  "patient": {
+    "id": "PAT-2026-0042",
+    "mrn": "LJ-00042",
+    "status": "active",
+    "createdDate": "2026-01-15",
+    "lastVisit": "2026-05-14",
+    "nextAppointment": "2026-09-10T09:00:00-04:00"
+  },
+  "demographics": {
+    "prefix": "Mr.",
+    "firstName": "W.",
+    "middleName": "Chris",
+    "lastName": "Harrison",
+    "preferredName": "Chris",
+    "displayName": "Chris Harrison",
+    "dateOfBirth": "1983-07-22",
+    "age": 42,
+    "gender": "Male",
+    "maritalStatus": "Married",
+    "preferredLanguage": "en",
+    "secondaryLanguage": null,
+    "ethnicity": "Caucasian",
+    "ssn": "XXX-XX-XXXX"
+  },
+  "contact": {
+    "phone": {
+      "mobile": "(336) 555-0142",
+      "home": null,
+      "work": "(336) 555-0200"
+    },
+    "email": "chris.harrison@email.com",
+    "preferredContactMethod": "mobile",
+    "textOptIn": true,
+    "emailOptIn": true,
+    "address": {
+      "street": "4200 Lawndale Drive",
+      "city": "Greensboro",
+      "state": "NC",
+      "zip": "27455",
+      "country": "US"
+    }
+  },
+  "emergencyContact": {
+    "name": "Sarah Harrison",
+    "relationship": "Spouse",
+    "phone": "(336) 555-0143"
+  },
+  "insurance": {
+    "primary": {
+      "carrier": "BlueCross BlueShield of NC",
+      "planName": "Blue Dental PPO Plus",
+      "memberId": "BCBS-DEMO-884421",
+      "groupNumber": "GRP-DEMO-7720",
+      "subscriberName": "W. Chris Harrison",
+      "subscriberRelationship": "Self",
+      "effectiveDate": "2025-01-01",
+      "coverageTiers": {
+        "preventive": 100,
+        "basic": 80,
+        "major": 50
+      },
+      "annualMaximum": 2000,
+      "annualMaximumUsed": 1240,
+      "annualMaximumRemaining": 760,
+      "deductible": 50,
+      "deductibleMet": true,
+      "benefitYearReset": "2027-01-01",
+      "verifiedDate": "2026-05-14",
+      "verifiedBy": "Emily"
+    },
+    "secondary": null
+  },
+  "medicalHistory": {
+    "lastUpdated": "2026-05-14",
+    "allergies": {
+      "hasAllergies": false,
+      "medications": [],
+      "materials": [],
+      "foods": [],
+      "environmental": [],
+      "latex": false,
+      "notes": "Patient reports no known allergies (NKDA). Confirmed at each visit."
+    },
+    "currentMedications": [
+      {
+        "name": "Multivitamin",
+        "dosage": "1 tablet daily",
+        "purpose": "General health",
+        "prescribedBy": "Self (OTC)",
+        "startDate": "2024-01-01"
+      }
+    ],
+    "medicalConditions": [],
+    "surgicalHistory": [
+      {
+        "procedure": "Appendectomy",
+        "year": 2005,
+        "notes": "Uncomplicated, full recovery"
+      }
+    ],
+    "familyHistory": {
+      "heartDisease": false,
+      "diabetes": false,
+      "cancer": false,
+      "bleedingDisorders": false,
+      "notes": "No significant family medical history reported"
+    },
+    "socialHistory": {
+      "tobaccoUse": "Never",
+      "alcoholUse": "Social (1-2 drinks/week)",
+      "recreationalDrugs": "None"
+    },
+    "vitals": {
+      "bloodPressure": "122/78",
+      "pulse": 72,
+      "recordedDate": "2026-05-14"
+    },
+    "asaClassification": "ASA I",
+    "premedication": "None required",
+    "sedationPreference": "Local anesthesia only",
+    "anxietyLevel": "Low",
+    "gagReflex": "Normal"
+  },
+  "dentalHistory": {
+    "lastDentalVisitBeforeUs": "2025-06-15",
+    "previousDentist": {
+      "name": "Dr. Margaret Chen, DDS",
+      "practice": "Friendly Smiles Family Dentistry",
+      "city": "Greensboro, NC",
+      "yearsWithProvider": 8,
+      "reasonForLeaving": "Seeking specialist care for implant options and digital dentistry"
+    },
+    "chiefComplaint": {
+      "initial": "Interested in digital dentistry approach. Concerned about sensitivity on lower right molar (#30). Also wants to replace old amalgam restoration on #19.",
+      "current": "Routine maintenance. Monitoring #30 for potential crown."
+    },
+    "brushingFrequency": "2x daily",
+    "flossingFrequency": "Daily",
+    "mouthwash": "Listerine Cool Mint (occasional)",
+    "dietConcerns": "Moderate coffee consumption (2-3 cups/day), occasional acidic foods",
+    "bruxism": "Mild — no night guard currently",
+    "tmjSymptoms": "None reported",
+    "orthodonticHistory": "Braces ages 13-15, retainer worn for 2 years",
+    "previousTrauma": "None"
+  },
+  "riskAssessment": {
+    "cariesRisk": "Low",
+    "periodontalRisk": "Low-Moderate",
+    "oralCancerRisk": "Low",
+    "bruxismRisk": "Moderate",
+    "overallRisk": "Low",
+    "lastAssessed": "2026-05-14",
+    "assessedBy": "Dr. Brenes",
+    "notes": "Overall healthy patient. Mild bruxism noted — recommend monitoring and discussing night guard at next visit. Tooth #30 shows early signs of cusp fracture — monitoring with possible crown recommendation."
+  },
+  "preferences": {
+    "appointmentPreferences": {
+      "preferredDays": ["Tuesday", "Wednesday"],
+      "preferredTimes": "Morning (8:00-11:00 AM)",
+      "reminderPreference": "Text 48 hours before + day of",
+      "confirmedVia": "text"
+    },
+    "communicationPreferences": {
+      "treatmentUpdates": "email",
+      "promotions": "email",
+      "recalls": "text",
+      "billing": "email"
+    },
+    "musicPreference": "Spotify — Jazz playlist",
+    "blanketPreference": true,
+    "notes": "Chris likes to see his scan results on the screen. Appreciates detailed explanations of findings. Very engaged patient who asks good questions."
+  },
+  "primaryProvider": {
+    "id": "prov-001",
+    "name": "Dr. Christian Brenes, DDS, MS",
+    "role": "Primary Dentist / Prosthodontist"
+  },
+  "hygienist": null,
+  "referralSource": {
+    "type": "Online Research",
+    "detail": "Found practice via Google search for 'digital dentistry Greensboro' and Instagram @lakejeanettedentistry",
+    "referringPatient": null
+  }
+}

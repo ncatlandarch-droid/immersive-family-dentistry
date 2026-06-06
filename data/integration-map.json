@@ -1,0 +1,514 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "integrationPhases": {
+    "phase1": {
+      "name": "Foundation",
+      "description": "Core practice management and patient communication systems",
+      "targetDate": "2026-Q3",
+      "status": "in-progress"
+    },
+    "phase2": {
+      "name": "Digital Workflow",
+      "description": "Scanning, design, and fabrication pipeline integration",
+      "targetDate": "2026-Q4",
+      "status": "planned"
+    },
+    "phase3": {
+      "name": "AI & Analytics",
+      "description": "AI diagnostic platforms and business intelligence dashboards",
+      "targetDate": "2027-Q1",
+      "status": "planned"
+    },
+    "phase4": {
+      "name": "Patient Experience",
+      "description": "Patient-facing portals, smile design previews, and PALOMA deep integration",
+      "targetDate": "2027-Q2",
+      "status": "planned"
+    }
+  },
+  "systems": [
+    {
+      "id": "int-001",
+      "name": "Dentrix G7",
+      "vendor": "Henry Schein One",
+      "category": "Practice Management System (PMS)",
+      "description": "Core practice management system handling patient records, scheduling, billing, insurance claims, clinical notes, and treatment planning.",
+      "currentStatus": "active",
+      "integrationPhase": "phase1",
+      "integrationStatus": "partial",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "Dentrix API (HL7/REST hybrid)",
+        "documentation": "Available via Henry Schein developer portal",
+        "authentication": "OAuth 2.0 + API Key",
+        "rateLimit": "1000 requests/hour",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "HL7 FHIR R4",
+        "secondary": ["XML", "CSV export"],
+        "patientData": "FHIR Patient Resource",
+        "appointments": "FHIR Appointment Resource",
+        "clinicalNotes": "FHIR DocumentReference"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Patient demographics, insurance info, appointment schedules",
+          "frequency": "Real-time via webhook",
+          "format": "FHIR R4 JSON"
+        },
+        {
+          "direction": "inbound",
+          "data": "Treatment plans, completed procedures, billing codes",
+          "frequency": "Nightly batch sync",
+          "format": "CSV/HL7"
+        },
+        {
+          "direction": "outbound",
+          "data": "PALOMA conversation logs, patient engagement metrics",
+          "frequency": "On-demand",
+          "format": "JSON"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Patient records", "Appointment schedule", "Treatment plans", "Insurance info", "Billing history"],
+        "writes": ["Appointment requests", "Patient communication logs"],
+        "status": "Phase 1 - Read-only access planned"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "AES-256 at rest, TLS 1.3 in transit",
+        "baa": "Business Associate Agreement required and signed"
+      },
+      "notes": "Primary source of truth for all patient data. PALOMA will read from Dentrix but never write clinical data directly."
+    },
+    {
+      "id": "int-002",
+      "name": "Medit Link",
+      "vendor": "Medit Corp",
+      "category": "Digital Impression / Intraoral Scanning",
+      "description": "Cloud platform for managing digital impressions captured with the Medit i700 wireless intraoral scanner. Stores 3D scan data, enables case sharing, and connects to CAD/CAM workflows.",
+      "currentStatus": "active",
+      "integrationPhase": "phase2",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API",
+        "documentation": "Medit Link Open API (partner access)",
+        "authentication": "OAuth 2.0",
+        "rateLimit": "500 requests/hour",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "STL",
+        "secondary": ["PLY", "OBJ", "DCM (DICOM)"],
+        "scanData": "3D mesh files (STL/PLY)",
+        "caseData": "JSON metadata"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Scan completion notifications, case metadata, scan quality scores",
+          "frequency": "Event-driven (webhook)",
+          "format": "JSON + STL references"
+        },
+        {
+          "direction": "outbound",
+          "data": "Case routing instructions, design requests",
+          "frequency": "On-demand",
+          "format": "JSON"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Scan history", "Case status", "Scan quality metrics"],
+        "writes": [],
+        "status": "Phase 2 - Read-only scan history"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "AES-256 at rest, TLS 1.2+ in transit",
+        "baa": "Required — pending execution"
+      },
+      "notes": "Dr. Brenes is a KOL for Medit. Priority access to beta API features. Scanner captures 70+ scans/week."
+    },
+    {
+      "id": "int-003",
+      "name": "Pearl Second Opinion AI",
+      "vendor": "Pearl Inc.",
+      "category": "AI Diagnostic Platform",
+      "description": "FDA-cleared AI platform that analyzes dental radiographs in real-time to detect pathology including caries, periapical lesions, calculus, and bone loss. Provides a 'second opinion' overlay on panoramic and periapical X-rays.",
+      "currentStatus": "active",
+      "integrationPhase": "phase3",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API",
+        "documentation": "Pearl Clinical API (enterprise)",
+        "authentication": "API Key + JWT",
+        "rateLimit": "200 analyses/hour",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "JSON (findings report)",
+        "secondary": ["DICOM (radiograph input)", "PNG (annotated overlay)"],
+        "input": "DICOM radiograph or high-res image",
+        "output": "JSON findings with confidence scores + annotated image overlay"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "AI findings (pathology detections with confidence scores, annotated images)",
+          "frequency": "Per-radiograph analysis (real-time)",
+          "format": "JSON + PNG overlay"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["AI findings per tooth", "Confidence scores", "Historical AI analyses"],
+        "writes": [],
+        "status": "Phase 3 - AI findings feed into PALOMA dental chart"
+      },
+      "compliance": {
+        "hipaa": true,
+        "fdaCleared": true,
+        "fdaClearanceNumber": "K220274",
+        "encryption": "AES-256 at rest, TLS 1.3 in transit",
+        "baa": "Signed"
+      },
+      "notes": "Pearl findings are integrated into the dental chart view. PALOMA references AI confidence scores when explaining findings to patients."
+    },
+    {
+      "id": "int-004",
+      "name": "Overjet Dental AI",
+      "vendor": "Overjet Inc.",
+      "category": "AI Diagnostic Platform",
+      "description": "FDA-cleared AI platform specializing in quantitative measurement of bone loss and caries detection on dental radiographs. Provides precise millimeter measurements and ADA classification of findings.",
+      "currentStatus": "active",
+      "integrationPhase": "phase3",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API",
+        "documentation": "Overjet Clinical API",
+        "authentication": "OAuth 2.0",
+        "rateLimit": "150 analyses/hour",
+        "sandboxAvailable": false
+      },
+      "dataFormat": {
+        "primary": "JSON (quantitative measurements)",
+        "secondary": ["DICOM (input)", "SVG (annotated overlay)"],
+        "input": "DICOM radiograph",
+        "output": "JSON with bone levels (mm), caries classification (ADA), periodontal measurements"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Quantitative bone loss measurements, caries classifications, periodontal scores",
+          "frequency": "Per-radiograph analysis",
+          "format": "JSON"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Bone loss measurements", "Caries classifications", "Periodontal risk scores"],
+        "writes": [],
+        "status": "Phase 3 - Quantitative data for patient education"
+      },
+      "compliance": {
+        "hipaa": true,
+        "fdaCleared": true,
+        "encryption": "AES-256 at rest, TLS 1.2+ in transit",
+        "baa": "Signed"
+      },
+      "notes": "Overjet complements Pearl by providing quantitative measurements. Used together for comprehensive AI-assisted diagnosis."
+    },
+    {
+      "id": "int-005",
+      "name": "SprintRay Pro 95S",
+      "vendor": "SprintRay Inc.",
+      "category": "3D Printing / Digital Fabrication",
+      "description": "High-speed dental 3D printer for chairside fabrication of surgical guides, temporary crowns, denture bases, night guards, models, and custom trays. Integrated with SprintRay Pro S wash and cure stations.",
+      "currentStatus": "active",
+      "integrationPhase": "phase2",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API (SprintRay Cloud)",
+        "documentation": "SprintRay Cloud API (partner access)",
+        "authentication": "API Key",
+        "rateLimit": "100 requests/hour",
+        "sandboxAvailable": false
+      },
+      "dataFormat": {
+        "primary": "STL (print file input)",
+        "secondary": ["JSON (job status)", "CSV (material usage logs)"],
+        "input": "STL/OBJ mesh files from CAD software",
+        "output": "JSON print job status, material consumption data"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Print job status, completion notifications, material usage, maintenance alerts",
+          "frequency": "Event-driven",
+          "format": "JSON"
+        },
+        {
+          "direction": "outbound",
+          "data": "Print job submission",
+          "frequency": "On-demand",
+          "format": "STL + JSON parameters"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Print job status for patient cases", "Estimated completion times"],
+        "writes": [],
+        "status": "Phase 2 - Status tracking for same-day cases"
+      },
+      "compliance": {
+        "hipaa": true,
+        "fdaCleared": true,
+        "encryption": "TLS 1.2 in transit",
+        "baa": "Not required (no PHI in print files)"
+      },
+      "notes": "Dr. Brenes is a KOL for SprintRay. Prints an average of 15-20 items per week including surgical guides, temps, and models."
+    },
+    {
+      "id": "int-006",
+      "name": "Exocad DentalCAD / ChairsideCAD",
+      "vendor": "Exocad GmbH (Align Technology)",
+      "category": "CAD/CAM Design Software",
+      "description": "Industry-leading dental CAD software for designing crowns, bridges, implant abutments, full-arch restorations, and smile designs. ChairsideCAD provides streamlined chairside workflows for same-day restorations.",
+      "currentStatus": "active",
+      "integrationPhase": "phase2",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": false,
+        "apiType": "File-based (no REST API)",
+        "documentation": "Exocad DentalDB documentation",
+        "authentication": "N/A (local software)",
+        "workaround": "File system monitoring for completed designs (STL/3MF output folders)"
+      },
+      "dataFormat": {
+        "primary": "STL (design output)",
+        "secondary": ["3MF", "DentalDB project files", "XML (design parameters)"],
+        "input": "STL scans from Medit Link",
+        "output": "STL/3MF restoration designs"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Completed design metadata, design screenshots, case status",
+          "frequency": "File system watch (polling every 5 min)",
+          "format": "XML + STL references"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Design completion status", "Case tracking"],
+        "writes": [],
+        "status": "Phase 2 - File-based status monitoring"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "Local storage — encrypted workstation",
+        "baa": "N/A (local software)"
+      },
+      "notes": "Dr. Brenes is a KOL for Exocad. No REST API available — integration via file system monitoring and manual case tracking."
+    },
+    {
+      "id": "int-007",
+      "name": "SmileCloud",
+      "vendor": "SmileCloud Platform",
+      "category": "Digital Smile Design (DSD)",
+      "description": "Cloud-based smile design platform for creating photorealistic smile mockups, 2D/3D smile simulations, and patient presentation materials. Integrates patient photos with digital wax-ups for treatment visualization.",
+      "currentStatus": "active",
+      "integrationPhase": "phase4",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API",
+        "documentation": "SmileCloud API documentation",
+        "authentication": "API Key + Bearer Token",
+        "rateLimit": "50 requests/hour",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "JSON (case data)",
+        "secondary": ["JPEG/PNG (smile renderings)", "PDF (patient presentations)"],
+        "input": "Patient photos (JPEG), facial scan data",
+        "output": "Smile simulation images, before/after comparisons, PDF presentations"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Smile design renderings, before/after simulations, case presentations",
+          "frequency": "On-demand",
+          "format": "JSON + JPEG/PDF"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Smile design previews for patient presentation", "Before/after simulation images"],
+        "writes": [],
+        "status": "Phase 4 - Patient-facing smile preview integration"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "AES-256 at rest, TLS 1.2+ in transit",
+        "baa": "Required — pending"
+      },
+      "notes": "Used for case acceptance presentations. PALOMA will eventually show patients their smile design previews during virtual consultations."
+    },
+    {
+      "id": "int-008",
+      "name": "Google Calendar",
+      "vendor": "Google LLC",
+      "category": "Scheduling / Calendar",
+      "description": "Google Workspace calendar used for provider scheduling, team meetings, CE events, and KOL lecture commitments. Supplements Dentrix scheduling for non-clinical events.",
+      "currentStatus": "active",
+      "integrationPhase": "phase1",
+      "integrationStatus": "partial",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API (Google Calendar API v3)",
+        "documentation": "https://developers.google.com/calendar",
+        "authentication": "OAuth 2.0 (Google Workspace)",
+        "rateLimit": "1000 requests/100 seconds",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "JSON (Google Calendar Event)",
+        "secondary": ["iCal (.ics)"],
+        "events": "Google Calendar Event Resource"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Provider availability, blocked times, CE events",
+          "frequency": "Real-time via webhook/push notifications",
+          "format": "JSON"
+        },
+        {
+          "direction": "outbound",
+          "data": "Appointment hold requests",
+          "frequency": "On-demand",
+          "format": "JSON"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Provider availability", "Office closures", "Special events"],
+        "writes": ["Appointment hold requests (pending confirmation)"],
+        "status": "Phase 1 - Read availability, propose times"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "Google Workspace encryption (AES-256)",
+        "baa": "Google Workspace BAA signed"
+      },
+      "notes": "Used alongside Dentrix scheduling. PALOMA checks Google Calendar for Dr. Brenes' availability when helping patients find appointment times."
+    },
+    {
+      "id": "int-009",
+      "name": "Weave",
+      "vendor": "Weave Communications",
+      "category": "Patient Communication Platform",
+      "description": "Unified patient communication platform handling phone, text, email, and review management. Provides appointment reminders, recall notifications, payment requests, and two-way texting with patients.",
+      "currentStatus": "active",
+      "integrationPhase": "phase1",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": true,
+        "apiType": "REST API",
+        "documentation": "Weave API documentation (partner access)",
+        "authentication": "OAuth 2.0",
+        "rateLimit": "300 requests/hour",
+        "sandboxAvailable": true
+      },
+      "dataFormat": {
+        "primary": "JSON",
+        "secondary": ["Webhook events"],
+        "messages": "JSON message objects",
+        "calls": "JSON call log entries"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Incoming patient messages, missed calls, review alerts",
+          "frequency": "Real-time via webhook",
+          "format": "JSON"
+        },
+        {
+          "direction": "outbound",
+          "data": "PALOMA-generated messages (appointment confirmations, post-op instructions)",
+          "frequency": "Event-driven",
+          "format": "JSON"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Patient communication history", "Pending messages"],
+        "writes": ["Automated follow-up messages", "Post-op care reminders"],
+        "status": "Phase 1 - Communication channel for PALOMA outreach"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "AES-256 at rest, TLS 1.3 in transit",
+        "baa": "Signed"
+      },
+      "notes": "Primary channel for PALOMA to send post-op care instructions, appointment reminders, and follow-up messages to patients via SMS."
+    },
+    {
+      "id": "int-010",
+      "name": "BlueSkyBio Blue Sky Plan",
+      "vendor": "BlueSkyBio LLC",
+      "category": "Implant Planning Software",
+      "description": "Free implant planning software for virtual implant placement, surgical guide design, and CBCT analysis. Integrates with BlueSkyBio implant catalog for component selection.",
+      "currentStatus": "active",
+      "integrationPhase": "phase2",
+      "integrationStatus": "not-started",
+      "apiAvailability": {
+        "hasApi": false,
+        "apiType": "File-based (DICOM import/STL export)",
+        "documentation": "BlueSkyBio user documentation",
+        "workaround": "DICOM/STL file exchange via shared network folder"
+      },
+      "dataFormat": {
+        "primary": "DICOM (CBCT input)",
+        "secondary": ["STL (surgical guide output)", "PDF (planning report)"],
+        "input": "DICOM CBCT volume + STL intraoral scan",
+        "output": "STL surgical guide + PDF implant planning report"
+      },
+      "dataFlows": [
+        {
+          "direction": "inbound",
+          "data": "Implant planning reports, surgical guide designs",
+          "frequency": "Per-case",
+          "format": "PDF + STL"
+        }
+      ],
+      "palomaIntegration": {
+        "reads": ["Implant planning case status"],
+        "writes": [],
+        "status": "Phase 2 - Case tracking only"
+      },
+      "compliance": {
+        "hipaa": true,
+        "encryption": "Local storage — encrypted workstation",
+        "baa": "N/A (local software)"
+      },
+      "notes": "Dr. Brenes is a KOL for BlueSkyBio. Software is free — key differentiator for accessible implant planning."
+    }
+  ],
+  "dataArchitecture": {
+    "primaryDataStore": "Dentrix G7 (source of truth for patient data)",
+    "palomaDataLayer": {
+      "description": "PALOMA maintains a read-only cache of relevant patient data, refreshed via scheduled syncs and real-time webhooks. All clinical data originates from Dentrix.",
+      "cacheStrategy": "Incremental sync every 15 minutes + real-time webhooks for appointments and messages",
+      "storageFormat": "JSON documents in structured file system",
+      "retentionPolicy": "Patient data cached for active session only; historical data references Dentrix directly"
+    },
+    "securityModel": {
+      "patientDataAccess": "Role-based access control (RBAC)",
+      "auditLogging": "All data access logged with timestamp, user, and action",
+      "encryption": "AES-256 at rest, TLS 1.3 in transit",
+      "dataMinimization": "PALOMA only caches data necessary for the current patient interaction"
+    }
+  }
+}

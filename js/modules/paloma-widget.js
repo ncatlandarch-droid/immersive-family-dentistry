@@ -1,0 +1,394 @@
+/* ═══════════════════════════════════════════════════════════
+   PALOMA Chat Widget — JavaScript Module
+   Patient Advocacy & Lifecycle Oral Map Assistant 🕊️
+   
+   Self-contained ES module. Handles:
+   - Chat UI injection
+   - Conversation state management
+   - Gemini API integration via Netlify Function proxy
+   - Bilingual EN/ES with auto-detect
+   - Smart suggestion chips
+   - HIPAA disclaimer
+   ═══════════════════════════════════════════════════════════ */
+
+const PALOMA_CONFIG = {
+    apiEndpoint: '/.netlify/functions/paloma-chat',
+    avatarPath: '/images/paloma/paloma-avatar.png',
+    iconPath: '/images/paloma/paloma-icon.png',
+    maxHistory: 20,
+    storageKey: 'paloma-history',
+    langKey: 'paloma-lang',
+};
+
+const STRINGS = {
+    en: {
+        name: 'PALOMA',
+        subtitle: 'Your AI Dental Health Guide',
+        disclaimer: '🔒 This is an AI assistant, not medical advice. For emergencies, call (336) 545-4281 or 911.',
+        placeholder: 'Ask PALOMA anything...',
+        greeting: `¡Hola! I'm PALOMA, your dental health guide at Lake Jeanette Dentistry. 🕊️
+
+I can help with questions about our services, insurance, scheduling, or dental health tips. How can I help you today?`,
+        suggestions: [
+            '🦷 What services do you offer?',
+            '💰 Do you accept my insurance?',
+            '📅 How do I book an appointment?',
+            '🔬 Tell me about your technology',
+        ],
+        poweredBy: 'Powered by',
+        thinking: 'PALOMA is thinking',
+        sendAria: 'Send message',
+        errorMsg: 'I apologize, I\'m having trouble connecting right now. Please call us directly at (336) 545-4281 and our team will be happy to help!',
+    },
+    es: {
+        name: 'PALOMA',
+        subtitle: 'Tu Guía de Salud Dental con IA',
+        disclaimer: '🔒 Este es un asistente de IA, no consejo médico. Para emergencias, llame al (336) 545-4281 o 911.',
+        placeholder: 'Pregúntale a PALOMA...',
+        greeting: `¡Hola! Soy PALOMA, tu guía de salud dental en Lake Jeanette Dentistry. 🕊️
+
+Puedo ayudarte con preguntas sobre nuestros servicios, seguros, citas, o consejos de salud dental. ¿En qué puedo ayudarte hoy?`,
+        suggestions: [
+            '🦷 ¿Qué servicios ofrecen?',
+            '💰 ¿Aceptan mi seguro dental?',
+            '📅 ¿Cómo puedo hacer una cita?',
+            '🔬 Cuéntame sobre su tecnología',
+        ],
+        poweredBy: 'Desarrollado por',
+        thinking: 'PALOMA está pensando',
+        sendAria: 'Enviar mensaje',
+        errorMsg: '¡Disculpa! Tengo problemas para conectarme. Por favor llama directamente al (336) 545-4281 y nuestro equipo estará encantado de ayudarte.',
+    }
+};
+
+class PalomaWidget {
+    constructor() {
+        this.isOpen = false;
+        this.isLoading = false;
+        this.messages = [];
+        this.lang = localStorage.getItem(PALOMA_CONFIG.langKey) || 'en';
+        this.loadHistory();
+        this.render();
+        this.attachListeners();
+    }
+
+    get strings() {
+        return STRINGS[this.lang];
+    }
+
+    // ─── Render ───
+    render() {
+        // FAB button
+        this.fab = document.createElement('button');
+        this.fab.className = 'paloma-fab';
+        this.fab.setAttribute('aria-label', 'Open PALOMA chat');
+        this.fab.id = 'paloma-fab';
+        this.fab.innerHTML = `<img src="${PALOMA_CONFIG.avatarPath}" alt="PALOMA" />`;
+
+        // Chat panel
+        this.panel = document.createElement('div');
+        this.panel.className = 'paloma-panel';
+        this.panel.id = 'paloma-panel';
+        this.panel.setAttribute('role', 'dialog');
+        this.panel.setAttribute('aria-label', 'Chat with PALOMA');
+        this.panel.innerHTML = this.buildPanelHTML();
+
+        document.body.appendChild(this.panel);
+        document.body.appendChild(this.fab);
+
+        // Cache DOM refs
+        this.messagesEl = this.panel.querySelector('.paloma-messages');
+        this.inputEl = this.panel.querySelector('.paloma-input');
+        this.sendBtn = this.panel.querySelector('.paloma-send');
+        this.suggestionsEl = this.panel.querySelector('.paloma-suggestions');
+        this.avatarEl = this.panel.querySelector('.paloma-header__avatar');
+
+        // Render existing messages or greeting
+        if (this.messages.length === 0) {
+            this.addBotMessage(this.strings.greeting);
+        } else {
+            this.renderHistory();
+        }
+    }
+
+    buildPanelHTML() {
+        const s = this.strings;
+        return `
+            <div class="paloma-header">
+                <img class="paloma-header__avatar" src="${PALOMA_CONFIG.avatarPath}" alt="PALOMA" />
+                <div class="paloma-header__info">
+                    <p class="paloma-header__name">${s.name}</p>
+                    <p class="paloma-header__subtitle">${s.subtitle}</p>
+                </div>
+                <div class="paloma-header__lang">
+                    <button class="${this.lang === 'en' ? 'active' : ''}" data-lang="en">EN</button>
+                    <button class="${this.lang === 'es' ? 'active' : ''}" data-lang="es">ES</button>
+                </div>
+            </div>
+            <div class="paloma-disclaimer">${s.disclaimer}</div>
+            <div class="paloma-messages" aria-live="polite"></div>
+            <div class="paloma-suggestions">
+                ${s.suggestions.map(text => `<button class="paloma-chip">${text}</button>`).join('')}
+            </div>
+            <div class="paloma-input-area">
+                <input class="paloma-input" type="text" placeholder="${s.placeholder}" aria-label="${s.placeholder}" />
+                <button class="paloma-send" aria-label="${s.sendAria}">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="paloma-footer">
+                ${s.poweredBy} <a href="https://thinkdesignplan.com" target="_blank" rel="noopener">Think! Design & Planning</a> × MouthMap
+            </div>
+        `;
+    }
+
+    // ─── Event Listeners ───
+    attachListeners() {
+        // FAB toggle
+        this.fab.addEventListener('click', () => this.toggle());
+
+        // Send message
+        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        this.inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+
+        // Suggestion chips
+        this.suggestionsEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('paloma-chip')) {
+                this.inputEl.value = e.target.textContent;
+                this.sendMessage();
+            }
+        });
+
+        // Language toggle
+        this.panel.querySelectorAll('.paloma-header__lang button').forEach(btn => {
+            btn.addEventListener('click', () => this.setLanguage(btn.dataset.lang));
+        });
+
+        // Escape to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) this.toggle();
+        });
+    }
+
+    // ─── Toggle Panel ───
+    toggle() {
+        this.isOpen = !this.isOpen;
+        this.panel.classList.toggle('paloma-panel--open', this.isOpen);
+        this.fab.classList.toggle('paloma-fab--close', this.isOpen);
+
+        if (this.isOpen) {
+            this.inputEl.focus();
+            this.scrollToBottom();
+        }
+    }
+
+    // ─── Language ───
+    setLanguage(lang) {
+        this.lang = lang;
+        localStorage.setItem(PALOMA_CONFIG.langKey, lang);
+
+        // Update header
+        this.panel.querySelector('.paloma-header__name').textContent = this.strings.name;
+        this.panel.querySelector('.paloma-header__subtitle').textContent = this.strings.subtitle;
+        this.panel.querySelector('.paloma-disclaimer').textContent = this.strings.disclaimer;
+        this.inputEl.placeholder = this.strings.placeholder;
+
+        // Update lang buttons
+        this.panel.querySelectorAll('.paloma-header__lang button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Update suggestions
+        this.suggestionsEl.innerHTML = this.strings.suggestions
+            .map(text => `<button class="paloma-chip">${text}</button>`)
+            .join('');
+
+        // Update footer
+        this.panel.querySelector('.paloma-footer').innerHTML = `
+            ${this.strings.poweredBy} <a href="https://thinkdesignplan.com" target="_blank" rel="noopener">Think! Design & Planning</a> × MouthMap
+        `;
+
+        // Send language change message
+        if (this.messages.length > 0) {
+            this.addBotMessage(lang === 'es'
+                ? '¡Perfecto! Ahora hablaré en español. ¿En qué puedo ayudarte? 🕊️'
+                : 'Great! I\'ll speak in English now. How can I help you? 🕊️'
+            );
+        }
+    }
+
+    // ─── Send Message ───
+    async sendMessage() {
+        const text = this.inputEl.value.trim();
+        if (!text || this.isLoading) return;
+
+        // Auto-detect language
+        const detectedLang = this.detectLanguage(text);
+        if (detectedLang !== this.lang) {
+            this.setLanguage(detectedLang);
+        }
+
+        this.addUserMessage(text);
+        this.inputEl.value = '';
+        this.hideSuggestions();
+        this.setLoading(true);
+
+        try {
+            const response = await this.callAPI(text);
+            this.addBotMessage(response);
+        } catch (error) {
+            console.error('PALOMA API error:', error);
+            this.addBotMessage(this.strings.errorMsg);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    // ─── API Call ───
+    async callAPI(message) {
+        const history = this.messages.slice(-PALOMA_CONFIG.maxHistory).map(m => ({
+            role: m.role,
+            content: m.content,
+        }));
+
+        const response = await fetch(PALOMA_CONFIG.apiEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message,
+                history,
+                lang: this.lang,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.reply || this.strings.errorMsg;
+    }
+
+    // ─── Message Management ───
+    addUserMessage(text) {
+        const msg = { role: 'user', content: text, timestamp: Date.now() };
+        this.messages.push(msg);
+        this.renderMessage(msg);
+        this.saveHistory();
+        this.scrollToBottom();
+    }
+
+    addBotMessage(text) {
+        const msg = { role: 'assistant', content: text, timestamp: Date.now() };
+        this.messages.push(msg);
+        this.renderMessage(msg);
+        this.saveHistory();
+        this.scrollToBottom();
+
+        // Brief speaking animation
+        this.avatarEl.classList.add('paloma-header__avatar--speaking');
+        setTimeout(() => {
+            this.avatarEl.classList.remove('paloma-header__avatar--speaking');
+        }, 2000);
+    }
+
+    renderMessage(msg) {
+        const div = document.createElement('div');
+        div.className = `paloma-msg paloma-msg--${msg.role === 'user' ? 'user' : 'bot'}`;
+        div.innerHTML = this.formatMessage(msg.content);
+        this.messagesEl.appendChild(div);
+    }
+
+    renderHistory() {
+        this.messagesEl.innerHTML = '';
+        this.messages.forEach(msg => this.renderMessage(msg));
+    }
+
+    formatMessage(text) {
+        // Basic markdown-like formatting
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+    }
+
+    // ─── UI Helpers ───
+    setLoading(loading) {
+        this.isLoading = loading;
+        this.sendBtn.disabled = loading;
+
+        if (loading) {
+            this.typingEl = document.createElement('div');
+            this.typingEl.className = 'paloma-typing';
+            this.typingEl.setAttribute('aria-label', this.strings.thinking);
+            this.typingEl.innerHTML = '<span></span><span></span><span></span>';
+            this.messagesEl.appendChild(this.typingEl);
+            this.scrollToBottom();
+            this.avatarEl.classList.add('paloma-header__avatar--speaking');
+        } else {
+            if (this.typingEl) {
+                this.typingEl.remove();
+                this.typingEl = null;
+            }
+            this.avatarEl.classList.remove('paloma-header__avatar--speaking');
+        }
+    }
+
+    hideSuggestions() {
+        this.suggestionsEl.style.display = 'none';
+    }
+
+    scrollToBottom() {
+        requestAnimationFrame(() => {
+            this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+        });
+    }
+
+    // ─── Language Detection ───
+    detectLanguage(text) {
+        const spanishPatterns = /\b(hola|gracias|por favor|buenos|buenas|cómo|qué|dónde|cuánto|necesito|tengo|puedo|quiero|ayuda|dolor|diente|muela|cita|seguro|dentista)\b/i;
+        return spanishPatterns.test(text) ? 'es' : 'en';
+    }
+
+    // ─── Persistence ───
+    saveHistory() {
+        try {
+            const trimmed = this.messages.slice(-PALOMA_CONFIG.maxHistory);
+            localStorage.setItem(PALOMA_CONFIG.storageKey, JSON.stringify(trimmed));
+        } catch (e) {
+            // Storage full — clear and continue
+            localStorage.removeItem(PALOMA_CONFIG.storageKey);
+        }
+    }
+
+    loadHistory() {
+        try {
+            const stored = localStorage.getItem(PALOMA_CONFIG.storageKey);
+            this.messages = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            this.messages = [];
+        }
+    }
+}
+
+// ─── Initialize ───
+export function initPaloma() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => new PalomaWidget());
+    } else {
+        new PalomaWidget();
+    }
+}
+
+// Auto-init if loaded as a script tag (not module)
+if (typeof window !== 'undefined' && !window.__PALOMA_INIT) {
+    window.__PALOMA_INIT = true;
+    initPaloma();
+}

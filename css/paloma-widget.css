@@ -1,0 +1,431 @@
+/* ═══════════════════════════════════════════════════════════
+   PALOMA Chat Widget — Styles
+   Patient Advocacy & Lifecycle Oral Map Assistant 🕊️
+   
+   Self-contained widget styles. Uses CSS custom properties 
+   from the parent site's design tokens for auto-theming.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Widget Variables ─── */
+:root {
+    --paloma-teal: #0D4F4F;
+    --paloma-teal-light: #1A6B6B;
+    --paloma-teal-glow: rgba(13, 79, 79, 0.25);
+    --paloma-dove: #F8FAF9;
+    --paloma-gold: #C4A35A;
+    --paloma-blue: #4A7FB5;
+    --paloma-emerald: #10B981;
+    --paloma-surface: #F1F5F9;
+    --paloma-text: #1E293B;
+    --paloma-muted: #64748B;
+    --paloma-border: #E2E8F0;
+    --paloma-white: #FFFFFF;
+    --paloma-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+    --paloma-radius: 20px;
+    --paloma-transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Floating Button ─── */
+.paloma-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--paloma-teal-glow), 0 2px 8px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--paloma-transition);
+    overflow: hidden;
+}
+
+.paloma-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 30px var(--paloma-teal-glow), 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.paloma-fab:active {
+    transform: scale(0.95);
+}
+
+.paloma-fab img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.paloma-fab--close img {
+    display: none;
+}
+
+.paloma-fab--close::after {
+    content: '✕';
+    font-size: 22px;
+    color: var(--paloma-white);
+    font-weight: 300;
+}
+
+/* Pulse ring animation */
+.paloma-fab::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--paloma-teal);
+    opacity: 0;
+    animation: paloma-pulse 3s ease-in-out infinite;
+}
+
+@keyframes paloma-pulse {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.15); }
+}
+
+/* ─── Chat Panel ─── */
+.paloma-panel {
+    position: fixed;
+    bottom: 104px;
+    right: 28px;
+    z-index: 9998;
+    width: 400px;
+    max-height: 600px;
+    border-radius: var(--paloma-radius);
+    background: var(--paloma-white);
+    box-shadow: var(--paloma-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: var(--paloma-transition);
+}
+
+.paloma-panel--open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* ─── Header ─── */
+.paloma-header {
+    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.paloma-header__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Speaking ring animation */
+.paloma-header__avatar--speaking {
+    border-color: var(--paloma-gold);
+    box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.3), 0 0 0 6px rgba(196, 163, 90, 0.15);
+    animation: paloma-speaking 1.5s ease-in-out infinite;
+}
+
+@keyframes paloma-speaking {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(196,163,90,0.3), 0 0 0 6px rgba(196,163,90,0.15); }
+    50% { box-shadow: 0 0 0 5px rgba(196,163,90,0.4), 0 0 0 10px rgba(196,163,90,0.2); }
+}
+
+.paloma-header__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.paloma-header__name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--paloma-white);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.paloma-header__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin: 2px 0 0;
+}
+
+.paloma-header__lang {
+    display: flex;
+    gap: 4px;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+}
+
+.paloma-header__lang button {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--paloma-transition);
+    font-family: 'Inter', sans-serif;
+}
+
+.paloma-header__lang button.active {
+    background: rgba(255,255,255,0.3);
+    color: var(--paloma-white);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.paloma-header__lang button:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* ─── HIPAA Disclaimer Bar ─── */
+.paloma-disclaimer {
+    background: var(--paloma-surface);
+    padding: 6px 16px;
+    font-size: 9px;
+    color: var(--paloma-muted);
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    border-bottom: 1px solid var(--paloma-border);
+    line-height: 1.4;
+}
+
+/* ─── Messages Area ─── */
+.paloma-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 280px;
+    max-height: 360px;
+    scroll-behavior: smooth;
+}
+
+.paloma-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.paloma-messages::-webkit-scrollbar-thumb {
+    background: var(--paloma-border);
+    border-radius: 4px;
+}
+
+/* Message bubbles */
+.paloma-msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: paloma-msg-in 0.3s ease-out;
+}
+
+@keyframes paloma-msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.paloma-msg--bot {
+    background: var(--paloma-surface);
+    color: var(--paloma-text);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.paloma-msg--user {
+    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    color: var(--paloma-white);
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+/* Typing indicator */
+.paloma-typing {
+    display: flex;
+    gap: 5px;
+    padding: 12px 18px;
+    align-self: flex-start;
+    background: var(--paloma-surface);
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+}
+
+.paloma-typing span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--paloma-muted);
+    animation: paloma-bounce 1.4s infinite ease-in-out;
+}
+
+.paloma-typing span:nth-child(2) { animation-delay: 0.2s; }
+.paloma-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes paloma-bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Smart Suggestions ─── */
+.paloma-suggestions {
+    padding: 8px 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--paloma-border);
+    background: var(--paloma-white);
+}
+
+.paloma-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--paloma-border);
+    background: var(--paloma-white);
+    color: var(--paloma-teal);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--paloma-transition);
+    white-space: nowrap;
+}
+
+.paloma-chip:hover {
+    background: var(--paloma-teal);
+    color: var(--paloma-white);
+    border-color: var(--paloma-teal);
+}
+
+/* ─── Input Area ─── */
+.paloma-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid var(--paloma-border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--paloma-white);
+}
+
+.paloma-input {
+    flex: 1;
+    border: 1px solid var(--paloma-border);
+    border-radius: 24px;
+    padding: 10px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--paloma-text);
+    outline: none;
+    transition: var(--paloma-transition);
+    background: var(--paloma-surface);
+}
+
+.paloma-input:focus {
+    border-color: var(--paloma-teal);
+    background: var(--paloma-white);
+    box-shadow: 0 0 0 3px var(--paloma-teal-glow);
+}
+
+.paloma-input::placeholder {
+    color: var(--paloma-muted);
+}
+
+.paloma-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--paloma-teal), var(--paloma-teal-light));
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--paloma-transition);
+    flex-shrink: 0;
+}
+
+.paloma-send:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 12px var(--paloma-teal-glow);
+}
+
+.paloma-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.paloma-send svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--paloma-white);
+}
+
+/* ─── Powered By Footer ─── */
+.paloma-footer {
+    padding: 6px 16px;
+    text-align: center;
+    font-size: 9px;
+    color: var(--paloma-muted);
+    font-family: 'Inter', sans-serif;
+    background: var(--paloma-surface);
+    border-top: 1px solid var(--paloma-border);
+}
+
+.paloma-footer a {
+    color: var(--paloma-teal);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 480px) {
+    .paloma-panel {
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: var(--paloma-radius) var(--paloma-radius) 0 0;
+    }
+
+    .paloma-messages {
+        max-height: calc(100dvh - 260px);
+    }
+
+    .paloma-fab {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+    }
+}
+
+@media (max-width: 768px) {
+    .paloma-panel {
+        width: min(400px, calc(100vw - 24px));
+        right: 12px;
+    }
+}

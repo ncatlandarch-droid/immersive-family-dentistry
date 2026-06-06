@@ -1,0 +1,461 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "totalFAQs": 32,
+  "categories": [
+    {
+      "id": "cat-general",
+      "name": { "en": "General", "es": "General" },
+      "icon": "info-circle",
+      "sortOrder": 1
+    },
+    {
+      "id": "cat-insurance",
+      "name": { "en": "Insurance & Financing", "es": "Seguros y Financiamiento" },
+      "icon": "shield-check",
+      "sortOrder": 2
+    },
+    {
+      "id": "cat-procedures",
+      "name": { "en": "Procedures & Treatments", "es": "Procedimientos y Tratamientos" },
+      "icon": "tooth",
+      "sortOrder": 3
+    },
+    {
+      "id": "cat-emergency",
+      "name": { "en": "Emergency & Urgent Care", "es": "Emergencias y Atención Urgente" },
+      "icon": "alert-triangle",
+      "sortOrder": 4
+    },
+    {
+      "id": "cat-technology",
+      "name": { "en": "Technology & Innovation", "es": "Tecnología e Innovación" },
+      "icon": "cpu",
+      "sortOrder": 5
+    },
+    {
+      "id": "cat-postop",
+      "name": { "en": "Post-Op Care Instructions", "es": "Instrucciones de Cuidado Post-Operatorio" },
+      "icon": "heart-pulse",
+      "sortOrder": 6
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-001",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "What are your office hours?",
+        "es": "¿Cuáles son sus horarios de oficina?"
+      },
+      "answer": {
+        "en": "We're open Monday through Wednesday from 8:00 AM to 5:00 PM, and Thursday from 8:00 AM to 3:00 PM. We are closed on Friday, Saturday, and Sunday. For dental emergencies after hours, please call our main line at (336) 545-4281 for instructions.",
+        "es": "Estamos abiertos de lunes a miércoles de 8:00 AM a 5:00 PM, y jueves de 8:00 AM a 3:00 PM. Estamos cerrados viernes, sábado y domingo. Para emergencias dentales fuera de horario, por favor llame a nuestra línea principal al (336) 545-4281 para instrucciones."
+      },
+      "tags": ["hours", "schedule", "availability"]
+    },
+    {
+      "id": "faq-002",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "Where are you located and is parking available?",
+        "es": "¿Dónde están ubicados y hay estacionamiento disponible?"
+      },
+      "answer": {
+        "en": "We're located at 3810 North Elm Street, Suite 201, Greensboro, NC 27455. We're on the second floor with elevator access. Free parking is available in the building lot, and we have a handicap-accessible entrance on the north side of the building.",
+        "es": "Estamos ubicados en 3810 North Elm Street, Suite 201, Greensboro, NC 27455. Estamos en el segundo piso con acceso por ascensor. Hay estacionamiento gratuito en el lote del edificio, y tenemos una entrada accesible para discapacitados en el lado norte del edificio."
+      },
+      "tags": ["location", "directions", "parking", "accessibility"]
+    },
+    {
+      "id": "faq-003",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "Are you accepting new patients?",
+        "es": "¿Están aceptando pacientes nuevos?"
+      },
+      "answer": {
+        "en": "Yes! We're always welcoming new patients and families. You can schedule your first appointment by calling us at (336) 545-4281 or booking online through our website. Your first visit will include a comprehensive exam, any necessary X-rays, and a personalized treatment plan discussion with Dr. Brenes.",
+        "es": "¡Sí! Siempre estamos dando la bienvenida a nuevos pacientes y familias. Puede programar su primera cita llamándonos al (336) 545-4281 o reservando en línea a través de nuestro sitio web. Su primera visita incluirá un examen completo, las radiografías necesarias y una discusión personalizada del plan de tratamiento con el Dr. Brenes."
+      },
+      "tags": ["new patients", "first visit", "appointment"]
+    },
+    {
+      "id": "faq-004",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "Do you offer services in Spanish?",
+        "es": "¿Ofrecen servicios en español?"
+      },
+      "answer": {
+        "en": "Absolutely! Dr. Brenes is fluent in both English and Spanish, and our team member Emily is also bilingual. We're committed to making every patient feel comfortable and informed in their preferred language. All of our patient materials, consent forms, and post-operative instructions are available in both English and Spanish.",
+        "es": "¡Absolutamente! El Dr. Brenes habla inglés y español con fluidez, y nuestra compañera Emily también es bilingüe. Estamos comprometidos a hacer que cada paciente se sienta cómodo e informado en su idioma preferido. Todos nuestros materiales para pacientes, formularios de consentimiento e instrucciones post-operatorias están disponibles en inglés y español."
+      },
+      "tags": ["spanish", "bilingual", "language"]
+    },
+    {
+      "id": "faq-005",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "What makes Lake Jeanette Dentistry different from other dental offices?",
+        "es": "¿Qué hace diferente a Lake Jeanette Dentistry de otras oficinas dentales?"
+      },
+      "answer": {
+        "en": "Three things set us apart: (1) Dr. Brenes is a prosthodontist — a specialist with 3 extra years of advanced training in complex restorations, implants, and smile design. (2) Our fully digital workflow with intraoral scanning, 3D printing, and CAD/CAM design means faster, more precise results and fewer appointments. (3) We use AI-assisted diagnostics (Pearl and Overjet) to catch problems earlier and explain findings clearly to you. Plus, we genuinely care about your comfort and experience — our team treats every patient like family.",
+        "es": "Tres cosas nos distinguen: (1) El Dr. Brenes es prostodoncista — un especialista con 3 años adicionales de formación avanzada en restauraciones complejas, implantes y diseño de sonrisa. (2) Nuestro flujo de trabajo completamente digital con escaneo intraoral, impresión 3D y diseño CAD/CAM significa resultados más rápidos, más precisos y menos citas. (3) Usamos diagnósticos asistidos por IA (Pearl y Overjet) para detectar problemas más temprano y explicarle los hallazgos claramente. Además, nos importa genuinamente su comodidad y experiencia — nuestro equipo trata a cada paciente como familia."
+      },
+      "tags": ["differentiator", "specialty", "technology", "prosthodontist"]
+    },
+    {
+      "id": "faq-006",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "What should I bring to my first appointment?",
+        "es": "¿Qué debo traer a mi primera cita?"
+      },
+      "answer": {
+        "en": "Please bring: (1) A valid photo ID, (2) Your dental insurance card (if applicable), (3) A list of current medications, (4) Any recent dental X-rays or records from your previous dentist (we can request these for you), and (5) Completed new patient forms (available on our website to fill out ahead of time). Arriving 15 minutes early helps us get you started on time!",
+        "es": "Por favor traiga: (1) Una identificación con foto válida, (2) Su tarjeta de seguro dental (si aplica), (3) Una lista de medicamentos actuales, (4) Cualquier radiografía dental o registros recientes de su dentista anterior (podemos solicitarlos por usted), y (5) Formularios de nuevo paciente completados (disponibles en nuestro sitio web para llenar con anticipación). ¡Llegar 15 minutos antes nos ayuda a comenzar a tiempo!"
+      },
+      "tags": ["first visit", "preparation", "documents"]
+    },
+    {
+      "id": "faq-007",
+      "categoryId": "cat-insurance",
+      "question": {
+        "en": "Do you accept my dental insurance?",
+        "es": "¿Aceptan mi seguro dental?"
+      },
+      "answer": {
+        "en": "We accept most major dental insurance plans including Delta Dental, MetLife, Cigna, Aetna, United Healthcare, BlueCross BlueShield of NC, Guardian, and Humana. If you don't see your plan listed, please call us — we work with many additional plans and are happy to verify your benefits for you before your visit.",
+        "es": "Aceptamos la mayoría de los planes de seguro dental principales incluyendo Delta Dental, MetLife, Cigna, Aetna, United Healthcare, BlueCross BlueShield de NC, Guardian y Humana. Si no ve su plan en la lista, por favor llámenos — trabajamos con muchos planes adicionales y estamos felices de verificar sus beneficios antes de su visita."
+      },
+      "tags": ["insurance", "coverage", "plans"]
+    },
+    {
+      "id": "faq-008",
+      "categoryId": "cat-insurance",
+      "question": {
+        "en": "What if I don't have dental insurance?",
+        "es": "¿Qué pasa si no tengo seguro dental?"
+      },
+      "answer": {
+        "en": "No insurance? No problem! We believe everyone deserves quality dental care. We offer: (1) Competitive self-pay rates, (2) In-house payment plans with 0% interest for 3-12 months, (3) CareCredit and LendingClub financing options, (4) HSA and FSA accepted, and (5) A 5% courtesy discount for patients who pay in full at the time of service. We'll always discuss costs upfront so there are no surprises.",
+        "es": "¿Sin seguro? ¡No hay problema! Creemos que todos merecen atención dental de calidad. Ofrecemos: (1) Tarifas competitivas de pago directo, (2) Planes de pago internos con 0% de interés por 3-12 meses, (3) Opciones de financiamiento CareCredit y LendingClub, (4) Aceptamos HSA y FSA, y (5) Un descuento de cortesía del 5% para pacientes que pagan en su totalidad al momento del servicio. Siempre discutiremos los costos por adelantado para que no haya sorpresas."
+      },
+      "tags": ["no insurance", "self-pay", "financing", "payment"]
+    },
+    {
+      "id": "faq-009",
+      "categoryId": "cat-insurance",
+      "question": {
+        "en": "How much will my procedure cost?",
+        "es": "¿Cuánto costará mi procedimiento?"
+      },
+      "answer": {
+        "en": "Costs vary depending on the procedure, complexity, and your insurance coverage. We always provide a detailed estimate before treatment begins, including what your insurance is expected to cover and your estimated out-of-pocket cost. For a general idea of pricing, check our services page or ask PALOMA about a specific procedure. We never want cost to be a surprise.",
+        "es": "Los costos varían según el procedimiento, la complejidad y su cobertura de seguro. Siempre proporcionamos un estimado detallado antes de comenzar el tratamiento, incluyendo lo que se espera que cubra su seguro y su costo estimado de bolsillo. Para una idea general de precios, consulte nuestra página de servicios o pregunte a PALOMA sobre un procedimiento específico. Nunca queremos que el costo sea una sorpresa."
+      },
+      "tags": ["cost", "pricing", "estimate", "insurance"]
+    },
+    {
+      "id": "faq-010",
+      "categoryId": "cat-insurance",
+      "question": {
+        "en": "Do you file insurance claims for me?",
+        "es": "¿Presentan reclamaciones de seguro por mí?"
+      },
+      "answer": {
+        "en": "Yes! We handle all insurance claims on your behalf. Our team will verify your benefits before treatment, submit claims electronically, and follow up on any outstanding claims. We'll also help you understand your Explanation of Benefits (EOB) if you receive one from your insurance company.",
+        "es": "¡Sí! Manejamos todas las reclamaciones de seguro en su nombre. Nuestro equipo verificará sus beneficios antes del tratamiento, enviará las reclamaciones electrónicamente y dará seguimiento a cualquier reclamación pendiente. También le ayudaremos a entender su Explicación de Beneficios (EOB) si recibe una de su compañía de seguros."
+      },
+      "tags": ["claims", "billing", "insurance"]
+    },
+    {
+      "id": "faq-011",
+      "categoryId": "cat-insurance",
+      "question": {
+        "en": "What is an annual maximum and why does it matter?",
+        "es": "¿Qué es un máximo anual y por qué importa?"
+      },
+      "answer": {
+        "en": "Your annual maximum is the most your insurance will pay for dental services in a calendar year — typically $1,000 to $2,500. Once you hit that limit, you're responsible for 100% of remaining costs until the benefit resets (usually January 1). This is why we recommend: (1) Using your benefits before year-end, (2) Phasing extensive treatment across benefit years, and (3) Combining insurance with financing for major procedures.",
+        "es": "Su máximo anual es lo máximo que su seguro pagará por servicios dentales en un año calendario — típicamente $1,000 a $2,500. Una vez que alcance ese límite, usted es responsable del 100% de los costos restantes hasta que el beneficio se reinicie (generalmente el 1 de enero). Por eso recomendamos: (1) Usar sus beneficios antes de fin de año, (2) Dividir tratamientos extensos en varios años de beneficios, y (3) Combinar seguro con financiamiento para procedimientos mayores."
+      },
+      "tags": ["annual maximum", "benefits", "insurance strategy"]
+    },
+    {
+      "id": "faq-012",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "What is a dental implant and how does it work?",
+        "es": "¿Qué es un implante dental y cómo funciona?"
+      },
+      "answer": {
+        "en": "A dental implant is a small titanium post that's surgically placed into your jawbone where a tooth is missing. It acts as an artificial tooth root. Over 3-4 months, the implant fuses with your bone (a process called osseointegration), creating a strong foundation. Then, a custom-designed crown is attached to the implant, giving you a tooth that looks, feels, and functions just like a natural one. With proper care, implants can last a lifetime.",
+        "es": "Un implante dental es un pequeño poste de titanio que se coloca quirúrgicamente en el hueso de la mandíbula donde falta un diente. Actúa como una raíz dental artificial. Durante 3-4 meses, el implante se fusiona con su hueso (un proceso llamado osteointegración), creando una base fuerte. Luego, se adhiere una corona diseñada a medida al implante, dándole un diente que se ve, se siente y funciona como uno natural. Con el cuidado adecuado, los implantes pueden durar toda la vida."
+      },
+      "tags": ["implants", "procedure", "tooth replacement"]
+    },
+    {
+      "id": "faq-013",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "What is All-on-4 / All-on-X?",
+        "es": "¿Qué es All-on-4 / All-on-X?"
+      },
+      "answer": {
+        "en": "All-on-4 (or All-on-X) is a technique that replaces an entire arch of teeth — upper, lower, or both — using just 4 to 6 strategically placed implants. Instead of individual implants for each tooth, the implants support a full fixed bridge. The revolutionary part? You can receive a complete set of temporary teeth on the SAME DAY as your surgery. After healing, a final zirconia prosthesis is custom-crafted for a beautiful, permanent result.",
+        "es": "All-on-4 (o All-on-X) es una técnica que reemplaza un arco completo de dientes — superior, inferior o ambos — usando solo 4 a 6 implantes colocados estratégicamente. En lugar de implantes individuales para cada diente, los implantes soportan un puente fijo completo. ¿La parte revolucionaria? Puede recibir un juego completo de dientes temporales el MISMO DÍA de su cirugía. Después de la cicatrización, se fabrica a medida una prótesis final de zirconia para un resultado hermoso y permanente."
+      },
+      "tags": ["all-on-4", "all-on-x", "full-arch", "implants"]
+    },
+    {
+      "id": "faq-014",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "How long does it take to get a crown?",
+        "es": "¿Cuánto tiempo toma obtener una corona?"
+      },
+      "answer": {
+        "en": "With our same-day crown technology, you can receive a permanent custom crown in a single 2-hour appointment! We scan your tooth digitally (no messy impressions), design the crown on our computer, and 3D print or mill it right here in the office. No temporary crown, no second visit, no waiting. For complex cases or esthetic cases requiring a specialized lab, the process takes about 2 visits over 2-3 weeks.",
+        "es": "¡Con nuestra tecnología de coronas el mismo día, puede recibir una corona permanente personalizada en una sola cita de 2 horas! Escaneamos su diente digitalmente (sin impresiones incómodas), diseñamos la corona en nuestra computadora, y la imprimimos en 3D o la fresamos aquí mismo en la oficina. Sin corona temporal, sin segunda visita, sin esperas. Para casos complejos o casos estéticos que requieren un laboratorio especializado, el proceso toma aproximadamente 2 visitas durante 2-3 semanas."
+      },
+      "tags": ["crown", "same-day", "CEREC", "restoration"]
+    },
+    {
+      "id": "faq-015",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "What are porcelain veneers and who is a good candidate?",
+        "es": "¿Qué son las carillas de porcelana y quién es un buen candidato?"
+      },
+      "answer": {
+        "en": "Porcelain veneers are wafer-thin ceramic shells that are bonded to the front of your teeth to create a uniform, beautiful smile. Good candidates include people with chipped, stained, gapped, slightly crooked, or worn teeth who want a dramatic improvement without braces. Veneers aren't ideal for patients with severe bite problems, active gum disease, or who grind their teeth heavily (though a night guard can help). Dr. Brenes will evaluate your specific situation during a consultation.",
+        "es": "Las carillas de porcelana son láminas ultra delgadas de cerámica que se adhieren al frente de sus dientes para crear una sonrisa uniforme y hermosa. Los buenos candidatos incluyen personas con dientes astillados, manchados, con espacios, ligeramente torcidos o desgastados que desean una mejora dramática sin frenos. Las carillas no son ideales para pacientes con problemas severos de mordida, enfermedad activa de las encías, o que rechinan mucho los dientes (aunque un protector nocturno puede ayudar). El Dr. Brenes evaluará su situación específica durante una consulta."
+      },
+      "tags": ["veneers", "cosmetic", "smile makeover"]
+    },
+    {
+      "id": "faq-016",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "Is sedation available for dental procedures?",
+        "es": "¿Hay sedación disponible para procedimientos dentales?"
+      },
+      "answer": {
+        "en": "Yes! We understand dental anxiety is real, and we offer several comfort options. For most procedures, local anesthesia keeps you completely comfortable. We can also provide nitrous oxide (laughing gas) for mild anxiety, or oral sedation for patients who need a deeper level of relaxation. For complex surgical cases, we coordinate with an anesthesiologist for IV sedation. We'll discuss the best option for you based on your comfort level and the procedure.",
+        "es": "¡Sí! Entendemos que la ansiedad dental es real, y ofrecemos varias opciones de confort. Para la mayoría de los procedimientos, la anestesia local lo mantiene completamente cómodo. También podemos proporcionar óxido nitroso (gas de la risa) para ansiedad leve, o sedación oral para pacientes que necesitan un nivel más profundo de relajación. Para casos quirúrgicos complejos, coordinamos con un anestesiólogo para sedación intravenosa. Discutiremos la mejor opción para usted según su nivel de comodidad y el procedimiento."
+      },
+      "tags": ["sedation", "anxiety", "comfort", "nitrous"]
+    },
+    {
+      "id": "faq-017",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "Do I need a root canal? What are the signs?",
+        "es": "¿Necesito un tratamiento de conducto? ¿Cuáles son las señales?"
+      },
+      "answer": {
+        "en": "Signs you may need a root canal include: persistent toothache (especially pain that wakes you at night), sensitivity to hot or cold that lingers, darkening of a tooth, swelling or tenderness in nearby gums, a persistent pimple on the gums, or pain when chewing. However, sometimes a tooth needs a root canal without any symptoms at all — our AI-assisted X-ray analysis can detect problems before you feel them. If you're experiencing any of these symptoms, please call us promptly.",
+        "es": "Las señales de que podría necesitar un tratamiento de conducto incluyen: dolor de muelas persistente (especialmente dolor que lo despierta por la noche), sensibilidad al calor o frío que persiste, oscurecimiento de un diente, hinchazón o sensibilidad en las encías cercanas, un granito persistente en las encías, o dolor al masticar. Sin embargo, a veces un diente necesita tratamiento de conducto sin ningún síntoma — nuestro análisis de rayos X asistido por IA puede detectar problemas antes de que los sienta. Si experimenta alguno de estos síntomas, por favor llámenos pronto."
+      },
+      "tags": ["root canal", "symptoms", "endodontics"]
+    },
+    {
+      "id": "faq-018",
+      "categoryId": "cat-emergency",
+      "question": {
+        "en": "What qualifies as a dental emergency?",
+        "es": "¿Qué se considera una emergencia dental?"
+      },
+      "answer": {
+        "en": "Dental emergencies include: (1) A knocked-out (avulsed) tooth — this is time-critical! (2) Severe, uncontrollable toothache, (3) Facial swelling that's spreading or affecting breathing/swallowing, (4) Broken jaw or facial trauma, (5) Uncontrollable bleeding after an extraction, (6) A broken or cracked tooth with sharp edges cutting your mouth, (7) A lost crown or filling with pain. If you're unsure whether your situation is an emergency, call us — we'd rather help you early than have you suffer in silence.",
+        "es": "Las emergencias dentales incluyen: (1) Un diente avulsionado — ¡esto es crítico en tiempo! (2) Dolor de muelas severo e incontrolable, (3) Hinchazón facial que se expande o afecta la respiración/deglución, (4) Mandíbula fracturada o trauma facial, (5) Sangrado incontrolable después de una extracción, (6) Un diente roto o agrietado con bordes filosos que cortan su boca, (7) Una corona o empaste perdido con dolor. Si no está seguro de si su situación es una emergencia, llámenos — preferimos ayudarle temprano a que sufra en silencio."
+      },
+      "tags": ["emergency", "urgent", "trauma"]
+    },
+    {
+      "id": "faq-019",
+      "categoryId": "cat-emergency",
+      "question": {
+        "en": "My tooth was knocked out — what do I do?",
+        "es": "Se me cayó un diente — ¿qué hago?"
+      },
+      "answer": {
+        "en": "Act fast! Every minute counts: (1) Find the tooth and pick it up by the CROWN (white part) — never touch the root. (2) If dirty, gently rinse with water for 10 seconds — do NOT scrub or use soap. (3) Try to place it back in the socket and hold it gently with your finger or by biting on gauze. (4) If you can't replant it, put it in a cup of MILK (best), your own saliva, or saline. Do NOT let it dry out. (5) Call us IMMEDIATELY at (336) 545-4281. We have the best chance of saving your tooth if you reach us within 30 minutes.",
+        "es": "¡Actúe rápido! Cada minuto cuenta: (1) Encuentre el diente y recójalo por la CORONA (parte blanca) — nunca toque la raíz. (2) Si está sucio, enjuáguelo suavemente con agua por 10 segundos — NO lo frote ni use jabón. (3) Intente colocarlo de nuevo en el alvéolo y sosténgalo suavemente con su dedo o mordiendo una gasa. (4) Si no puede reimplantarlo, póngalo en un vaso de LECHE (lo mejor), su propia saliva o solución salina. NO lo deje secar. (5) Llámenos INMEDIATAMENTE al (336) 545-4281. Tenemos la mejor oportunidad de salvar su diente si nos contacta dentro de 30 minutos."
+      },
+      "tags": ["avulsed tooth", "knocked out", "emergency", "first aid"]
+    },
+    {
+      "id": "faq-020",
+      "categoryId": "cat-emergency",
+      "question": {
+        "en": "I have a severe toothache at night — what can I do until I can see you?",
+        "es": "Tengo un dolor de muelas severo por la noche — ¿qué puedo hacer hasta que pueda verlos?"
+      },
+      "answer": {
+        "en": "For temporary relief: (1) Take ibuprofen (Advil) 400-600mg every 6 hours for both pain and inflammation — alternate with acetaminophen (Tylenol) 500mg if needed. (2) Rinse gently with warm salt water (1/2 teaspoon salt in 8 oz warm water). (3) Apply a cold compress on the outside of your cheek — 20 minutes on, 20 minutes off. (4) Keep your head elevated when lying down. (5) Avoid very hot, cold, or sweet foods on the affected side. Call us first thing in the morning at (336) 545-4281 and we'll see you that day.",
+        "es": "Para alivio temporal: (1) Tome ibuprofeno (Advil) 400-600mg cada 6 horas para dolor e inflamación — alterne con acetaminofén (Tylenol) 500mg si es necesario. (2) Enjuague suavemente con agua tibia con sal (1/2 cucharadita de sal en 8 oz de agua tibia). (3) Aplique una compresa fría en el exterior de su mejilla — 20 minutos puesta, 20 minutos sin. (4) Mantenga su cabeza elevada al acostarse. (5) Evite alimentos muy calientes, fríos o dulces en el lado afectado. Llámenos a primera hora de la mañana al (336) 545-4281 y lo veremos ese día."
+      },
+      "tags": ["toothache", "pain relief", "home remedy", "emergency"]
+    },
+    {
+      "id": "faq-021",
+      "categoryId": "cat-emergency",
+      "question": {
+        "en": "My crown or filling fell out — is this an emergency?",
+        "es": "Se me cayó la corona o el empaste — ¿es una emergencia?"
+      },
+      "answer": {
+        "en": "A lost crown or filling isn't a life-threatening emergency, but you should contact us within 24 hours to prevent further damage or sensitivity. In the meantime: (1) If you have the crown, try placing it back on with a small dab of denture adhesive or toothpaste (temporary fix only). (2) Avoid chewing on that side. (3) If the area is sensitive, apply clove oil or an over-the-counter dental cement (available at pharmacies). (4) Don't use superglue! Call us at (336) 545-4281 and we'll schedule you promptly.",
+        "es": "Una corona o empaste perdido no es una emergencia que amenace la vida, pero debe contactarnos dentro de 24 horas para prevenir daños adicionales o sensibilidad. Mientras tanto: (1) Si tiene la corona, intente colocarla de nuevo con un poco de adhesivo para dentaduras o pasta dental (solución temporal solamente). (2) Evite masticar de ese lado. (3) Si el área está sensible, aplique aceite de clavo o un cemento dental de venta libre (disponible en farmacias). (4) ¡No use pegamento instantáneo! Llámenos al (336) 545-4281 y lo programaremos pronto."
+      },
+      "tags": ["lost crown", "lost filling", "temporary fix"]
+    },
+    {
+      "id": "faq-022",
+      "categoryId": "cat-technology",
+      "question": {
+        "en": "What is AI-assisted dentistry and how do you use it?",
+        "es": "¿Qué es la odontología asistida por IA y cómo la usan?"
+      },
+      "answer": {
+        "en": "We use two FDA-cleared AI platforms — Pearl Second Opinion and Overjet — to analyze your dental X-rays in real-time. These AI systems can detect cavities, bone loss, infections, and other issues with remarkable accuracy, acting as a 'second set of eyes' for Dr. Brenes. The AI highlights areas of concern with confidence scores, helping ensure nothing is missed. It also helps us explain your X-ray findings to you visually, so you can see exactly what we see. AI assists — it never replaces — Dr. Brenes' clinical judgment.",
+        "es": "Usamos dos plataformas de IA aprobadas por la FDA — Pearl Second Opinion y Overjet — para analizar sus radiografías dentales en tiempo real. Estos sistemas de IA pueden detectar caries, pérdida ósea, infecciones y otros problemas con precisión notable, actuando como un 'segundo par de ojos' para el Dr. Brenes. La IA resalta áreas de preocupación con puntajes de confianza, ayudando a asegurar que nada se pase por alto. También nos ayuda a explicarle sus hallazgos radiográficos visualmente, para que pueda ver exactamente lo que nosotros vemos. La IA asiste — nunca reemplaza — el juicio clínico del Dr. Brenes."
+      },
+      "tags": ["AI", "artificial intelligence", "Pearl", "Overjet", "diagnostics"]
+    },
+    {
+      "id": "faq-023",
+      "categoryId": "cat-technology",
+      "question": {
+        "en": "What is a digital dental scan and why is it better than traditional impressions?",
+        "es": "¿Qué es un escaneo dental digital y por qué es mejor que las impresiones tradicionales?"
+      },
+      "answer": {
+        "en": "Instead of biting into messy, gag-inducing impression trays, we use a Medit i700 wireless intraoral scanner — a small wand that captures thousands of 3D images per second as it moves over your teeth. The result is a precise, full-color digital model of your mouth in under 3 minutes. Benefits: (1) Far more accurate than traditional impressions, (2) No gagging or discomfort, (3) Instant results — you can see your teeth on screen immediately, (4) Digital files can be sent to our design software or lab instantly, (5) Faster turnaround for crowns, aligners, and appliances.",
+        "es": "En lugar de morder bandejas de impresión desagradables que causan arcadas, usamos un escáner intraoral inalámbrico Medit i700 — una pequeña varita que captura miles de imágenes 3D por segundo mientras se mueve sobre sus dientes. El resultado es un modelo digital preciso y a todo color de su boca en menos de 3 minutos. Beneficios: (1) Mucho más preciso que las impresiones tradicionales, (2) Sin arcadas ni incomodidad, (3) Resultados instantáneos — puede ver sus dientes en pantalla inmediatamente, (4) Los archivos digitales se pueden enviar a nuestro software de diseño o laboratorio instantáneamente, (5) Tiempo de entrega más rápido para coronas, alineadores y aparatos."
+      },
+      "tags": ["digital scan", "Medit", "intraoral scanner", "impressions"]
+    },
+    {
+      "id": "faq-024",
+      "categoryId": "cat-technology",
+      "question": {
+        "en": "Do you 3D print dental restorations in your office?",
+        "es": "¿Imprimen restauraciones dentales en 3D en su oficina?"
+      },
+      "answer": {
+        "en": "Yes! We have a SprintRay Pro 95S 3D printer right in our office. We use it to fabricate surgical guides for implant placement, temporary crowns, night guards, dental models, and custom trays — often while you're still in the chair. This dramatically reduces wait times and eliminates the need for outside lab work on many procedures. Dr. Brenes designs the restoration digitally in Exocad software, and then we print it in minutes.",
+        "es": "¡Sí! Tenemos una impresora 3D SprintRay Pro 95S aquí en nuestra oficina. La usamos para fabricar guías quirúrgicas para colocación de implantes, coronas temporales, protectores nocturnos, modelos dentales y cubetas personalizadas — a menudo mientras usted todavía está en el sillón. Esto reduce dramáticamente los tiempos de espera y elimina la necesidad de trabajo de laboratorio externo en muchos procedimientos. El Dr. Brenes diseña la restauración digitalmente en el software Exocad, y luego la imprimimos en minutos."
+      },
+      "tags": ["3D printing", "SprintRay", "in-office", "same-day"]
+    },
+    {
+      "id": "faq-025",
+      "categoryId": "cat-technology",
+      "question": {
+        "en": "What is PALOMA and how can she help me?",
+        "es": "¿Qué es PALOMA y cómo me puede ayudar?"
+      },
+      "answer": {
+        "en": "PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant) is your personal AI dental care assistant at Lake Jeanette Dentistry. She can help you understand your dental chart and treatment plan, explain procedures in simple terms, review your insurance coverage, provide post-operative care instructions, help you prepare for upcoming appointments, and answer questions in both English and Spanish. PALOMA is always available to help — think of her as a knowledgeable friend who helps you navigate your dental care journey.",
+        "es": "PALOMA (Asistente de Mapa Oral de Ciclo de Vida y Defensa del Paciente) es su asistente personal de cuidado dental con IA en Lake Jeanette Dentistry. Ella puede ayudarle a entender su cuadro dental y plan de tratamiento, explicar procedimientos en términos simples, revisar su cobertura de seguro, proporcionar instrucciones de cuidado post-operatorio, ayudarle a prepararse para próximas citas, y responder preguntas en inglés y español. PALOMA siempre está disponible para ayudar — piense en ella como una amiga conocedora que le ayuda a navegar su camino de cuidado dental."
+      },
+      "tags": ["PALOMA", "AI assistant", "patient support"]
+    },
+    {
+      "id": "faq-026",
+      "categoryId": "cat-postop",
+      "question": {
+        "en": "Post-Op Care: After a Dental Implant Placement",
+        "es": "Cuidado Post-Operatorio: Después de la Colocación de un Implante Dental"
+      },
+      "answer": {
+        "en": "**Day of Surgery:** Apply ice packs (20 min on, 20 min off) for the first 6 hours. Bite gently on gauze for 30-60 minutes to control bleeding. Take prescribed medications as directed. Eat soft, cool foods only. No spitting, rinsing, or using a straw for 24 hours.\n\n**Days 1-3:** Mild swelling and bruising are normal — peak on days 2-3. Continue ibuprofen 400-600mg every 6 hours. Gently rinse with warm salt water after meals. Soft diet (yogurt, mashed potatoes, smoothies, scrambled eggs). No smoking — it significantly impairs healing.\n\n**Days 4-14:** Swelling should be decreasing. Resume gentle brushing around (not on) the surgical site. Continue soft foods for 1-2 weeks. Attend your 7-10 day follow-up appointment.\n\n**Weeks 2-16:** Gradually return to normal diet as comfort allows. The implant is healing and integrating with bone — avoid chewing hard foods directly on the implant area. Keep all follow-up appointments.\n\n**Call us immediately if:** Bleeding won't stop after 30+ minutes of pressure, swelling increases after day 3, you develop a fever over 101°F, severe pain not relieved by medication, or numbness that doesn't resolve within 24 hours.",
+        "es": "**Día de la Cirugía:** Aplique bolsas de hielo (20 min puestas, 20 min sin) durante las primeras 6 horas. Muerda suavemente una gasa por 30-60 minutos para controlar el sangrado. Tome los medicamentos recetados según las indicaciones. Solo alimentos blandos y frescos. No escupir, enjuagar ni usar popote por 24 horas.\n\n**Días 1-3:** La hinchazón leve y los moretones son normales — pico en los días 2-3. Continue ibuprofeno 400-600mg cada 6 horas. Enjuague suavemente con agua tibia con sal después de las comidas. Dieta blanda (yogur, puré de papas, licuados, huevos revueltos). No fumar — afecta significativamente la cicatrización.\n\n**Días 4-14:** La hinchazón debería estar disminuyendo. Reanude el cepillado suave alrededor (no sobre) el sitio quirúrgico. Continue con alimentos blandos por 1-2 semanas. Asista a su cita de seguimiento de 7-10 días.\n\n**Semanas 2-16:** Regrese gradualmente a la dieta normal según la comodidad lo permita. El implante está sanando e integrándose con el hueso — evite masticar alimentos duros directamente en el área del implante. Mantenga todas las citas de seguimiento.\n\n**Llámenos inmediatamente si:** El sangrado no se detiene después de 30+ minutos de presión, la hinchazón aumenta después del día 3, desarrolla fiebre mayor a 38.3°C, dolor severo no aliviado por medicamentos, o entumecimiento que no se resuelve en 24 horas."
+      },
+      "tags": ["post-op", "implant", "aftercare", "healing"]
+    },
+    {
+      "id": "faq-027",
+      "categoryId": "cat-postop",
+      "question": {
+        "en": "Post-Op Care: After a Crown Placement",
+        "es": "Cuidado Post-Operatorio: Después de la Colocación de una Corona"
+      },
+      "answer": {
+        "en": "**Immediately After:** Your lip and tongue may be numb for 1-3 hours. Avoid eating until the numbness wears off to prevent biting yourself. The anesthesia will wear off gradually.\n\n**First 24 Hours:** Mild sensitivity to hot, cold, or pressure is normal and should improve over 1-2 weeks. Take ibuprofen if needed. Avoid sticky or very hard foods on the new crown for 24 hours.\n\n**Ongoing Care:** Brush and floss your crown just like a natural tooth. Use a non-abrasive toothpaste. If your bite feels 'high' or uneven after the numbness wears off, call us — we can adjust it in a quick 10-minute visit. Your crown should feel natural within a few days.\n\n**With a Temporary Crown:** If you received a temporary crown: avoid sticky foods (taffy, gum), chew on the other side, and be gentle when flossing — pull the floss out to the side rather than snapping it up. If the temporary comes off, clean it and try to place it back with denture adhesive, then call us.\n\n**Call us if:** You experience persistent pain beyond 2 weeks, the crown feels loose, your bite still feels off after a few days, or the crown chips or cracks.",
+        "es": "**Inmediatamente Después:** Su labio y lengua pueden estar adormecidos por 1-3 horas. Evite comer hasta que el adormecimiento desaparezca para evitar morderse. La anestesia desaparecerá gradualmente.\n\n**Primeras 24 Horas:** La sensibilidad leve al calor, frío o presión es normal y debería mejorar en 1-2 semanas. Tome ibuprofeno si es necesario. Evite alimentos pegajosos o muy duros sobre la nueva corona por 24 horas.\n\n**Cuidado Continuo:** Cepille y use hilo dental en su corona como un diente natural. Use pasta dental no abrasiva. Si su mordida se siente 'alta' o desigual después de que desaparezca el adormecimiento, llámenos — podemos ajustarla en una visita rápida de 10 minutos. Su corona debería sentirse natural en pocos días.\n\n**Con Corona Temporal:** Si recibió una corona temporal: evite alimentos pegajosos (caramelos, chicle), mastique del otro lado, y sea gentil al usar hilo dental — tire el hilo hacia un lado en lugar de jalarlo hacia arriba. Si la temporal se cae, límpiela e intente colocarla de nuevo con adhesivo para dentaduras, luego llámenos.\n\n**Llámenos si:** Experimenta dolor persistente más allá de 2 semanas, la corona se siente floja, su mordida aún se siente desigual después de unos días, o la corona se astilla o se agrieta."
+      },
+      "tags": ["post-op", "crown", "aftercare", "temporary crown"]
+    },
+    {
+      "id": "faq-028",
+      "categoryId": "cat-postop",
+      "question": {
+        "en": "Post-Op Care: After a Root Canal",
+        "es": "Cuidado Post-Operatorio: Después de un Tratamiento de Conducto"
+      },
+      "answer": {
+        "en": "**First 24-48 Hours:** It's normal to feel some soreness or tenderness for a few days — the tooth and surrounding area may be inflamed. Take ibuprofen 400-600mg every 6 hours as needed. Avoid chewing on the treated tooth until the permanent crown is placed.\n\n**Pain Management:** Most post-root canal discomfort is mild and resolves in 3-5 days. If you were prescribed antibiotics, complete the full course even if you feel better. Alternate ibuprofen and acetaminophen if needed for stronger relief.\n\n**Important:** Your tooth now has a temporary filling. This tooth WILL need a permanent crown to prevent fracture — typically within 2-4 weeks of the root canal. A root canal-treated tooth without a crown is at high risk of breaking.\n\n**Call us if:** You experience severe pain not relieved by medication, visible swelling, your bite feels significantly uneven, the temporary filling falls out, or you have an allergic reaction to any prescribed medication.",
+        "es": "**Primeras 24-48 Horas:** Es normal sentir algo de dolor o sensibilidad por unos días — el diente y el área circundante pueden estar inflamados. Tome ibuprofeno 400-600mg cada 6 horas según sea necesario. Evite masticar con el diente tratado hasta que se coloque la corona permanente.\n\n**Manejo del Dolor:** La mayoría de las molestias post-conducto son leves y se resuelven en 3-5 días. Si le recetaron antibióticos, complete el curso completo aunque se sienta mejor. Alterne ibuprofeno y acetaminofén si necesita un alivio más fuerte.\n\n**Importante:** Su diente ahora tiene un empaste temporal. Este diente NECESITARÁ una corona permanente para prevenir fracturas — típicamente dentro de 2-4 semanas del tratamiento de conducto. Un diente con tratamiento de conducto sin corona tiene alto riesgo de romperse.\n\n**Llámenos si:** Experimenta dolor severo no aliviado por medicamentos, hinchazón visible, su mordida se siente significativamente desigual, el empaste temporal se cae, o tiene una reacción alérgica a cualquier medicamento recetado."
+      },
+      "tags": ["post-op", "root canal", "endodontics", "aftercare"]
+    },
+    {
+      "id": "faq-029",
+      "categoryId": "cat-postop",
+      "question": {
+        "en": "Post-Op Care: After a Tooth Extraction",
+        "es": "Cuidado Post-Operatorio: Después de una Extracción Dental"
+      },
+      "answer": {
+        "en": "**First 2 Hours:** Bite firmly on gauze for 30-60 minutes. Change gauze if it becomes soaked. Some oozing is normal for 24 hours.\n\n**Day 1:** Apply ice (20 min on, 20 min off). Do NOT spit, rinse, use a straw, smoke, or drink alcohol for 24 hours — these actions can dislodge the blood clot and cause a painful condition called dry socket. Soft, cool foods only. Sleep with your head elevated.\n\n**Days 2-3:** Begin gently rinsing with warm salt water after meals. Continue soft diet. Swelling peaks around day 2-3 and then gradually improves.\n\n**Days 4-7:** Gradually return to normal foods as comfort allows. Continue salt water rinses. Gently brush teeth near (not directly on) the extraction site.\n\n**Dry Socket Warning:** If you develop increasing pain starting 3-5 days after the extraction (especially pain radiating to your ear), a bad taste in your mouth, or visible bone in the socket, you may have dry socket. Call us immediately — we can place a medicated dressing for rapid relief.\n\n**Call us if:** Bleeding won't stop with pressure, swelling worsens after day 3, fever develops, severe or increasing pain after day 3, or numbness persists beyond 24 hours.",
+        "es": "**Primeras 2 Horas:** Muerda firmemente la gasa por 30-60 minutos. Cambie la gasa si se empapa. Algo de exudación es normal por 24 horas.\n\n**Día 1:** Aplique hielo (20 min puesto, 20 min sin). NO escupir, enjuagar, usar popote, fumar ni beber alcohol por 24 horas — estas acciones pueden desalojar el coágulo de sangre y causar una condición dolorosa llamada alveolitis seca. Solo alimentos blandos y frescos. Duerma con la cabeza elevada.\n\n**Días 2-3:** Comience a enjuagar suavemente con agua tibia con sal después de las comidas. Continue la dieta blanda. La hinchazón alcanza su pico alrededor del día 2-3 y luego mejora gradualmente.\n\n**Días 4-7:** Regrese gradualmente a alimentos normales según la comodidad lo permita. Continue los enjuagues con agua salada. Cepille suavemente los dientes cerca (no directamente sobre) el sitio de extracción.\n\n**Advertencia de Alveolitis Seca:** Si desarrolla dolor creciente comenzando 3-5 días después de la extracción (especialmente dolor que irradia al oído), mal sabor en la boca, o hueso visible en el alvéolo, puede tener alveolitis seca. Llámenos inmediatamente — podemos colocar un apósito medicado para alivio rápido.\n\n**Llámenos si:** El sangrado no se detiene con presión, la hinchazón empeora después del día 3, se desarrolla fiebre, dolor severo o creciente después del día 3, o el adormecimiento persiste más allá de 24 horas."
+      },
+      "tags": ["post-op", "extraction", "dry socket", "aftercare"]
+    },
+    {
+      "id": "faq-030",
+      "categoryId": "cat-postop",
+      "question": {
+        "en": "Post-Op Care: After Scaling and Root Planing (Deep Cleaning)",
+        "es": "Cuidado Post-Operatorio: Después de Raspado y Alisado Radicular (Limpieza Profunda)"
+      },
+      "answer": {
+        "en": "**First 24 Hours:** Some tenderness, sensitivity, and minor bleeding from the gums is normal. Avoid hot, spicy, crunchy, or acidic foods. Rinse gently with warm salt water 2-3 times per day. Do not brush or floss the treated area aggressively.\n\n**Days 2-7:** Gradually resume normal brushing with a soft-bristled toothbrush. Sensitivity to cold may last 1-2 weeks — use a desensitizing toothpaste (like Sensodyne). Your gums may appear slightly darker as they heal — this is normal and indicates healing.\n\n**Ongoing:** Your gums will tighten and become healthier over the next 4-6 weeks. You may notice teeth feel slightly looser initially as swollen gum tissue recedes — this is expected and will stabilize. It's CRITICAL to maintain excellent home care (brushing 2x/day, flossing daily) and attend your periodontal maintenance appointments every 3-4 months.\n\n**Call us if:** Excessive bleeding that doesn't stop, severe pain, swelling that worsens, or fever.",
+        "es": "**Primeras 24 Horas:** Algo de sensibilidad, molestia y sangrado menor de las encías es normal. Evite alimentos calientes, picantes, crujientes o ácidos. Enjuague suavemente con agua tibia con sal 2-3 veces al día. No cepille ni use hilo dental agresivamente en el área tratada.\n\n**Días 2-7:** Reanude gradualmente el cepillado normal con un cepillo de cerdas suaves. La sensibilidad al frío puede durar 1-2 semanas — use una pasta dental desensibilizante (como Sensodyne). Sus encías pueden aparecer ligeramente más oscuras mientras sanan — esto es normal e indica cicatrización.\n\n**Continuo:** Sus encías se apretarán y se volverán más saludables durante las próximas 4-6 semanas. Puede notar que los dientes se sienten ligeramente más sueltos inicialmente a medida que el tejido de las encías hinchado retrocede — esto es esperado y se estabilizará. Es CRÍTICO mantener excelente cuidado en casa (cepillado 2x/día, hilo dental diario) y asistir a sus citas de mantenimiento periodontal cada 3-4 meses.\n\n**Llámenos si:** Sangrado excesivo que no se detiene, dolor severo, hinchazón que empeora o fiebre."
+      },
+      "tags": ["post-op", "deep cleaning", "scaling", "periodontal", "aftercare"]
+    },
+    {
+      "id": "faq-031",
+      "categoryId": "cat-general",
+      "question": {
+        "en": "Can I see photos of your work (before and after)?",
+        "es": "¿Puedo ver fotos de su trabajo (antes y después)?"
+      },
+      "answer": {
+        "en": "Absolutely! We love sharing our results. You can see before-and-after photos on our website gallery, Instagram (@lakejeanettedentistry), and TikTok (@lake.jeanette.dent). We only share photos with patient consent, and we're always adding new cases. During your consultation, Dr. Brenes can also show you cases similar to yours so you can see what to expect from your own treatment.",
+        "es": "¡Absolutamente! Nos encanta compartir nuestros resultados. Puede ver fotos de antes y después en la galería de nuestro sitio web, Instagram (@lakejeanettedentistry) y TikTok (@lake.jeanette.dent). Solo compartimos fotos con el consentimiento del paciente, y siempre estamos agregando nuevos casos. Durante su consulta, el Dr. Brenes también puede mostrarle casos similares al suyo para que vea qué esperar de su propio tratamiento."
+      },
+      "tags": ["before after", "photos", "gallery", "social media"]
+    },
+    {
+      "id": "faq-032",
+      "categoryId": "cat-procedures",
+      "question": {
+        "en": "What is a prosthodontist and why does it matter?",
+        "es": "¿Qué es un prostodoncista y por qué importa?"
+      },
+      "answer": {
+        "en": "A prosthodontist is a dental specialist who has completed 3 additional years of rigorous residency training beyond dental school, focusing on the restoration and replacement of teeth. Think of it this way: all prosthodontists are dentists, but not all dentists are prosthodontists — just like all cardiologists are doctors, but not all doctors are cardiologists. Dr. Brenes' advanced training means he handles the most complex cases — full-mouth rehabilitations, implant-supported prostheses, and intricate esthetic cases — with a level of expertise and precision that comes from thousands of additional hours of specialized training.",
+        "es": "Un prostodoncista es un especialista dental que ha completado 3 años adicionales de residencia rigurosa más allá de la escuela dental, enfocándose en la restauración y reemplazo de dientes. Piénselo así: todos los prostodoncistas son dentistas, pero no todos los dentistas son prostodoncistas — así como todos los cardiólogos son médicos, pero no todos los médicos son cardiólogos. La formación avanzada del Dr. Brenes significa que maneja los casos más complejos — rehabilitaciones orales completas, prótesis sobre implantes y casos estéticos intrincados — con un nivel de experiencia y precisión que proviene de miles de horas adicionales de entrenamiento especializado."
+      },
+      "tags": ["prosthodontist", "specialist", "credentials", "training"]
+    }
+  ]
+}

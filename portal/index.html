@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MouthMap Platform — Portal Selection</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0D4F4F 0%, #1A2F4B 50%, #0D4F4F 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .hub {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hub-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.2);
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: cover;
+        }
+
+        .hub h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .hub-sub {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .hub-practice {
+            color: rgba(255,255,255,0.45);
+            font-size: 12px;
+            margin-bottom: 40px;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .portal-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 32px 24px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portal-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .portal-card__icon {
+            font-size: 40px;
+            line-height: 1;
+        }
+
+        .portal-card__title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .portal-card__desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.5;
+        }
+
+        .portal-card__badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-patient { background: rgba(16,185,129,0.2); color: #6EE7B7; }
+        .badge-admin { background: rgba(196,163,90,0.2); color: #E8D5A3; }
+        .badge-staff { background: rgba(74,127,181,0.2); color: #A3C4E0; }
+
+        .hub-back {
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .hub-back:hover { color: rgba(255,255,255,0.8); }
+
+        .hub-footer {
+            margin-top: 40px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.25);
+        }
+
+        .hub-footer a { color: rgba(255,255,255,0.35); text-decoration: none; }
+        .hub-footer a:hover { color: rgba(255,255,255,0.6); }
+
+        @media (max-width: 600px) {
+            .portal-grid { grid-template-columns: 1fr; }
+            .hub h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hub">
+        <img src="/images/paloma/paloma-avatar.png" alt="PALOMA" class="hub-avatar" />
+        <h1>🕊️ MouthMap Platform</h1>
+        <p class="hub-sub">Powered by PALOMA — Patient Advocacy & Lifecycle Oral Map Assistant</p>
+        <p class="hub-practice">Lake Jeanette Family & Implant Dentistry • Demo Mode</p>
+
+        <div class="portal-grid">
+            <a href="/portal/patient.html" class="portal-card">
+                <div class="portal-card__icon">🦷</div>
+                <div class="portal-card__title">Patient Portal</div>
+                <div class="portal-card__desc">View your 3D mouth scan, treatment history, costs, and chat with PALOMA about your dental health.</div>
+                <span class="portal-card__badge badge-patient">My MouthMap</span>
+            </a>
+
+            <a href="/admin/" class="portal-card">
+                <div class="portal-card__icon">📊</div>
+                <div class="portal-card__title">Admin Dashboard</div>
+                <div class="portal-card__desc">Practice KPIs, production charts, PALOMA analytics, patient records, and data management.</div>
+                <span class="portal-card__badge badge-admin">Dr. Brenes</span>
+            </a>
+
+            <a href="/staff/" class="portal-card">
+                <div class="portal-card__icon">📋</div>
+                <div class="portal-card__title">Staff View</div>
+                <div class="portal-card__desc">Today's schedule, follow-up queue, and recent PALOMA patient questions.</div>
+                <span class="portal-card__badge badge-staff">Team</span>
+            </a>
+        </div>
+
+        <a href="/" class="hub-back">← Back to Lake Jeanette Dentistry website</a>
+
+        <div class="hub-footer">
+            <p>Built by <a href="https://thinkdesignplan.com" target="_blank">Think! Design & Planning, LLC</a> × MouthMap</p>
+        </div>
+    </div>
+</body>
+</html>

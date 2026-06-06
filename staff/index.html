@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff View | Lake Jeanette Family & Implant Dentistry</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --staff-bg: #F0F2F5;
+            --staff-surface: #FFFFFF;
+            --staff-border: #E2E8F0;
+            --staff-text: #1E293B;
+            --staff-muted: #64748B;
+            --staff-teal: #0D4F4F;
+            --staff-green: #10B981;
+            --staff-amber: #F59E0B;
+            --staff-red: #EF4444;
+            --staff-radius: 12px;
+            --staff-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--staff-bg); color: var(--staff-text); min-height: 100vh; }
+        
+        .staff-header {
+            background: var(--staff-teal); color: white; padding: 16px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .staff-header h1 { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; }
+        .staff-header__sub { font-size: 12px; opacity: 0.7; }
+        .staff-header__right { display: flex; align-items: center; gap: 12px; }
+        .staff-header__time { font-size: 13px; font-weight: 500; }
+        .staff-header a { color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; }
+        
+        .staff-body { padding: 24px; max-width: 1000px; margin: 0 auto; }
+        
+        .staff-section { margin-bottom: 24px; }
+        .staff-section h2 { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        
+        .schedule-list { display: flex; flex-direction: column; gap: 8px; }
+        .schedule-card {
+            background: var(--staff-surface); border-radius: var(--staff-radius);
+            padding: 14px 18px; border: 1px solid var(--staff-border); box-shadow: var(--staff-shadow);
+            display: flex; align-items: center; gap: 14px;
+        }
+        .schedule-card__time { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; width: 65px; color: var(--staff-teal); }
+        .schedule-card__info { flex: 1; }
+        .schedule-card__name { font-weight: 600; font-size: 14px; }
+        .schedule-card__proc { font-size: 12px; color: var(--staff-muted); }
+        
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-confirmed { background: #D1FAE5; color: #065F46; }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-arrived { background: #DBEAFE; color: #1E40AF; }
+        .badge-in-chair { background: #EDE9FE; color: #5B21B6; }
+        
+        .followups { display: flex; flex-direction: column; gap: 8px; }
+        .followup-card {
+            background: var(--staff-surface); border-radius: var(--staff-radius);
+            padding: 14px 18px; border: 1px solid var(--staff-border); border-left: 4px solid var(--staff-amber);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .followup-card__name { font-weight: 600; font-size: 14px; }
+        .followup-card__reason { font-size: 12px; color: var(--staff-muted); }
+        .followup-card__action { padding: 6px 14px; border-radius: 8px; background: var(--staff-teal); color: white; font-size: 12px; font-weight: 600; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+        .followup-card__action:hover { opacity: 0.9; }
+        
+        .schedule-card__mouth { padding: 5px 12px; border-radius: 8px; background: var(--staff-teal); color: white; font-size: 11px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: all 0.2s; }
+        .schedule-card__mouth:hover { opacity: 0.85; transform: scale(1.03); }
+        
+        .paloma-feed { display: flex; flex-direction: column; gap: 8px; }
+        .paloma-card {
+            background: var(--staff-surface); border-radius: var(--staff-radius);
+            padding: 12px 16px; border: 1px solid var(--staff-border); font-size: 13px;
+        }
+        .paloma-card__q { font-weight: 600; margin-bottom: 4px; }
+        .paloma-card__meta { font-size: 11px; color: var(--staff-muted); display: flex; gap: 12px; }
+        
+        @media (max-width: 768px) {
+            .staff-body { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="staff-header">
+        <div>
+            <h1>📋 Staff View</h1>
+            <p class="staff-header__sub">Lake Jeanette Family & Implant Dentistry</p>
+        </div>
+        <div class="staff-header__right">
+            <span class="staff-header__time" id="clock"></span>
+            <a href="/">← Website</a>
+        </div>
+    </header>
+
+    <div class="staff-body">
+        <!-- Today's Schedule -->
+        <div class="staff-section">
+            <h2>📅 Today's Schedule</h2>
+            <div class="schedule-list" id="schedule-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Follow-ups -->
+        <div class="staff-section">
+            <h2>⚠️ Follow-up Queue</h2>
+            <div class="followups" id="followup-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- PALOMA Feed -->
+        <div class="staff-section">
+            <h2>🕊️ Recent PALOMA Questions</h2>
+            <p style="font-size:12px;color:var(--staff-muted);margin-bottom:8px;">Anonymized patient questions from the last 24 hours</p>
+            <div class="paloma-feed" id="paloma-feed">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clock
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+        updateClock();
+        setInterval(updateClock, 60000);
+
+        // Schedule
+        const schedule = [
+            { time: '8:00 AM', name: 'Johnson, Maria', proc: 'Cleaning & Exam', status: 'confirmed', hasPortal: false },
+            { time: '9:00 AM', name: 'Williams, James', proc: 'Crown Prep #14', status: 'in-chair', hasPortal: false },
+            { time: '10:30 AM', name: 'Harrison, Chris', proc: 'AI Scan Review', status: 'arrived', hasPortal: true },
+            { time: '11:30 AM', name: 'Rodriguez, Ana', proc: 'Implant Consult (Español)', status: 'confirmed', hasPortal: false },
+            { time: '1:00 PM', name: 'Thompson, David', proc: 'Root Canal #19', status: 'confirmed', hasPortal: false },
+            { time: '2:30 PM', name: 'Chen, Lisa', proc: 'Veneer Delivery', status: 'pending', hasPortal: false },
+            { time: '3:30 PM', name: '— Open —', proc: '', status: '', hasPortal: false },
+        ];
+
+        document.getElementById('schedule-list').innerHTML = schedule.map(s => `
+            <div class="schedule-card">
+                <div class="schedule-card__time">${s.time}</div>
+                <div class="schedule-card__info">
+                    <div class="schedule-card__name">${s.name}</div>
+                    <div class="schedule-card__proc">${s.proc}</div>
+                </div>
+                ${s.hasPortal ? `<a href="/portal/patient.html" class="schedule-card__mouth">🦷 MouthMap</a>` : ''}
+                ${s.status ? `<span class="badge badge-${s.status}">${s.status.replace('-', ' ')}</span>` : ''}
+            </div>
+        `).join('');
+
+        // Follow-ups
+        const followups = [
+            { name: 'Park, Susan', reason: 'Post-op check — extraction #32 (3 days ago)', action: 'Call' },
+            { name: 'Davis, Mark', reason: 'Treatment plan review — Full-mouth rehab estimate', action: 'Email' },
+            { name: 'Martinez, Carlos', reason: 'Insurance pre-auth needed — Implant #19', action: 'Submit' },
+        ];
+
+        document.getElementById('followup-list').innerHTML = followups.map(f => `
+            <div class="followup-card">
+                <div>
+                    <div class="followup-card__name">${f.name}</div>
+                    <div class="followup-card__reason">${f.reason}</div>
+                </div>
+                <button class="followup-card__action">${f.action}</button>
+            </div>
+        `).join('');
+
+        // PALOMA Feed
+        const palomaQuestions = [
+            { q: '"Do you accept Delta Dental PPO?"', lang: 'EN', time: '2h ago', category: 'Insurance' },
+            { q: '"¿Cuánto cuestan los implantes dentales?"', lang: 'ES', time: '3h ago', category: 'Services' },
+            { q: '"What should I do about my sensitivity after a filling?"', lang: 'EN', time: '5h ago', category: 'Post-Op' },
+            { q: '"Can I see my 3D scan at home?"', lang: 'EN', time: '6h ago', category: 'Technology' },
+            { q: '"¿Tienen plan de pagos para tratamientos grandes?"', lang: 'ES', time: '8h ago', category: 'Financing' },
+        ];
+
+        document.getElementById('paloma-feed').innerHTML = palomaQuestions.map(p => `
+            <div class="paloma-card">
+                <div class="paloma-card__q">${p.q}</div>
+                <div class="paloma-card__meta">
+                    <span>🌐 ${p.lang}</span>
+                    <span>🏷️ ${p.category}</span>
+                    <span>🕐 ${p.time}</span>
+                </div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>

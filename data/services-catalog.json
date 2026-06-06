@@ -1,0 +1,619 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "currency": "USD",
+  "priceDisclaimer": {
+    "en": "All prices are estimates and may vary based on individual treatment needs, complexity, and insurance coverage. A personalized treatment plan with exact costs will be provided after your consultation with Dr. Brenes.",
+    "es": "Todos los precios son estimados y pueden variar según las necesidades individuales de tratamiento, complejidad y cobertura de seguro. Se proporcionará un plan de tratamiento personalizado con costos exactos después de su consulta con el Dr. Brenes."
+  },
+  "categories": [
+    {
+      "id": "cat-implants",
+      "name": { "en": "Dental Implants", "es": "Implantes Dentales" },
+      "icon": "implant",
+      "sortOrder": 1
+    },
+    {
+      "id": "cat-fullarch",
+      "name": { "en": "Full-Arch Restoration", "es": "Restauración de Arco Completo" },
+      "icon": "full-arch",
+      "sortOrder": 2
+    },
+    {
+      "id": "cat-cosmetic",
+      "name": { "en": "Cosmetic Dentistry", "es": "Odontología Cosmética" },
+      "icon": "cosmetic",
+      "sortOrder": 3
+    },
+    {
+      "id": "cat-restorative",
+      "name": { "en": "Restorative Dentistry", "es": "Odontología Restaurativa" },
+      "icon": "restorative",
+      "sortOrder": 4
+    },
+    {
+      "id": "cat-family",
+      "name": { "en": "Family Dentistry", "es": "Odontología Familiar" },
+      "icon": "family",
+      "sortOrder": 5
+    },
+    {
+      "id": "cat-emergency",
+      "name": { "en": "Emergency Care", "es": "Atención de Emergencia" },
+      "icon": "emergency",
+      "sortOrder": 6
+    }
+  ],
+  "services": [
+    {
+      "id": "svc-001",
+      "name": { "en": "Single Dental Implant", "es": "Implante Dental Individual" },
+      "categoryId": "cat-implants",
+      "description": {
+        "en": "A dental implant is a titanium post surgically placed into the jawbone to replace a missing tooth root. Once healed, a custom-designed crown is placed on top, creating a natural-looking, fully functional replacement tooth. Dr. Brenes uses digital planning with CBCT imaging and 3D-printed surgical guides for precise, predictable implant placement.",
+        "es": "Un implante dental es un poste de titanio colocado quirúrgicamente en el hueso de la mandíbula para reemplazar la raíz de un diente perdido. Una vez cicatrizado, se coloca una corona diseñada a medida, creando un diente de reemplazo de aspecto natural y completamente funcional. El Dr. Brenes utiliza planificación digital con imágenes CBCT y guías quirúrgicas impresas en 3D para una colocación precisa y predecible."
+      },
+      "shortDescription": {
+        "en": "Permanent tooth replacement with a titanium implant and custom crown",
+        "es": "Reemplazo permanente de diente con implante de titanio y corona personalizada"
+      },
+      "priceRange": {
+        "min": 3500,
+        "max": 5500,
+        "note": "Includes implant, abutment, and crown. Bone grafting additional if needed."
+      },
+      "duration": {
+        "totalMonths": "3-6",
+        "visits": [
+          { "name": "Consultation & Planning", "duration": "60 min" },
+          { "name": "Implant Placement Surgery", "duration": "60-90 min" },
+          { "name": "Healing Period", "duration": "3-4 months" },
+          { "name": "Impression & Abutment", "duration": "45 min" },
+          { "name": "Crown Delivery", "duration": "30 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D6010", "description": "Surgical placement of implant body — endosteal implant" },
+        { "code": "D6056", "description": "Prefabricated abutment" },
+        { "code": "D6058", "description": "Abutment supported porcelain/ceramic crown" }
+      ],
+      "insuranceCoverage": {
+        "typical": "major",
+        "coveragePercent": 50,
+        "notes": "Many plans cover implants under major services. Some plans exclude implants entirely. Pre-authorization recommended."
+      },
+      "technologyUsed": ["Medit i700 Scanner", "BlueSkyBio Implant Planning", "SprintRay 3D Printer (Surgical Guides)", "Exocad DentalCAD"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Does getting a dental implant hurt?", "es": "¿Duele colocarse un implante dental?" },
+          "answer": { "en": "Most patients report that implant placement is less painful than a tooth extraction. We use local anesthesia and offer sedation options for anxious patients. Post-operative discomfort is typically mild and managed with over-the-counter pain medication for 2-3 days.", "es": "La mayoría de los pacientes reportan que la colocación de un implante es menos dolorosa que una extracción dental. Usamos anestesia local y ofrecemos opciones de sedación para pacientes ansiosos. La incomodidad post-operatoria es típicamente leve y se maneja con medicamentos de venta libre para el dolor durante 2-3 días." }
+        },
+        {
+          "question": { "en": "How long do dental implants last?", "es": "¿Cuánto duran los implantes dentales?" },
+          "answer": { "en": "With proper care and regular dental visits, dental implants can last a lifetime. The implant itself (the titanium post) is designed to be permanent. The crown on top may need replacement after 15-20 years due to normal wear.", "es": "Con el cuidado adecuado y visitas dentales regulares, los implantes dentales pueden durar toda la vida. El implante en sí (el poste de titanio) está diseñado para ser permanente. La corona superior puede necesitar reemplazo después de 15-20 años debido al desgaste normal." }
+        },
+        {
+          "question": { "en": "Am I a candidate for dental implants?", "es": "¿Soy candidato para implantes dentales?" },
+          "answer": { "en": "Most adults with good general health are candidates for dental implants. We'll evaluate your jawbone density with a 3D CBCT scan, review your medical history, and discuss your goals. Even if you've been told you don't have enough bone, modern grafting techniques often make implants possible.", "es": "La mayoría de los adultos con buena salud general son candidatos para implantes dentales. Evaluaremos la densidad de su hueso mandibular con una tomografía 3D CBCT, revisaremos su historial médico y discutiremos sus objetivos. Incluso si le han dicho que no tiene suficiente hueso, las técnicas modernas de injerto a menudo hacen posibles los implantes." }
+        }
+      ],
+      "isSignature": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "svc-002",
+      "name": { "en": "All-on-X Full-Arch Implant Restoration", "es": "Restauración de Arco Completo All-on-X" },
+      "categoryId": "cat-fullarch",
+      "description": {
+        "en": "All-on-X (All-on-4 or All-on-6) is a revolutionary technique that replaces an entire arch of teeth using just 4-6 strategically placed implants. This provides a fixed, non-removable set of teeth that looks, feels, and functions like natural teeth. Dr. Brenes uses a fully digital workflow — from 3D planning through guided surgery to same-day provisional teeth — delivering life-changing results in a single day.",
+        "es": "All-on-X (All-on-4 o All-on-6) es una técnica revolucionaria que reemplaza un arco completo de dientes usando solo 4-6 implantes colocados estratégicamente. Esto proporciona un juego de dientes fijos, no removibles, que se ven, sienten y funcionan como dientes naturales. El Dr. Brenes utiliza un flujo de trabajo completamente digital — desde la planificación 3D, pasando por la cirugía guiada, hasta los dientes provisionales el mismo día — entregando resultados que cambian vidas en un solo día."
+      },
+      "shortDescription": {
+        "en": "Full-arch tooth replacement on 4-6 implants — teeth in a day",
+        "es": "Reemplazo de arco completo sobre 4-6 implantes — dientes en un día"
+      },
+      "priceRange": {
+        "min": 20000,
+        "max": 35000,
+        "note": "Per arch. Includes implants, surgical guides, provisional prosthesis, and final zirconia prosthesis."
+      },
+      "duration": {
+        "totalMonths": "6-12",
+        "visits": [
+          { "name": "Comprehensive Consultation & 3D Planning", "duration": "90 min" },
+          { "name": "Digital Design & Surgical Guide Fabrication", "duration": "1-2 weeks (lab)" },
+          { "name": "Surgery Day — Implants + Same-Day Teeth", "duration": "4-6 hours" },
+          { "name": "Post-Op Follow-ups (multiple)", "duration": "30 min each" },
+          { "name": "Healing Period", "duration": "4-6 months" },
+          { "name": "Final Prosthesis Impressions & Try-in", "duration": "60-90 min" },
+          { "name": "Final Prosthesis Delivery", "duration": "60 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D6010", "description": "Surgical placement of implant body — endosteal implant (×4-6)" },
+        { "code": "D6114", "description": "Implant/abutment supported fixed denture — maxillary" },
+        { "code": "D6115", "description": "Implant/abutment supported fixed denture — mandibular" },
+        { "code": "D6056", "description": "Prefabricated abutment (×4-6)" },
+        { "code": "D7210", "description": "Surgical extraction (if needed)" }
+      ],
+      "insuranceCoverage": {
+        "typical": "major",
+        "coveragePercent": 50,
+        "notes": "Coverage varies widely. Most plans have annual maximums ($1,500-$2,500) that cover only a small fraction. Financing strongly recommended."
+      },
+      "technologyUsed": ["Medit i700 Scanner", "BlueSkyBio Implant Planning", "SprintRay 3D Printer", "Exocad DentalCAD", "CBCT Imaging"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Can I get teeth the same day as my implant surgery?", "es": "¿Puedo obtener dientes el mismo día de mi cirugía de implantes?" },
+          "answer": { "en": "Yes! Our digital workflow allows us to design and fabricate a provisional set of teeth before your surgery day. You'll walk out of our office with a full set of beautiful, functional teeth on the same day as your implant placement.", "es": "¡Sí! Nuestro flujo de trabajo digital nos permite diseñar y fabricar un juego provisional de dientes antes del día de su cirugía. Saldrá de nuestra oficina con un juego completo de dientes hermosos y funcionales el mismo día de la colocación de sus implantes." }
+        },
+        {
+          "question": { "en": "What is the difference between All-on-4 and All-on-6?", "es": "¿Cuál es la diferencia entre All-on-4 y All-on-6?" },
+          "answer": { "en": "All-on-4 uses four implants per arch, while All-on-6 uses six. The choice depends on your bone quality, density, and the specific demands of your case. Dr. Brenes will recommend the optimal number during your consultation based on your 3D CBCT scan results.", "es": "All-on-4 usa cuatro implantes por arco, mientras que All-on-6 usa seis. La elección depende de la calidad y densidad de su hueso, y las demandas específicas de su caso. El Dr. Brenes recomendará el número óptimo durante su consulta basándose en los resultados de su tomografía 3D CBCT." }
+        }
+      ],
+      "isSignature": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "svc-003",
+      "name": { "en": "Digital Smile Design (DSD)", "es": "Diseño Digital de Sonrisa (DSD)" },
+      "categoryId": "cat-cosmetic",
+      "description": {
+        "en": "Digital Smile Design is our approach to creating your perfect smile before any treatment begins. Using advanced software and facial analysis, Dr. Brenes designs your new smile digitally, allowing you to see and approve the result before we start. This collaborative process ensures your smile is customized to your face, personality, and goals — no surprises, just beautiful, predictable results.",
+        "es": "El Diseño Digital de Sonrisa es nuestro enfoque para crear su sonrisa perfecta antes de que comience cualquier tratamiento. Usando software avanzado y análisis facial, el Dr. Brenes diseña su nueva sonrisa digitalmente, permitiéndole ver y aprobar el resultado antes de comenzar. Este proceso colaborativo asegura que su sonrisa esté personalizada a su rostro, personalidad y objetivos — sin sorpresas, solo resultados hermosos y predecibles."
+      },
+      "shortDescription": {
+        "en": "See your new smile before treatment begins with digital design technology",
+        "es": "Vea su nueva sonrisa antes de comenzar el tratamiento con tecnología de diseño digital"
+      },
+      "priceRange": {
+        "min": 500,
+        "max": 1500,
+        "note": "Design fee is often credited toward the final restoration treatment."
+      },
+      "duration": {
+        "totalMonths": "1-2 weeks for design",
+        "visits": [
+          { "name": "Photo Session & Facial Analysis", "duration": "30 min" },
+          { "name": "Digital Design Presentation", "duration": "45 min" },
+          { "name": "Mock-Up Try-In (optional)", "duration": "30 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D0470", "description": "Diagnostic casts" },
+        { "code": "D9999", "description": "Unspecified adjunctive procedure — DSD design fee" }
+      ],
+      "insuranceCoverage": {
+        "typical": "not-covered",
+        "coveragePercent": 0,
+        "notes": "Smile design is considered elective/cosmetic and is typically not covered by insurance."
+      },
+      "technologyUsed": ["SmileCloud DSD Platform", "Medit i700 Scanner", "Facial Photography Suite"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Can I really see my new smile before getting veneers?", "es": "¿Realmente puedo ver mi nueva sonrisa antes de ponerme las carillas?" },
+          "answer": { "en": "Absolutely! Our Digital Smile Design process creates a photorealistic preview of your new smile on your actual photo. We can even create a physical mock-up that you can try on in the office to see how your new smile will look and feel in real life.", "es": "¡Absolutamente! Nuestro proceso de Diseño Digital de Sonrisa crea una vista previa fotorrealista de su nueva sonrisa en su foto real. Incluso podemos crear una maqueta física que puede probar en la oficina para ver cómo se verá y sentirá su nueva sonrisa en la vida real." }
+        }
+      ],
+      "isSignature": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "svc-004",
+      "name": { "en": "Full-Mouth Rehabilitation", "es": "Rehabilitación Oral Completa" },
+      "categoryId": "cat-fullarch",
+      "description": {
+        "en": "Full-mouth rehabilitation is a comprehensive treatment approach that restores all teeth in both arches to optimal function, health, and esthetics. This is ideal for patients with extensive wear, multiple failing restorations, bite problems, or those seeking a complete transformation. Dr. Brenes combines implants, crowns, veneers, and other restorations into a cohesive plan designed digitally for predictable results.",
+        "es": "La rehabilitación oral completa es un enfoque de tratamiento integral que restaura todos los dientes en ambos arcos a una función, salud y estética óptimas. Es ideal para pacientes con desgaste extenso, múltiples restauraciones defectuosas, problemas de mordida, o aquellos que buscan una transformación completa. El Dr. Brenes combina implantes, coronas, carillas y otras restauraciones en un plan cohesivo diseñado digitalmente para resultados predecibles."
+      },
+      "shortDescription": {
+        "en": "Complete restoration of all teeth for optimal function and esthetics",
+        "es": "Restauración completa de todos los dientes para función y estética óptimas"
+      },
+      "priceRange": {
+        "min": 15000,
+        "max": 60000,
+        "note": "Varies significantly based on the number and type of restorations needed."
+      },
+      "duration": {
+        "totalMonths": "6-18",
+        "visits": [
+          { "name": "Comprehensive Exam & Records", "duration": "90 min" },
+          { "name": "Digital Planning & Wax-Up", "duration": "2-4 weeks (lab)" },
+          { "name": "Treatment Presentation", "duration": "60 min" },
+          { "name": "Preparation Appointments (multiple)", "duration": "2-4 hours each" },
+          { "name": "Provisional Phase", "duration": "1-3 months" },
+          { "name": "Final Restoration Delivery", "duration": "2-3 hours" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D2740", "description": "Crown — porcelain/ceramic substrate" },
+        { "code": "D2750", "description": "Crown — porcelain fused to high noble metal" },
+        { "code": "D6010", "description": "Surgical placement of implant body" },
+        { "code": "D2962", "description": "Labial veneer — porcelain laminate" }
+      ],
+      "insuranceCoverage": {
+        "typical": "major",
+        "coveragePercent": 50,
+        "notes": "Individual restorations may be covered under major services. Annual maximums limit per-year coverage. Phased treatment over multiple benefit years is common."
+      },
+      "technologyUsed": ["Medit i700 Scanner", "Exocad DentalCAD", "SmileCloud DSD", "SprintRay 3D Printer", "Pearl AI"],
+      "commonQuestions": [
+        {
+          "question": { "en": "How long does a full-mouth rehabilitation take?", "es": "¿Cuánto tiempo tarda una rehabilitación oral completa?" },
+          "answer": { "en": "A full-mouth rehabilitation typically takes 6-18 months depending on the complexity of your case. We break the treatment into manageable phases, and you'll have comfortable provisional restorations throughout the process so you're never without functional, attractive teeth.", "es": "Una rehabilitación oral completa típicamente toma de 6 a 18 meses dependiendo de la complejidad de su caso. Dividimos el tratamiento en fases manejables, y tendrá restauraciones provisionales cómodas durante todo el proceso para que nunca esté sin dientes funcionales y atractivos." }
+        }
+      ],
+      "isSignature": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "svc-005",
+      "name": { "en": "Porcelain Veneers", "es": "Carillas de Porcelana" },
+      "categoryId": "cat-cosmetic",
+      "description": {
+        "en": "Porcelain veneers are ultra-thin shells of ceramic bonded to the front surfaces of your teeth to create a beautiful, uniform smile. They can correct chips, gaps, discoloration, slight misalignment, and worn teeth. Dr. Brenes designs each veneer digitally using smile design technology, ensuring each one is custom-crafted to complement your facial features.",
+        "es": "Las carillas de porcelana son láminas ultra delgadas de cerámica adheridas a las superficies frontales de sus dientes para crear una sonrisa hermosa y uniforme. Pueden corregir astillas, espacios, decoloración, ligero desalineamiento y dientes desgastados. El Dr. Brenes diseña cada carilla digitalmente usando tecnología de diseño de sonrisa, asegurando que cada una esté hecha a medida para complementar sus rasgos faciales."
+      },
+      "shortDescription": {
+        "en": "Custom porcelain shells for a perfect, natural-looking smile",
+        "es": "Láminas de porcelana personalizadas para una sonrisa perfecta y natural"
+      },
+      "priceRange": {
+        "min": 1200,
+        "max": 2500,
+        "note": "Per tooth. Most smile makeovers involve 6-10 veneers."
+      },
+      "duration": {
+        "totalMonths": "2-4 weeks",
+        "visits": [
+          { "name": "Consultation & Smile Design", "duration": "60 min" },
+          { "name": "Tooth Preparation & Impressions", "duration": "2-3 hours" },
+          { "name": "Temporary Veneers Wear Period", "duration": "1-2 weeks" },
+          { "name": "Final Veneer Bonding", "duration": "2-3 hours" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D2962", "description": "Labial veneer — porcelain laminate — chairside" },
+        { "code": "D2961", "description": "Labial veneer — resin laminate — chairside" }
+      ],
+      "insuranceCoverage": {
+        "typical": "not-covered",
+        "coveragePercent": 0,
+        "notes": "Veneers are considered cosmetic and typically not covered by dental insurance. Financing options available."
+      },
+      "technologyUsed": ["SmileCloud DSD", "Medit i700 Scanner", "Exocad DentalCAD"],
+      "commonQuestions": [
+        {
+          "question": { "en": "How long do porcelain veneers last?", "es": "¿Cuánto duran las carillas de porcelana?" },
+          "answer": { "en": "With proper care, porcelain veneers typically last 15-20 years or more. They're highly durable and stain-resistant. We recommend avoiding biting hard objects like ice or using your teeth as tools, and wearing a night guard if you grind your teeth.", "es": "Con el cuidado adecuado, las carillas de porcelana típicamente duran de 15 a 20 años o más. Son altamente durables y resistentes a las manchas. Recomendamos evitar morder objetos duros como hielo o usar sus dientes como herramientas, y usar un protector nocturno si rechina los dientes." }
+        },
+        {
+          "question": { "en": "Do veneers damage your natural teeth?", "es": "¿Las carillas dañan los dientes naturales?" },
+          "answer": { "en": "A minimal amount of enamel is removed to bond the veneer — typically less than 0.5mm. Dr. Brenes uses conservative preparation techniques to preserve as much natural tooth structure as possible. Once bonded, the veneer actually strengthens the tooth.", "es": "Se remueve una cantidad mínima de esmalte para adherir la carilla — típicamente menos de 0.5mm. El Dr. Brenes usa técnicas de preparación conservadoras para preservar la mayor cantidad posible de estructura dental natural. Una vez adherida, la carilla realmente fortalece el diente." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 5
+    },
+    {
+      "id": "svc-006",
+      "name": { "en": "Family Dentistry", "es": "Odontología Familiar" },
+      "categoryId": "cat-family",
+      "description": {
+        "en": "We provide comprehensive family dentistry for patients of all ages, including routine checkups, cleanings, fillings, and preventive care. Our goal is to keep your entire family's smiles healthy with regular care, early detection using AI-assisted diagnostics, and personalized hygiene plans. We love seeing families grow and building lasting relationships with our community.",
+        "es": "Proporcionamos odontología familiar integral para pacientes de todas las edades, incluyendo chequeos de rutina, limpiezas, empastes y cuidado preventivo. Nuestro objetivo es mantener saludables las sonrisas de toda su familia con cuidado regular, detección temprana usando diagnósticos asistidos por IA, y planes de higiene personalizados. Nos encanta ver crecer a las familias y construir relaciones duraderas con nuestra comunidad."
+      },
+      "shortDescription": {
+        "en": "Comprehensive dental care for the whole family — checkups, cleanings, and more",
+        "es": "Cuidado dental integral para toda la familia — chequeos, limpiezas y más"
+      },
+      "priceRange": {
+        "min": 150,
+        "max": 450,
+        "note": "New patient exam, X-rays, and cleaning. Follow-up visits are typically less."
+      },
+      "duration": {
+        "totalMonths": "Ongoing",
+        "visits": [
+          { "name": "New Patient Exam & X-rays", "duration": "60-90 min" },
+          { "name": "Routine Cleaning (Prophylaxis)", "duration": "45-60 min" },
+          { "name": "Periodic Exam", "duration": "30 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D0150", "description": "Comprehensive oral evaluation — new or established patient" },
+        { "code": "D0210", "description": "Intraoral — complete series of radiographic images" },
+        { "code": "D0274", "description": "Bitewings — four radiographic images" },
+        { "code": "D1110", "description": "Prophylaxis — adult" },
+        { "code": "D1120", "description": "Prophylaxis — child" }
+      ],
+      "insuranceCoverage": {
+        "typical": "preventive",
+        "coveragePercent": 100,
+        "notes": "Most insurance plans cover preventive visits (exams, X-rays, cleanings) at 100% with no copay. Two cleanings per year are standard."
+      },
+      "technologyUsed": ["Pearl Second Opinion AI", "Overjet Dental AI", "Medit i700 Scanner"],
+      "commonQuestions": [
+        {
+          "question": { "en": "How often should I visit the dentist?", "es": "¿Con qué frecuencia debo visitar al dentista?" },
+          "answer": { "en": "We recommend visiting every 6 months for a routine exam and cleaning. Some patients with gum disease or higher risk factors may benefit from visits every 3-4 months. We'll personalize your recall schedule based on your needs.", "es": "Recomendamos visitar cada 6 meses para un examen de rutina y limpieza. Algunos pacientes con enfermedad de las encías o factores de riesgo más altos pueden beneficiarse de visitas cada 3-4 meses. Personalizaremos su calendario de citas según sus necesidades." }
+        },
+        {
+          "question": { "en": "What ages do you treat?", "es": "¿Qué edades tratan?" },
+          "answer": { "en": "We welcome patients of all ages! We recommend bringing your child for their first dental visit by age 1 or when their first tooth erupts. Our team is experienced with pediatric patients and takes extra care to make young visitors comfortable.", "es": "¡Aceptamos pacientes de todas las edades! Recomendamos traer a su hijo a su primera visita dental antes del año de edad o cuando aparezca su primer diente. Nuestro equipo tiene experiencia con pacientes pediátricos y toma cuidado extra para que los visitantes jóvenes se sientan cómodos." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 6
+    },
+    {
+      "id": "svc-007",
+      "name": { "en": "Same-Day Crowns (CEREC / Digital)", "es": "Coronas el Mismo Día (CEREC / Digital)" },
+      "categoryId": "cat-restorative",
+      "description": {
+        "en": "No more temporary crowns or multiple visits! Using our Medit i700 scanner, Exocad design software, and SprintRay 3D printer, Dr. Brenes can design and fabricate a permanent, custom-fit crown in a single appointment. The entire process — from digital scan to finished crown — takes about 2 hours, giving you a beautiful, precise restoration without the wait.",
+        "es": "¡No más coronas temporales ni múltiples visitas! Usando nuestro escáner Medit i700, software de diseño Exocad e impresora 3D SprintRay, el Dr. Brenes puede diseñar y fabricar una corona permanente, hecha a medida, en una sola cita. Todo el proceso — desde el escaneo digital hasta la corona terminada — toma aproximadamente 2 horas, dándole una restauración hermosa y precisa sin la espera."
+      },
+      "shortDescription": {
+        "en": "Custom permanent crown designed and delivered in a single visit",
+        "es": "Corona permanente personalizada diseñada y entregada en una sola visita"
+      },
+      "priceRange": {
+        "min": 1000,
+        "max": 1800,
+        "note": "Single crown. Material choice (ceramic, zirconia, e.max) affects pricing."
+      },
+      "duration": {
+        "totalMonths": "Same day",
+        "visits": [
+          { "name": "Single Visit — Prep, Scan, Design, Mill, Bond", "duration": "2-2.5 hours" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D2740", "description": "Crown — porcelain/ceramic substrate" },
+        { "code": "D2750", "description": "Crown — porcelain fused to high noble metal" },
+        { "code": "D2752", "description": "Crown — porcelain fused to noble metal" }
+      ],
+      "insuranceCoverage": {
+        "typical": "major",
+        "coveragePercent": 50,
+        "notes": "Crowns are covered under major services. Most plans cover 50% after deductible. Same-day and lab-made crowns are billed the same CDT code."
+      },
+      "technologyUsed": ["Medit i700 Scanner", "Exocad ChairsideCAD", "SprintRay 3D Printer"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Are same-day crowns as good as lab-made crowns?", "es": "¿Las coronas del mismo día son tan buenas como las hechas en laboratorio?" },
+          "answer": { "en": "Yes! Our digital workflow produces crowns with exceptional precision and fit. In many cases, the accuracy of our digital scans and CAD design surpasses traditional impressions. The materials we use are the same high-quality ceramics used by top dental labs.", "es": "¡Sí! Nuestro flujo de trabajo digital produce coronas con precisión y ajuste excepcionales. En muchos casos, la precisión de nuestros escaneos digitales y diseño CAD supera las impresiones tradicionales. Los materiales que usamos son las mismas cerámicas de alta calidad utilizadas por los mejores laboratorios dentales." }
+        }
+      ],
+      "isSignature": true,
+      "sortOrder": 7
+    },
+    {
+      "id": "svc-008",
+      "name": { "en": "Teeth Whitening", "es": "Blanqueamiento Dental" },
+      "categoryId": "cat-cosmetic",
+      "description": {
+        "en": "Brighten your smile with professional teeth whitening. We offer both in-office power whitening for dramatic results in one visit, and custom take-home whitening trays for gradual brightening at your convenience. Our whitening treatments are safe, effective, and supervised by Dr. Brenes to minimize sensitivity.",
+        "es": "Ilumine su sonrisa con blanqueamiento dental profesional. Ofrecemos tanto blanqueamiento potente en consultorio para resultados dramáticos en una visita, como bandejas de blanqueamiento personalizadas para llevar a casa para un aclaramiento gradual a su conveniencia. Nuestros tratamientos de blanqueamiento son seguros, efectivos y supervisados por el Dr. Brenes para minimizar la sensibilidad."
+      },
+      "shortDescription": {
+        "en": "Professional whitening for a brighter, more confident smile",
+        "es": "Blanqueamiento profesional para una sonrisa más brillante y segura"
+      },
+      "priceRange": {
+        "min": 250,
+        "max": 650,
+        "note": "In-office whitening: $450-$650. Take-home kit: $250-$350."
+      },
+      "duration": {
+        "totalMonths": "Same day or 2 weeks",
+        "visits": [
+          { "name": "In-Office Power Whitening", "duration": "60-90 min" },
+          { "name": "Take-Home Tray Impression", "duration": "30 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D9972", "description": "External bleaching — per arch — in office" },
+        { "code": "D9975", "description": "External bleaching — per arch — home application" }
+      ],
+      "insuranceCoverage": {
+        "typical": "not-covered",
+        "coveragePercent": 0,
+        "notes": "Teeth whitening is cosmetic and not covered by dental insurance."
+      },
+      "technologyUsed": ["Professional-grade whitening systems"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Will whitening make my teeth sensitive?", "es": "¿El blanqueamiento hará mis dientes sensibles?" },
+          "answer": { "en": "Some patients experience mild, temporary sensitivity during or after whitening, but it typically resolves within 24-48 hours. We use desensitizing agents and customize the concentration to minimize discomfort. If you have a history of sensitivity, we'll adjust the treatment accordingly.", "es": "Algunos pacientes experimentan sensibilidad leve y temporal durante o después del blanqueamiento, pero típicamente se resuelve dentro de 24-48 horas. Usamos agentes desensibilizantes y personalizamos la concentración para minimizar la incomodidad. Si tiene historial de sensibilidad, ajustaremos el tratamiento en consecuencia." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 8
+    },
+    {
+      "id": "svc-009",
+      "name": { "en": "Root Canal Therapy", "es": "Tratamiento de Conducto Radicular" },
+      "categoryId": "cat-restorative",
+      "description": {
+        "en": "Root canal therapy saves a tooth that is severely decayed or infected by removing the damaged nerve tissue, cleaning and disinfecting the inner canals, and sealing the tooth to prevent re-infection. Contrary to popular belief, modern root canals are comfortable procedures performed with local anesthesia. Dr. Brenes may recommend a crown after root canal treatment to protect and strengthen the tooth.",
+        "es": "El tratamiento de conducto radicular salva un diente que está severamente cariado o infectado al remover el tejido nervioso dañado, limpiar y desinfectar los conductos internos, y sellar el diente para prevenir la reinfección. Contrario a la creencia popular, los tratamientos de conducto modernos son procedimientos cómodos realizados con anestesia local. El Dr. Brenes puede recomendar una corona después del tratamiento de conducto para proteger y fortalecer el diente."
+      },
+      "shortDescription": {
+        "en": "Save your natural tooth by treating infection at the root",
+        "es": "Salve su diente natural tratando la infección en la raíz"
+      },
+      "priceRange": {
+        "min": 800,
+        "max": 1500,
+        "note": "Varies by tooth (anterior vs. molar) and number of canals. Crown additional."
+      },
+      "duration": {
+        "totalMonths": "1-2 visits",
+        "visits": [
+          { "name": "Root Canal Treatment", "duration": "60-90 min" },
+          { "name": "Follow-Up & Crown Prep (if needed)", "duration": "60 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D3310", "description": "Endodontic therapy — anterior tooth" },
+        { "code": "D3320", "description": "Endodontic therapy — premolar tooth" },
+        { "code": "D3330", "description": "Endodontic therapy — molar tooth" }
+      ],
+      "insuranceCoverage": {
+        "typical": "major",
+        "coveragePercent": 50,
+        "notes": "Root canals are typically covered under major services at 50% after deductible."
+      },
+      "technologyUsed": ["Digital radiography", "Apex locator", "Rotary endodontic systems"],
+      "commonQuestions": [
+        {
+          "question": { "en": "Is a root canal painful?", "es": "¿Es doloroso un tratamiento de conducto?" },
+          "answer": { "en": "No! Modern root canal therapy is performed with effective local anesthesia and is typically no more uncomfortable than getting a filling. Most patients are surprised at how comfortable the procedure is. The pain you feel BEFORE the root canal (from the infection) is far worse than the treatment itself.", "es": "¡No! El tratamiento de conducto moderno se realiza con anestesia local efectiva y típicamente no es más incómodo que ponerse un empaste. La mayoría de los pacientes se sorprenden de lo cómodo que es el procedimiento. El dolor que siente ANTES del tratamiento de conducto (por la infección) es mucho peor que el tratamiento en sí." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 9
+    },
+    {
+      "id": "svc-010",
+      "name": { "en": "Periodontal Treatment", "es": "Tratamiento Periodontal" },
+      "categoryId": "cat-family",
+      "description": {
+        "en": "Periodontal (gum) disease is the leading cause of tooth loss in adults. We provide comprehensive periodontal treatment including deep cleanings (scaling and root planing), periodontal maintenance, and referral for surgical intervention when needed. Using AI-assisted analysis of your X-rays, we can detect bone loss early and track your progress over time with quantitative measurements.",
+        "es": "La enfermedad periodontal (de las encías) es la causa principal de pérdida de dientes en adultos. Proporcionamos tratamiento periodontal integral incluyendo limpiezas profundas (raspado y alisado radicular), mantenimiento periodontal, y referencia para intervención quirúrgica cuando sea necesario. Usando análisis asistido por IA de sus radiografías, podemos detectar la pérdida ósea tempranamente y dar seguimiento a su progreso con mediciones cuantitativas."
+      },
+      "shortDescription": {
+        "en": "Treat and manage gum disease to protect your teeth and health",
+        "es": "Trate y controle la enfermedad de las encías para proteger sus dientes y salud"
+      },
+      "priceRange": {
+        "min": 200,
+        "max": 1200,
+        "note": "Scaling & root planing: $200-$350 per quadrant. Periodontal maintenance: $175-$250 per visit."
+      },
+      "duration": {
+        "totalMonths": "Ongoing management",
+        "visits": [
+          { "name": "Periodontal Evaluation", "duration": "45 min" },
+          { "name": "Scaling & Root Planing (per quadrant)", "duration": "60 min" },
+          { "name": "Periodontal Maintenance (every 3-4 months)", "duration": "45-60 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D4341", "description": "Periodontal scaling and root planing — four or more teeth per quadrant" },
+        { "code": "D4342", "description": "Periodontal scaling and root planing — one to three teeth per quadrant" },
+        { "code": "D4910", "description": "Periodontal maintenance" },
+        { "code": "D4355", "description": "Full mouth debridement" }
+      ],
+      "insuranceCoverage": {
+        "typical": "basic",
+        "coveragePercent": 80,
+        "notes": "Scaling and root planing is typically covered under basic services at 80%. Periodontal maintenance may replace regular cleanings and is usually covered at 80%."
+      },
+      "technologyUsed": ["Overjet Dental AI (bone loss measurement)", "Pearl AI", "Digital radiography"],
+      "commonQuestions": [
+        {
+          "question": { "en": "What is the difference between a regular cleaning and a deep cleaning?", "es": "¿Cuál es la diferencia entre una limpieza regular y una limpieza profunda?" },
+          "answer": { "en": "A regular cleaning (prophylaxis) removes plaque and tartar above the gum line and is preventive. A deep cleaning (scaling and root planing) goes below the gum line to remove bacterial deposits and smooth the root surfaces, allowing the gums to heal and reattach. Deep cleanings are therapeutic — they treat existing gum disease.", "es": "Una limpieza regular (profilaxis) remueve la placa y el sarro por encima de la línea de las encías y es preventiva. Una limpieza profunda (raspado y alisado radicular) va por debajo de la línea de las encías para remover depósitos bacterianos y alisar las superficies radiculares, permitiendo que las encías sanen y se readhieran. Las limpiezas profundas son terapéuticas — tratan la enfermedad de encías existente." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 10
+    },
+    {
+      "id": "svc-011",
+      "name": { "en": "Night Guards / Occlusal Splints", "es": "Protectores Nocturnos / Férulas Oclusales" },
+      "categoryId": "cat-family",
+      "description": {
+        "en": "Custom-fitted night guards protect your teeth from the damaging effects of bruxism (teeth grinding) and clenching during sleep. Dr. Brenes uses digital scanning and 3D printing to create precisely-fitted guards that are comfortable enough to wear every night. Night guards can prevent tooth fractures, jaw pain, headaches, and premature wear of restorations.",
+        "es": "Los protectores nocturnos hechos a medida protegen sus dientes de los efectos dañinos del bruxismo (rechinar de dientes) y el apretamiento durante el sueño. El Dr. Brenes usa escaneo digital e impresión 3D para crear protectores con ajuste preciso que son lo suficientemente cómodos para usar cada noche. Los protectores nocturnos pueden prevenir fracturas dentales, dolor de mandíbula, dolores de cabeza y desgaste prematuro de restauraciones."
+      },
+      "shortDescription": {
+        "en": "Custom-fit digital night guard to protect teeth from grinding",
+        "es": "Protector nocturno digital hecho a medida para proteger los dientes del rechinamiento"
+      },
+      "priceRange": {
+        "min": 350,
+        "max": 700,
+        "note": "Digitally designed and 3D-printed for precise fit."
+      },
+      "duration": {
+        "totalMonths": "1-2 visits",
+        "visits": [
+          { "name": "Digital Scan", "duration": "15 min" },
+          { "name": "Night Guard Delivery & Adjustment", "duration": "20 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D9944", "description": "Occlusal guard — hard appliance — full arch" },
+        { "code": "D9945", "description": "Occlusal guard — soft appliance — full arch" }
+      ],
+      "insuranceCoverage": {
+        "typical": "basic",
+        "coveragePercent": 50,
+        "notes": "Some plans cover night guards under basic services. Many plans limit to one guard per benefit period (usually every 2-3 years)."
+      },
+      "technologyUsed": ["Medit i700 Scanner", "Exocad DentalCAD", "SprintRay 3D Printer"],
+      "commonQuestions": [
+        {
+          "question": { "en": "How do I know if I need a night guard?", "es": "¿Cómo sé si necesito un protector nocturno?" },
+          "answer": { "en": "Signs you might need a night guard include waking up with jaw soreness, headaches (especially in the morning), worn or flattened teeth, chipped teeth, or your partner noticing grinding sounds at night. Dr. Brenes can examine your teeth for signs of bruxism during your regular checkup.", "es": "Las señales de que podría necesitar un protector nocturno incluyen despertar con dolor en la mandíbula, dolores de cabeza (especialmente en la mañana), dientes desgastados o aplanados, dientes astillados, o que su pareja note sonidos de rechinamiento en la noche. El Dr. Brenes puede examinar sus dientes para detectar signos de bruxismo durante su chequeo regular." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 11
+    },
+    {
+      "id": "svc-012",
+      "name": { "en": "Emergency Dental Care", "es": "Atención Dental de Emergencia" },
+      "categoryId": "cat-emergency",
+      "description": {
+        "en": "Dental emergencies don't wait, and neither should you. We reserve time in our schedule for same-day emergency appointments. Whether you're dealing with a knocked-out tooth, severe toothache, broken crown, or dental abscess, our team will get you out of pain and stabilize your situation as quickly as possible. Call us immediately and we'll fit you in.",
+        "es": "Las emergencias dentales no esperan, y usted tampoco debería. Reservamos tiempo en nuestro horario para citas de emergencia el mismo día. Ya sea que esté lidiando con un diente avulsionado, dolor de muelas severo, corona rota o absceso dental, nuestro equipo lo sacará del dolor y estabilizará su situación lo más rápido posible. Llámenos inmediatamente y lo atenderemos."
+      },
+      "shortDescription": {
+        "en": "Same-day emergency appointments for urgent dental problems",
+        "es": "Citas de emergencia el mismo día para problemas dentales urgentes"
+      },
+      "priceRange": {
+        "min": 100,
+        "max": 500,
+        "note": "Emergency exam and palliative treatment. Additional procedures billed separately."
+      },
+      "duration": {
+        "totalMonths": "Same day",
+        "visits": [
+          { "name": "Emergency Exam & Triage", "duration": "30-60 min" },
+          { "name": "Palliative Treatment", "duration": "30-60 min" }
+        ]
+      },
+      "cdtCodes": [
+        { "code": "D0140", "description": "Limited oral evaluation — problem focused" },
+        { "code": "D0220", "description": "Intraoral — periapical first radiographic image" },
+        { "code": "D9110", "description": "Palliative (emergency) treatment of dental pain" }
+      ],
+      "insuranceCoverage": {
+        "typical": "preventive",
+        "coveragePercent": 80,
+        "notes": "Emergency exams are typically covered. Palliative treatment may be covered under basic services."
+      },
+      "technologyUsed": ["Pearl AI (rapid radiograph analysis)", "Digital radiography"],
+      "commonQuestions": [
+        {
+          "question": { "en": "What should I do if a tooth gets knocked out?", "es": "¿Qué debo hacer si se me cae un diente?" },
+          "answer": { "en": "Time is critical! Pick up the tooth by the crown (not the root), gently rinse it with water if dirty (don't scrub), and try to place it back in the socket. If you can't, put it in a glass of milk or hold it between your cheek and gums. Call us immediately — we have the best chance of saving the tooth if you reach us within 30-60 minutes.", "es": "¡El tiempo es crítico! Recoja el diente por la corona (no la raíz), enjuáguelo suavemente con agua si está sucio (no lo frote), e intente colocarlo de nuevo en el alvéolo. Si no puede, póngalo en un vaso de leche o sosténgalo entre la mejilla y las encías. Llámenos inmediatamente — tenemos la mejor oportunidad de salvar el diente si nos contacta dentro de 30-60 minutos." }
+        },
+        {
+          "question": { "en": "Do you see patients on weekends for emergencies?", "es": "¿Atienden pacientes los fines de semana por emergencias?" },
+          "answer": { "en": "Our office is closed on weekends, but you can call our main number (336) 545-4281 for after-hours emergency instructions. For life-threatening emergencies (difficulty breathing, uncontrollable bleeding, facial trauma), please call 911 or go to the nearest emergency room.", "es": "Nuestra oficina está cerrada los fines de semana, pero puede llamar a nuestro número principal (336) 545-4281 para instrucciones de emergencia fuera de horario. Para emergencias que amenazan la vida (dificultad para respirar, sangrado incontrolable, trauma facial), por favor llame al 911 o vaya a la sala de emergencias más cercana." }
+        }
+      ],
+      "isSignature": false,
+      "sortOrder": 12
+    }
+  ]
+}

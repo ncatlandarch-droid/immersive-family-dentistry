@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Lake Jeanette Family & Implant Dentistry</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- ═══ Auth Gate ═══ -->
+    <div id="auth-gate" class="auth-gate">
+        <div class="auth-card">
+            <div class="auth-icon">🔐</div>
+            <h1 class="auth-title">Practice Admin</h1>
+            <p class="auth-subtitle">Lake Jeanette Family & Implant Dentistry</p>
+            <form id="login-form" class="auth-form">
+                <input type="email" id="login-email" class="auth-input" placeholder="Admin email" required />
+                <input type="password" id="login-password" class="auth-input" placeholder="Password" required />
+                <button type="submit" class="auth-btn">Sign In</button>
+                <p id="auth-error" class="auth-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ Dashboard ═══ -->
+    <div id="dashboard" class="dashboard" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="/images/paloma/paloma-icon.png" alt="" class="sidebar-logo" />
+                <div>
+                    <h2 class="sidebar-title">Admin</h2>
+                    <p class="sidebar-subtitle">MouthMap Platform</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="sidebar-item active" data-view="overview">
+                    <span>📊</span> Overview
+                </button>
+                <button class="sidebar-item" data-view="production">
+                    <span>💰</span> Production
+                </button>
+                <button class="sidebar-item" data-view="patients">
+                    <span>👥</span> Patients
+                </button>
+                <button class="sidebar-item" data-view="paloma-analytics">
+                    <span>🕊️</span> PALOMA Analytics
+                </button>
+                <button class="sidebar-item" data-view="schedule">
+                    <span>📅</span> Schedule
+                </button>
+                <button class="sidebar-item" data-view="data-editor">
+                    <span>📝</span> Data Editor
+                </button>
+                <button class="sidebar-item" data-view="settings">
+                    <span>⚙️</span> Settings
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/" class="sidebar-link">← Back to Website</a>
+                <button id="logout-btn" class="sidebar-logout">Sign Out</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="sidebar-toggle" class="topbar-toggle">☰</button>
+                    <h1 id="page-title" class="topbar-title">Overview</h1>
+                </div>
+                <div class="topbar-right">
+                    <span class="topbar-date" id="current-date"></span>
+                    <div class="topbar-avatar">CB</div>
+                </div>
+            </header>
+
+            <!-- View: Overview -->
+            <div id="view-overview" class="view active">
+                <!-- KPI Row -->
+                <div class="kpi-row" id="kpi-row">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Monthly Production</h3>
+                        <canvas id="chart-production"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Collection Rate</h3>
+                        <canvas id="chart-collections"></canvas>
+                    </div>
+                </div>
+
+                <!-- Second Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>New Patients</h3>
+                        <canvas id="chart-patients"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Case Acceptance Rate</h3>
+                        <canvas id="chart-acceptance"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- View: Production -->
+            <div id="view-production" class="view">
+                <div class="view-header">
+                    <h2>Production & Revenue</h2>
+                    <select id="production-period" class="view-select">
+                        <option value="3">Last 3 Months</option>
+                        <option value="6" selected>Last 6 Months</option>
+                        <option value="12">Last 12 Months</option>
+                    </select>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="production-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Production</th>
+                                <th>Collections</th>
+                                <th>Rate</th>
+                                <th>New Pts</th>
+                                <th>Case Accept</th>
+                                <th>Avg/Patient</th>
+                            </tr>
+                        </thead>
+                        <tbody id="production-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- View: Patients -->
+            <div id="view-patients" class="view">
+                <div class="view-header">
+                    <h2>Patient Records</h2>
+                    <input type="search" id="patient-search" class="view-search" placeholder="Search patients..." />
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Last Visit</th>
+                                <th>Next Visit</th>
+                                <th>Status</th>
+                                <th>MouthMap</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patients-tbody">
+                            <tr>
+                                <td><strong>Chris Harrison</strong></td>
+                                <td>May 14, 2026</td>
+                                <td>Sep 10, 2026</td>
+                                <td><span class="badge badge-green">Active</span></td>
+                                <td><a href="/portal/patient.html" class="table-link">🦷 View 3D Scan</a></td>
+                                <td><a href="/portal/patient.html" class="table-link">Full Portal →</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-note">
+                    💡 Click <strong>"View 3D Scan"</strong> to see the patient's interactive mouth model, dental chart, and AI findings. Connect to Dentrix PMS for live sync.
+                </div>
+            </div>
+
+            <!-- View: PALOMA Analytics -->
+            <div id="view-paloma-analytics" class="view">
+                <div class="view-header">
+                    <h2>🕊️ PALOMA Analytics</h2>
+                </div>
+                <div class="kpi-row" id="paloma-kpis">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Conversations by Language</h3>
+                        <canvas id="chart-paloma-lang"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top Question Categories</h3>
+                        <canvas id="chart-paloma-topics"></canvas>
+                    </div>
+                </div>
+                <div class="info-note">
+                    💡 PALOMA analytics are populated with demo data. Connect the Netlify Function to a database for live tracking.
+                </div>
+            </div>
+
+            <!-- View: Schedule -->
+            <div id="view-schedule" class="view">
+                <div class="view-header">
+                    <h2>📅 Today's Schedule</h2>
+                    <span class="view-date" id="schedule-date"></span>
+                </div>
+                <div class="schedule-grid" id="schedule-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- View: Data Editor -->
+            <div id="view-data-editor" class="view">
+                <div class="view-header">
+                    <h2>📝 Practice Data Editor</h2>
+                </div>
+                <div class="editor-tabs">
+                    <button class="editor-tab active" data-file="site-config">Site Config</button>
+                    <button class="editor-tab" data-file="services-catalog">Services</button>
+                    <button class="editor-tab" data-file="insurance-plans">Insurance</button>
+                    <button class="editor-tab" data-file="faq-knowledge">FAQ</button>
+                    <button class="editor-tab" data-file="staff-directory">Staff</button>
+                </div>
+                <div class="editor-container">
+                    <textarea id="data-editor-textarea" class="editor-textarea" spellcheck="false"></textarea>
+                    <div class="editor-actions">
+                        <button id="editor-save" class="btn-primary">💾 Save Changes</button>
+                        <button id="editor-reset" class="btn-secondary">↺ Reset</button>
+                        <span id="editor-status" class="editor-status"></span>
+                    </div>
+                </div>
+                <div class="info-note">
+                    ⚠️ <strong>Careful!</strong> Editing these JSON files directly changes what PALOMA knows. Invalid JSON will break the system.
+                </div>
+            </div>
+
+            <!-- View: Settings -->
+            <div id="view-settings" class="view">
+                <div class="view-header">
+                    <h2>⚙️ Settings</h2>
+                </div>
+                <div class="settings-section">
+                    <h3>PALOMA Configuration</h3>
+                    <div class="setting-row">
+                        <label>PALOMA Active</label>
+                        <input type="checkbox" checked id="paloma-active" />
+                    </div>
+                    <div class="setting-row">
+                        <label>Default Language</label>
+                        <select id="default-lang">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label>Auto-detect Language</label>
+                        <input type="checkbox" checked id="auto-detect-lang" />
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Integration Status</h3>
+                    <div id="integration-status">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Deployment</h3>
+                    <div class="info-note">
+                        🚀 This site is deployed via <strong>Netlify</strong>. Push to GitHub to trigger a new deploy.
+                        <br>🔑 Set <code>GEMINI_API_KEY</code> in Netlify environment variables for PALOMA to work.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

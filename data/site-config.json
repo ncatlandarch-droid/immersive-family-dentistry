@@ -1,0 +1,229 @@
+{
+  "practice": {
+    "name": "Lake Jeanette Family & Implant Dentistry",
+    "legalName": "Lake Jeanette Family & Implant Dentistry, PLLC",
+    "dba": "Brenes Precision Dentistry",
+    "taxId": "DEMO-XX-XXXXXXX",
+    "npi": "DEMO-1234567890",
+    "statePermit": "NC-DEMO-29481",
+    "established": 2019,
+    "specialty": "Digital Precision Dentistry, Prosthodontics, Implantology",
+    "tagline": "Where Precision Meets Compassion",
+    "missionStatement": "To deliver world-class restorative and implant dentistry through cutting-edge digital technology, personalized care, and a commitment to patient education — all in a warm, family-friendly environment.",
+    "philosophy": "We believe every patient deserves access to the same precision technology and materials used in the most advanced dental centers worldwide. Through digital workflows, AI-assisted diagnostics, and same-day fabrication, we eliminate guesswork and deliver predictable, beautiful results."
+  },
+  "location": {
+    "address": {
+      "street": "3810 North Elm Street",
+      "suite": "Suite 201",
+      "city": "Greensboro",
+      "state": "NC",
+      "zip": "27455",
+      "country": "US",
+      "formatted": "3810 North Elm Street, Suite 201, Greensboro, NC 27455"
+    },
+    "coordinates": {
+      "latitude": 36.1182,
+      "longitude": -79.8271
+    },
+    "googlePlaceId": "ChIJxxxxxxxxxxxxxxxxxx",
+    "timezone": "America/New_York",
+    "parkingNotes": "Free parking available in the building lot. Handicap-accessible entrance on the north side.",
+    "buildingAccess": "Second floor, elevator available. Suite 201 is immediately to your right as you exit the elevator."
+  },
+  "contact": {
+    "phone": {
+      "primary": "(336) 545-4281",
+      "formatted": "+13365454281",
+      "afterHours": "(336) 545-4281"
+    },
+    "email": {
+      "general": "contact@ljfamilydentist.com",
+      "appointments": "appointments@ljfamilydentist.com",
+      "billing": "billing@ljfamilydentist.com"
+    },
+    "website": "https://ljfamilydentist.com",
+    "appointmentUrl": "https://ljfamilydentist.com/book"
+  },
+  "hours": {
+    "timezone": "America/New_York",
+    "regular": {
+      "monday": { "open": "08:00", "close": "17:00", "label": "8:00 AM – 5:00 PM" },
+      "tuesday": { "open": "08:00", "close": "17:00", "label": "8:00 AM – 5:00 PM" },
+      "wednesday": { "open": "08:00", "close": "17:00", "label": "8:00 AM – 5:00 PM" },
+      "thursday": { "open": "08:00", "close": "15:00", "label": "8:00 AM – 3:00 PM" },
+      "friday": { "open": null, "close": null, "label": "Closed" },
+      "saturday": { "open": null, "close": null, "label": "Closed" },
+      "sunday": { "open": null, "close": null, "label": "Closed" }
+    },
+    "holidays": [
+      { "date": "2026-01-01", "name": "New Year's Day", "closed": true },
+      { "date": "2026-01-19", "name": "MLK Jr. Day", "closed": true },
+      { "date": "2026-05-25", "name": "Memorial Day", "closed": true },
+      { "date": "2026-07-04", "name": "Independence Day", "closed": true },
+      { "date": "2026-09-07", "name": "Labor Day", "closed": true },
+      { "date": "2026-11-26", "name": "Thanksgiving", "closed": true },
+      { "date": "2026-11-27", "name": "Day After Thanksgiving", "closed": true },
+      { "date": "2026-12-24", "name": "Christmas Eve", "closed": true },
+      { "date": "2026-12-25", "name": "Christmas Day", "closed": true }
+    ],
+    "emergencyProtocol": "For after-hours dental emergencies, call our main line at (336) 545-4281. The voicemail will provide instructions for reaching Dr. Brenes or the on-call provider."
+  },
+  "social": {
+    "instagram": {
+      "handle": "@lakejeanettedentistry",
+      "url": "https://instagram.com/lakejeanettedentistry"
+    },
+    "facebook": {
+      "pageName": "Lake Jeanette Family & Implant Dentistry",
+      "url": "https://facebook.com/lakejeanettedentistry"
+    },
+    "tiktok": {
+      "handle": "@lake.jeanette.dent",
+      "url": "https://tiktok.com/@lake.jeanette.dent"
+    },
+    "google": {
+      "reviewUrl": "https://g.page/lakejeanettedentistry/review",
+      "averageRating": 4.9,
+      "totalReviews": 187
+    },
+    "youtube": {
+      "channel": "Lake Jeanette Dentistry",
+      "url": "https://youtube.com/@lakejeanettedentistry"
+    }
+  },
+  "branding": {
+    "colors": {
+      "primary": "#4A7FB5",
+      "primaryLight": "#6B9FD4",
+      "primaryDark": "#3A6A9E",
+      "accent": "#C4A35A",
+      "accentLight": "#D4B87A",
+      "accentDark": "#A88B3D",
+      "dark": "#1A2F4B",
+      "teal": "#0D4F4F",
+      "tealLight": "#1A6B6B",
+      "white": "#FFFFFF",
+      "offWhite": "#F5F5F0",
+      "textPrimary": "#1A2F4B",
+      "textSecondary": "#5A6B7A",
+      "success": "#2E7D32",
+      "warning": "#F9A825",
+      "error": "#C62828",
+      "background": "#FAFAFA"
+    },
+    "fonts": {
+      "heading": "Playfair Display",
+      "body": "Inter",
+      "accent": "Bastliga One"
+    },
+    "logo": {
+      "primary": "/images/logo.png",
+      "transparent": "/images/logo transparent.png",
+      "ljTransparent": "/images/LJ transparent Logo.png"
+    }
+  },
+  "paloma": {
+    "name": "PALOMA",
+    "fullName": "Patient Advocacy & Lifecycle Oral Map Assistant",
+    "version": "1.0.0-beta",
+    "personality": {
+      "traits": ["warm", "knowledgeable", "reassuring", "patient", "empathetic", "precise"],
+      "tone": "Professional yet approachable — like a trusted friend who happens to be a dental expert",
+      "neverDo": [
+        "Never be pushy about scheduling or treatments",
+        "Never diagnose — always defer to Dr. Brenes for clinical decisions",
+        "Never share other patients' information",
+        "Never guarantee outcomes or specific pricing without consultation",
+        "Never dismiss patient fears or concerns",
+        "Never use overly clinical jargon without explanation"
+      ],
+      "alwaysDo": [
+        "Always acknowledge patient emotions and validate concerns",
+        "Always offer to explain procedures in simpler terms",
+        "Always remind patients that the team is here to help",
+        "Always provide information in the patient's preferred language",
+        "Always mention financing options when discussing costs",
+        "Always encourage patients to ask questions"
+      ]
+    },
+    "languages": {
+      "supported": ["en", "es"],
+      "default": "en"
+    },
+    "greetings": {
+      "en": {
+        "firstVisit": "Hi there! I'm PALOMA, your personal dental care assistant at Lake Jeanette Family & Implant Dentistry. I'm here to help you navigate your dental journey — from understanding procedures to tracking your treatment plan. How can I help you today?",
+        "returning": "Welcome back, {patientName}! I'm PALOMA, and I've been keeping track of your dental care journey. What can I help you with today?",
+        "afterHours": "Hi! You've reached Lake Jeanette Dentistry after hours. I'm PALOMA, and while I can't schedule appointments right now, I can answer questions about our services, provide post-op care instructions, or help you prepare for your next visit. If this is a dental emergency, please call (336) 545-4281 for our emergency line.",
+        "emergency": "I understand you may be in pain or distress. Let me help. If you're experiencing severe bleeding, facial swelling affecting breathing, or jaw trauma, please call 911 or go to your nearest emergency room immediately. For urgent dental issues during office hours, call us at (336) 545-4281 and we'll work to see you the same day."
+      },
+      "es": {
+        "firstVisit": "¡Hola! Soy PALOMA, tu asistente personal de cuidado dental en Lake Jeanette Family & Implant Dentistry. Estoy aquí para ayudarte en tu camino dental — desde entender los procedimientos hasta dar seguimiento a tu plan de tratamiento. ¿En qué puedo ayudarte hoy?",
+        "returning": "¡Bienvenido/a de nuevo, {patientName}! Soy PALOMA, y he estado siguiendo tu progreso dental. ¿En qué te puedo ayudar hoy?",
+        "afterHours": "¡Hola! Has contactado a Lake Jeanette Dentistry fuera del horario de atención. Soy PALOMA, y aunque no puedo programar citas en este momento, puedo responder preguntas sobre nuestros servicios, darte instrucciones de cuidado post-operatorio, o ayudarte a prepararte para tu próxima visita. Si tienes una emergencia dental, por favor llama al (336) 545-4281.",
+        "emergency": "Entiendo que puedes estar con dolor o malestar. Déjame ayudarte. Si tienes sangrado severo, hinchazón facial que afecta tu respiración, o trauma en la mandíbula, por favor llama al 911 o ve a la sala de emergencias más cercana inmediatamente. Para problemas dentales urgentes durante el horario de atención, llámanos al (336) 545-4281 y trabajaremos para verte el mismo día."
+      }
+    },
+    "capabilities": [
+      "Patient record review and treatment plan explanation",
+      "Appointment scheduling assistance",
+      "Insurance verification and benefits explanation",
+      "Post-operative care instructions",
+      "Procedure education and FAQs",
+      "Financial estimates and payment plan guidance",
+      "Emergency triage assistance",
+      "Bilingual support (English/Spanish)",
+      "AI-assisted dental chart review",
+      "Treatment timeline visualization"
+    ],
+    "avatarConfig": {
+      "style": "friendly-professional",
+      "primaryColor": "#4A7FB5",
+      "accentColor": "#C4A35A",
+      "animationStyle": "gentle-pulse"
+    }
+  },
+  "technology": {
+    "scanners": ["Medit i700 Wireless Intraoral Scanner"],
+    "printers": ["SprintRay Pro 95S 3D Printer"],
+    "cadSoftware": ["Exocad DentalCAD", "Exocad ChairsideCAD"],
+    "aiPlatforms": ["Pearl Second Opinion AI", "Overjet Dental AI"],
+    "imagingPartners": ["SmileCloud DSD Platform"],
+    "practiceManagement": "Dentrix G7",
+    "patientCommunication": "Weave",
+    "digitalImpression": "Medit Link"
+  },
+  "kolAffiliations": [
+    {
+      "company": "Medit",
+      "role": "Key Opinion Leader",
+      "product": "Medit i700 Intraoral Scanner",
+      "since": 2021
+    },
+    {
+      "company": "SprintRay",
+      "role": "Key Opinion Leader",
+      "product": "SprintRay Pro 3D Printers",
+      "since": 2022
+    },
+    {
+      "company": "Exocad",
+      "role": "Key Opinion Leader",
+      "product": "Exocad DentalCAD / ChairsideCAD",
+      "since": 2022
+    },
+    {
+      "company": "BlueSkyBio",
+      "role": "Key Opinion Leader",
+      "product": "BlueSkyBio Implant Planning",
+      "since": 2023
+    }
+  ],
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "lastUpdated": "2026-06-06T07:00:00-04:00",
+    "generatedBy": "PALOMA Data Architecture v1.0",
+    "environment": "beta"
+  }
+}
