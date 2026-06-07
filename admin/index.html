@@ -1182,16 +1182,13 @@
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
         });
-        document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-        });
 
         await loadData();
         initNavigation();
         renderOverview();
         renderProduction();
         renderPalomaAnalytics();
-        renderSchedule();
+        loadScheduleData();
         initDataEditor();
         initSettings();
         initAppointmentFilters();
@@ -1251,6 +1248,7 @@
                 // Load data when switching to these views
                 if (view === 'appointments') loadAppointments();
                 if (view === 'practice-settings') loadPracticeSettings();
+                if (view === 'schedule') loadScheduleData();
             });
         });
 
@@ -1952,28 +1950,217 @@
         });
     }
 
-    // ─── Schedule ───
-    function renderSchedule() {
-        const slots = [
-            { time: '8:00 AM', patient: 'Johnson, Maria', procedure: 'Cleaning & Exam', status: 'badge-green', statusText: 'Confirmed' },
-            { time: '9:00 AM', patient: 'Williams, James', procedure: 'Crown Prep #14', status: 'badge-green', statusText: 'Confirmed' },
-            { time: '10:30 AM', patient: 'Harrison, Chris', procedure: 'AI Scan Review', status: 'badge-amber', statusText: 'Pending' },
-            { time: '11:30 AM', patient: 'Rodriguez, Ana', procedure: 'Implant Consult (ES)', status: 'badge-green', statusText: 'Confirmed' },
-            { time: '1:00 PM', patient: 'Thompson, David', procedure: 'Root Canal #19', status: 'badge-green', statusText: 'Confirmed' },
-            { time: '2:30 PM', patient: 'Chen, Lisa', procedure: 'Veneer Delivery', status: 'badge-amber', statusText: 'Pending' },
-            { time: '3:30 PM', patient: '— Open Slot —', procedure: '', status: '', statusText: '' },
-        ];
+    // ═══════════════════════════════════════════════════════════
+    //  SCHEDULE VIEW — Today & Week
+    // ═══════════════════════════════════════════════════════════
 
-        document.getElementById('schedule-grid').innerHTML = slots.map(s => `
-            <div class="schedule-slot">
-                <div class="schedule-slot__time">${s.time}</div>
-                <div>
-                    <div class="schedule-slot__patient">${s.patient}</div>
-                    <div class="schedule-slot__procedure">${s.procedure}</div>
-                </div>
-                ${s.statusText ? `<div class="schedule-slot__status"><span class="badge ${s.status}"><span class="badge-dot"></span> ${s.statusText}</span></div>` : ''}
-            </div>
-        `).join('');
+    let schedViewMode = 'today';
+    let scheduleAppointments = [];
+
+    // Patient avatar helper
+    function getPatientAvatar(name, size = 40) {
+        if (!name) return '';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const colors = ['#14B8A6', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#EC4899', '#10B981', '#6366F1'];
+        const colorIndex = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length;
+        const bg = colors[colorIndex];
+        return `<div class="patient-avatar" style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:${size * 0.4}px;color:white;flex-shrink:0;">${initials}</div>`;
+    }
+
+    function switchSchedView(mode) {
+        schedViewMode = mode;
+        document.querySelectorAll('.sched-toggle').forEach(b => {
+            b.classList.toggle('active', b.dataset.schedView === mode);
+        });
+        if (mode === 'today') {
+            document.getElementById('sched-title').textContent = '📅 Today\'s Schedule';
+            renderTodaySchedule();
+        } else {
+            document.getElementById('sched-title').textContent = '📅 This Week\'s Schedule';
+            renderWeekSchedule();
+        }
+    }
+
+    async function loadScheduleData() {
+        const container = document.getElementById('sched-content');
+        container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading schedule…</span></div>`;
+        try {
+            scheduleAppointments = await listAppointments();
+        } catch (err) {
+            scheduleAppointments = [];
+            console.warn('Schedule: could not load appointments', err);
+        }
+        if (schedViewMode === 'today') {
+            renderTodaySchedule();
+        } else {
+            renderWeekSchedule();
+        }
+    }
+
+    function getApptDateObj(a) {
+        if (!a.preferred_date) return null;
+        try { return new Date(a.preferred_date); } catch { return null; }
+    }
+
+    function isSameDay(d1, d2) {
+        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+    }
+
+    function formatTimeShort(d) {
+        return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+
+    function statusBadgeSmall(status) {
+        const map = { pending: 'badge-amber', confirmed: 'badge-green', cancelled: 'badge-red', completed: 'badge-blue' };
+        return `<span class="badge ${map[status] || 'badge-muted'}"><span class="badge-dot"></span> ${status}</span>`;
+    }
+
+    // ─── Today's Schedule ───
+    function renderTodaySchedule() {
+        const container = document.getElementById('sched-content');
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0=Sun..6=Sat
+        const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+        // Set date label
+        document.getElementById('sched-date-label').textContent = today.toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+        });
+
+        // Filter to today's appointments (non-cancelled)
+        const todayAppts = scheduleAppointments.filter(a => {
+            const d = getApptDateObj(a);
+            return d && isSameDay(d, today) && a.status !== 'cancelled';
+        }).sort((a, b) => new Date(a.preferred_date) - new Date(b.preferred_date));
+
+        document.getElementById('sched-appt-count').textContent = `${todayAppts.length} appointment${todayAppts.length !== 1 ? 's' : ''}`;
+
+        // Determine end hour (Thursday = 3 PM, else 5 PM)
+        const endHour = (dayOfWeek === 4) ? 15 : 17;
+        const startHour = 8;
+
+        // Weekend check
+        if (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏖️</div>
+                    <p class="empty-state-text">${dayNames[dayOfWeek]} — Office Closed</p>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-top:8px">Switch to "This Week" to see upcoming appointments.</p>
+                </div>`;
+            return;
+        }
+
+        // Build hour-by-hour timeline
+        let html = '<div class="sched-timeline">';
+        for (let h = startHour; h < endHour; h++) {
+            const hourLabel = h <= 12 ? `${h === 0 ? 12 : h}:00 ${h < 12 ? 'AM' : 'PM'}` : `${h - 12}:00 PM`;
+            const hourAppts = todayAppts.filter(a => {
+                const d = getApptDateObj(a);
+                return d && d.getHours() === h;
+            });
+
+            html += `<div class="sched-hour-row">`;
+            html += `<div class="sched-hour-label">${hourLabel}</div>`;
+            html += `<div class="sched-hour-content">`;
+
+            if (hourAppts.length > 0) {
+                hourAppts.forEach(a => {
+                    const d = getApptDateObj(a);
+                    const timeStr = d ? formatTimeShort(d) : '';
+                    const dur = a.duration ? `${a.duration} min` : '';
+                    html += `
+                        <div class="sched-appt-card status-${a.status || 'pending'}" onclick="this.classList.toggle('expanded')">
+                            ${getPatientAvatar(a.patient_name, 40)}
+                            <div class="sched-appt-info">
+                                <div class="sched-appt-name">${a.patient_name || 'Unknown'}</div>
+                                <div class="sched-appt-reason">${a.reason || 'General Visit'}</div>
+                                <div class="sched-appt-meta">
+                                    <span class="sched-appt-time">🕐 ${timeStr}${dur ? ' · ' + dur : ''}</span>
+                                    ${a.insurance_provider ? `<span class="sched-appt-insurance">🛡️ ${a.insurance_provider}</span>` : ''}
+                                </div>
+                                ${a.notes ? `<div class="sched-appt-notes">📝 ${a.notes}</div>` : ''}
+                            </div>
+                            <div class="sched-appt-right">
+                                ${statusBadgeSmall(a.status)}
+                            </div>
+                        </div>`;
+                });
+            } else {
+                html += `<div class="sched-empty-slot">Available</div>`;
+            }
+
+            html += `</div></div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ─── Week Schedule ───
+    function renderWeekSchedule() {
+        const container = document.getElementById('sched-content');
+        const today = new Date();
+        const todayDow = today.getDay(); // 0=Sun..6=Sat
+
+        // Find Monday of this week
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - ((todayDow === 0 ? 7 : todayDow) - 1));
+        monday.setHours(0, 0, 0, 0);
+
+        const weekDays = [];
+        const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday'];
+        for (let i = 0; i < 4; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            weekDays.push(d);
+        }
+
+        // Count total non-cancelled for the week
+        let totalWeekAppts = 0;
+        const dayData = weekDays.map((wd, idx) => {
+            const appts = scheduleAppointments.filter(a => {
+                const d = getApptDateObj(a);
+                return d && isSameDay(d, wd) && a.status !== 'cancelled';
+            }).sort((a, b) => new Date(a.preferred_date) - new Date(b.preferred_date));
+            totalWeekAppts += appts.length;
+            return { date: wd, label: dayLabels[idx], appts };
+        });
+
+        document.getElementById('sched-date-label').textContent = `Week of ${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        document.getElementById('sched-appt-count').textContent = `${totalWeekAppts} appointment${totalWeekAppts !== 1 ? 's' : ''}`;
+
+        let html = '<div class="sched-week-grid">';
+        dayData.forEach(col => {
+            const isToday = isSameDay(col.date, today);
+            const dateStr = col.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            html += `
+                <div class="sched-week-col${isToday ? ' is-today' : ''}">
+                    <div class="sched-week-col-header">
+                        <h4>${col.label}${isToday ? ' (Today)' : ''}</h4>
+                        <span class="sched-week-date">${dateStr}</span>
+                    </div>
+                    <div class="sched-week-col-body">`;
+
+            if (col.appts.length === 0) {
+                html += `<div class="sched-week-empty">No appointments</div>`;
+            } else {
+                col.appts.forEach(a => {
+                    const d = getApptDateObj(a);
+                    const timeStr = d ? formatTimeShort(d) : '';
+                    html += `
+                        <div class="sched-week-card status-${a.status || 'pending'}">
+                            ${getPatientAvatar(a.patient_name, 28)}
+                            <div class="sched-week-card-info">
+                                <div class="sched-week-card-name">${a.patient_name || 'Unknown'}</div>
+                                <div class="sched-week-card-detail">${timeStr}${a.reason ? ' · ' + a.reason : ''}</div>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            html += `</div></div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     // ─── Data Editor ───
