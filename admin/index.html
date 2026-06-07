@@ -1307,23 +1307,12 @@
 
     async function loadAppointments() {
         const container = document.getElementById('appt-content');
-        try {
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-            const fsData = await Promise.race([listAppointments(), timeoutPromise]);
-            if (fsData && fsData.length > 0) {
-                allAppointments = fsData;
-            } else {
-                throw new Error('empty');
-            }
-        } catch (err) {
-            console.warn('[Appointments] Firestore unavailable (' + err.message + '), using demo data');
-            // Use schedule data if already loaded, otherwise generate
-            if (scheduleAppointments && scheduleAppointments.length > 0) {
-                allAppointments = scheduleAppointments;
-            } else {
-                allAppointments = generateDemoSchedule();
-                scheduleAppointments = allAppointments;
-            }
+        // Use shared demo data
+        if (scheduleAppointments && scheduleAppointments.length > 0) {
+            allAppointments = scheduleAppointments;
+        } else {
+            allAppointments = generateDemoSchedule();
+            scheduleAppointments = allAppointments;
         }
         updateFilterCounts();
         renderAppointments();
@@ -2236,23 +2225,9 @@
     }
 
     async function loadScheduleData() {
-        const container = document.getElementById('sched-content');
-        container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading schedule…</span></div>`;
-
-        // Try Firestore first, fall back to demo data
-        try {
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-            const fsData = await Promise.race([listAppointments(), timeoutPromise]);
-            if (fsData && fsData.length > 0) {
-                scheduleAppointments = fsData;
-                console.log('[Schedule] ✅ Loaded', fsData.length, 'appointments from Firestore');
-            } else {
-                throw new Error('empty');
-            }
-        } catch (err) {
-            console.warn('[Schedule] Firestore unavailable (' + err.message + '), using demo data');
-            scheduleAppointments = generateDemoSchedule();
-        }
+        // Always use demo data for reliable demo experience
+        scheduleAppointments = generateDemoSchedule();
+        console.log('[Schedule] ✅ Loaded', scheduleAppointments.length, 'demo appointments');
 
         if (schedViewMode === 'today') renderTodaySchedule();
         else if (schedViewMode === 'week') renderWeekSchedule();
@@ -2593,8 +2568,8 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
         border: 2px solid rgba(20, 184, 166, 0.4);
