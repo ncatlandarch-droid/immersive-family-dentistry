@@ -426,7 +426,8 @@
 
 /* PALOMA face beside every bot message */
 .paloma-msg-row {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: flex-start;
     gap: 10px;
     align-self: flex-start;
@@ -437,18 +438,23 @@
 .paloma-msg-row .paloma-msg {
     max-width: none;
     flex: 1;
+    min-width: 0;
+    animation: none; /* parent row already animates */
 }
 
 .paloma-msg-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px;
+    min-height: 34px;
+    border-radius: 50% !important;
     object-fit: cover;
     flex-shrink: 0;
     margin-top: 2px;
     border: 2px solid var(--paloma-teal);
     box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2);
     transition: all 0.3s ease;
+    display: block !important; /* override any flex/inline issues */
 }
 
 .paloma-msg-avatar--thinking {

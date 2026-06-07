@@ -20,6 +20,7 @@ const PALOMA_CONFIG = {
     storageKey: 'paloma-chat-history',
     versionKey: 'paloma-version',
     langKey: 'paloma-lang',
+    maxHistory: 20,
 };
 
 const STRINGS = {
