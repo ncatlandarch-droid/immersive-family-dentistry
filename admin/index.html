@@ -965,11 +965,21 @@
         </main>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/modules/firebase-db.js"></script>
+
     <script>
     /* ═══════════════════════════════════════════════════════════
        Admin Dashboard — Complete JavaScript
        Appointments Queue, Practice Settings, Charts, Analytics
        ═══════════════════════════════════════════════════════════ */
+
+    // ─── Initialize Firebase ───
+    initFirebase();
 
     // ─── State ───
     let financialData = null;
@@ -1117,10 +1127,7 @@
     async function loadAppointments() {
         const container = document.getElementById('appt-content');
         try {
-            const res = await fetch('/.netlify/functions/appointment-list');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            allAppointments = data.appointments || [];
+            allAppointments = await listAppointments();
             updateFilterCounts();
             renderAppointments();
         } catch (err) {
@@ -1209,10 +1216,10 @@
                                 <td style="white-space:nowrap">${formatDate(a.created_at)}</td>
                                 <td>
                                     <div class="appt-actions">
-                                        ${a.status === 'pending' ? `<button class="btn-primary btn-sm" onclick="updateApptStatus(${a.id},'confirmed')">✓ Confirm</button>` : ''}
-                                        ${a.status === 'confirmed' ? `<button class="btn-primary btn-sm" style="background:var(--admin-blue)" onclick="updateApptStatus(${a.id},'completed')">✓ Complete</button>` : ''}
-                                        ${a.status !== 'cancelled' && a.status !== 'completed' ? `<button class="btn-danger btn-sm" onclick="updateApptStatus(${a.id},'cancelled')">✗ Cancel</button>` : ''}
-                                        <button class="btn-secondary btn-sm" onclick="addApptNote(${a.id})">📝 Note</button>
+                                        ${a.status === 'pending' ? `<button class="btn-primary btn-sm" onclick="updateApptStatus('${a.id}','confirmed')">✓ Confirm</button>` : ''}
+                                        ${a.status === 'confirmed' ? `<button class="btn-primary btn-sm" style="background:var(--admin-blue)" onclick="updateApptStatus('${a.id}','completed')">✓ Complete</button>` : ''}
+                                        ${a.status !== 'cancelled' && a.status !== 'completed' ? `<button class="btn-danger btn-sm" onclick="updateApptStatus('${a.id}','cancelled')">✗ Cancel</button>` : ''}
+                                        <button class="btn-secondary btn-sm" onclick="addApptNote('${a.id}')">📝 Note</button>
                                     </div>
                                 </td>
                             </tr>
@@ -1224,12 +1231,7 @@
 
     async function updateApptStatus(id, status) {
         try {
-            const res = await fetch('/.netlify/functions/appointment-update', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, status }),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            await updateAppointment(id, { status });
             showToast(`Appointment ${status} successfully`, 'success');
             await loadAppointments();
         } catch (err) {
@@ -1241,12 +1243,7 @@
         const note = prompt('Enter a note for this appointment:');
         if (note === null || note.trim() === '') return;
         try {
-            const res = await fetch('/.netlify/functions/appointment-update', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, notes: note.trim() }),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            await updateAppointment(id, { notes: note.trim() });
             showToast('Note added successfully', 'success');
             await loadAppointments();
         } catch (err) {
@@ -1273,15 +1270,7 @@
         const container = document.getElementById('ps-content');
         container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading settings…</span></div>`;
         try {
-            const res = await fetch('/.netlify/functions/practice-settings');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            practiceSettings = await res.json();
-            // Parse JSON strings if needed
-            for (const key of Object.keys(practiceSettings)) {
-                if (typeof practiceSettings[key] === 'string') {
-                    try { practiceSettings[key] = JSON.parse(practiceSettings[key]); } catch {}
-                }
-            }
+            practiceSettings = await getSettings();
             renderPracticeSettingsSection();
         } catch (err) {
             container.innerHTML = `
@@ -1296,12 +1285,7 @@
 
     async function savePracticeSetting(key, value) {
         try {
-            const res = await fetch('/.netlify/functions/practice-settings', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, value }),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            await saveSetting(key, value);
             practiceSettings[key] = value;
             showToast(`${key.replace(/_/g, ' ')} saved successfully`, 'success');
             return true;
