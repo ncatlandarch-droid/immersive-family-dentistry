@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Lake Jeanette Family & Implant Dentistry</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -852,7 +855,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="/images/paloma/paloma-icon.png" alt="" class="sidebar-logo" />
+                <img src="/images/paloma/paloma-hero.png" alt="" class="sidebar-logo" />
                 <div>
                     <h2 class="sidebar-title">Admin</h2>
                     <p class="sidebar-subtitle">MouthMap Platform</p>
@@ -2647,13 +2650,13 @@
     </style>
 
     <button class="admin-paloma-fab" id="admin-paloma-fab" title="Ask PALOMA about patients">
-        <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
+        <img src="../images/paloma/paloma-hero.png" alt="PALOMA" />
         <span class="admin-paloma-badge">AI</span>
     </button>
 
     <div class="admin-paloma-panel" id="admin-paloma-panel">
         <div class="admin-paloma-header">
-            <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
+            <img src="../images/paloma/paloma-hero.png" alt="PALOMA" />
             <div class="admin-paloma-header__info">
                 <h4>PALOMA</h4>
                 <p>🔒 Clinical Assistant Mode</p>
@@ -2718,7 +2721,7 @@
         function addBotMsg(text) {
             const div = document.createElement('div');
             div.className = 'admin-paloma-msg admin-paloma-msg--bot';
-            div.innerHTML = `<img src="../images/paloma/paloma-icon.png" alt="PALOMA" /><div class="admin-paloma-bubble">${formatMsg(text)}</div>`;
+            div.innerHTML = `<img src="../images/paloma/paloma-hero.png" alt="PALOMA" /><div class="admin-paloma-bubble">${formatMsg(text)}</div>`;
             messagesEl.appendChild(div);
             messagesEl.scrollTop = messagesEl.scrollHeight;
             chatHistory.push({ role: 'assistant', content: text });
@@ -2745,7 +2748,7 @@
             // Show typing
             const typing = document.createElement('div');
             typing.className = 'admin-paloma-typing';
-            typing.innerHTML = '<img src="../images/paloma/paloma-icon.png" alt="" /><div class="admin-paloma-typing-dots"><span></span><span></span><span></span></div>';
+            typing.innerHTML = '<img src="../images/paloma/paloma-hero.png" alt="" /><div class="admin-paloma-typing-dots"><span></span><span></span><span></span></div>';
             messagesEl.appendChild(typing);
             messagesEl.scrollTop = messagesEl.scrollHeight;
 
