@@ -492,10 +492,21 @@ class PalomaWidget {
     }
 
     renderMessage(msg) {
-        const div = document.createElement('div');
-        div.className = `paloma-msg paloma-msg--${msg.role === 'user' ? 'user' : 'bot'}`;
-        div.innerHTML = this.formatMessage(msg.content);
-        this.messagesEl.appendChild(div);
+        if (msg.role === 'user') {
+            const div = document.createElement('div');
+            div.className = 'paloma-msg paloma-msg--user';
+            div.innerHTML = this.formatMessage(msg.content);
+            this.messagesEl.appendChild(div);
+        } else {
+            // Bot message with PALOMA's face avatar
+            const wrapper = document.createElement('div');
+            wrapper.className = 'paloma-msg-row';
+            wrapper.innerHTML = `
+                <img class="paloma-msg-avatar" src="${PALOMA_CONFIG.iconPath}" alt="PALOMA" />
+                <div class="paloma-msg paloma-msg--bot">${this.formatMessage(msg.content)}</div>
+            `;
+            this.messagesEl.appendChild(wrapper);
+        }
     }
 
     renderHistory() {
@@ -517,10 +528,13 @@ class PalomaWidget {
         this.sendBtn.disabled = loading;
 
         if (loading) {
+            // Typing indicator with PALOMA's face
             this.typingEl = document.createElement('div');
-            this.typingEl.className = 'paloma-typing';
-            this.typingEl.setAttribute('aria-label', this.strings.thinking);
-            this.typingEl.innerHTML = '<span></span><span></span><span></span>';
+            this.typingEl.className = 'paloma-msg-row';
+            this.typingEl.innerHTML = `
+                <img class="paloma-msg-avatar paloma-msg-avatar--thinking" src="${PALOMA_CONFIG.iconPath}" alt="PALOMA" />
+                <div class="paloma-typing" aria-label="${this.strings.thinking}"><span></span><span></span><span></span></div>
+            `;
             this.messagesEl.appendChild(this.typingEl);
             this.scrollToBottom();
             this.avatarEl.classList.add('paloma-header__avatar--speaking');
