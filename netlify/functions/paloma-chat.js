@@ -116,7 +116,7 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { message, history = [], lang = 'en' } = JSON.parse(event.body);
+        const { message, history = [], lang = 'en', scheduleContext = '' } = JSON.parse(event.body);
 
         if (!message || typeof message !== 'string') {
             return {
@@ -126,42 +126,10 @@ exports.handler = async (event) => {
             };
         }
 
-        // ─── Load Live Practice Settings from Database ───
-        let practiceContext = '';
-        let dbSql = null;
-        try {
-            const { getSQL } = require('./db-helper');
-            dbSql = getSQL();
-            const rows = await dbSql`SELECT key, value FROM practice_settings`;
-            const settings = {};
-            for (const row of rows) settings[row.key] = row.value;
-
-                if (settings.pricing) {
-                    practiceContext += '\n\nCURRENT PRICING (use these exact prices):\n';
-                    for (const item of settings.pricing) {
-                        practiceContext += `- ${item.name}: $${item.price}\n`;
-                    }
-                }
-                if (settings.office_hours) {
-                    practiceContext += '\nCURRENT OFFICE HOURS:\n';
-                    for (const [day, hrs] of Object.entries(settings.office_hours)) {
-                        practiceContext += hrs.closed
-                            ? `- ${day}: Closed\n`
-                            : `- ${day}: ${hrs.open} – ${hrs.close}\n`;
-                    }
-                }
-                if (settings.insurance) {
-                    practiceContext += `\nACCEPTED INSURANCE: ${settings.insurance.join(', ')}\n`;
-                }
-                if (settings.contact) {
-                    practiceContext += `\nCONTACT: Phone: ${settings.contact.phone}, Email: ${settings.contact.email}\n`;
-                }
-        } catch (dbErr) {
-            console.warn('Could not load practice settings:', dbErr.message);
-        }
-
-        // ─── Enhanced System Prompt with Live Data ───
-        const enhancedPrompt = SYSTEM_PROMPT + practiceContext + `
+        // ─── Enhanced System Prompt with Live Schedule Data ───
+        // Practice settings are now in the base SYSTEM_PROMPT (hardcoded)
+        // Schedule context is sent from the client (loaded from Firestore)
+        const enhancedPrompt = SYSTEM_PROMPT + scheduleContext + `
 
 APPOINTMENT BOOKING SYSTEM:
 You can ACTUALLY book appointments now! When you have collected ALL the required info from a patient (name, phone/email, reason, preferred date/time), include this special tag at the END of your response:
@@ -175,7 +143,16 @@ preferred_date: when they want
 insurance: their insurance or None
 [/BOOK_APPOINTMENT]
 
-This will automatically save the appointment to our system. ALWAYS confirm the details with the patient BEFORE including this tag. After booking, tell them their appointment request has been received and the front desk will confirm within 1 business day.`;
+This will automatically save the appointment to our system. ALWAYS confirm the details with the patient BEFORE including this tag. After booking, tell them their appointment request has been received and the front desk will confirm within 1 business day.
+
+SCHEDULING INTELLIGENCE:
+When a patient asks to book an appointment or asks about availability:
+1. Check the CURRENT SCHEDULE & AVAILABILITY section above
+2. Suggest SPECIFIC available times: "I see we have openings on [day] at [time] and [time]. Which works best for you?"
+3. If they ask for a time that's booked, say: "That time is already taken, but I have [nearest available] open. Would that work?"
+4. If they're flexible, recommend the earliest available slot
+5. Always mention the day AND time when suggesting slots
+6. For urgent/emergency cases, offer the earliest available slot and also mention calling (336) 545-4281`;
 
         // Build conversation contents for Gemini
         const contents = [];

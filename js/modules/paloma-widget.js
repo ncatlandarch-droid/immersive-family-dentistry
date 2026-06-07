@@ -422,9 +422,19 @@ class PalomaWidget {
                 content: (m.content || '').substring(0, 500),
             }));
 
+        // Fetch live schedule context from Firestore
+        let scheduleContext = '';
+        try {
+            if (typeof getScheduleContext === 'function') {
+                scheduleContext = await getScheduleContext();
+            }
+        } catch (e) {
+            console.warn('PALOMA: Could not load schedule context:', e.message);
+        }
+
         let body;
         try {
-            body = JSON.stringify({ message, history, lang: this.lang });
+            body = JSON.stringify({ message, history, lang: this.lang, scheduleContext });
         } catch (e) {
             // If history can't be serialized, send without it
             console.warn('PALOMA: History serialization failed, sending without history');
