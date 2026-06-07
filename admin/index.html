@@ -403,6 +403,137 @@
     .schedule-slot__procedure { font-size: 13px; color: var(--admin-muted); }
     .schedule-slot__status { margin-left: auto; }
 
+    /* ═══ Schedule View — Today & Week ═══ */
+    .sched-header {
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+    }
+    .sched-header h2 { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; }
+    .sched-header-meta { display: flex; align-items: center; gap: 16px; }
+    .sched-date { font-size: 14px; color: var(--admin-muted); }
+    .sched-count {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        background: var(--admin-teal-glow); color: var(--admin-teal);
+    }
+    .sched-toggle-group { display: flex; gap: 4px; }
+    .sched-toggle {
+        padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 500;
+        color: var(--admin-muted); border: 1px solid var(--admin-border);
+        transition: var(--admin-transition); background: transparent;
+    }
+    .sched-toggle.active { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+    .sched-toggle:hover { border-color: var(--admin-teal); color: var(--admin-teal); }
+    .sched-toggle.active:hover { color: white; }
+
+    /* Today's Timeline */
+    .sched-timeline { display: flex; flex-direction: column; gap: 4px; }
+    .sched-hour-row {
+        display: flex; align-items: stretch; min-height: 68px; gap: 16px;
+        border-bottom: 1px solid var(--admin-border);
+    }
+    .sched-hour-label {
+        width: 72px; flex-shrink: 0; padding: 12px 0;
+        font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 13px;
+        color: var(--admin-muted); text-align: right; padding-right: 16px;
+    }
+    .sched-hour-content {
+        flex: 1; padding: 6px 0; display: flex; flex-direction: column; gap: 6px;
+    }
+
+    /* Appointment Card */
+    .sched-appt-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius); padding: 14px 18px;
+        display: flex; align-items: center; gap: 14px;
+        transition: var(--admin-transition); cursor: pointer;
+        position: relative;
+    }
+    .sched-appt-card:hover {
+        border-color: rgba(255,255,255,0.12);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        transform: translateY(-1px);
+    }
+    .sched-appt-card.status-confirmed { border-left: 3px solid var(--admin-green); }
+    .sched-appt-card.status-pending { border-left: 3px solid var(--admin-amber); }
+    .sched-appt-card.status-cancelled { border-left: 3px solid var(--admin-red); opacity: 0.6; }
+    .sched-appt-card.status-completed { border-left: 3px solid var(--admin-blue); }
+
+    .sched-appt-info { flex: 1; min-width: 0; }
+    .sched-appt-name { font-weight: 600; font-size: 14px; color: var(--admin-text); }
+    .sched-appt-reason { font-size: 13px; color: var(--admin-muted); margin-top: 2px; }
+    .sched-appt-meta { display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+    .sched-appt-time { font-size: 12px; color: var(--admin-text-secondary); font-weight: 500; }
+    .sched-appt-insurance { font-size: 11px; color: var(--admin-muted); }
+    .sched-appt-notes {
+        margin-top: 8px; padding: 8px 12px; border-radius: 8px;
+        background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border);
+        font-size: 12px; color: var(--admin-text-secondary);
+        display: none; animation: slideUp 0.2s ease-out;
+    }
+    .sched-appt-card.expanded .sched-appt-notes { display: block; }
+    .sched-appt-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* Empty slot */
+    .sched-empty-slot {
+        border: 1px dashed rgba(255,255,255,0.08);
+        border-radius: var(--admin-radius); padding: 14px 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; color: rgba(255,255,255,0.2); font-weight: 500;
+        min-height: 52px;
+    }
+
+    /* Week View */
+    .sched-week-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .sched-week-col {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius);
+        overflow: hidden; transition: var(--admin-transition);
+    }
+    .sched-week-col.is-today { border-color: var(--admin-teal); box-shadow: 0 0 20px var(--admin-teal-glow); }
+    .sched-week-col-header {
+        padding: 14px 16px; border-bottom: 1px solid var(--admin-border);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .sched-week-col-header h4 {
+        font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+        color: var(--admin-text);
+    }
+    .sched-week-col-header .sched-week-date { font-size: 11px; color: var(--admin-muted); }
+    .sched-week-col.is-today .sched-week-col-header h4 { color: var(--admin-teal); }
+    .sched-week-col-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; min-height: 120px; }
+
+    /* Compact card for week view */
+    .sched-week-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm); padding: 10px 12px;
+        display: flex; align-items: center; gap: 10px;
+        transition: var(--admin-transition); cursor: pointer;
+    }
+    .sched-week-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+    .sched-week-card.status-confirmed { border-left: 3px solid var(--admin-green); }
+    .sched-week-card.status-pending { border-left: 3px solid var(--admin-amber); }
+    .sched-week-card.status-cancelled { border-left: 3px solid var(--admin-red); opacity: 0.6; }
+    .sched-week-card.status-completed { border-left: 3px solid var(--admin-blue); }
+    .sched-week-card-info { flex: 1; min-width: 0; }
+    .sched-week-card-name { font-weight: 600; font-size: 12.5px; color: var(--admin-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sched-week-card-detail { font-size: 11px; color: var(--admin-muted); margin-top: 2px; }
+    .sched-week-empty {
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; color: rgba(255,255,255,0.2); padding: 24px 0;
+    }
+
+    /* Patient Avatar (inline) */
+    .patient-avatar { letter-spacing: 0.5px; text-transform: uppercase; }
+
     /* ─── Data Editor ─── */
     .editor-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
 
@@ -647,6 +778,12 @@
         .form-row-3 { grid-template-columns: 1fr; }
         .view { padding: 16px; }
         .appt-header { flex-direction: column; align-items: flex-start; }
+        .sched-week-grid { grid-template-columns: 1fr; }
+        .sched-header { flex-direction: column; align-items: flex-start; }
+        .sched-hour-label { width: 52px; font-size: 11px; }
+    }
+    @media (min-width: 769px) and (max-width: 1100px) {
+        .sched-week-grid { grid-template-columns: repeat(2, 1fr); }
     }
     </style>
 </head>
@@ -681,6 +818,9 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
+                <button class="sidebar-item active" data-view="schedule">
+                    <span>📅</span> Schedule
+                </button>
                 <button class="sidebar-item" data-view="appointments">
                     <span>📋</span> Appointments
                 </button>
@@ -688,7 +828,7 @@
                     <span>🏥</span> Practice Settings
                 </button>
                 <div class="sidebar-divider"></div>
-                <button class="sidebar-item active" data-view="overview">
+                <button class="sidebar-item" data-view="overview">
                     <span>📊</span> Overview
                 </button>
                 <button class="sidebar-item" data-view="production">
@@ -699,9 +839,6 @@
                 </button>
                 <button class="sidebar-item" data-view="paloma-analytics">
                     <span>🕊️</span> PALOMA Analytics
-                </button>
-                <button class="sidebar-item" data-view="schedule">
-                    <span>📅</span> Schedule
                 </button>
                 <button class="sidebar-item" data-view="data-editor">
                     <span>📝</span> Data Editor
@@ -722,7 +859,7 @@
             <header class="topbar">
                 <div class="topbar-left">
                     <button id="sidebar-toggle" class="topbar-toggle">☰</button>
-                    <h1 id="page-title" class="topbar-title">Overview</h1>
+                    <h1 id="page-title" class="topbar-title">Schedule</h1>
                 </div>
                 <div class="topbar-right">
                     <span class="topbar-date" id="current-date"></span>
@@ -784,7 +921,7 @@
             </div>
 
             <!-- ═══ View: Overview ═══ -->
-            <div id="view-overview" class="view active">
+            <div id="view-overview" class="view">
                 <div class="kpi-row" id="kpi-row"></div>
                 <div class="charts-row">
                     <div class="chart-card">
@@ -894,12 +1031,26 @@
             </div>
 
             <!-- View: Schedule -->
-            <div id="view-schedule" class="view">
-                <div class="view-header">
-                    <h2>📅 Today's Schedule</h2>
-                    <span class="view-date" id="schedule-date"></span>
+            <div id="view-schedule" class="view active">
+                <div class="sched-header">
+                    <div>
+                        <h2 id="sched-title">📅 Today's Schedule</h2>
+                        <div class="sched-header-meta" style="margin-top:6px">
+                            <span class="sched-date" id="sched-date-label"></span>
+                            <span class="sched-count" id="sched-appt-count">0 appointments</span>
+                        </div>
+                    </div>
+                    <div class="sched-toggle-group">
+                        <button class="sched-toggle active" data-sched-view="today" onclick="switchSchedView('today')">Today</button>
+                        <button class="sched-toggle" data-sched-view="week" onclick="switchSchedView('week')">This Week</button>
+                    </div>
                 </div>
-                <div class="schedule-grid" id="schedule-grid"></div>
+                <div id="sched-content">
+                    <div class="spinner-overlay">
+                        <div class="spinner"></div>
+                        <span class="spinner-text">Loading schedule…</span>
+                    </div>
+                </div>
             </div>
 
             <!-- View: Data Editor -->
@@ -1892,6 +2043,268 @@
             `).join('');
         }
     }
+    </script>
+
+    <!-- ═══ PALOMA Admin Assistant ═══ -->
+    <style>
+    .admin-paloma-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
+        border: 2px solid rgba(20, 184, 166, 0.4);
+        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3);
+        cursor: pointer;
+        z-index: 1000;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .admin-paloma-fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(20, 184, 166, 0.5); }
+    .admin-paloma-fab img { width: 100%; height: 100%; object-fit: cover; }
+    .admin-paloma-fab .admin-paloma-badge {
+        position: absolute; top: -2px; right: -2px;
+        background: var(--admin-gold); color: #000; font-size: 10px; font-weight: 700;
+        width: 20px; height: 20px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .admin-paloma-panel {
+        position: fixed;
+        bottom: 96px;
+        right: 24px;
+        width: 400px;
+        max-height: 520px;
+        background: rgba(17, 24, 39, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius);
+        box-shadow: var(--admin-shadow-lg);
+        z-index: 1001;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .admin-paloma-panel.open { display: flex; animation: adminPalomaIn 0.3s ease-out; }
+    @keyframes adminPalomaIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .admin-paloma-header {
+        display: flex; align-items: center; gap: 12px;
+        padding: 16px; border-bottom: 1px solid var(--admin-border);
+        background: rgba(20, 184, 166, 0.05);
+    }
+    .admin-paloma-header img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--admin-teal); object-fit: cover; }
+    .admin-paloma-header__info h4 { font-size: 15px; font-weight: 600; color: var(--admin-text); }
+    .admin-paloma-header__info p { font-size: 11px; color: var(--admin-teal); font-weight: 500; }
+    .admin-paloma-close { margin-left: auto; font-size: 20px; color: var(--admin-muted); cursor: pointer; padding: 4px 8px; }
+    .admin-paloma-close:hover { color: var(--admin-text); }
+
+    .admin-paloma-messages {
+        flex: 1; overflow-y: auto; padding: 16px;
+        display: flex; flex-direction: column; gap: 12px;
+        max-height: 340px;
+    }
+    .admin-paloma-msg {
+        font-size: 13px; line-height: 1.5; padding: 10px 14px;
+        border-radius: 12px; animation: adminPalomaIn 0.3s ease-out;
+    }
+    .admin-paloma-msg--bot {
+        display: flex; align-items: flex-start; gap: 10px;
+        align-self: flex-start; max-width: 90%;
+    }
+    .admin-paloma-msg--bot img { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--admin-teal); object-fit: cover; flex-shrink: 0; margin-top: 2px; }
+    .admin-paloma-msg--bot .admin-paloma-bubble { background: var(--admin-surface-alt); color: var(--admin-text); padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 4px; }
+    .admin-paloma-msg--user {
+        background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
+        color: white; align-self: flex-end; max-width: 85%;
+        border-bottom-right-radius: 4px;
+    }
+    .admin-paloma-msg--bot .admin-paloma-bubble strong { color: var(--admin-teal); }
+
+    .admin-paloma-input-area {
+        display: flex; gap: 8px; padding: 12px 16px;
+        border-top: 1px solid var(--admin-border);
+    }
+    .admin-paloma-input {
+        flex: 1; background: var(--admin-surface-alt); border: 1px solid var(--admin-border);
+        border-radius: 8px; padding: 10px 14px; color: var(--admin-text);
+        font-size: 13px; outline: none;
+    }
+    .admin-paloma-input:focus { border-color: var(--admin-teal); }
+    .admin-paloma-input::placeholder { color: var(--admin-muted); }
+    .admin-paloma-send {
+        background: var(--admin-teal); border-radius: 8px; padding: 8px 16px;
+        color: white; font-weight: 600; font-size: 13px;
+        transition: all 0.2s;
+    }
+    .admin-paloma-send:hover { background: var(--admin-teal-dark); }
+    .admin-paloma-send:disabled { opacity: 0.5; }
+
+    .admin-paloma-chips {
+        display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 12px;
+    }
+    .admin-paloma-chip {
+        font-size: 11px; padding: 5px 10px; border-radius: 20px;
+        background: var(--admin-surface-alt); border: 1px solid var(--admin-border);
+        color: var(--admin-text-secondary); cursor: pointer; transition: all 0.2s;
+    }
+    .admin-paloma-chip:hover { border-color: var(--admin-teal); color: var(--admin-teal); }
+
+    .admin-paloma-typing {
+        display: flex; align-items: center; gap: 10px; align-self: flex-start;
+    }
+    .admin-paloma-typing img { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--admin-teal); object-fit: cover; animation: palomaAdminPulse 1.5s infinite; }
+    .admin-paloma-typing-dots { display: flex; gap: 4px; background: var(--admin-surface-alt); padding: 10px 14px; border-radius: 12px; }
+    .admin-paloma-typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--admin-muted); animation: palomaDotBounce 1.4s infinite ease-in-out; }
+    .admin-paloma-typing-dots span:nth-child(2) { animation-delay: 0.16s; }
+    .admin-paloma-typing-dots span:nth-child(3) { animation-delay: 0.32s; }
+    @keyframes palomaDotBounce { 0%, 80%, 100% { transform: scale(0.6); } 40% { transform: scale(1); } }
+    @keyframes palomaAdminPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(20,184,166,0.4); } 50% { box-shadow: 0 0 0 6px rgba(20,184,166,0); } }
+
+    @media (max-width: 480px) {
+        .admin-paloma-panel { width: calc(100vw - 32px); right: 16px; bottom: 88px; max-height: 70vh; }
+    }
+    </style>
+
+    <button class="admin-paloma-fab" id="admin-paloma-fab" title="Ask PALOMA about patients">
+        <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
+        <span class="admin-paloma-badge">AI</span>
+    </button>
+
+    <div class="admin-paloma-panel" id="admin-paloma-panel">
+        <div class="admin-paloma-header">
+            <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
+            <div class="admin-paloma-header__info">
+                <h4>PALOMA</h4>
+                <p>🔒 Clinical Assistant Mode</p>
+            </div>
+            <button class="admin-paloma-close" id="admin-paloma-close">✕</button>
+        </div>
+        <div class="admin-paloma-messages" id="admin-paloma-messages"></div>
+        <div class="admin-paloma-chips" id="admin-paloma-chips">
+            <button class="admin-paloma-chip">📅 Who do I have today?</button>
+            <button class="admin-paloma-chip">📋 Any pending to confirm?</button>
+            <button class="admin-paloma-chip">🔍 What's my week look like?</button>
+            <button class="admin-paloma-chip">🚨 Any emergencies scheduled?</button>
+        </div>
+        <div class="admin-paloma-input-area">
+            <input class="admin-paloma-input" id="admin-paloma-input" placeholder="Ask about patients, schedule..." />
+            <button class="admin-paloma-send" id="admin-paloma-send">Send</button>
+        </div>
+    </div>
+
+    <script>
+    // ─── PALOMA Admin Chat ───
+    (function() {
+        const fab = document.getElementById('admin-paloma-fab');
+        const panel = document.getElementById('admin-paloma-panel');
+        const closeBtn = document.getElementById('admin-paloma-close');
+        const input = document.getElementById('admin-paloma-input');
+        const sendBtn = document.getElementById('admin-paloma-send');
+        const messagesEl = document.getElementById('admin-paloma-messages');
+        const chipsEl = document.getElementById('admin-paloma-chips');
+
+        let isOpen = false;
+        let isLoading = false;
+        let chatHistory = [];
+
+        // Toggle
+        fab.addEventListener('click', () => {
+            isOpen = !isOpen;
+            panel.classList.toggle('open', isOpen);
+            if (isOpen && messagesEl.children.length === 0) {
+                addBotMsg("Good morning, Dr. Brenes! 🕊️ I'm in **Clinical Assistant Mode** — I have access to your full patient database and schedule. Ask me anything about your patients or today's lineup.");
+            }
+            if (isOpen) input.focus();
+        });
+        closeBtn.addEventListener('click', () => { isOpen = false; panel.classList.remove('open'); });
+
+        // Chips
+        chipsEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('admin-paloma-chip')) {
+                input.value = e.target.textContent.replace(/^[^\s]+\s/, '');
+                sendMessage();
+            }
+        });
+
+        // Send
+        sendBtn.addEventListener('click', sendMessage);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        function formatMsg(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+        }
+
+        function addBotMsg(text) {
+            const div = document.createElement('div');
+            div.className = 'admin-paloma-msg admin-paloma-msg--bot';
+            div.innerHTML = `<img src="../images/paloma/paloma-icon.png" alt="PALOMA" /><div class="admin-paloma-bubble">${formatMsg(text)}</div>`;
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            chatHistory.push({ role: 'assistant', content: text });
+        }
+
+        function addUserMsg(text) {
+            const div = document.createElement('div');
+            div.className = 'admin-paloma-msg admin-paloma-msg--user';
+            div.textContent = text;
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            chatHistory.push({ role: 'user', content: text });
+        }
+
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text || isLoading) return;
+            addUserMsg(text);
+            input.value = '';
+            chipsEl.style.display = 'none';
+            isLoading = true;
+            sendBtn.disabled = true;
+
+            // Show typing
+            const typing = document.createElement('div');
+            typing.className = 'admin-paloma-typing';
+            typing.innerHTML = '<img src="../images/paloma/paloma-icon.png" alt="" /><div class="admin-paloma-typing-dots"><span></span><span></span><span></span></div>';
+            messagesEl.appendChild(typing);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            try {
+                // Build context
+                let scheduleContext = '';
+                let patientContext = '';
+                try {
+                    if (typeof getScheduleContext === 'function') scheduleContext = await getScheduleContext();
+                    if (typeof getPatientContext === 'function') patientContext = await getPatientContext();
+                } catch (e) { console.warn('Admin context error:', e.message); }
+
+                const res = await fetch('/.netlify/functions/paloma-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        history: chatHistory.slice(-8).map(m => ({ role: m.role, content: m.content.substring(0, 500) })),
+                        lang: 'en',
+                        mode: 'admin',
+                        scheduleContext,
+                        patientContext,
+                    }),
+                });
+                const data = await res.json();
+                typing.remove();
+                addBotMsg(data.reply || "I couldn't process that — try again.");
+            } catch (e) {
+                typing.remove();
+                addBotMsg("I had trouble connecting. Please try again.");
+                console.error('Admin PALOMA error:', e);
+            }
+
+            isLoading = false;
+            sendBtn.disabled = false;
+        }
+    })();
     </script>
 </body>
 </html>

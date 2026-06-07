@@ -116,7 +116,7 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { message, history = [], lang = 'en', scheduleContext = '' } = JSON.parse(event.body);
+        const { message, history = [], lang = 'en', scheduleContext = '', mode = 'patient', patientContext = '' } = JSON.parse(event.body);
 
         if (!message || typeof message !== 'string') {
             return {
@@ -126,10 +126,38 @@ exports.handler = async (event) => {
             };
         }
 
+        // ─── Build System Prompt Based on Mode ───
+        let basePrompt;
+        if (mode === 'admin') {
+            basePrompt = `You are PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant), operating in CLINICAL ASSISTANT MODE for Dr. Christian Brenes at Lake Jeanette Family & Implant Dentistry.
+
+ROLE: You are Dr. Brenes' intelligent clinical assistant. He is a board-certified Prosthodontist (UNC Chapel Hill). You help him with:
+- Quick patient lookups ("Tell me about Maria Gonzalez's next appointment")
+- Schedule summaries ("Who do I have today?", "What's my week look like?")
+- Treatment planning notes ("What procedures are scheduled for tomorrow?")
+- Patient history context ("When was Robert Chen's last visit?")
+- Clinical reminders ("Any pending appointments I need to confirm?")
+
+PERSONALITY: Professional but personable. Use clinical language when appropriate. Be efficient — Dr. Brenes is busy. Give concise, actionable answers. Use bullet points for lists. Bold important info.
+
+RULES:
+1. Reference ONLY the patient data and schedule provided below — do NOT fabricate patient information.
+2. If asked about a patient not in the data, say: "I don't have records for that patient in the current system."
+3. Keep responses brief and clinical — 2-3 paragraphs max.
+4. When summarizing schedules, format as a clean timeline.
+5. Highlight anything urgent (emergencies, pending confirmations).
+6. You can suggest schedule optimizations or flag conflicts.
+
+PRACTICE INFO:
+- Hours: Mon-Wed 8am-5pm, Thu 8am-3pm, Fri-Sun Closed
+- Phone: (336) 545-4281
+- Team: Dr. Brenes + dental assistants Missie, Logan, Emily, Michelle, Cameron` + patientContext;
+        } else {
+            basePrompt = SYSTEM_PROMPT;
+        }
+
         // ─── Enhanced System Prompt with Live Schedule Data ───
-        // Practice settings are now in the base SYSTEM_PROMPT (hardcoded)
-        // Schedule context is sent from the client (loaded from Firestore)
-        const enhancedPrompt = SYSTEM_PROMPT + scheduleContext + `
+        const enhancedPrompt = basePrompt + scheduleContext + `
 
 APPOINTMENT BOOKING SYSTEM:
 You can ACTUALLY book appointments now! When you have collected ALL the required info from a patient (name, phone/email, reason, preferred date/time), include this special tag at the END of your response:

@@ -440,6 +440,56 @@ async function getScheduleContext() {
     }
 }
 
+// ─── Patient Context for Admin PALOMA ───
+
+async function getPatientContext() {
+    try {
+        const appointments = await listAppointments({ limit: 100 });
+        if (!appointments || appointments.length === 0) return '';
+
+        // Group by patient
+        const patients = {};
+        for (const a of appointments) {
+            const name = a.patient_name || 'Unknown';
+            if (!patients[name]) {
+                patients[name] = {
+                    phone: a.patient_phone,
+                    email: a.patient_email,
+                    insurance: a.insurance_provider,
+                    appointments: [],
+                };
+            }
+            patients[name].appointments.push({
+                date: a.preferred_date,
+                reason: a.reason,
+                status: a.status,
+                duration: a.duration || 60,
+                notes: a.notes || '',
+                source: a.source,
+            });
+        }
+
+        let ctx = '\n\nPATIENT DATABASE:\n';
+        for (const [name, data] of Object.entries(patients)) {
+            ctx += `\n👤 ${name}`;
+            ctx += ` | Phone: ${data.phone || 'N/A'} | Email: ${data.email || 'N/A'} | Insurance: ${data.insurance || 'None'}\n`;
+            for (const appt of data.appointments) {
+                const d = appt.date ? new Date(appt.date) : null;
+                const dateStr = d ? d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'TBD';
+                ctx += `   - ${dateStr}: ${appt.reason} (${appt.status}, ${appt.duration}min)`;
+                if (appt.notes) ctx += ` — Notes: ${appt.notes}`;
+                ctx += '\n';
+            }
+        }
+
+        ctx += `\nTotal patients: ${Object.keys(patients).length} | Total appointments: ${appointments.length}\n`;
+        return ctx;
+    } catch (e) {
+        console.warn('[getPatientContext] error:', e.message);
+        return '';
+    }
+}
+
 // ─── Auth Helpers ───
 
 async function signInAdmin(email, password) {
