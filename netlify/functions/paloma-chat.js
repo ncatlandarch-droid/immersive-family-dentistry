@@ -6,6 +6,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // PALOMA's system prompt — her personality and rules
 const SYSTEM_PROMPT = `You are PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant), the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry in Greensboro, NC. You were created by Think! Design and Planning, LLC as part of the MouthMap platform.
@@ -200,35 +201,71 @@ When a patient asks to book an appointment or asks about availability:
             parts: [{ text: message }],
         });
 
-        // Call Gemini API with timeout
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout (Netlify max is 26s)
+        // Call Gemini API with timeout + fallback
+        const requestBody = JSON.stringify({
+            system_instruction: {
+                parts: [{ text: enhancedPrompt.substring(0, 15000) }], // Cap prompt size
+            },
+            contents,
+            generationConfig: {
+                temperature: 0.7,
+                topP: 0.9,
+                topK: 40,
+                maxOutputTokens: 800,
+            },
+            safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            ],
+        });
 
+        // Try primary model, fallback to 2.0-flash on 503
+        let response;
         try {
-            const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+            const controller1 = new AbortController();
+            const timeout1 = setTimeout(() => controller1.abort(), 12000);
+            response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                signal: controller.signal,
-                body: JSON.stringify({
-                    system_instruction: {
-                        parts: [{ text: enhancedPrompt }],
-                    },
-                    contents,
-                    generationConfig: {
-                        temperature: 0.7,
-                        topP: 0.9,
-                        topK: 40,
-                        maxOutputTokens: 800,
-                    },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                    ],
-                }),
+                signal: controller1.signal,
+                body: requestBody,
             });
-            clearTimeout(timeout);
+            clearTimeout(timeout1);
+
+            // If primary fails with 503/429, try fallback
+            if (response.status === 503 || response.status === 429) {
+                console.warn(`Primary model returned ${response.status}, trying fallback...`);
+                const controller2 = new AbortController();
+                const timeout2 = setTimeout(() => controller2.abort(), 12000);
+                response = await fetch(`${GEMINI_FALLBACK_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller2.signal,
+                    body: requestBody,
+                });
+                clearTimeout(timeout2);
+            }
+        } catch (fetchErr) {
+            // If primary times out, try fallback
+            if (fetchErr.name === 'AbortError') {
+                console.warn('Primary model timed out, trying fallback...');
+                const controller3 = new AbortController();
+                const timeout3 = setTimeout(() => controller3.abort(), 12000);
+                response = await fetch(`${GEMINI_FALLBACK_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller3.signal,
+                    body: requestBody,
+                });
+                clearTimeout(timeout3);
+            } else {
+                throw fetchErr;
+            }
+        }
+
+        try {
 
             if (!response.ok) {
                 const errorText = await response.text();
