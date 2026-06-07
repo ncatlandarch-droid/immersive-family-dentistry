@@ -627,6 +627,99 @@
 }
 
 /* ─── Powered By Footer ─── */
+/* Gamification — XP bar & achievements */
+.paloma-gamification {
+    padding: 8px 16px;
+    border-top: 1px solid var(--paloma-border);
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.05), rgba(59, 130, 246, 0.05));
+}
+
+.paloma-xp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paloma-level-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--paloma-teal);
+    white-space: nowrap;
+    background: rgba(20, 184, 166, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.paloma-xp-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--paloma-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.paloma-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--paloma-teal), #3B82F6);
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.paloma-xp-text {
+    font-size: 10px;
+    color: var(--paloma-muted);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.paloma-achievements {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.paloma-ach {
+    font-size: 16px;
+    cursor: help;
+    transition: transform 0.2s;
+    animation: paloma-ach-pop 0.4s ease-out;
+}
+
+.paloma-ach:hover {
+    transform: scale(1.3);
+}
+
+@keyframes paloma-ach-pop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.paloma-levelup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, var(--paloma-teal), #3B82F6);
+    color: white;
+    padding: 16px 28px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(20, 184, 166, 0.4);
+    animation: paloma-levelup-anim 3s ease-out forwards;
+    text-align: center;
+}
+
+@keyframes paloma-levelup-anim {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    30% { transform: translate(-50%, -50%) scale(1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -70%) scale(0.8); }
+}
+
 .paloma-footer {
     padding: 6px 16px;
     text-align: center;

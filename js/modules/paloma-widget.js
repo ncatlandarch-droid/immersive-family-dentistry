@@ -15,7 +15,7 @@ const PALOMA_VERSION = '2.1'; // Increment to clear stale localStorage
 
 const PALOMA_CONFIG = {
     avatarPath: '/images/paloma/paloma-hero.png',
-    iconPath: '/images/paloma/paloma-icon.png',
+    iconPath: '/images/paloma/paloma-hero.png',
     apiEndpoint: '/.netlify/functions/paloma-chat',
     storageKey: 'paloma-chat-history',
     versionKey: 'paloma-version',
@@ -195,6 +195,14 @@ class PalomaWidget {
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                     </svg>
                 </button>
+            </div>
+            <div class="paloma-gamification" id="paloma-gamification">
+                <div class="paloma-xp-row">
+                    <span class="paloma-level-badge" id="paloma-level">🦷 Lv 1</span>
+                    <div class="paloma-xp-bar"><div class="paloma-xp-fill" id="paloma-xp-fill" style="width: 0%"></div></div>
+                    <span class="paloma-xp-text" id="paloma-xp-text">0 / 100 XP</span>
+                </div>
+                <div class="paloma-achievements" id="paloma-achievements"></div>
             </div>
             <div class="paloma-footer">
                 ${s.poweredBy} <a href="https://thinkdesignplan.com" target="_blank" rel="noopener">Think! Design & Planning</a> × MouthMap
@@ -490,6 +498,18 @@ class PalomaWidget {
                 this.avatarEl.classList.remove('paloma-header__avatar--speaking');
             }, 2000);
         }
+
+        // ─── Gamification: Award XP based on response content ───
+        if (typeof PalomaGamification !== 'undefined') {
+            const lower = text.toLowerCase();
+            if (lower.includes('book') || lower.includes('appointment') || lower.includes('schedule') || lower.includes('cita')) {
+                PalomaGamification.addXP(50, '📅 Appointment Explorer');
+            } else if (lower.includes('tip') || lower.includes('floss') || lower.includes('brush') || lower.includes('fluoride')) {
+                PalomaGamification.addXP(15, '🧠 Dental Wisdom');
+            } else {
+                PalomaGamification.addXP(10, '💬 Conversation');
+            }
+        }
     }
 
     renderMessage(msg) {
@@ -612,3 +632,133 @@ if (typeof window !== 'undefined' && !window.__PALOMA_INIT) {
     window.__PALOMA_INIT = true;
     initPaloma();
 }
+
+// ═══════════════════════════════════════════════════════════
+//  PALOMA GAMIFICATION ENGINE
+//  Dental Health Points — rewards patients for engaging
+// ═══════════════════════════════════════════════════════════
+
+const PalomaGamification = {
+    storageKey: 'paloma-xp',
+    levels: [
+        { lvl: 1, name: 'New Patient', xp: 0, icon: '🦷' },
+        { lvl: 2, name: 'Curious Smile', xp: 100, icon: '😊' },
+        { lvl: 3, name: 'Dental Explorer', xp: 250, icon: '🔍' },
+        { lvl: 4, name: 'Health Seeker', xp: 500, icon: '💪' },
+        { lvl: 5, name: 'Smile Champion', xp: 800, icon: '🏆' },
+        { lvl: 6, name: 'Oral Health Pro', xp: 1200, icon: '⭐' },
+        { lvl: 7, name: 'Dental Guru', xp: 1800, icon: '🧠' },
+        { lvl: 8, name: 'MouthMap Master', xp: 2500, icon: '👑' },
+    ],
+    achievements: {
+        first_chat: { name: 'First Chat', icon: '💬', desc: 'Started your first conversation' },
+        five_chats: { name: 'Getting Social', icon: '🗣️', desc: 'Had 5 conversations' },
+        asked_insurance: { name: 'Smart Planner', icon: '🛡️', desc: 'Asked about insurance' },
+        booked_appt: { name: 'Action Taker', icon: '📅', desc: 'Explored booking' },
+        dental_tip: { name: 'Knowledge Seeker', icon: '🧠', desc: 'Learned a dental health tip' },
+        bilingual: { name: 'Bilingüe', icon: '🌐', desc: 'Used PALOMA in both languages' },
+        night_owl: { name: 'Night Owl', icon: '🦉', desc: 'Chatted after 9 PM' },
+        early_bird: { name: 'Early Bird', icon: '🐦', desc: 'Chatted before 7 AM' },
+    },
+
+    getData() {
+        try {
+            return JSON.parse(localStorage.getItem(this.storageKey)) || { xp: 0, earned: [], chats: 0, langs: [] };
+        } catch { return { xp: 0, earned: [], chats: 0, langs: [] }; }
+    },
+
+    save(data) {
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+    },
+
+    getLevel(xp) {
+        let current = this.levels[0];
+        for (const l of this.levels) {
+            if (xp >= l.xp) current = l;
+        }
+        const nextIdx = this.levels.indexOf(current) + 1;
+        const next = nextIdx < this.levels.length ? this.levels[nextIdx] : null;
+        return { current, next };
+    },
+
+    addXP(amount, reason) {
+        const data = this.getData();
+        const oldLevel = this.getLevel(data.xp).current.lvl;
+        data.xp += amount;
+        data.chats = (data.chats || 0) + 1;
+
+        // Check time-based achievements
+        const hour = new Date().getHours();
+        if (hour >= 21 && !data.earned.includes('night_owl')) data.earned.push('night_owl');
+        if (hour < 7 && !data.earned.includes('early_bird')) data.earned.push('early_bird');
+
+        // Chat milestones
+        if (!data.earned.includes('first_chat')) data.earned.push('first_chat');
+        if (data.chats >= 5 && !data.earned.includes('five_chats')) data.earned.push('five_chats');
+
+        // Topic achievements
+        if (reason.includes('Appointment') && !data.earned.includes('booked_appt')) data.earned.push('booked_appt');
+        if (reason.includes('Dental Wisdom') && !data.earned.includes('dental_tip')) data.earned.push('dental_tip');
+
+        this.save(data);
+
+        const newLevel = this.getLevel(data.xp).current.lvl;
+        if (newLevel > oldLevel) {
+            this.showLevelUp(newLevel);
+        }
+
+        this.updateUI();
+    },
+
+    showLevelUp(lvl) {
+        const level = this.levels.find(l => l.lvl === lvl);
+        if (!level) return;
+        const toast = document.createElement('div');
+        toast.className = 'paloma-levelup';
+        toast.innerHTML = `${level.icon} Level Up! <strong>${level.name}</strong>`;
+        const panel = document.querySelector('.paloma-panel');
+        if (panel) {
+            panel.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    },
+
+    updateUI() {
+        const data = this.getData();
+        const { current, next } = this.getLevel(data.xp);
+
+        const levelEl = document.getElementById('paloma-level');
+        const fillEl = document.getElementById('paloma-xp-fill');
+        const textEl = document.getElementById('paloma-xp-text');
+        const achEl = document.getElementById('paloma-achievements');
+
+        if (!levelEl) return;
+
+        levelEl.textContent = `${current.icon} Lv ${current.lvl}`;
+        levelEl.title = current.name;
+
+        if (next) {
+            const progress = ((data.xp - current.xp) / (next.xp - current.xp)) * 100;
+            fillEl.style.width = `${Math.min(progress, 100)}%`;
+            textEl.textContent = `${data.xp} / ${next.xp} XP`;
+        } else {
+            fillEl.style.width = '100%';
+            textEl.textContent = `${data.xp} XP ⭐ MAX`;
+        }
+
+        // Show earned achievements
+        if (achEl && data.earned.length > 0) {
+            achEl.innerHTML = data.earned.slice(-4).map(id => {
+                const a = this.achievements[id];
+                return a ? `<span class="paloma-ach" title="${a.desc}">${a.icon}</span>` : '';
+            }).join('');
+        }
+    },
+
+    init() {
+        this.updateUI();
+    }
+};
+
+// Init gamification after DOM
+document.addEventListener('DOMContentLoaded', () => PalomaGamification.init());
