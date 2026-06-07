@@ -449,6 +449,17 @@ class PalomaWidget {
 
         const data = await response.json();
         if (data.debug) console.warn('PALOMA debug:', data.debug);
+
+        // If PALOMA booked an appointment, save it to Firestore
+        if (data.bookingData && typeof createAppointment === 'function') {
+            try {
+                const saved = await createAppointment(data.bookingData);
+                if (saved) console.log('[PALOMA] ✅ Appointment saved to Firestore:', saved.id);
+            } catch (e) {
+                console.warn('[PALOMA] Could not save appointment:', e.message);
+            }
+        }
+
         return data.reply || this.strings.errorMsg;
     }
 

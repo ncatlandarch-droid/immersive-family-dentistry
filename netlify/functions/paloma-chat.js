@@ -174,7 +174,7 @@ When a patient asks to book an appointment or asks about availability:
 
         // Call Gemini API with timeout
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 9000); // 9s timeout
+        const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout (Netlify max is 26s)
 
         try {
             const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -222,9 +222,9 @@ When a patient asks to book an appointment or asks about availability:
                     : 'I apologize, I couldn\'t process that. Could you try again?');
 
             // ─── Detect & Process Appointment Booking ───
-            let appointmentId = null;
+            let bookingData = null;
             const bookingMatch = reply.match(/\[BOOK_APPOINTMENT\]([\s\S]*?)\[\/BOOK_APPOINTMENT\]/);
-            if (bookingMatch && dbSql) {
+            if (bookingMatch) {
                 try {
                     const bookingText = bookingMatch[1];
                     const getField = (field) => {
@@ -232,43 +232,31 @@ When a patient asks to book an appointment or asks about availability:
                         return match ? match[1].trim() : '';
                     };
 
-                    const result = await dbSql`
-                        INSERT INTO appointments (
-                            patient_name, patient_phone, patient_email,
-                            reason, preferred_date, insurance_provider,
-                            source, lang, status
-                        ) VALUES (
-                            ${getField('name')},
-                            ${getField('phone')},
-                            ${getField('email')},
-                            ${getField('reason')},
-                            ${getField('preferred_date')},
-                            ${getField('insurance') || 'None'},
-                            'paloma-chat',
-                            ${lang},
-                            'pending'
-                        )
-                        RETURNING id
-                    `;
-                    appointmentId = result[0].id;
-                    console.log('PALOMA booked appointment #' + appointmentId);
+                    bookingData = {
+                        patient_name: getField('name'),
+                        patient_phone: getField('phone'),
+                        patient_email: getField('email'),
+                        reason: getField('reason'),
+                        preferred_date: getField('preferred_date'),
+                        insurance_provider: getField('insurance') || 'None',
+                        source: 'paloma-chat',
+                        lang,
+                    };
 
                     // Strip the booking tag from the visible reply
                     reply = reply.replace(/\[BOOK_APPOINTMENT\][\s\S]*?\[\/BOOK_APPOINTMENT\]/, '').trim();
-                    // Append confirmation
-                    reply += `\n\n✅ **Appointment Request #${appointmentId} confirmed!** Our front desk will reach out within 1 business day to finalize your time.`;
+                    reply += `\n\n✅ **Appointment request received!** Our front desk will reach out within 1 business day to confirm your time.`;
+                    console.log('PALOMA parsed booking:', JSON.stringify(bookingData));
                 } catch (bookErr) {
-                    console.error('Booking save error:', bookErr.message);
+                    console.error('Booking parse error:', bookErr.message);
+                    reply = reply.replace(/\[BOOK_APPOINTMENT\][\s\S]*?\[\/BOOK_APPOINTMENT\]/, '').trim();
                 }
-            } else if (bookingMatch) {
-                // Strip tag even if no DB
-                reply = reply.replace(/\[BOOK_APPOINTMENT\][\s\S]*?\[\/BOOK_APPOINTMENT\]/, '').trim();
             }
 
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ reply, appointmentId }),
+                body: JSON.stringify({ reply, bookingData }),
             };
 
         } catch (fetchError) {
