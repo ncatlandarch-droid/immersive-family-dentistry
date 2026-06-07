@@ -855,7 +855,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="/images/paloma/paloma-hero.png" alt="" class="sidebar-logo" />
+                <img src="/images/paloma/paloma-icon.png" alt="" class="sidebar-logo" />
                 <div>
                     <h2 class="sidebar-title">Admin</h2>
                     <p class="sidebar-subtitle">MouthMap Platform</p>
@@ -2175,10 +2175,16 @@
             if (schedViewMode === 'today') renderTodaySchedule();
             else if (schedViewMode === 'week') renderWeekSchedule();
             else renderMonthSchedule();
-            // Still load data in background for Week/Month views
+            // Load data in background, then re-render
             try {
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
                 scheduleAppointments = await Promise.race([listAppointments(), timeoutPromise]);
+                // Re-render with loaded data
+                if (scheduleAppointments.length > 0) {
+                    if (schedViewMode === 'today') renderTodaySchedule();
+                    else if (schedViewMode === 'week') renderWeekSchedule();
+                    else renderMonthSchedule();
+                }
             } catch (err) {
                 console.warn('Schedule: background load failed —', err.message);
             }
@@ -2532,8 +2538,8 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
         border: 2px solid rgba(20, 184, 166, 0.4);
