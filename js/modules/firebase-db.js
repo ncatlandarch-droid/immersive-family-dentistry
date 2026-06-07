@@ -79,11 +79,15 @@ async function createAppointment(data) {
 }
 
 async function listAppointments(filters = {}) {
-    const { db } = initFirebase();
-    if (!db) return [];
+    const fb = initFirebase();
+    if (!fb || !fb.db) {
+        console.warn('[Firestore] listAppointments: Firebase not initialized');
+        return [];
+    }
+    const db = fb.db;
     
     try {
-        let query = db.collection('appointments').orderBy('created_at', 'desc');
+        let query = db.collection('appointments');
         
         if (filters.status) {
             query = query.where('status', '==', filters.status);
@@ -91,20 +95,26 @@ async function listAppointments(filters = {}) {
         if (filters.email) {
             query = query.where('patient_email', '==', filters.email);
         }
-        if (filters.limit) {
-            query = query.limit(filters.limit);
-        } else {
-            query = query.limit(50);
+        
+        const limit = filters.limit || 100;
+        
+        // Try ordered query first, fall back to unordered
+        let snapshot;
+        try {
+            snapshot = await query.orderBy('created_at', 'desc').limit(limit).get();
+        } catch (indexErr) {
+            console.warn('[Firestore] Index not ready, falling back to unordered query');
+            snapshot = await query.limit(limit).get();
         }
         
-        const snapshot = await query.get();
         const appointments = [];
         snapshot.forEach(doc => {
             appointments.push({ id: doc.id, ...doc.data() });
         });
+        console.log(`[Firestore] listAppointments: ${appointments.length} results`);
         return appointments;
     } catch (e) {
-        console.error('[Firestore] listAppointments error:', e);
+        console.error('[Firestore] listAppointments error:', e.message);
         return [];
     }
 }

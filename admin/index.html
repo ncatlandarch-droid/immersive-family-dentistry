@@ -2125,10 +2125,12 @@
         const container = document.getElementById('sched-content');
         container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading schedule…</span></div>`;
         try {
-            scheduleAppointments = await listAppointments();
+            // 8s timeout to prevent infinite spinner
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+            scheduleAppointments = await Promise.race([listAppointments(), timeoutPromise]);
         } catch (err) {
             scheduleAppointments = [];
-            console.warn('Schedule: could not load appointments', err);
+            console.warn('Schedule: could not load appointments —', err.message);
         }
         if (schedViewMode === 'today') {
             renderTodaySchedule();
