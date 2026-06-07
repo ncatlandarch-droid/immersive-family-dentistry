@@ -534,6 +534,47 @@
     /* Patient Avatar (inline) */
     .patient-avatar { letter-spacing: 0.5px; text-transform: uppercase; }
 
+    /* Month View */
+    .sched-month-grid {
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .sched-month-header {
+        text-align: center; font-size: 11px; font-weight: 700;
+        color: var(--admin-muted); padding: 8px 0; text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .sched-month-cell {
+        min-height: 64px; padding: 6px 8px;
+        background: var(--admin-surface); border: 1px solid var(--admin-glass-border);
+        border-radius: 8px; display: flex; flex-direction: column;
+        align-items: flex-start; gap: 4px; transition: var(--admin-transition);
+        cursor: default;
+    }
+    .sched-month-cell:hover { border-color: rgba(255,255,255,0.15); }
+    .sched-month-cell.sched-month-empty { background: transparent; border-color: transparent; }
+    .sched-month-cell.is-today {
+        border-color: var(--admin-teal); box-shadow: 0 0 12px var(--admin-teal-glow);
+        background: rgba(20, 184, 166, 0.08);
+    }
+    .sched-month-cell.is-closed {
+        opacity: 0.35; background: rgba(255,255,255,0.02);
+    }
+    .sched-month-day {
+        font-size: 13px; font-weight: 600; color: var(--admin-text);
+    }
+    .sched-month-cell.is-today .sched-month-day {
+        color: var(--admin-teal); font-weight: 700;
+    }
+    .sched-month-label {
+        font-size: 10px; color: var(--admin-muted); font-style: italic;
+    }
+    .sched-month-count {
+        font-size: 10px; font-weight: 600; color: var(--admin-teal);
+        background: rgba(20, 184, 166, 0.12); padding: 2px 6px;
+        border-radius: 6px; white-space: nowrap;
+    }
+    .sched-month-cell.has-appts { border-color: rgba(20, 184, 166, 0.3); }
+
     /* ─── Data Editor ─── */
     .editor-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
 
@@ -1026,6 +1067,7 @@
                     <div class="sched-toggle-group">
                         <button class="sched-toggle active" data-sched-view="today" onclick="switchSchedView('today')">Today</button>
                         <button class="sched-toggle" data-sched-view="week" onclick="switchSchedView('week')">This Week</button>
+                        <button class="sched-toggle" data-sched-view="month" onclick="switchSchedView('month')">This Month</button>
                     </div>
                 </div>
                 <div id="sched-content">
@@ -2112,31 +2154,45 @@
         document.querySelectorAll('.sched-toggle').forEach(b => {
             b.classList.toggle('active', b.dataset.schedView === mode);
         });
-        if (mode === 'today') {
-            document.getElementById('sched-title').textContent = '📅 Today\'s Schedule';
-            renderTodaySchedule();
-        } else {
-            document.getElementById('sched-title').textContent = '📅 This Week\'s Schedule';
-            renderWeekSchedule();
-        }
+        const titles = { today: '📅 Today\'s Schedule', week: '📅 This Week\'s Schedule', month: '📅 This Month\'s Schedule' };
+        document.getElementById('sched-title').textContent = titles[mode] || titles.today;
+        if (mode === 'today') renderTodaySchedule();
+        else if (mode === 'week') renderWeekSchedule();
+        else renderMonthSchedule();
     }
 
     async function loadScheduleData() {
         const container = document.getElementById('sched-content');
+        const today = new Date();
+        const dow = today.getDay(); // 0=Sun, 5=Fri, 6=Sat
+
+        // On weekends (when office is closed), render immediately then load data in background
+        if (dow === 0 || dow === 5 || dow === 6) {
+            scheduleAppointments = [];
+            if (schedViewMode === 'today') renderTodaySchedule();
+            else if (schedViewMode === 'week') renderWeekSchedule();
+            else renderMonthSchedule();
+            // Still load data in background for Week/Month views
+            try {
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+                scheduleAppointments = await Promise.race([listAppointments(), timeoutPromise]);
+            } catch (err) {
+                console.warn('Schedule: background load failed —', err.message);
+            }
+            return;
+        }
+
         container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading schedule…</span></div>`;
         try {
-            // 8s timeout to prevent infinite spinner
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
             scheduleAppointments = await Promise.race([listAppointments(), timeoutPromise]);
         } catch (err) {
             scheduleAppointments = [];
             console.warn('Schedule: could not load appointments —', err.message);
         }
-        if (schedViewMode === 'today') {
-            renderTodaySchedule();
-        } else {
-            renderWeekSchedule();
-        }
+        if (schedViewMode === 'today') renderTodaySchedule();
+        else if (schedViewMode === 'week') renderWeekSchedule();
+        else renderMonthSchedule();
     }
 
     function getApptDateObj(a) {
@@ -2302,6 +2358,76 @@
             html += `</div></div>`;
         });
         html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ─── Month Schedule ───
+    function renderMonthSchedule() {
+        const container = document.getElementById('sched-content');
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const monthName = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        // First day of month and days in month
+        const firstDay = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startDow = firstDay.getDay(); // 0=Sun
+
+        // Count appointments per day
+        const apptsByDay = {};
+        let totalMonthAppts = 0;
+        scheduleAppointments.forEach(a => {
+            const d = getApptDateObj(a);
+            if (!d || a.status === 'cancelled') return;
+            if (d.getMonth() === month && d.getFullYear() === year) {
+                const day = d.getDate();
+                apptsByDay[day] = (apptsByDay[day] || 0) + 1;
+                totalMonthAppts++;
+            }
+        });
+
+        document.getElementById('sched-date-label').textContent = monthName;
+        document.getElementById('sched-appt-count').textContent = `${totalMonthAppts} appointment${totalMonthAppts !== 1 ? 's' : ''}`;
+
+        // Closed days: 0=Sun, 5=Fri, 6=Sat
+        const closedDays = [0, 5, 6];
+
+        let html = `<div class="sched-month-grid">`;
+        // Header row
+        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
+            html += `<div class="sched-month-header">${d}</div>`;
+        });
+
+        // Empty cells before first day
+        for (let i = 0; i < startDow; i++) {
+            html += `<div class="sched-month-cell sched-month-empty"></div>`;
+        }
+
+        // Day cells
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cellDate = new Date(year, month, day);
+            const dow = cellDate.getDay();
+            const isToday = isSameDay(cellDate, today);
+            const isClosed = closedDays.includes(dow);
+            const count = apptsByDay[day] || 0;
+
+            let cls = 'sched-month-cell';
+            if (isToday) cls += ' is-today';
+            if (isClosed) cls += ' is-closed';
+            if (count > 0) cls += ' has-appts';
+
+            html += `<div class="${cls}">`;
+            html += `<span class="sched-month-day">${day}</span>`;
+            if (isClosed) {
+                html += `<span class="sched-month-label">Closed</span>`;
+            } else if (count > 0) {
+                html += `<span class="sched-month-count">${count} appt${count > 1 ? 's' : ''}</span>`;
+            }
+            html += `</div>`;
+        }
+
+        html += `</div>`;
         container.innerHTML = html;
     }
 
