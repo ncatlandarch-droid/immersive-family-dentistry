@@ -36,3 +36,16 @@ function initFirebase() {
 // Expose globally
 window.firebaseConfig = firebaseConfig;
 window.initFirebase = initFirebase;
+
+// Auto-initialize and seed on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const fb = initFirebase();
+    if (fb && fb.db) {
+        // Auto-seed practice data if Firestore is empty
+        if (typeof seedPracticeData === 'function') {
+            seedPracticeData().then(seeded => {
+                if (seeded) console.log('[Firebase] 🌱 Practice data seeded on first load!');
+            }).catch(e => console.log('[Firebase] Seed check:', e.message));
+        }
+    }
+});
