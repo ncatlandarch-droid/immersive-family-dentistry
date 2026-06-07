@@ -1213,21 +1213,23 @@
             weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
         });
 
-        await loadData();
-        initNavigation();
-        renderOverview();
-        renderProduction();
-        renderPalomaAnalytics();
-        loadScheduleData();
-        loadPatients();
-        initDataEditor();
-        initSettings();
-        initAppointmentFilters();
-        initPracticeSettingsTabs();
+        try { await loadData(); } catch(e) { console.error('loadData crashed:', e); }
+        try { initNavigation(); } catch(e) { console.error('initNavigation crashed:', e); }
+        try { renderOverview(); } catch(e) { console.error('renderOverview crashed:', e); }
+        try { renderProduction(); } catch(e) { console.error('renderProduction crashed:', e); }
+        try { renderPalomaAnalytics(); } catch(e) { console.error('renderPalomaAnalytics crashed:', e); }
+
+        // CRITICAL: Schedule + Appointments must always run
+        try { await loadScheduleData(); } catch(e) { console.error('loadScheduleData crashed:', e); }
+        try { loadPatients(); } catch(e) { console.error('loadPatients crashed:', e); }
+        try { initDataEditor(); } catch(e) { console.error('initDataEditor crashed:', e); }
+        try { initSettings(); } catch(e) { console.error('initSettings crashed:', e); }
+        try { initAppointmentFilters(); } catch(e) { console.error('initAppointmentFilters crashed:', e); }
+        try { initPracticeSettingsTabs(); } catch(e) { console.error('initPracticeSettingsTabs crashed:', e); }
 
         // Auto-refresh appointments every 30s
-        loadAppointments();
-        apptAutoRefresh = setInterval(loadAppointments, 30000);
+        try { loadAppointments(); } catch(e) { console.error('loadAppointments crashed:', e); }
+        apptAutoRefresh = setInterval(() => { try { loadAppointments(); } catch(e) {} }, 30000);
     }
 
     // ─── Load Data ───
@@ -2225,13 +2227,25 @@
     }
 
     async function loadScheduleData() {
-        // Always use demo data for reliable demo experience
-        scheduleAppointments = generateDemoSchedule();
-        console.log('[Schedule] ✅ Loaded', scheduleAppointments.length, 'demo appointments');
+        try {
+            // Always use demo data for reliable demo experience
+            scheduleAppointments = generateDemoSchedule();
+            console.log('[Schedule] ✅ Loaded', scheduleAppointments.length, 'demo appointments');
+            console.log('[Schedule] Sample:', JSON.stringify(scheduleAppointments[0]));
+            console.log('[Schedule] Dates:', scheduleAppointments.slice(0, 5).map(a => a.preferred_date));
+        } catch (e) {
+            console.error('[Schedule] ❌ generateDemoSchedule CRASHED:', e);
+            scheduleAppointments = [];
+        }
 
-        if (schedViewMode === 'today') renderTodaySchedule();
-        else if (schedViewMode === 'week') renderWeekSchedule();
-        else renderMonthSchedule();
+        try {
+            if (schedViewMode === 'today') renderTodaySchedule();
+            else if (schedViewMode === 'week') renderWeekSchedule();
+            else renderMonthSchedule();
+        } catch (e) {
+            console.error('[Schedule] ❌ Render CRASHED:', e);
+            document.getElementById('sched-content').innerHTML = `<div style="color:red;padding:24px;">Schedule render error: ${e.message}</div>`;
+        }
     }
 
     function getApptDateObj(a) {
