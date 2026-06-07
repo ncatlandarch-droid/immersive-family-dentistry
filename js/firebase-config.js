@@ -37,21 +37,7 @@ function initFirebase() {
 window.firebaseConfig = firebaseConfig;
 window.initFirebase = initFirebase;
 
-// Auto-initialize and seed on page load
+// Auto-initialize (no auto-seed — dashboard uses its own demo data)
 document.addEventListener('DOMContentLoaded', () => {
-    const fb = initFirebase();
-    if (fb && fb.db) {
-        // Auto-seed practice data if Firestore is empty
-        if (typeof seedPracticeData === 'function') {
-            seedPracticeData().then(seeded => {
-                if (seeded) console.log('[Firebase] 🌱 Practice data seeded on first load!');
-            }).catch(e => console.log('[Firebase] Seed check:', e.message));
-        }
-        // Auto-seed schedule data if no appointments exist
-        if (typeof seedScheduleData === 'function') {
-            seedScheduleData().then(seeded => {
-                if (seeded) console.log('[Firebase] 📅 Schedule data seeded on first load!');
-            }).catch(e => console.log('[Firebase] Schedule seed check:', e.message));
-        }
-    }
+    initFirebase();
 });
