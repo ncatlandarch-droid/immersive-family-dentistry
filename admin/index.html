@@ -1165,6 +1165,8 @@
     let siteConfig = null;
     let integrationMap = null;
     let allAppointments = [];
+    let scheduleAppointments = [];
+    let schedViewMode = 'today';
     let currentFilter = 'all';
     let practiceSettings = {};
     let currentPSSection = 'hours';
@@ -2146,9 +2148,8 @@
     //  SCHEDULE VIEW — Today & Week
     // ═══════════════════════════════════════════════════════════
 
-    let schedViewMode = 'today';
-    let scheduleAppointments = [];
 
+    // (schedViewMode and scheduleAppointments declared in State block above)
     // Patient avatar helper
     function getPatientAvatar(name, size = 40) {
         if (!name) return '';
