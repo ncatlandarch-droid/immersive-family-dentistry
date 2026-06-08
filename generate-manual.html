@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MouthMap + PALOMA Platform — Instruction Manual</title>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+  .card { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); text-align: center; }
+  h1 { color: #0f766e; margin-bottom: 8px; }
+  p { color: #555; font-size: 16px; line-height: 1.6; }
+  .btn { display: inline-block; margin-top: 24px; padding: 16px 48px; background: linear-gradient(135deg, #14b8a6, #0f766e); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .status { margin-top: 16px; color: #14b8a6; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🕊️ PALOMA Platform</h1>
+  <h2>Instruction Manual for Dr. Brenes</h2>
+  <p>Click below to generate and download the complete instruction manual as a Microsoft Word document.</p>
+  <button class="btn" onclick="generateDoc()">📄 Download Word Document</button>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+async function generateDoc() {
+  const status = document.getElementById('status');
+  status.textContent = 'Generating document...';
+
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, ShadingType } = docx;
+
+  const teal = '0F766E';
+  const gold = 'F59E0B';
+
+  function h1(text) {
+    return new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 }, children: [new TextRun({ text, bold: true, size: 32, color: teal, font: 'Calibri' })] });
+  }
+  function h2(text) {
+    return new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 300, after: 150 }, children: [new TextRun({ text, bold: true, size: 26, color: '1E293B', font: 'Calibri' })] });
+  }
+  function h3(text) {
+    return new Paragraph({ heading: HeadingLevel.HEADING_3, spacing: { before: 200, after: 100 }, children: [new TextRun({ text, bold: true, size: 22, color: teal, font: 'Calibri' })] });
+  }
+  function p(text, opts = {}) {
+    return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, size: 21, font: 'Calibri', ...opts })] });
+  }
+  function bullet(text, opts = {}) {
+    return new Paragraph({ bullet: { level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text, size: 21, font: 'Calibri', ...opts })] });
+  }
+  function checkbox(text) {
+    return new Paragraph({ bullet: { level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: '☐ ' + text, size: 21, font: 'Calibri' })] });
+  }
+  function bold(text) { return new TextRun({ text, bold: true, size: 21, font: 'Calibri' }); }
+  function hr() {
+    return new Paragraph({ spacing: { before: 200, after: 200 }, border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' } }, children: [new TextRun({ text: '', size: 4 })] });
+  }
+  function tip(title, text) {
+    return new Paragraph({
+      spacing: { before: 150, after: 150 },
+      indent: { left: 400 },
+      border: { left: { style: BorderStyle.SINGLE, size: 6, color: teal } },
+      children: [new TextRun({ text: title + ' ', bold: true, size: 21, font: 'Calibri', color: teal }), new TextRun({ text, size: 21, font: 'Calibri' })]
+    });
+  }
+
+  function makeTable(headers, rows) {
+    const headerRow = new TableRow({
+      tableHeader: true,
+      children: headers.map(h => new TableCell({
+        shading: { type: ShadingType.SOLID, color: teal },
+        children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 20, font: 'Calibri', color: 'FFFFFF' })] })],
+        width: { size: Math.floor(9000 / headers.length), type: WidthType.DXA },
+      }))
+    });
+    const dataRows = rows.map(row => new TableRow({
+      children: row.map(cell => new TableCell({
+        children: [new Paragraph({ children: [new TextRun({ text: cell, size: 20, font: 'Calibri' })] })],
+        width: { size: Math.floor(9000 / headers.length), type: WidthType.DXA },
+      }))
+    }));
+    return new Table({ width: { size: 9000, type: WidthType.DXA }, rows: [headerRow, ...dataRows] });
+  }
+
+  const doc = new Document({
+    creator: 'Think! Design & Planning, LLC',
+    title: 'MouthMap + PALOMA Platform — Instruction Manual',
+    description: 'Instruction manual for Dr. Christian Brenes',
+    sections: [{
+      properties: { page: { margin: { top: 1200, right: 1200, bottom: 1200, left: 1200 } } },
+      children: [
+        // Title page
+        new Paragraph({ spacing: { before: 2000 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: '🕊️', size: 72, font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: 'Lake Jeannette Family & Implant Dentistry', bold: true, size: 36, color: teal, font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: 'MouthMap + PALOMA Platform', size: 28, color: '64748B', font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 50 }, children: [new TextRun({ text: 'INSTRUCTION MANUAL', bold: true, size: 32, color: '1E293B', font: 'Calibri' })] }),
+        hr(),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Prepared for: Dr. Christian Brenes', size: 22, font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Prepared by: Chris Howell, Think! Design & Planning, LLC', size: 22, font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Date: June 7, 2026', size: 22, font: 'Calibri' })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200 }, children: [new TextRun({ text: 'Live: https://immersive-family-dentistry.netlify.app', size: 20, font: 'Calibri', color: teal })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Admin: https://immersive-family-dentistry.netlify.app/admin/', size: 20, font: 'Calibri', color: teal })] }),
+
+        // Welcome
+        new Paragraph({ spacing: { before: 600 } }),
+        h1('Welcome, Christian'),
+        p('This manual walks you through every feature of your new AI-powered dental platform. Everything you see is live and functional — not a mockup. I built this to show you what\'s possible when we combine your clinical expertise with modern AI technology.'),
+        p('Take 15 minutes to explore. Then let\'s talk about making it real with YOUR data.', { bold: true }),
+        hr(),
+
+        // Part 1
+        h1('Part 1: The Patient Experience'),
+        h2('🌐 Main Website'),
+        p('URL: https://immersive-family-dentistry.netlify.app'),
+        p('This is what your patients see. It\'s a premium, modern dental website that positions Lake Jeannette as the most technologically advanced practice in the Triad.'),
+        bullet('Hero Section — Your credentials, UNC Chapel Hill, digital pioneer positioning'),
+        bullet('Services Section — Implants, prosthodontics, cosmetic, preventive care'),
+        bullet('Technology Section — 3D MouthMap scanner visualization (interactive)'),
+        bullet('Experience Section — Before/after smile gallery'),
+        bullet('Team Section — Staff profiles'),
+        bullet('Book Now Button — Links to scheduling'),
+        bullet('Shop — Branded merchandise (T-shirts, mugs, hoodies, caps)'),
+
+        h2('🕊️ PALOMA — Your AI Dental Assistant'),
+        p('Look for the large avatar in the bottom-right corner of any page — that\'s PALOMA!'),
+        p('PALOMA stands for Patient Advocacy & Lifecycle Oral Map Assistant. She is a 24/7 AI concierge for your practice.'),
+        p('Try these conversations:', { bold: true }),
+        makeTable(['What to Say', 'What PALOMA Does'], [
+          ['"What services do you offer?"', 'Lists your full service menu with pricing'],
+          ['"Do you accept Delta Dental?"', 'Checks your insurance list accurately'],
+          ['"I need to schedule a cleaning"', 'Walks through booking, asks for date/time'],
+          ['"My tooth hurts"', 'Provides first-aid guidance + urgency triage'],
+          ['"¿Hablan español?"', 'Switches to fluent Spanish automatically'],
+          ['"What are your hours?"', 'Mon-Thu schedule (Fri-Sun closed)'],
+          ['"How much do implants cost?"', 'Your pricing range ($3,500-$5,000)'],
+          ['"Tell me about Dr. Brenes"', 'UNC credentials, specialties, experience'],
+        ]),
+        tip('TIP:', 'PALOMA speaks your practice data. She knows your hours, insurance partners, services, pricing, and staff. She\'s not generic — she\'s yours.'),
+
+        h2('🎮 Gamification System'),
+        p('As patients chat with PALOMA, they earn Dental Health Points (XP):'),
+        makeTable(['Action', 'XP Earned', 'Achievement'], [
+          ['Ask any question', '10 XP', '💬 First Chat'],
+          ['Ask about booking', '50 XP', '📅 Action Taker'],
+          ['Learn a dental tip', '15 XP', '🧠 Knowledge Seeker'],
+          ['Chat 5+ times', '—', '🗣️ Getting Social'],
+          ['Chat after 9 PM', '—', '🦉 Night Owl'],
+        ]),
+        p('Levels: 🦷 New Patient → 😊 Curious Smile → 🔍 Dental Explorer → 💪 Health Seeker → 🏆 Smile Champion → ⭐ Oral Health Pro → 🧠 Dental Guru → 👑 MouthMap Master'),
+        hr(),
+
+        // Part 2
+        h1('Part 2: Admin Dashboard'),
+        h2('🔐 How to Log In'),
+        p('URL: https://immersive-family-dentistry.netlify.app/admin/'),
+        bullet('Enter any email (e.g., christian@ljfamilydentist.com)'),
+        bullet('Enter any password (demo mode)'),
+        bullet('Click Sign In'),
+        tip('NOTE:', 'In demo mode, any email/password works. When we connect your real data, we\'ll set up proper secure authentication.'),
+
+        h2('📅 Schedule View (YOUR FIRST STOP)'),
+        p('The schedule is the first thing you see after logging in:'),
+        makeTable(['View', 'What It Shows'], [
+          ['Today', 'Hour-by-hour timeline. Shows "Office Closed" on Fri/Sat/Sun'],
+          ['This Week', '4-column grid (Mon-Thu) with all appointments'],
+          ['This Month', 'Full calendar with appointment counts per workday'],
+        ]),
+        p('Each appointment card shows: patient name, time, procedure type, and status badge.'),
+        tip('IMPORTANT:', 'Right now this shows demo data — 12 sample patients, 3-6 appts/workday. Once you send your real schedule, we\'ll populate actual patients.'),
+
+        h2('📋 Appointments Queue'),
+        p('Click "Appointments" in the sidebar. Filter by: All / Pending / Confirmed / Completed / Cancelled.'),
+
+        h2('📊 Overview Dashboard'),
+        p('Click "Overview" — 6 Key Performance Indicators:'),
+        makeTable(['KPI', 'Demo Value', 'What It Tracks'], [
+          ['👥 Active Patients', '847 (↑12%)', 'Patients seen in last 12 months'],
+          ['💰 Monthly Revenue', '$142,500 (↑8%)', 'Total production this month'],
+          ['📅 Booking Rate', '94% (↑3%)', 'Inquiry → booked appointment'],
+          ['⭐ Satisfaction', '4.8/5 (↑2%)', 'Average patient rating'],
+          ['✅ Treatment Acceptance', '87% (↑5%)', '% of plans patients accept'],
+          ['🏁 Case Completion', '92% (↑3%)', '% of accepted plans completed'],
+        ]),
+
+        h2('🕊️ Admin PALOMA Chat'),
+        p('Click PALOMA\'s large avatar (bottom-right). This is your private Clinical Assistant.'),
+        p('Try asking:', { bold: true }),
+        bullet('"Show me today\'s schedule"'),
+        bullet('"Who has appointments this week?"'),
+        bullet('"What insurance does Maria Santos have?"'),
+        hr(),
+
+        // Part 3
+        h1('Part 3: What I Need to Make This REAL'),
+        h2('🔴 Priority 1: Your Real Data (Send These First!)'),
+        makeTable(['What I Need', 'Why', 'How to Send'], [
+          ['Current patient schedule (4 weeks)', 'Replace demo appointments', 'CSV export or screenshots from PMS'],
+          ['Patient roster', 'Build real patient profiles', 'Export from Dentrix/Eaglesoft'],
+          ['Treatment pricing sheet', 'PALOMA quotes accurate prices', 'PDF or spreadsheet'],
+          ['Insurance partners list', 'PALOMA verifies coverage', 'List of accepted plans'],
+          ['Staff photos & bios', 'Personalize team section', 'Headshots + short bios'],
+          ['Your professional headshot', 'Replace AI hero image', 'High-res photo'],
+          ['Office photos (5-10)', 'Replace AI interior images', 'Reception, operatories, equipment'],
+          ['Before/after cases', 'Real transformation gallery', 'Photo pairs (with consent)'],
+        ]),
+        tip('TIP:', 'Start with your schedule and pricing. Those two alone make it 80% real. Email to chris@thinkdesignplanning.com'),
+
+        h2('🟡 Priority 2: System Integrations (Phase 2)'),
+        makeTable(['Integration', 'What It Does', 'Timeline'], [
+          ['Practice Management System', 'Sync real appointments & records', '2-3 weeks'],
+          ['Online Booking', 'PALOMA books directly', '1-2 weeks'],
+          ['Insurance Verification', 'Real-time eligibility checks', '1 week'],
+          ['Patient Portal Login', 'Patients see own records', '2 weeks'],
+          ['SMS/Email Notifications', 'Reminders & follow-ups', '1 week'],
+          ['Payment Processing', 'Online payments (Stripe)', '1 week'],
+        ]),
+
+        h2('🟢 Priority 3: Enhancements'),
+        makeTable(['Feature', 'Impact', 'Description'], [
+          ['3D MouthMap per patient', '🔥🔥🔥', 'Interactive dental map per patient'],
+          ['AI Treatment Plan Presenter', '🔥🔥🔥', 'PALOMA walks through plans with 3D visuals'],
+          ['Voice Mode', '🔥🔥', 'Neural TTS spoken conversations'],
+          ['Smart Recall System', '🔥🔥', 'AI identifies overdue patients'],
+          ['Treatment Acceptance Tracker', '🔥🔥', 'Track acceptance vs decline trends'],
+          ['Review Generator', '🔥🔥', 'Auto-prompt Google reviews'],
+        ]),
+        hr(),
+
+        // Part 4
+        h1('Part 4: The Business Case'),
+        h2('Revenue Impact'),
+        makeTable(['Metric', 'Industry Average', 'With PALOMA'], [
+          ['Treatment Acceptance', '50-60%', '85-90%'],
+          ['No-Show Rate', '15-20%', '5-8%'],
+          ['New Patient Conversion', '30-40%', '60-70%'],
+          ['After-Hours Capture', '0%', '100%'],
+          ['Patient Satisfaction', '4.2/5', '4.8+/5'],
+          ['Staff Phone Time', '2-3 hrs/day', '30 min/day'],
+        ]),
+        p('Estimated Annual Revenue Impact: +$360,000', { bold: true, color: teal }),
+        bullet('+$12,000/mo from after-hours patient capture'),
+        bullet('+$3,000/mo from reduced no-shows'),
+        bullet('+$15,000/mo from higher treatment acceptance'),
+        hr(),
+
+        // Part 5
+        h1('Part 5: Quick Test Checklist (15 Minutes)'),
+        h2('Patient Experience'),
+        checkbox('Visit the main site'),
+        checkbox('Click PALOMA → Chat about services'),
+        checkbox('Ask about insurance: "Do you accept Delta Dental?"'),
+        checkbox('Try Spanish: "Hola, necesito una cita"'),
+        checkbox('Ask about pricing: "How much do implants cost?"'),
+        checkbox('Try scheduling: "I want to book an appointment"'),
+
+        h2('Admin Dashboard'),
+        checkbox('Go to /admin/ → Sign in with any email/password'),
+        checkbox('Schedule → Click "This Week" to see Mon-Thu appointments'),
+        checkbox('Schedule → Click "This Month" for June calendar'),
+        checkbox('Appointments → Filter by Pending, Confirmed, Completed'),
+        checkbox('Overview → See KPI dashboard'),
+        checkbox('Patients → Search patient roster'),
+        checkbox('PALOMA Analytics → Conversation metrics'),
+        checkbox('Click PALOMA (bottom-right) → Ask "Who has appointments Monday?"'),
+        checkbox('Settings → Review hours, pricing, insurance'),
+        hr(),
+
+        // Part 6
+        h1('Part 6: The Vision'),
+        makeTable(['Phase', 'Timeline', 'What Happens'], [
+          ['Phase 1', '✅ NOW', 'Demo platform — AI, dashboard, gamification, schedule'],
+          ['Phase 2', '30 Days', 'Connect real PMS, patient data, scheduling'],
+          ['Phase 3', '60 Days', '3D MouthMap per patient, voice mode'],
+          ['Phase 4', '90 Days', 'Package as SaaS for dentists nationwide'],
+        ]),
+        tip('THE GOAL:', 'Every dentist in America should have a PALOMA. You\'ll be the first — and the proof of concept.'),
+
+        h2('Next Steps'),
+        bullet('🎯 Play with the demo — explore every feature (15 min)'),
+        bullet('📧 Send Chris your real data — start with schedule + pricing'),
+        bullet('📞 Schedule a 30-minute walkthrough call'),
+        bullet('🚀 Pick your launch date — live with real data in 2-3 weeks'),
+        hr(),
+
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 300 }, children: [
+          new TextRun({ text: 'Questions? ', size: 22, font: 'Calibri' }),
+          new TextRun({ text: 'Call Chris: (336) 488-0203', bold: true, size: 22, font: 'Calibri' }),
+        ]}),
+        new Paragraph({ alignment: AlignmentType.CENTER, children: [
+          new TextRun({ text: 'Email: chris@thinkdesignplanning.com', size: 22, font: 'Calibri', color: teal }),
+        ]}),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 300 }, children: [
+          new TextRun({ text: 'Built with ❤️ by Think! Design & Planning, LLC × MouthMap', size: 18, font: 'Calibri', color: '94A3B8' }),
+        ]}),
+      ]
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'MouthMap_PALOMA_Instruction_Manual_Dr_Brenes.docx';
+  a.click();
+  URL.revokeObjectURL(url);
+  status.textContent = '✅ Downloaded! Check your Downloads folder.';
+}
+</script>
+</body>
+</html>

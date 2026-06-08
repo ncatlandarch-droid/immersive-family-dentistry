@@ -809,25 +809,116 @@
     .empty-state-text { font-size: 15px; }
 
     /* ═══ Responsive ═══ */
+
+    /* Tablet */
+    @media (min-width: 769px) and (max-width: 1100px) {
+        .sched-week-grid { grid-template-columns: repeat(2, 1fr); }
+        .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Mobile */
     @media (max-width: 768px) {
-        .sidebar { transform: translateX(-100%); }
+        .sidebar {
+            transform: translateX(-100%);
+            position: fixed;
+            z-index: 999;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+        }
         .sidebar.open { transform: translateX(0); }
         .main-content { margin-left: 0; }
         .topbar-toggle { display: block; }
+
+        /* Sidebar overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* Topbar */
+        .topbar {
+            padding: 12px 16px;
+            flex-wrap: wrap;
+        }
+        .topbar h2 { font-size: 18px; }
+
+        /* Views */
+        .view { padding: 12px; }
+
+        /* KPIs */
+        .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+        .kpi-card { padding: 14px; }
+        .kpi-card__value { font-size: 22px; }
+
+        /* Charts */
         .charts-row { grid-template-columns: 1fr; }
-        .kpi-row { grid-template-columns: repeat(2, 1fr); }
-        .hours-row { grid-template-columns: 1fr; gap: 8px; }
-        .pricing-row { grid-template-columns: 1fr; gap: 8px; }
+
+        /* Schedule */
+        .sched-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .sched-view-toggle { align-self: stretch; }
+        .sched-view-toggle button { flex: 1; padding: 8px 12px; font-size: 13px; }
+        .sched-hour-label { width: 52px; font-size: 11px; }
+
+        /* Week grid: stack columns */
+        .sched-week-grid { grid-template-columns: 1fr; gap: 12px; }
+        .sched-week-col { border-radius: 10px; }
+
+        /* Month calendar: compact */
+        .sched-month-grid {
+            font-size: 11px;
+        }
+        .sched-month-grid th { padding: 6px 2px; font-size: 10px; }
+        .sched-month-grid td { padding: 4px 2px; min-height: 48px; }
+        .sched-month-grid .day-num { font-size: 12px; }
+        .sched-month-grid .badge { font-size: 9px; padding: 1px 4px; }
+
+        /* Appointments */
+        .appt-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .appt-filters { flex-wrap: wrap; gap: 6px; }
+        .appt-filters button { padding: 6px 12px; font-size: 12px; }
+        .appt-card { padding: 12px; }
+        .appt-card-header { flex-direction: column; gap: 8px; }
+
+        /* Patients */
+        .patient-table { font-size: 12px; }
+        .patient-table th, .patient-table td { padding: 8px 6px; }
+        .patient-table th:nth-child(n+4),
+        .patient-table td:nth-child(n+4) { display: none; }
+
+        /* Forms */
         .form-row { grid-template-columns: 1fr; }
         .form-row-3 { grid-template-columns: 1fr; }
-        .view { padding: 16px; }
-        .appt-header { flex-direction: column; align-items: flex-start; }
-        .sched-week-grid { grid-template-columns: 1fr; }
-        .sched-header { flex-direction: column; align-items: flex-start; }
-        .sched-hour-label { width: 52px; font-size: 11px; }
+        .hours-row { grid-template-columns: 1fr; gap: 8px; }
+        .pricing-row { grid-template-columns: 1fr; gap: 8px; }
+
+        /* PALOMA FAB */
+        .admin-paloma-fab {
+            width: 100px !important;
+            height: 100px !important;
+            bottom: 16px !important;
+            right: 16px !important;
+        }
+
+        /* Overview stats cards */
+        .overview-stat { padding: 12px; }
+        .overview-stat h3 { font-size: 14px; }
     }
-    @media (min-width: 769px) and (max-width: 1100px) {
-        .sched-week-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* Small phones */
+    @media (max-width: 480px) {
+        .kpi-row { grid-template-columns: 1fr; }
+        .topbar h2 { font-size: 16px; }
+        .sched-header h3 { font-size: 16px; }
+
+        .admin-paloma-fab {
+            width: 80px !important;
+            height: 80px !important;
+            bottom: 12px !important;
+            right: 12px !important;
+        }
     }
     </style>
 </head>
@@ -852,6 +943,8 @@
 
     <!-- ═══ Dashboard ═══ -->
     <div id="dashboard" class="dashboard" style="display: none;">
+        <!-- Sidebar overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
@@ -1287,8 +1380,24 @@
         });
 
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
         document.getElementById('sidebar-toggle').addEventListener('click', () => {
             sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+        });
+        // Close sidebar when overlay is tapped (mobile)
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        });
+        // Close sidebar when a nav item is clicked on mobile
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
         });
     }
 
@@ -2582,8 +2691,8 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        width: 320px;
-        height: 320px;
+        width: 200px;
+        height: 200px;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
         border: 3px solid rgba(20, 184, 166, 0.6);
