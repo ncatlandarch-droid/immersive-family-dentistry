@@ -22,7 +22,8 @@ exports.handler = async (event) => {
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'chris@thinkdesignandplanning.com';
+    const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'chris@thinkdesignandplanning.com')
+        .split(',').map(e => e.trim()).filter(Boolean);
 
     if (!RESEND_API_KEY) {
         console.error('[morning-summary] ❌ RESEND_API_KEY not set');
