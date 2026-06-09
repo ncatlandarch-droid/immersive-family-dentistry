@@ -15,7 +15,7 @@ const PALOMA_VERSION = '2.1'; // Increment to clear stale localStorage
 
 const PALOMA_CONFIG = {
     avatarPath: '/images/paloma/paloma-hero.png',
-    iconPath: '/images/paloma/paloma-icon.png',
+    iconPath: '/images/paloma/paloma-hero.png',
     apiEndpoint: '/.netlify/functions/paloma-chat',
     storageKey: 'paloma-chat-history',
     versionKey: 'paloma-version',
@@ -86,7 +86,7 @@ class PalomaWidget {
         this.fab.className = 'paloma-fab';
         this.fab.setAttribute('aria-label', 'Chat with PALOMA');
         this.fab.id = 'paloma-fab';
-        this.fab.innerHTML = `<img src="/images/paloma/paloma-icon.png" alt="PALOMA" />`;
+        this.fab.innerHTML = `<img src="/images/paloma/paloma-hero.png" alt="PALOMA" />`;
 
         // Name label under the bubble
         this.fabLabel = document.createElement('div');

@@ -374,11 +374,11 @@ p { line-height: 1.7; }
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  padding: 0.875rem 2rem;
+  padding: 1rem 2.25rem;
   border-radius: var(--radius-full);
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: var(--text-base);
+  font-size: 1.05rem;
   transition: all var(--transition-base);
   white-space: nowrap;
 }
@@ -681,7 +681,7 @@ p { line-height: 1.7; }
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--space-xl);
-  padding-top: calc(var(--header-height) + 3rem);
+  padding-top: calc(var(--header-height) + 5rem);
 }
 
 .hero-label {
