@@ -329,13 +329,13 @@ p { line-height: 1.7; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: 1.2rem;
   list-style: none;
 }
 
 .nav-links a {
   font-family: var(--font-body);
-  font-size: var(--text-base);
+  font-size: 0.9rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
   transition: color var(--transition-fast);
@@ -2721,11 +2721,6 @@ p { line-height: 1.7; }
 /* Nav Community Link */
 .nav-community {
   position: relative;
-}
-.nav-community::before {
-  content: '🤝';
-  margin-right: 0.3rem;
-  font-size: 0.85em;
 }
 
 /* Responsive */
