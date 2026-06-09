@@ -1329,18 +1329,16 @@
     <!-- ═══ Auth Gate ═══ -->
     <div id="auth-gate" class="auth-gate">
         <div class="auth-card">
-            <div class="auth-icon">🔐</div>
-            <h1 class="auth-title">Practice Admin</h1>
+            <div class="auth-icon">🕊️</div>
+            <h1 class="auth-title">PALOMA Admin</h1>
             <p class="auth-subtitle">Lake Jeanette Family & Implant Dentistry</p>
             <form id="login-form" class="auth-form">
-                <input type="email" id="login-email" class="auth-input" placeholder="Admin email" required />
-                <input type="password" id="login-password" class="auth-input" placeholder="Password" required />
-                <select id="login-role" class="auth-input" style="text-align:center">
-                    <option value="admin">🔑 Practice Owner</option>
-                    <option value="staff">👩‍⚕️ Staff</option>
+                <p style="color:var(--admin-muted);font-size:13px;margin-bottom:8px">Select your role to continue</p>
+                <select id="login-role" class="auth-input" style="text-align:center;font-size:15px;padding:14px">
+                    <option value="admin">🔑 Practice Owner (Dr. Brenes)</option>
+                    <option value="staff">👩‍⚕️ Staff Member</option>
                 </select>
-                <button type="submit" class="auth-btn">Sign In</button>
-                <p id="auth-error" class="auth-error"></p>
+                <button type="submit" class="auth-btn">Enter Dashboard →</button>
             </form>
         </div>
     </div>
@@ -4107,7 +4105,11 @@
         let currentFile = null;
 
         if (uploadZone) {
-            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('click', (e) => {
+                // Don't open file browser when clicking dropdown, button, or selected file
+                if (e.target.closest('select') || e.target.closest('button') || e.target.closest('.fin-selected-file')) return;
+                fileInput.click();
+            });
             uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
             uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
             uploadZone.addEventListener('drop', (e) => {
