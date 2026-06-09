@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+const TTS_MODEL = 'gemini-2.0-flash';
 const DEFAULT_VOICE = 'Aoede'; // Calm, soothing, warm — perfect dental assistant
 
 exports.handler = async (event) => {
