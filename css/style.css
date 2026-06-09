@@ -744,6 +744,7 @@ p { line-height: 1.7; }
   gap: var(--space-3xl);
   margin-top: var(--space-3xl);
   padding-top: var(--space-2xl);
+  padding-bottom: var(--space-3xl);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
