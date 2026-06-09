@@ -885,7 +885,7 @@
        ============================ -->
   <div class="community-modal" id="community-modal">
     <div class="community-backdrop" onclick="document.getElementById('community-modal').classList.remove('active'); document.body.style.overflow='';"></div>
-    <div class="community-panel">
+<div class="community-panel">
       <div class="community-header">
         <div class="community-title-group">
           <h2>🤝 Our Community</h2>
@@ -901,114 +901,142 @@
         </div>
         <div class="community-filters" id="community-filters">
           <button class="filter-chip active" data-filter="all" onclick="setCommunityFilter('all', this)">All</button>
-          <button class="filter-chip" data-filter="dental" onclick="setCommunityFilter('dental', this)">Dental Labs</button>
-          <button class="filter-chip" data-filter="health" onclick="setCommunityFilter('health', this)">Health & Wellness</button>
-          <button class="filter-chip" data-filter="tech" onclick="setCommunityFilter('tech', this)">Technology</button>
+          <button class="filter-chip" data-filter="venture" onclick="setCommunityFilter('venture', this)">Think! Ventures</button>
+          <button class="filter-chip" data-filter="agriculture" onclick="setCommunityFilter('agriculture', this)">Agriculture</button>
+          <button class="filter-chip" data-filter="events" onclick="setCommunityFilter('events', this)">Events & Culture</button>
           <button class="filter-chip" data-filter="education" onclick="setCommunityFilter('education', this)">Education</button>
-          <button class="filter-chip" data-filter="design" onclick="setCommunityFilter('design', this)">Design & Planning</button>
+          <button class="filter-chip" data-filter="advocacy" onclick="setCommunityFilter('advocacy', this)">Advocacy</button>
         </div>
       </div>
 
       <div class="community-grid" id="community-grid">
-        <!-- Design & Planning -->
-        <div class="community-card featured" data-category="design">
-          <div class="community-card__badge">COOPERATIVE LEAD</div>
+        <!-- ═══ THINK! VENTURES — PARENT ═══ -->
+        <div class="community-card featured" data-category="venture">
+          <div class="community-card__badge">COOPERATIVE PARENT</div>
+          <div class="community-card__icon">🏛️</div>
+          <h3>Think! Ventures</h3>
+          <p class="community-card__type">Cooperative Holding Entity</p>
+          <p>The parent cooperative powering innovation across design, agriculture, technology, and community development. Think! Ventures connects diverse industries through shared vision and mutual support.</p>
+          <div class="community-card__tags">
+            <span>Cooperative</span><span>Innovation</span><span>Community</span><span>Development</span>
+          </div>
+        </div>
+
+        <!-- ═══ THINK! DESIGN & PLANNING ═══ -->
+        <div class="community-card" data-category="venture">
           <div class="community-card__icon">🏗️</div>
           <h3>Think! Design and Planning, LLC</h3>
           <p class="community-card__type">Design, Technology & Innovation</p>
-          <p>Architecture, landscape architecture, digital twins, AI platforms, and cooperative business development. The creative engine behind MouthMap, PALOMA, and the digital twin ecosystem.</p>
+          <p>USDA Technical Service Provider, landscape architecture, digital twins, AI platforms, and cooperative business development. The creative engine behind MouthMap, PALOMA, AVA, and the digital twin ecosystem.</p>
           <div class="community-card__tags">
-            <span>AI/ML</span><span>Digital Twins</span><span>Architecture</span><span>Web Development</span>
+            <span>AI/ML</span><span>USDA TSP</span><span>Landscape Architecture</span><span>Digital Twins</span>
+          </div>
+          <a href="https://thinkdesignandplanning.com" target="_blank" class="community-card__link">Visit Website →</a>
+        </div>
+
+        <!-- ═══ RETHINKING THE LEAF ═══ -->
+        <div class="community-card" data-category="agriculture">
+          <div class="community-card__icon">🌿</div>
+          <h3>ReThinking The Leaf</h3>
+          <p class="community-card__type">Agrotherapy & Agritourism Estate</p>
+          <p>66-acre agrotherapy destination in Lawrenceville, VA featuring lavender fields, cabin retreats, wellness experiences, and community agriculture. A model for Black land stewardship and regenerative tourism.</p>
+          <div class="community-card__tags">
+            <span>Lavender</span><span>Agrotherapy</span><span>Agritourism</span><span>66 Acres</span>
+          </div>
+          <a href="https://rethinktheleaf.netlify.app" target="_blank" class="community-card__link">Visit Website →</a>
+        </div>
+
+        <!-- ═══ ANOINTED ACRES STABLES ═══ -->
+        <div class="community-card" data-category="agriculture">
+          <div class="community-card__icon">🐴</div>
+          <h3>Anointed Acres Stables</h3>
+          <p class="community-card__type">Equine Therapy & Youth Development</p>
+          <p>Equine-assisted therapy and youth development programs in Lawrenceville, VA. Building confidence, healing, and leadership through the bond between young people and horses.</p>
+          <div class="community-card__tags">
+            <span>Equine Therapy</span><span>Youth Programs</span><span>Lawrenceville, VA</span>
           </div>
         </div>
 
-        <!-- Dental Labs -->
-        <div class="community-card" data-category="dental">
-          <div class="community-card__icon">🦷</div>
-          <h3>Precision Dental Lab Partners</h3>
-          <p class="community-card__type">Dental Laboratory</p>
-          <p>Expert dental lab partners providing high-quality crowns, implant restorations, veneers, and full-arch prosthetics with digital workflow integration.</p>
+        <!-- ═══ BROWNTOWN FARMS ═══ -->
+        <div class="community-card" data-category="agriculture">
+          <div class="community-card__icon">🌾</div>
+          <h3>Browntown Farms</h3>
+          <p class="community-card__type">Century Farm (Est. 1908)</p>
+          <p>Historic Century Farm in Warfield, VA — operating continuously since 1908. Fresh produce, artisan jams, and preserves rooted in over a century of agricultural heritage and family tradition.</p>
           <div class="community-card__tags">
-            <span>Crowns</span><span>Implants</span><span>Veneers</span><span>CAD/CAM</span>
+            <span>Century Farm</span><span>Produce</span><span>Jams</span><span>Warfield, VA</span>
           </div>
         </div>
 
-        <div class="community-card" data-category="dental">
-          <div class="community-card__icon">🔬</div>
-          <h3>Digital Impressions Network</h3>
-          <p class="community-card__type">Digital Scanning & Imaging</p>
-          <p>3D intraoral scanning, CBCT imaging services, and digital workflow partners supporting precision dentistry with cutting-edge technology.</p>
+        <!-- ═══ FULL CIRCLE BLOOM ═══ -->
+        <div class="community-card" data-category="agriculture">
+          <div class="community-card__icon">🌱</div>
+          <h3>Full Circle Bloom</h3>
+          <p class="community-card__type">Aeroponic Farm — Veteran-Owned</p>
+          <p>Veteran-owned aeroponic farm in Kenbridge, VA. Cutting-edge vertical farming technology growing clean, pesticide-free produce year-round with 95% less water than traditional methods.</p>
           <div class="community-card__tags">
-            <span>3D Scanning</span><span>CBCT</span><span>Digital Workflow</span>
+            <span>Aeroponics</span><span>Veteran-Owned</span><span>Vertical Farm</span><span>Kenbridge, VA</span>
           </div>
         </div>
 
-        <!-- Health & Wellness -->
-        <div class="community-card" data-category="health">
-          <div class="community-card__icon">💚</div>
-          <h3>Systemic Wellness Partners</h3>
-          <p class="community-card__type">Health & Wellness</p>
-          <p>Holistic health practitioners, nutritionists, and wellness providers who understand the oral-systemic health connection that Dr. Brenes champions.</p>
+        <!-- ═══ BROTHERS FUNCTION GROUP ═══ -->
+        <div class="community-card" data-category="events">
+          <div class="community-card__icon">🎤</div>
+          <h3>Brothers Function Group</h3>
+          <p class="community-card__type">Event Curation & Business Directory</p>
+          <p>Premier event curation and minority business directory serving NC, VA, DC, and GA. Connecting communities through curated cultural experiences, networking events, and business promotion.</p>
           <div class="community-card__tags">
-            <span>Nutrition</span><span>Oral-Systemic</span><span>Wellness</span>
+            <span>Events</span><span>Business Directory</span><span>NC/VA/DC/GA</span>
           </div>
         </div>
 
-        <div class="community-card" data-category="health">
-          <div class="community-card__icon">🧘</div>
-          <h3>Patient Comfort Partners</h3>
-          <p class="community-card__type">Comfort & Anxiety Management</p>
-          <p>Sedation specialists, comfort-focused care providers, and patient experience partners who help make dental visits stress-free and comfortable.</p>
+        <!-- ═══ NATIONAL BLACK FARMERS ASSOCIATION ═══ -->
+        <div class="community-card" data-category="advocacy">
+          <div class="community-card__icon">✊</div>
+          <h3>National Black Farmers Association</h3>
+          <p class="community-card__type">Civil Rights & Land Retention</p>
+          <p>Advocating for Black farmers' civil rights, land retention, and equitable access to USDA programs from Baskerville, VA. A national voice for agricultural justice and generational land stewardship.</p>
           <div class="community-card__tags">
-            <span>Sedation</span><span>Comfort Care</span><span>Anxiety Relief</span>
+            <span>Civil Rights</span><span>Land Retention</span><span>USDA Equity</span><span>Baskerville, VA</span>
           </div>
         </div>
 
-        <!-- Technology -->
-        <div class="community-card" data-category="tech">
-          <div class="community-card__icon">🤖</div>
-          <h3>MouthMap AI Platform</h3>
-          <p class="community-card__type">AI & Patient Intelligence</p>
-          <p>The AI-powered patient engagement platform featuring PALOMA, digital health records, predictive diagnostics, and the MouthMap digital twin system.</p>
-          <div class="community-card__tags">
-            <span>PALOMA</span><span>AI Diagnostics</span><span>Digital Twin</span>
-          </div>
-        </div>
-
-        <div class="community-card" data-category="tech">
-          <div class="community-card__icon">🖨️</div>
-          <h3>3D Printing Partners</h3>
-          <p class="community-card__type">Additive Manufacturing</p>
-          <p>Dental 3D printing partners for surgical guides, temporary restorations, models, and custom appliances — enabling same-day solutions.</p>
-          <div class="community-card__tags">
-            <span>3D Printing</span><span>Surgical Guides</span><span>Same-Day</span>
-          </div>
-        </div>
-
-        <!-- Education -->
+        <!-- ═══ VSU SMALL FARM OUTREACH ═══ -->
         <div class="community-card" data-category="education">
           <div class="community-card__icon">🎓</div>
-          <h3>University Faculty Network</h3>
-          <p class="community-card__type">Academic & Research</p>
-          <p>Academic collaborators and university faculty partners advancing dental science, education, and evidence-based treatment protocols.</p>
+          <h3>VSU Small Farm Outreach</h3>
+          <p class="community-card__type">HBCU Extension & Farmer Training</p>
+          <p>Virginia State University's extension program providing farmer training, technical assistance, and outreach to small and minority-owned farms across Virginia. HBCU-powered agricultural education.</p>
           <div class="community-card__tags">
-            <span>Research</span><span>Education</span><span>Faculty</span>
+            <span>HBCU</span><span>Extension</span><span>Farmer Training</span><span>Petersburg, VA</span>
           </div>
         </div>
 
-        <div class="community-card" data-category="education">
-          <div class="community-card__icon">📺</div>
-          <h3>Dental Education Media</h3>
-          <p class="community-card__type">Patient Education</p>
-          <p>Educational content creators producing 112K+ views of patient education videos, treatment explanations, and oral health awareness content.</p>
+        <!-- ═══ LAKE JEANETTE FAMILY & IMPLANT DENTISTRY ═══ -->
+        <div class="community-card" data-category="venture">
+          <div class="community-card__icon">🦷</div>
+          <h3>Lake Jeanette Family & Implant Dentistry</h3>
+          <p class="community-card__type">Precision Prosthodontics</p>
+          <p>Led by Dr. Christian Brenes, Prosthodontist and university faculty member. Intelligence-driven systemic wellness, digital twin diagnostics, and the house of modern smiles and comfort.</p>
           <div class="community-card__tags">
-            <span>Video Content</span><span>Patient Ed</span><span>112K+ Views</span>
+            <span>Prosthodontics</span><span>Implants</span><span>Digital Twin</span><span>Greensboro, NC</span>
+          </div>
+          <a href="https://ljfamilydentist-paloma.netlify.app" target="_blank" class="community-card__link">Visit Website →</a>
+        </div>
+
+        <!-- ═══ MOUTHMAP AI ═══ -->
+        <div class="community-card" data-category="venture">
+          <div class="community-card__icon">🤖</div>
+          <h3>MouthMap AI Platform</h3>
+          <p class="community-card__type">AI-Powered Dental Intelligence</p>
+          <p>The AI-powered patient engagement platform featuring PALOMA virtual dental assistant, digital health records, predictive diagnostics, and the MouthMap digital twin system.</p>
+          <div class="community-card__tags">
+            <span>PALOMA</span><span>AI Diagnostics</span><span>Digital Twin</span><span>SaaS</span>
           </div>
         </div>
       </div>
 
       <div class="community-footer">
-        <p>Interested in joining our cooperative? <a href="mailto:chris@thinkdesignandplanning.com">Contact Think! Design and Planning</a></p>
       </div>
     </div>
   </div>

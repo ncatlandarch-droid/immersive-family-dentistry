@@ -2700,6 +2700,19 @@ p { line-height: 1.7; }
   padding: 0.2rem 0.55rem;
   border-radius: 1rem;
 }
+.community-card__link {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: var(--color-cyan, #00bcd4);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+}
+.community-card__link:hover {
+  color: #fff;
+  transform: translateX(4px);
+}
 
 /* Footer */
 .community-footer {
