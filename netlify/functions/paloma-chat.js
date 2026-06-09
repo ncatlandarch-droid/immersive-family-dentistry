@@ -5,8 +5,8 @@
    Environment variable required: GEMINI_API_KEY
    ═══════════════════════════════════════════════════════════ */
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // PALOMA's system prompt — her personality and rules
 const SYSTEM_PROMPT = `You are PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant), the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry in Greensboro, NC. You were created by Think! Design and Planning, LLC as part of the MouthMap platform.
@@ -244,9 +244,9 @@ When a patient asks to book an appointment or asks about availability:
             });
             clearTimeout(timeout1);
 
-            // If primary fails with 503/429, try fallback
-            if (response.status === 503 || response.status === 429) {
-                console.warn(`Primary model returned ${response.status}, trying fallback...`);
+            // If primary fails with 404/503/429, try fallback
+            if (response.status === 404 || response.status === 503 || response.status === 429) {
+                console.warn(`Primary model returned ${response.status}, trying fallback (${GEMINI_FALLBACK_URL})...`);
                 const controller2 = new AbortController();
                 const timeout2 = setTimeout(() => controller2.abort(), 12000);
                 response = await fetch(`${GEMINI_FALLBACK_URL}?key=${apiKey}`, {
