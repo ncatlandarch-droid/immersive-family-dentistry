@@ -281,13 +281,14 @@ p { line-height: 1.7; }
 }
 
 .header-inner {
-  max-width: var(--container-max);
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-lg);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-lg);
 }
 
 .logo {
@@ -334,7 +335,7 @@ p { line-height: 1.7; }
 
 .nav-links a {
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
   transition: color var(--transition-fast);
