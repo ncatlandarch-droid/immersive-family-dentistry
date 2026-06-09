@@ -284,8 +284,8 @@ When a patient asks to book an appointment or asks about availability:
                     statusCode: 200,
                     headers,
                     body: JSON.stringify({
-                        reply: `I'm having a moment — please try again, or call us directly at (336) 545-4281! 🕊️`,
-                        debug: `API ${response.status}`
+                        reply: `I'm having a moment — please try again, or call us directly at (336) 545-4281!`,
+                        debug: `API ${response.status}: ${errorText.substring(0, 200)}`
                     }),
                 };
             }
