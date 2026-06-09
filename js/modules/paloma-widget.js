@@ -15,7 +15,7 @@ const PALOMA_VERSION = '2.1'; // Increment to clear stale localStorage
 
 const PALOMA_CONFIG = {
     avatarPath: '/images/paloma/paloma-hero.png',
-    iconPath: '/images/paloma/paloma-hero.png',
+    iconPath: '/images/paloma/paloma-icon.png',
     apiEndpoint: '/.netlify/functions/paloma-chat',
     storageKey: 'paloma-chat-history',
     versionKey: 'paloma-version',
@@ -29,7 +29,7 @@ const STRINGS = {
         subtitle: 'Your AI Dental Health Guide',
         disclaimer: '🔒 This is an AI assistant, not medical advice. For emergencies, call (336) 545-4281 or 911.',
         placeholder: 'Ask PALOMA anything...',
-        greeting: `¡Hola! I'm PALOMA, your dental health guide at Lake Jeanette Dentistry. 🕊️
+        greeting: `¡Hola! I'm PALOMA, your dental health guide at Lake Jeanette Dentistry.
 
 I can help with questions about our services, insurance, scheduling, or dental health tips. How can I help you today?`,
         suggestions: [
@@ -48,7 +48,7 @@ I can help with questions about our services, insurance, scheduling, or dental h
         subtitle: 'Tu Guía de Salud Dental con IA',
         disclaimer: '🔒 Este es un asistente de IA, no consejo médico. Para emergencias, llame al (336) 545-4281 o 911.',
         placeholder: 'Pregúntale a PALOMA...',
-        greeting: `¡Hola! Soy PALOMA, tu guía de salud dental en Lake Jeanette Dentistry. 🕊️
+        greeting: `¡Hola! Soy PALOMA, tu guía de salud dental en Lake Jeanette Dentistry.
 
 Puedo ayudarte con preguntas sobre nuestros servicios, seguros, citas, o consejos de salud dental. ¿En qué puedo ayudarte hoy?`,
         suggestions: [
@@ -86,7 +86,7 @@ class PalomaWidget {
         this.fab.className = 'paloma-fab';
         this.fab.setAttribute('aria-label', 'Chat with PALOMA');
         this.fab.id = 'paloma-fab';
-        this.fab.innerHTML = `<img src="/images/paloma/paloma-hero.png" alt="PALOMA" />`;
+        this.fab.innerHTML = `<img src="/images/paloma/paloma-icon.png" alt="PALOMA" />`;
 
         // Name label under the bubble
         this.fabLabel = document.createElement('div');
@@ -135,7 +135,7 @@ class PalomaWidget {
         if (!sessionStorage.getItem('paloma-tooltip-shown')) {
             this.fabTooltip = document.createElement('div');
             this.fabTooltip.className = 'paloma-fab-tooltip';
-            this.fabTooltip.innerHTML = 'Hi! I\'m <strong>PALOMA</strong> 🕊️ Can I help?';
+            this.fabTooltip.innerHTML = 'Hi! I\'m <strong>PALOMA</strong> — Can I help?';
             document.body.appendChild(this.fabTooltip);
             sessionStorage.setItem('paloma-tooltip-shown', 'true');
 
@@ -387,8 +387,8 @@ class PalomaWidget {
         // Send language change message
         if (this.messages.length > 0) {
             this.addBotMessage(lang === 'es'
-                ? '¡Perfecto! Ahora hablaré en español. ¿En qué puedo ayudarte? 🕊️'
-                : 'Great! I\'ll speak in English now. How can I help you? 🕊️'
+                ? '¡Perfecto! Ahora hablaré en español. ¿En qué puedo ayudarte?'
+                : 'Great! I\'ll speak in English now. How can I help you?'
             );
         }
     }
