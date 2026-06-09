@@ -724,7 +724,7 @@
         <h3>Be the First to Access Your Digital Twin</h3>
         <p>Join the waitlist and get early access when the portal launches.</p>
         <form class="portal-form" onsubmit="event.preventDefault(); this.querySelector('.portal-success').style.display='block'; this.querySelector('button').textContent='You\'re on the list ✓';">
-          <input type="email" id="waitlist-email" name="email" placeholder="Enter your email" required>
+          <input type="email" id="waitlist-email" name="email" autocomplete="email" placeholder="Enter your email" required>
           <button type="submit" class="btn btn-primary">Join Waitlist</button>
           <p class="portal-success" style="display:none; color:var(--color-cyan); margin-top:var(--space-sm); font-size:var(--text-sm);">🎉 You're on the list! We'll notify you when the portal launches.</p>
         </form>
