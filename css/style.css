@@ -2078,11 +2078,30 @@ p { line-height: 1.7; }
     color: var(--color-white);
   }
 
+  /* Login dropdown on mobile — full width centered */
+  .nav-login-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .login-dropdown {
+    position: fixed;
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    right: auto;
+    width: min(360px, calc(100vw - 32px));
+  }
+
   h1 { font-size: var(--text-4xl); }
   h2 { font-size: var(--text-2xl); }
 
+  /* Hero stats — 2x2 grid on tablet */
   .hero-stats {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-lg);
   }
 
@@ -2110,8 +2129,11 @@ p { line-height: 1.7; }
     display: none;
   }
 
+  /* Trust items — 2x2 grid */
   .trust-items {
-    gap: var(--space-xl);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
   }
 
   .footer-grid {
@@ -2139,6 +2161,16 @@ p { line-height: 1.7; }
   .team-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* 3D model — smaller on tablet */
+  .sketchfab-embed-wrapper iframe {
+    height: 350px !important;
+  }
+
+  /* Section padding reduction */
+  .section {
+    padding: var(--space-3xl) 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2155,8 +2187,36 @@ p { line-height: 1.7; }
     justify-content: center;
   }
 
+  /* Hero stats — still 2x2 but tighter */
+  .hero-stats {
+    gap: var(--space-md);
+  }
+
+  .hero-stat .stat-value {
+    font-size: var(--text-2xl);
+  }
+
+  .hero-stat .stat-label {
+    font-size: var(--text-xs);
+  }
+
   .team-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Trust items — stack on phone */
+  .trust-items {
+    grid-template-columns: 1fr;
+  }
+
+  /* 3D model — even smaller on phone */
+  .sketchfab-embed-wrapper iframe {
+    height: 280px !important;
+  }
+
+  /* Login dropdown full-screen on phone */
+  .login-dropdown {
+    width: calc(100vw - 24px);
   }
 }
 
