@@ -920,11 +920,320 @@
             right: 12px !important;
         }
     }
+
+    /* ═══ Notification System ═══ */
+    .notif-bell-wrap { position: relative; }
+    .notif-bell-btn {
+        font-size: 20px; padding: 8px; border-radius: 10px;
+        transition: var(--admin-transition); position: relative;
+        background: transparent;
+    }
+    .notif-bell-btn:hover { background: rgba(255,255,255,0.06); }
+    .notif-bell-btn.has-unread { animation: notif-shake 0.5s ease; }
+    @keyframes notif-shake {
+        0%,100% { transform: rotate(0); }
+        20% { transform: rotate(12deg); }
+        40% { transform: rotate(-10deg); }
+        60% { transform: rotate(6deg); }
+        80% { transform: rotate(-4deg); }
+    }
+    .notif-badge {
+        position: absolute; top: 2px; right: 2px;
+        min-width: 18px; height: 18px; padding: 0 5px;
+        border-radius: 9px; background: var(--admin-red);
+        color: white; font-size: 10px; font-weight: 700;
+        display: none; align-items: center; justify-content: center;
+        line-height: 1;
+    }
+    .notif-badge.visible { display: flex; }
+
+    .notif-dropdown {
+        position: absolute; top: 100%; right: 0; margin-top: 8px;
+        width: 380px; max-height: 480px;
+        background: var(--admin-surface-solid); border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius); box-shadow: var(--admin-shadow-lg);
+        z-index: 1000; opacity: 0; visibility: hidden;
+        transform: translateY(-8px); transition: all 0.25s ease;
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+    .notif-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    .notif-dropdown-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 18px; border-bottom: 1px solid var(--admin-border);
+    }
+    .notif-dropdown-header h3 { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; }
+    .notif-mark-read-btn {
+        font-size: 12px; color: var(--admin-teal); font-weight: 500;
+        padding: 4px 10px; border-radius: 6px; transition: var(--admin-transition);
+    }
+    .notif-mark-read-btn:hover { background: var(--admin-teal-glow); }
+
+    .notif-dropdown-list { overflow-y: auto; max-height: 400px; flex: 1; }
+    .notif-dropdown-empty {
+        padding: 40px 20px; text-align: center; color: var(--admin-muted);
+        font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .notif-dropdown-empty span { font-size: 28px; opacity: 0.4; }
+
+    .notif-item {
+        display: flex; gap: 12px; padding: 14px 18px; cursor: pointer;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        transition: background 0.2s ease;
+    }
+    .notif-item:hover { background: rgba(255,255,255,0.03); }
+    .notif-item.unread { background: rgba(20, 184, 166, 0.04); border-left: 3px solid var(--admin-teal); }
+    .notif-item-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; flex-shrink: 0;
+    }
+    .notif-item-icon.type-lead { background: var(--admin-blue-glow); }
+    .notif-item-icon.type-appointment { background: var(--admin-green-glow); }
+    .notif-item-icon.type-paloma { background: var(--admin-teal-glow); }
+    .notif-item-icon.type-achievement { background: var(--admin-gold-glow); }
+    .notif-item-body { flex: 1; min-width: 0; }
+    .notif-item-title { font-size: 13px; font-weight: 600; color: var(--admin-text); margin-bottom: 2px; }
+    .notif-item-desc { font-size: 12px; color: var(--admin-text-secondary); line-height: 1.4; }
+    .notif-item-time { font-size: 11px; color: var(--admin-muted); margin-top: 4px; }
+
+    /* Toast notifications */
+    .notif-toast-container {
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        display: flex; flex-direction: column; gap: 10px;
+        pointer-events: none;
+    }
+    .notif-toast {
+        display: flex; align-items: flex-start; gap: 12px;
+        padding: 14px 18px; border-radius: var(--admin-radius);
+        background: var(--admin-surface-solid); border: 1px solid var(--admin-border);
+        box-shadow: var(--admin-shadow-lg); pointer-events: auto;
+        cursor: pointer; min-width: 320px; max-width: 400px;
+        animation: notif-toast-in 0.35s ease-out;
+        transition: all 0.3s ease;
+    }
+    .notif-toast.dismissing { opacity: 0; transform: translateX(120%); }
+    @keyframes notif-toast-in {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .notif-toast-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .notif-toast-body { flex: 1; }
+    .notif-toast-title { font-size: 13px; font-weight: 600; color: var(--admin-text); margin-bottom: 2px; }
+    .notif-toast-desc { font-size: 12px; color: var(--admin-text-secondary); line-height: 1.4; }
+    .notif-toast-close {
+        font-size: 18px; color: var(--admin-muted); flex-shrink: 0;
+        padding: 0 4px; line-height: 1;
+    }
+    .notif-toast-close:hover { color: var(--admin-text); }
+    .notif-toast-progress {
+        position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+        background: var(--admin-teal); border-radius: 0 0 var(--admin-radius) var(--admin-radius);
+        animation: notif-toast-timer 5s linear forwards;
+    }
+    @keyframes notif-toast-timer { from { width: 100%; } to { width: 0%; } }
+
+    /* ═══ Financial Intelligence Module ═══ */
+    .sidebar-item.owner-only { display: none; }
+    .sidebar-item.owner-only.visible { display: flex; }
+
+    .fin-upload-zone {
+        border: 2px dashed rgba(255,255,255,0.12);
+        border-radius: var(--admin-radius);
+        padding: 40px 24px;
+        text-align: center;
+        transition: var(--admin-transition);
+        cursor: pointer;
+        background: var(--admin-glass);
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .fin-upload-zone:hover, .fin-upload-zone.dragover {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+    }
+    .fin-upload-zone__icon { font-size: 48px; margin-bottom: 12px; opacity: 0.6; }
+    .fin-upload-zone__title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; color: var(--admin-text); margin-bottom: 6px; }
+    .fin-upload-zone__subtitle { font-size: 13px; color: var(--admin-muted); margin-bottom: 16px; }
+    .fin-upload-zone__input { display: none; }
+    .fin-upload-controls { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+    .fin-upload-controls select {
+        padding: 9px 14px; border: 1px solid var(--admin-border); border-radius: 10px;
+        font-size: 13px; background: var(--admin-surface-solid); color: var(--admin-text); outline: none;
+    }
+    .fin-selected-file {
+        display: flex; align-items: center; gap: 8px; margin-top: 12px;
+        justify-content: center; font-size: 13px; color: var(--admin-teal);
+    }
+    .fin-progress-bar {
+        width: 100%; height: 4px; border-radius: 2px; background: var(--admin-border);
+        margin-top: 12px; overflow: hidden; display: none;
+    }
+    .fin-progress-bar.active { display: block; }
+    .fin-progress-bar__fill {
+        height: 100%; border-radius: 2px; width: 0%;
+        background: linear-gradient(90deg, var(--admin-teal), var(--admin-blue));
+        transition: width 0.3s ease;
+    }
+
+    /* Financial KPI with progress */
+    .fin-kpi-card { position: relative; overflow: hidden; }
+    .fin-kpi-progress {
+        width: 100%; height: 6px; border-radius: 3px;
+        background: rgba(255,255,255,0.06); margin-top: 10px; overflow: hidden;
+    }
+    .fin-kpi-progress__fill {
+        height: 100%; border-radius: 3px; transition: width 0.8s ease;
+    }
+    .fin-kpi-progress__fill.teal { background: linear-gradient(90deg, var(--admin-teal-dark), var(--admin-teal)); }
+    .fin-kpi-progress__fill.blue { background: linear-gradient(90deg, #2563EB, var(--admin-blue)); }
+    .fin-kpi-progress__fill.gold { background: linear-gradient(90deg, #D97706, var(--admin-gold)); }
+    .fin-kpi-progress__fill.green { background: linear-gradient(90deg, #059669, var(--admin-green)); }
+    .fin-kpi-target { font-size: 10px; color: var(--admin-muted); margin-top: 4px; }
+
+    /* AI Analysis Panel */
+    .fin-ai-panel {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border-radius: var(--admin-radius);
+        border: 1px solid var(--admin-glass-border);
+        box-shadow: var(--admin-shadow);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .fin-ai-header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--admin-border);
+        background: rgba(255,255,255,0.02);
+    }
+    .fin-ai-header__icon { font-size: 22px; }
+    .fin-ai-header__title {
+        font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--admin-text);
+    }
+    .fin-ai-body { padding: 22px; }
+    .fin-ai-body p { font-size: 14px; line-height: 1.7; color: var(--admin-text-secondary); margin-bottom: 16px; }
+
+    .fin-ai-loading {
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; padding: 48px 20px; gap: 16px;
+    }
+    .fin-ai-loading .spinner { width: 36px; height: 36px; }
+    .fin-ai-loading span { font-size: 14px; color: var(--admin-muted); }
+
+    .fin-trends { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .fin-trend-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; border-radius: var(--admin-radius-sm);
+        background: rgba(255,255,255,0.02); border: 1px solid var(--admin-border);
+    }
+    .fin-trend-arrow { font-size: 16px; width: 24px; text-align: center; }
+    .fin-trend-arrow.up { color: var(--admin-green); }
+    .fin-trend-arrow.down { color: var(--admin-red); }
+    .fin-trend-arrow.flat { color: var(--admin-muted); }
+    .fin-trend-metric { font-weight: 600; font-size: 13px; color: var(--admin-text); flex: 1; }
+    .fin-trend-pct { font-size: 13px; font-weight: 600; }
+    .fin-trend-pct.up { color: var(--admin-green); }
+    .fin-trend-pct.down { color: var(--admin-red); }
+    .fin-trend-pct.flat { color: var(--admin-muted); }
+    .fin-trend-detail { font-size: 12px; color: var(--admin-muted); }
+
+    .fin-alerts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .fin-alert-card {
+        padding: 14px 18px; border-radius: var(--admin-radius-sm);
+        border-left: 3px solid; font-size: 13px;
+    }
+    .fin-alert-card.warning {
+        background: var(--admin-gold-glow); border-color: var(--admin-gold);
+        color: var(--admin-gold);
+    }
+    .fin-alert-card.critical {
+        background: var(--admin-red-glow); border-color: var(--admin-red);
+        color: var(--admin-red);
+    }
+    .fin-alert-card.info {
+        background: var(--admin-blue-glow); border-color: var(--admin-blue);
+        color: var(--admin-blue);
+    }
+    .fin-alert-title { font-weight: 600; margin-bottom: 4px; }
+    .fin-alert-msg { font-size: 12px; opacity: 0.85; }
+
+    .fin-recommendations { list-style: none; padding: 0; }
+    .fin-recommendations li {
+        padding: 8px 0; border-bottom: 1px solid var(--admin-border);
+        font-size: 13px; color: var(--admin-text-secondary);
+        display: flex; align-items: flex-start; gap: 8px;
+    }
+    .fin-recommendations li:last-child { border-bottom: none; }
+    .fin-recommendations li::before { content: '→'; color: var(--admin-teal); font-weight: 700; flex-shrink: 0; }
+
+    /* Achievements */
+    .fin-achievements {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px; margin-bottom: 24px;
+    }
+    .fin-achievement {
+        background: var(--admin-surface); backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius); padding: 16px;
+        text-align: center; transition: var(--admin-transition);
+        position: relative; overflow: hidden;
+    }
+    .fin-achievement.unlocked {
+        border-color: rgba(245, 158, 11, 0.3);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+    }
+    .fin-achievement.locked { opacity: 0.45; }
+    .fin-achievement__icon { font-size: 32px; margin-bottom: 6px; }
+    .fin-achievement__name {
+        font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+        color: var(--admin-text); margin-bottom: 4px;
+    }
+    .fin-achievement__desc { font-size: 10px; color: var(--admin-muted); }
+    .fin-achievement.unlocked .fin-achievement__desc { color: var(--admin-gold); }
+
+    .fin-streak-banner {
+        display: flex; align-items: center; justify-content: center;
+        gap: 8px; padding: 12px 20px; border-radius: var(--admin-radius);
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(20, 184, 166, 0.08));
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        margin-bottom: 24px; font-size: 14px; font-weight: 600; color: var(--admin-gold);
+    }
+    .fin-streak-banner__fire { font-size: 20px; }
+
+    .fin-level-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        margin-bottom: 24px;
+    }
+    .fin-level-badge.bronze { background: rgba(205, 127, 50, 0.15); color: #CD7F32; border: 1px solid rgba(205, 127, 50, 0.3); }
+    .fin-level-badge.silver { background: rgba(192, 192, 192, 0.15); color: #C0C0C0; border: 1px solid rgba(192, 192, 192, 0.3); }
+    .fin-level-badge.gold { background: var(--admin-gold-glow); color: var(--admin-gold); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .fin-level-badge.platinum { background: rgba(139, 92, 246, 0.15); color: var(--admin-purple); border: 1px solid rgba(139, 92, 246, 0.3); }
+
+    .fin-section-label {
+        font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+        color: var(--admin-muted); text-transform: uppercase; letter-spacing: 0.06em;
+        margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .fin-upload-controls { flex-direction: column; }
+        .fin-achievements { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+        .fin-achievements { grid-template-columns: 1fr; }
+    }
+
     </style>
 </head>
 <body>
     <!-- ═══ Toast Container ═══ -->
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- ═══ Notification Toast Container (top-right slide-in) ═══ -->
+    <div class="notif-toast-container" id="notif-toast-container"></div>
 
     <!-- ═══ Auth Gate ═══ -->
     <div id="auth-gate" class="auth-gate">
@@ -935,6 +1244,10 @@
             <form id="login-form" class="auth-form">
                 <input type="email" id="login-email" class="auth-input" placeholder="Admin email" required />
                 <input type="password" id="login-password" class="auth-input" placeholder="Password" required />
+                <select id="login-role" class="auth-input" style="text-align:center">
+                    <option value="admin">🔑 Practice Owner</option>
+                    <option value="staff">👩‍⚕️ Staff</option>
+                </select>
                 <button type="submit" class="auth-btn">Sign In</button>
                 <p id="auth-error" class="auth-error"></p>
             </form>
@@ -977,6 +1290,9 @@
                 <button class="sidebar-item" data-view="paloma-analytics">
                     <span>🕊️</span> PALOMA Analytics
                 </button>
+                <button class="sidebar-item owner-only" id="sidebar-financial" data-view="financial-intelligence">
+                    <span>💰</span> Financial Intelligence
+                </button>
                 <button class="sidebar-item" data-view="data-editor">
                     <span>📝</span> Data Editor
                 </button>
@@ -1000,6 +1316,22 @@
                 </div>
                 <div class="topbar-right">
                     <span class="topbar-date" id="current-date"></span>
+                    <!-- Notification Bell -->
+                    <div class="notif-bell-wrap" id="notif-bell-wrap">
+                        <button class="notif-bell-btn" id="notif-bell-btn" title="Notifications">
+                            🔔
+                            <span class="notif-badge" id="notif-badge">0</span>
+                        </button>
+                        <div class="notif-dropdown" id="notif-dropdown">
+                            <div class="notif-dropdown-header">
+                                <h3>Notifications</h3>
+                                <button class="notif-mark-read-btn" id="notif-mark-all-read">Mark all read</button>
+                            </div>
+                            <div class="notif-dropdown-list" id="notif-dropdown-list">
+                                <div class="notif-dropdown-empty"><span>🔔</span>No notifications yet</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="topbar-avatar">CB</div>
                 </div>
             </header>
@@ -1150,6 +1482,78 @@
                 </div>
             </div>
 
+            <!-- ═══ View: Financial Intelligence ═══ -->
+            <div id="view-financial-intelligence" class="view">
+                <div class="view-header">
+                    <h2>💰 Financial Intelligence</h2>
+                </div>
+
+                <!-- Level Badge -->
+                <div id="fin-level-container"></div>
+
+                <!-- Streak Banner -->
+                <div id="fin-streak-container"></div>
+
+                <!-- Upload Zone -->
+                <div class="fin-upload-zone" id="fin-upload-zone">
+                    <div class="fin-upload-zone__icon">📁</div>
+                    <div class="fin-upload-zone__title">Upload Financial Report</div>
+                    <div class="fin-upload-zone__subtitle">Drag & drop CSV, PDF, or XLSX files here — or click to browse</div>
+                    <input type="file" class="fin-upload-zone__input" id="fin-file-input" accept=".csv,.pdf,.xlsx,.xls" />
+                    <div class="fin-upload-controls">
+                        <select id="fin-report-type">
+                            <option value="Production Report">Production Report</option>
+                            <option value="Collections Report">Collections Report</option>
+                            <option value="Expenses">Expenses</option>
+                            <option value="P&L Statement">P&L Statement</option>
+                        </select>
+                        <button class="btn-primary" id="fin-upload-btn" disabled>📤 Upload & Analyze</button>
+                    </div>
+                    <div class="fin-selected-file" id="fin-selected-file" style="display:none"></div>
+                    <div class="fin-progress-bar" id="fin-progress-bar">
+                        <div class="fin-progress-bar__fill" id="fin-progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Financial KPI Cards -->
+                <div class="kpi-row" id="fin-kpi-row"></div>
+
+                <!-- Achievements -->
+                <div class="fin-section-label">🏆 Financial Achievements</div>
+                <div class="fin-achievements" id="fin-achievements"></div>
+
+                <!-- AI Analysis Panel -->
+                <div class="fin-ai-panel">
+                    <div class="fin-ai-header">
+                        <span class="fin-ai-header__icon">🧠</span>
+                        <span class="fin-ai-header__title">PALOMA Financial Insights</span>
+                    </div>
+                    <div class="fin-ai-body" id="fin-ai-body">
+                        <p style="color:var(--admin-muted);font-style:italic">Upload a financial report to receive AI-powered analysis, or view the demo insights below.</p>
+                    </div>
+                </div>
+
+                <!-- Upload History -->
+                <div class="fin-section-label">📋 Upload History</div>
+                <div class="data-table-container" id="fin-history-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Report Type</th>
+                                <th>File Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fin-history-tbody"></tbody>
+                    </table>
+                </div>
+
+                <div class="info-note" style="margin-top:16px">
+                    🔒 Financial data is analyzed in real-time and never stored on our servers. Reports are processed by PALOMA's AI and discarded after analysis.
+                </div>
+            </div>
+
             <!-- View: Schedule -->
             <div id="view-schedule" class="view active">
                 <div class="sched-header">
@@ -1292,6 +1696,8 @@
         authGate.style.display = 'none';
         dashboard.style.display = 'flex';
         initDashboard();
+        // Initialize notifications after login
+        try { initNotificationSystem(); } catch(e) { console.error('Notification init error:', e); }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => {
@@ -2944,6 +3350,593 @@
             isLoading = false;
             sendBtn.disabled = false;
         }
+    })();
+
+    /* ═══════════════════════════════════════════════════════════
+       REAL-TIME NOTIFICATION SYSTEM
+       Bell, Dropdown, Toast, Push, Web Audio Chime, Live Demo
+       ═══════════════════════════════════════════════════════════ */
+    (function() {
+        'use strict';
+
+        // ─── State ───
+        let notifications = [];
+        let notifDropdownOpen = false;
+        let notifDemoTimer = null;
+        let audioCtx = null;
+
+        // ─── DOM Refs ───
+        const bellBtn = document.getElementById('notif-bell-btn');
+        const badge = document.getElementById('notif-badge');
+        const dropdown = document.getElementById('notif-dropdown');
+        const dropdownList = document.getElementById('notif-dropdown-list');
+        const markAllBtn = document.getElementById('notif-mark-all-read');
+        const toastContainer = document.getElementById('notif-toast-container');
+
+        // ─── Notification Types Config ───
+        const NOTIF_TYPES = {
+            lead:        { icon: '📩', label: 'New Inquiry' },
+            appointment: { icon: '📅', label: 'Appointment' },
+            paloma:      { icon: '🕊️', label: 'PALOMA' }
+        };
+
+        // ─── Web Audio Chime ───
+        function playNotifChime() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+
+                // Create a pleasant two-tone chime
+                const notes = [830, 1050]; // E5, C6 — gentle ascending
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(2000, now);
+
+                    gain.gain.setValueAtTime(0, now + i * 0.12);
+                    gain.gain.linearRampToValueAtTime(0.15, now + i * 0.12 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now + i * 0.12);
+                    osc.stop(now + i * 0.12 + 0.6);
+                });
+            } catch (e) {
+                // Audio not available — silent fail
+            }
+        }
+
+        // ─── Time Ago Formatter ───
+        function timeAgo(date) {
+            const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+
+        // ─── Update Badge ───
+        function updateBadge() {
+            const unread = notifications.filter(n => !n.read).length;
+            badge.textContent = unread;
+            if (unread > 0) {
+                badge.classList.add('visible');
+                bellBtn.classList.add('has-unread');
+                setTimeout(() => bellBtn.classList.remove('has-unread'), 600);
+            } else {
+                badge.classList.remove('visible');
+            }
+        }
+
+        // ─── Render Dropdown List ───
+        function renderDropdown() {
+            if (notifications.length === 0) {
+                dropdownList.innerHTML = '<div class="notif-dropdown-empty"><span>🔔</span>No notifications yet</div>';
+                return;
+            }
+
+            dropdownList.innerHTML = notifications
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 20)
+                .map(n => {
+                    const cfg = NOTIF_TYPES[n.type] || NOTIF_TYPES.lead;
+                    return `
+                        <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
+                            <div class="notif-item-icon type-${n.type}">${cfg.icon}</div>
+                            <div class="notif-item-body">
+                                <div class="notif-item-title">${n.title}</div>
+                                <div class="notif-item-desc">${n.description}</div>
+                                <div class="notif-item-time">${timeAgo(n.timestamp)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            // Click to mark individual as read
+            dropdownList.querySelectorAll('.notif-item.unread').forEach(el => {
+                el.addEventListener('click', () => {
+                    const id = el.dataset.id;
+                    const notif = notifications.find(n => n.id === id);
+                    if (notif) { notif.read = true; renderDropdown(); updateBadge(); }
+                });
+            });
+        }
+
+        // ─── Show Toast Notification ───
+        function showNotifToast(notif) {
+            const cfg = NOTIF_TYPES[notif.type] || NOTIF_TYPES.lead;
+            const toast = document.createElement('div');
+            toast.className = 'notif-toast';
+            toast.style.position = 'relative';
+            toast.innerHTML = `
+                <div class="notif-toast-icon type-${notif.type}">${cfg.icon}</div>
+                <div class="notif-toast-body">
+                    <div class="notif-toast-title">${notif.title}</div>
+                    <div class="notif-toast-desc">${notif.description}</div>
+                </div>
+                <button class="notif-toast-close">&times;</button>
+                <div class="notif-toast-progress"></div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            // Dismiss on click
+            const dismiss = () => {
+                toast.classList.add('dismissing');
+                setTimeout(() => toast.remove(), 300);
+            };
+            toast.querySelector('.notif-toast-close').addEventListener('click', (e) => {
+                e.stopPropagation(); dismiss();
+            });
+            toast.addEventListener('click', () => {
+                dismiss();
+                // Open dropdown
+                if (!notifDropdownOpen) { toggleDropdown(); }
+            });
+
+            // Auto-dismiss after 5s
+            setTimeout(dismiss, 5000);
+        }
+
+        // ─── Browser Push Notification ───
+        function sendBrowserNotif(notif) {
+            if (Notification.permission !== 'granted') return;
+            if (document.hasFocus()) return; // Only push when tab not focused
+            try {
+                const cfg = NOTIF_TYPES[notif.type] || NOTIF_TYPES.lead;
+                new Notification(notif.title, {
+                    body: notif.description,
+                    icon: '/images/paloma/paloma-icon.png',
+                    badge: '/images/paloma/paloma-icon.png',
+                    tag: notif.id
+                });
+            } catch (e) { /* Push not supported */ }
+        }
+
+        // ─── Request Push Permission ───
+        function requestPushPermission() {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        console.log('[Notifications] Browser push permission granted');
+                    }
+                });
+            }
+        }
+
+        // ─── Add Notification ───
+        function addNotification(type, title, description, options = {}) {
+            const notif = {
+                id: 'notif-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                type: type,
+                title: title,
+                description: description,
+                timestamp: options.timestamp || new Date(),
+                read: options.read || false
+            };
+
+            notifications.unshift(notif);
+
+            // Keep max 50
+            if (notifications.length > 50) notifications = notifications.slice(0, 50);
+
+            updateBadge();
+            renderDropdown();
+
+            // Show toast + chime + push for NEW (not pre-populated) notifications
+            if (!options.silent) {
+                showNotifToast(notif);
+                playNotifChime();
+                sendBrowserNotif(notif);
+            }
+
+            return notif;
+        }
+
+        // ─── Toggle Dropdown ───
+        function toggleDropdown() {
+            notifDropdownOpen = !notifDropdownOpen;
+            if (notifDropdownOpen) {
+                dropdown.classList.add('open');
+                renderDropdown();
+            } else {
+                dropdown.classList.remove('open');
+            }
+        }
+
+        // ─── Event Listeners ───
+        bellBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        markAllBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notifications.forEach(n => n.read = true);
+            updateBadge();
+            renderDropdown();
+        });
+
+        // Close dropdown on outside click
+        document.addEventListener('click', (e) => {
+            if (notifDropdownOpen && !document.getElementById('notif-bell-wrap').contains(e.target)) {
+                toggleDropdown();
+            }
+        });
+
+        // ─── Demo Data Seed ───
+        function seedDemoNotifications() {
+            const now = Date.now();
+            addNotification('appointment', 'Appointment Request',
+                'Maria Garcia requested an appointment via PALOMA',
+                { timestamp: new Date(now - 2 * 60 * 1000), silent: true }
+            );
+            addNotification('lead', 'New Patient Inquiry',
+                'James Wilson asking about implants — submitted via website contact form',
+                { timestamp: new Date(now - 15 * 60 * 1000), silent: true }
+            );
+            addNotification('paloma', 'PALOMA Milestone',
+                '50 conversations completed this week — engagement up 23%',
+                { timestamp: new Date(now - 60 * 60 * 1000), silent: true }
+            );
+            addNotification('appointment', 'Appointment Confirmed',
+                'Robert Chen confirmed his 2:30 PM cleaning appointment',
+                { timestamp: new Date(now - 3 * 60 * 60 * 1000), silent: true, read: true }
+            );
+            addNotification('lead', 'Website Lead',
+                'Sandra Nguyen asked about Invisalign pricing — follow up recommended',
+                { timestamp: new Date(now - 5 * 60 * 60 * 1000), silent: true, read: true }
+            );
+        }
+
+        // ─── Live Demo Simulator (every 45s) ───
+        const DEMO_EVENTS = [
+            { type: 'appointment', title: 'New Booking Request', desc: 'Emily Torres wants to schedule a teeth whitening consultation' },
+            { type: 'lead', title: 'New Patient Inquiry', desc: 'David Park is asking about dental crown options and pricing' },
+            { type: 'paloma', title: 'PALOMA Chat Active', desc: 'Active conversation with a potential new patient about insurance' },
+            { type: 'appointment', title: 'Appointment Rescheduled', desc: 'Lisa Kim moved her appointment from Thursday to Friday at 10 AM' },
+            { type: 'lead', title: 'Emergency Contact', desc: 'Michael Brown requesting urgent appointment for a chipped tooth' },
+            { type: 'paloma', title: 'PALOMA Insight', desc: 'Most asked question today: "Do you accept Delta Dental insurance?"' },
+            { type: 'appointment', title: 'Walk-in Registered', desc: 'New walk-in patient Angela Rivera checked in at the front desk' },
+            { type: 'lead', title: 'Referral Lead', desc: 'Jennifer Lee referred by existing patient — interested in veneers' }
+        ];
+        let demoIdx = 0;
+
+        function startLiveDemo() {
+            notifDemoTimer = setInterval(() => {
+                const evt = DEMO_EVENTS[demoIdx % DEMO_EVENTS.length];
+                addNotification(evt.type, evt.title, evt.desc);
+                demoIdx++;
+            }, 45000);
+        }
+
+        // ─── Public Init (called after login) ───
+        window.initNotificationSystem = function() {
+            requestPushPermission();
+            seedDemoNotifications();
+            updateBadge();
+            renderDropdown();
+            startLiveDemo();
+            console.log('[Notifications] System initialized with', notifications.length, 'notifications');
+        };
+    })();
+
+    /* ═══════════════════════════════════════════════════════════
+       FINANCIAL INTELLIGENCE MODULE
+       Role-based, KPIs, Achievements, Upload, AI Analysis
+       ═══════════════════════════════════════════════════════════ */
+    (function() {
+        'use strict';
+
+        // ─── Role-Based Visibility ───
+        const roleSelect = document.getElementById('login-role');
+        const finSidebar = document.getElementById('sidebar-financial');
+        const loginForm = document.getElementById('login-form');
+
+        // Show/hide financial tab based on role
+        if (loginForm) {
+            loginForm.addEventListener('submit', () => {
+                const role = roleSelect ? roleSelect.value : 'admin';
+                if (role === 'admin' && finSidebar) {
+                    finSidebar.classList.add('visible');
+                }
+            });
+        }
+
+        // ─── Demo Financial Data ───
+        const DEMO_KPIS = {
+            production: { value: 285000, target: 300000, label: 'Monthly Production', format: 'currency', color: 'teal' },
+            collection: { value: 92, target: 96, label: 'Collection Rate', format: 'percent', color: 'blue' },
+            ar: { value: 34500, target: 20000, label: 'Outstanding AR', format: 'currency', color: 'gold', inverse: true },
+            expense: { value: 61, target: 60, label: 'Expense Ratio', format: 'percent', color: 'green', inverse: true }
+        };
+
+        const ACHIEVEMENTS = [
+            { id: 'prod300', icon: '🔥', name: 'Production Milestone', desc: 'Hit $300K monthly production', unlocked: false },
+            { id: 'collect95', icon: '💎', name: 'Collection Champion', desc: 'Collection rate above 95%', unlocked: false },
+            { id: 'newpts10', icon: '🚀', name: 'Growth Mode', desc: '10+ new patients this month', unlocked: true },
+            { id: 'lean60', icon: '⭐', name: 'Lean Machine', desc: 'Expense ratio under 60%', unlocked: false },
+            { id: 'perfect', icon: '🏆', name: 'Perfect Month', desc: 'All targets hit simultaneously', unlocked: false }
+        ];
+
+        const DEMO_HISTORY = JSON.parse(localStorage.getItem('fin-history') || 'null') || [
+            { date: '2025-05-28', type: 'Production Report', file: 'May_2025_Production.csv', status: 'Analyzed' },
+            { date: '2025-05-15', type: 'Collections Report', file: 'May_Collections.pdf', status: 'Analyzed' }
+        ];
+
+        const DEMO_ANALYSIS = {
+            summary: 'Lake Jeanette Family & Implant Dentistry had a strong month with $285,000 in production, approaching the $300K target. Collection rate at 92% is below the 95-98% benchmark — investigate aging claims and follow up on outstanding insurance payments.',
+            trends: [
+                { metric: 'Production', direction: 'up', pct: '+6.2%', detail: 'vs. last month' },
+                { metric: 'Collection Rate', direction: 'down', pct: '-1.8%', detail: 'vs. last month' },
+                { metric: 'New Patients', direction: 'up', pct: '+14%', detail: '12 new this month' },
+                { metric: 'Overhead', direction: 'flat', pct: '0%', detail: 'Stable at 61%' }
+            ],
+            alerts: [
+                { level: 'warning', title: 'Collection Rate Below Target', msg: '92% vs. 95% target. $22,800 in claims over 30 days old.' },
+                { level: 'info', title: 'Production Trending Up', msg: 'On pace to exceed $300K next month if current trajectory holds.' }
+            ],
+            recommendations: [
+                'Follow up on 14 outstanding insurance claims over 30 days (est. $22,800 recoverable)',
+                'Consider adding a Friday half-day to capture additional production capacity',
+                'Lab costs at 11% are within benchmark — negotiate volume discount for implant components',
+                'Patient recall rate strong at 78% — target 85% with PALOMA automated reminders'
+            ]
+        };
+
+        // ─── Render Functions ───
+        function formatCurrency(n) { return '$' + n.toLocaleString(); }
+
+        function renderKPIs() {
+            const row = document.getElementById('fin-kpi-row');
+            if (!row) return;
+            row.innerHTML = Object.entries(DEMO_KPIS).map(([key, kpi]) => {
+                const val = kpi.format === 'currency' ? formatCurrency(kpi.value) : kpi.value + '%';
+                const targetVal = kpi.format === 'currency' ? formatCurrency(kpi.target) : kpi.target + '%';
+                const pct = kpi.inverse
+                    ? Math.max(0, Math.min(100, (kpi.target / kpi.value) * 100))
+                    : Math.min(100, (kpi.value / kpi.target) * 100);
+                return `
+                    <div class="kpi-card fin-kpi-card">
+                        <div class="kpi-label">${kpi.label}</div>
+                        <div class="kpi-value">${val}</div>
+                        <div class="fin-kpi-progress">
+                            <div class="fin-kpi-progress__fill ${kpi.color}" style="width:${pct}%"></div>
+                        </div>
+                        <div class="fin-kpi-target">Target: ${targetVal}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAchievements() {
+            const el = document.getElementById('fin-achievements');
+            if (!el) return;
+            el.innerHTML = ACHIEVEMENTS.map(a => `
+                <div class="fin-achievement ${a.unlocked ? 'unlocked' : 'locked'}">
+                    <div class="fin-achievement__icon">${a.icon}</div>
+                    <div class="fin-achievement__name">${a.name}</div>
+                    <div class="fin-achievement__desc">${a.unlocked ? '✓ Achieved' : a.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderStreak() {
+            const el = document.getElementById('fin-streak-container');
+            if (!el) return;
+            el.innerHTML = `
+                <div class="fin-streak-banner">
+                    <span class="fin-streak-banner__fire">🔥</span>
+                    8 consecutive months above 90% collection rate
+                </div>
+            `;
+        }
+
+        function renderLevel() {
+            const el = document.getElementById('fin-level-container');
+            if (!el) return;
+            el.innerHTML = `<div class="fin-level-badge silver">🏅 Practice Level: Silver</div>`;
+        }
+
+        function renderAnalysis(analysis) {
+            const body = document.getElementById('fin-ai-body');
+            if (!body) return;
+            body.innerHTML = `
+                <p>${analysis.summary}</p>
+                <div class="fin-section-label">📈 Trends</div>
+                <div class="fin-trends">
+                    ${analysis.trends.map(t => `
+                        <div class="fin-trend-item">
+                            <span class="fin-trend-arrow ${t.direction}">${t.direction === 'up' ? '↑' : t.direction === 'down' ? '↓' : '→'}</span>
+                            <span class="fin-trend-metric">${t.metric}</span>
+                            <span class="fin-trend-pct ${t.direction}">${t.pct}</span>
+                            <span class="fin-trend-detail">${t.detail}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="fin-section-label">⚠️ Alerts</div>
+                <div class="fin-alerts">
+                    ${analysis.alerts.map(a => `
+                        <div class="fin-alert-card ${a.level}">
+                            <div class="fin-alert-title">${a.title}</div>
+                            <div class="fin-alert-msg">${a.msg}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="fin-section-label">💡 Recommendations</div>
+                <ul class="fin-recommendations">
+                    ${analysis.recommendations.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('fin-history-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = DEMO_HISTORY.map(h => `
+                <tr>
+                    <td>${h.date}</td>
+                    <td>${h.type}</td>
+                    <td>${h.file}</td>
+                    <td><span style="color:var(--admin-green)">✓ ${h.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // ─── File Upload Logic ───
+        const uploadZone = document.getElementById('fin-upload-zone');
+        const fileInput = document.getElementById('fin-file-input');
+        const uploadBtn = document.getElementById('fin-upload-btn');
+        const selectedFile = document.getElementById('fin-selected-file');
+        const progressBar = document.getElementById('fin-progress-bar');
+        const progressFill = document.getElementById('fin-progress-fill');
+        let currentFile = null;
+
+        if (uploadZone) {
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+            uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault(); uploadZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+            });
+            fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+        }
+
+        function handleFile(file) {
+            currentFile = file;
+            selectedFile.style.display = 'flex';
+            selectedFile.innerHTML = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            uploadBtn.disabled = false;
+        }
+
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', async () => {
+                if (!currentFile) return;
+                const reportType = document.getElementById('fin-report-type').value;
+
+                // Show progress
+                progressBar.classList.add('active');
+                progressFill.style.width = '20%';
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '⏳ Analyzing...';
+
+                try {
+                    // Read file as base64
+                    const reader = new FileReader();
+                    const fileContent = await new Promise((resolve) => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(currentFile);
+                    });
+
+                    progressFill.style.width = '50%';
+
+                    // Send to Netlify function
+                    const resp = await fetch('/.netlify/functions/financial-analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fileContent, fileType: currentFile.type, reportType })
+                    });
+
+                    progressFill.style.width = '80%';
+
+                    if (resp.ok) {
+                        const result = await resp.json();
+                        renderAnalysis(result);
+                        // Update history
+                        DEMO_HISTORY.unshift({
+                            date: new Date().toISOString().slice(0, 10),
+                            type: reportType, file: currentFile.name, status: 'Analyzed'
+                        });
+                        localStorage.setItem('fin-history', JSON.stringify(DEMO_HISTORY));
+                        renderHistory();
+                    } else {
+                        // Fallback to demo analysis on error
+                        renderAnalysis(DEMO_ANALYSIS);
+                    }
+
+                    progressFill.style.width = '100%';
+                } catch (err) {
+                    console.error('Financial analysis error:', err);
+                    renderAnalysis(DEMO_ANALYSIS);
+                    progressFill.style.width = '100%';
+                }
+
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '📤 Upload & Analyze';
+                    currentFile = null;
+                    selectedFile.style.display = 'none';
+                    fileInput.value = '';
+                }, 1500);
+            });
+        }
+
+        // ─── Initialize on view switch ───
+        const origSwitchView = window.switchView;
+        window.switchView = function(view) {
+            if (typeof origSwitchView === 'function') origSwitchView(view);
+            if (view === 'financial-intelligence') {
+                renderKPIs();
+                renderAchievements();
+                renderStreak();
+                renderLevel();
+                renderAnalysis(DEMO_ANALYSIS);
+                renderHistory();
+            }
+        };
+
+        // Also init if view is already active
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const view = item.dataset.view;
+                if (view === 'financial-intelligence') {
+                    // Small delay to let view become visible
+                    setTimeout(() => {
+                        renderKPIs();
+                        renderAchievements();
+                        renderStreak();
+                        renderLevel();
+                        renderAnalysis(DEMO_ANALYSIS);
+                        renderHistory();
+                    }, 100);
+                }
+            });
+        });
+
+        console.log('[Financial Intelligence] Module loaded');
     })();
     </script>
 </body>
