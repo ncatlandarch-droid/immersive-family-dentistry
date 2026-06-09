@@ -681,7 +681,7 @@ p { line-height: 1.7; }
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--space-xl);
-  padding-top: var(--header-height);
+  padding-top: calc(var(--header-height) + 2rem);
 }
 
 .hero-label {
@@ -729,7 +729,7 @@ p { line-height: 1.7; }
   font-size: var(--text-lg);
   color: var(--color-slate-light);
   max-width: 540px;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
   line-height: 1.7;
 }
 
