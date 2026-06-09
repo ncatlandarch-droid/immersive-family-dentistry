@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const TTS_MODEL = 'gemini-2.0-flash';
+const TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 const DEFAULT_VOICE = 'Aoede'; // Calm, soothing, warm — perfect dental assistant
 
 exports.handler = async (event) => {
@@ -38,7 +38,7 @@ exports.handler = async (event) => {
         const voiceName = voice || DEFAULT_VOICE;
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1/models/${TTS_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

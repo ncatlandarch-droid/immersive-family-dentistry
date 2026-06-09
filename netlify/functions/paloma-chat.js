@@ -5,8 +5,8 @@
    Environment variable required: GEMINI_API_KEY
    ═══════════════════════════════════════════════════════════ */
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent';
-const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // PALOMA's system prompt — her personality and rules
 const SYSTEM_PROMPT = `You are PALOMA (Patient Advocacy & Lifecycle Oral Map Assistant), the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry in Greensboro, NC. You were created by Think! Design and Planning, LLC as part of the MouthMap platform.
@@ -211,15 +211,12 @@ When a patient asks to book an appointment or asks about availability:
             parts: [{ text: message }],
         });
 
-        // Call Gemini API with timeout + fallback
-        // v1 API: prepend system prompt as first conversation turn
-        const allContents = [
-            { role: 'user', parts: [{ text: `[SYSTEM INSTRUCTIONS - Follow these at all times]\n${enhancedPrompt.substring(0, 15000)}` }] },
-            { role: 'model', parts: [{ text: 'Understood. I am PALOMA, the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry. I will follow all instructions.' }] },
-            ...contents,
-        ];
+        // Call Gemini API with timeout + fallback (v1beta supports system_instruction)
         const requestBody = JSON.stringify({
-            contents: allContents,
+            system_instruction: {
+                parts: [{ text: enhancedPrompt.substring(0, 15000) }],
+            },
+            contents,
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
