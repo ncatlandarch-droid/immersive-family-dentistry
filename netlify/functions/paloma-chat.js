@@ -212,11 +212,14 @@ When a patient asks to book an appointment or asks about availability:
         });
 
         // Call Gemini API with timeout + fallback
+        // v1 API: prepend system prompt as first conversation turn
+        const allContents = [
+            { role: 'user', parts: [{ text: `[SYSTEM INSTRUCTIONS - Follow these at all times]\n${enhancedPrompt.substring(0, 15000)}` }] },
+            { role: 'model', parts: [{ text: 'Understood. I am PALOMA, the bilingual AI dental health guide for Lake Jeanette Family & Implant Dentistry. I will follow all instructions.' }] },
+            ...contents,
+        ];
         const requestBody = JSON.stringify({
-            system_instruction: {
-                parts: [{ text: enhancedPrompt.substring(0, 15000) }], // Cap prompt size
-            },
-            contents,
+            contents: allContents,
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
