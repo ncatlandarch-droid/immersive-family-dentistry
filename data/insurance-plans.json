@@ -1,391 +1,98 @@
 {
-  "schemaVersion": "1.0.0",
-  "lastUpdated": "2026-06-06T07:00:00-04:00",
+  "schemaVersion": "1.1.0",
+  "lastUpdated": "2026-06-09T07:00:00-04:00",
   "disclaimer": {
-    "en": "Insurance coverage details are general estimates based on typical plan structures. Actual coverage varies by specific plan, employer group, and individual policy. We always verify your benefits before treatment and provide a detailed estimate. Our team will help you maximize your benefits.",
-    "es": "Los detalles de cobertura de seguro son estimaciones generales basadas en estructuras de planes típicos. La cobertura real varía según el plan específico, grupo de empleador y póliza individual. Siempre verificamos sus beneficios antes del tratamiento y proporcionamos un estimado detallado. Nuestro equipo le ayudará a maximizar sus beneficios."
+    "en": "We accept ALL dental insurance plans that allow out-of-network providers. We are NOT in-network with any insurance company. Many PPO plans offer out-of-network benefits that can be used at our practice. We will submit claims on your behalf and help you maximize your out-of-network benefits. Contact Missie, our Patient Coordinator, at (336) 545-4281 to verify your specific benefits before your visit.",
+    "es": "Aceptamos TODOS los planes de seguro dental que permiten proveedores fuera de la red. NO estamos en la red de ninguna compañía de seguros. Muchos planes PPO ofrecen beneficios fuera de la red que se pueden usar en nuestra práctica. Enviaremos las reclamaciones en su nombre y le ayudaremos a maximizar sus beneficios fuera de la red. Contacte a Missie, nuestra Coordinadora de Pacientes, al (336) 545-4281 para verificar sus beneficios específicos antes de su visita."
   },
-  "acceptedInsurance": [
-    {
-      "id": "ins-001",
-      "carrier": "Delta Dental",
-      "plans": ["Delta Dental PPO", "Delta Dental Premier", "DeltaCare USA (DHMO)"],
-      "isPreferred": true,
-      "network": "PPO and Premier",
-      "phoneVerification": "1-800-932-0783",
-      "portalUrl": "https://www.deltadental.com",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams (D0120, D0150)", "Cleanings (D1110)", "Bitewing X-rays (D0274)", "Fluoride (D1206)"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings (D2140-D2394)", "Simple extractions (D7140)", "Periodontal scaling (D4341)", "Root canal — anterior (D3310)"],
-          "waitingPeriod": "None for most plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns (D2740-D2752)", "Bridges (D6210-D6242)", "Implants (D6010)", "Root canal — molar (D3330)"],
-          "waitingPeriod": "12 months for new enrollees on many plans"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2500 },
-        "note": "Resets January 1 on most plans"
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150,
-        "note": "Does not apply to preventive services"
-      },
-      "notes": "Delta Dental is the most common dental insurance in NC. As a PPO and Premier provider, our patients receive in-network rates."
+  "insurancePolicy": {
+    "networkStatus": "out-of-network",
+    "networkDescription": {
+      "en": "Lake Jeanette Family & Implant Dentistry is an out-of-network provider for all dental insurance plans. We accept all dental insurance plans that allow out-of-network providers.",
+      "es": "Lake Jeanette Family & Implant Dentistry es un proveedor fuera de la red para todos los planes de seguro dental. Aceptamos todos los planes de seguro dental que permiten proveedores fuera de la red."
     },
-    {
-      "id": "ins-002",
-      "carrier": "MetLife",
-      "plans": ["MetLife PDP (Preferred Dentist Program)", "MetLife TakeAlong Dental"],
-      "isPreferred": true,
-      "network": "PDP Network",
-      "phoneVerification": "1-800-275-4638",
-      "portalUrl": "https://www.metlife.com/dental",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays", "Sealants"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Simple extractions", "Root canals (anterior/premolar)"],
-          "waitingPeriod": "6 months on some plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Dentures", "Implants (select plans)"],
-          "waitingPeriod": "12 months on most plans"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2000 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "MetLife is widely available through employer groups in the Greensboro area."
+    "ppoExplanation": {
+      "en": "If you have a PPO dental plan, you likely have out-of-network benefits. This means your insurance will still cover a portion of your dental care at our office. The out-of-network benefit level may be slightly different from in-network, but many patients find the quality of specialized care they receive here is well worth it. We handle all the paperwork — we submit claims directly to your insurance company on your behalf.",
+      "es": "Si tiene un plan dental PPO, probablemente tenga beneficios fuera de la red. Esto significa que su seguro aún cubrirá una parte de su cuidado dental en nuestra oficina. El nivel de beneficio fuera de la red puede ser ligeramente diferente al de dentro de la red, pero muchos pacientes encuentran que la calidad del cuidado especializado que reciben aquí vale la pena. Nosotros manejamos todo el papeleo — enviamos las reclamaciones directamente a su compañía de seguros en su nombre."
     },
-    {
-      "id": "ins-003",
-      "carrier": "Cigna Dental",
-      "plans": ["Cigna DPPO", "Cigna Dental Care (DHMO)", "Cigna Total"],
-      "isPreferred": true,
-      "network": "DPPO Network",
-      "phoneVerification": "1-800-244-6224",
-      "portalUrl": "https://www.cigna.com/dental",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "Bitewing X-rays"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Periodontal treatment"],
-          "waitingPeriod": "None on most DPPO plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Implants", "Dentures"],
-          "waitingPeriod": "12 months on individual plans"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2500 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "Common with many Greensboro-area employers. DPPO plans provide out-of-network coverage at reduced rates."
+    "whatWeDoForYou": {
+      "en": [
+        "Verify your out-of-network benefits before treatment",
+        "Submit all insurance claims on your behalf",
+        "Help you understand your coverage and estimated out-of-pocket costs",
+        "Provide detailed estimates before treatment begins",
+        "Assist with any insurance questions or claim follow-ups"
+      ],
+      "es": [
+        "Verificamos sus beneficios fuera de la red antes del tratamiento",
+        "Enviamos todas las reclamaciones de seguro en su nombre",
+        "Le ayudamos a entender su cobertura y costos estimados de bolsillo",
+        "Proporcionamos estimados detallados antes de comenzar el tratamiento",
+        "Asistimos con cualquier pregunta de seguro o seguimiento de reclamaciones"
+      ]
     },
-    {
-      "id": "ins-004",
-      "carrier": "Aetna Dental",
-      "plans": ["Aetna DMO", "Aetna PPO", "Aetna Dental Direct"],
-      "isPreferred": true,
-      "network": "PPO Network",
-      "phoneVerification": "1-800-451-7715",
-      "portalUrl": "https://www.aetna.com/dental",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays", "Fluoride"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Endodontics", "Periodontics"],
-          "waitingPeriod": "6 months on some plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Implants (plan-dependent)", "Prosthodontics"],
-          "waitingPeriod": "12 months"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2500 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "Aetna offers strong implant coverage on select PPO plans. Always verify implant benefits specifically."
-    },
-    {
-      "id": "ins-005",
-      "carrier": "United Healthcare Dental",
-      "plans": ["UHC Dental PPO", "UHC Dual Complete", "UHC Community Plan"],
-      "isPreferred": false,
-      "network": "PPO Network",
-      "phoneVerification": "1-800-999-3367",
-      "portalUrl": "https://www.uhc.com/dental",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Root canals"],
-          "waitingPeriod": "6-12 months on individual plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Dentures"],
-          "waitingPeriod": "12 months"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 3000 }
-      },
-      "deductible": {
-        "individual": 75,
-        "family": 225
-      },
-      "notes": "We are in-network for most UHC dental PPO plans. Community Plan (Medicaid) may have different coverage structures."
-    },
-    {
-      "id": "ins-006",
-      "carrier": "BlueCross BlueShield of NC",
-      "plans": ["Blue Dental PPO", "Blue Dental PPO Plus", "Blue Medicare Dental"],
-      "isPreferred": true,
-      "network": "PPO and PPO Plus",
-      "phoneVerification": "1-800-214-4844",
-      "portalUrl": "https://www.bluecrossnc.com",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays", "Fluoride", "Sealants"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Root canals", "Periodontal scaling"],
-          "waitingPeriod": "None on most employer plans"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Implants (select plans)", "Dentures"],
-          "waitingPeriod": "12 months on individual plans"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2500 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "BCBSNC is the dominant carrier in North Carolina. Many state employees and large employers use BCBS. Strong coverage for prosthodontic services."
-    },
-    {
-      "id": "ins-007",
-      "carrier": "Guardian Dental",
-      "plans": ["Guardian DentalGuard Preferred (PPO)", "Guardian DentalGuard (DHMO)"],
-      "isPreferred": false,
-      "network": "PPO Network",
-      "phoneVerification": "1-888-482-7342",
-      "portalUrl": "https://www.guardiandirect.com",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Root canals"],
-          "waitingPeriod": "3-6 months"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Dentures", "Implants (plan-dependent)"],
-          "waitingPeriod": "12 months"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1500,
-        "range": { "min": 1000, "max": 2000 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "Growing presence in the Greensboro market. Good coverage for basic and preventive services."
-    },
-    {
-      "id": "ins-008",
-      "carrier": "Humana Dental",
-      "plans": ["Humana Dental PPO", "Humana Dental HMO", "Humana Loyalty Plus"],
-      "isPreferred": false,
-      "network": "PPO Network",
-      "phoneVerification": "1-800-233-4013",
-      "portalUrl": "https://www.humana.com/dental",
-      "coverageTiers": {
-        "preventive": {
-          "coveragePercent": 100,
-          "deductibleApplies": false,
-          "examples": ["Exams", "Cleanings", "X-rays"],
-          "frequency": "2 exams + 2 cleanings per year"
-        },
-        "basic": {
-          "coveragePercent": 80,
-          "deductibleApplies": true,
-          "examples": ["Fillings", "Extractions", "Root canals"],
-          "waitingPeriod": "6 months"
-        },
-        "major": {
-          "coveragePercent": 50,
-          "deductibleApplies": true,
-          "examples": ["Crowns", "Bridges", "Dentures"],
-          "waitingPeriod": "12 months"
-        }
-      },
-      "annualMaximum": {
-        "typical": 1250,
-        "range": { "min": 1000, "max": 1500 }
-      },
-      "deductible": {
-        "individual": 50,
-        "family": 150
-      },
-      "notes": "Humana Loyalty Plus plans increase annual maximums over time if you stay enrolled without claims. Good for long-term patients."
+    "contactForVerification": {
+      "name": "Missie",
+      "role": "Patient Coordinator",
+      "phone": "(336) 545-4281",
+      "email": "Contact@LJFamilyDentist.com",
+      "note": {
+        "en": "Missie has over 20 years of experience and can help you understand exactly what your plan covers at our office. We recommend calling before your first visit so there are no surprises.",
+        "es": "Missie tiene más de 20 años de experiencia y puede ayudarle a entender exactamente lo que su plan cubre en nuestra oficina. Recomendamos llamar antes de su primera visita para que no haya sorpresas."
+      }
     }
-  ],
+  },
   "financingOptions": [
     {
       "id": "fin-001",
       "name": "CareCredit",
       "type": "third-party-financing",
       "description": {
-        "en": "CareCredit is a healthcare credit card that offers promotional financing for dental procedures. Apply in our office or online in minutes. Special promotional periods available: 6, 12, 18, or 24 months with no interest if paid in full during the promotional period.",
-        "es": "CareCredit es una tarjeta de crédito para atención médica que ofrece financiamiento promocional para procedimientos dentales. Solicite en nuestra oficina o en línea en minutos. Períodos promocionales especiales disponibles: 6, 12, 18 o 24 meses sin intereses si se paga en su totalidad durante el período promocional."
+        "en": "CareCredit is a healthcare credit card that offers promotional financing for dental procedures. Apply in our office or online in minutes. Special promotional periods available with no interest if paid in full during the promotional period.",
+        "es": "CareCredit es una tarjeta de crédito para atención médica que ofrece financiamiento promocional para procedimientos dentales. Solicite en nuestra oficina o en línea en minutos. Períodos promocionales especiales disponibles sin intereses si se paga en su totalidad durante el período promocional."
       },
       "applyUrl": "https://www.carecredit.com/apply",
       "phoneNumber": "1-800-365-8295",
       "features": [
-        "No interest if paid in full within 6-24 months",
+        "No interest if paid in full within promotional period",
         "Minimum monthly payments required",
         "Apply online or in our office",
-        "Credit lines from $500 to $25,000+",
         "Can be used for future dental and medical expenses"
       ],
-      "eligibility": "Credit approval required. Promotional offers subject to credit approval and account terms.",
-      "interestRate": {
-        "promotional": "0% for 6-24 months if paid in full",
-        "standard": "26.99% APR if promotional balance not paid in full"
-      }
+      "eligibility": "Credit approval required. Promotional offers subject to credit approval and account terms."
     },
     {
       "id": "fin-002",
-      "name": "LendingClub Patient Solutions",
+      "name": "Sunbit",
       "type": "third-party-financing",
       "description": {
-        "en": "LendingClub Patient Solutions offers fixed-rate personal loans for dental treatment. Choose a repayment term that fits your budget — from 24 to 84 months. Know your exact monthly payment upfront with no surprises.",
-        "es": "LendingClub Patient Solutions ofrece préstamos personales a tasa fija para tratamiento dental. Elija un plazo de pago que se ajuste a su presupuesto — de 24 a 84 meses. Conozca su pago mensual exacto desde el principio sin sorpresas."
+        "en": "Sunbit offers easy, flexible payment plans for dental care. With a quick, simple application that won't affect your credit score, most patients are approved. Split your treatment costs into manageable monthly payments.",
+        "es": "Sunbit ofrece planes de pago fáciles y flexibles para cuidado dental. Con una solicitud rápida y sencilla que no afectará su puntaje de crédito, la mayoría de los pacientes son aprobados. Divida los costos de su tratamiento en pagos mensuales manejables."
       },
-      "applyUrl": "https://www.lendingclub.com/patient-solutions",
-      "phoneNumber": "1-800-978-0266",
+      "applyUrl": "https://www.sunbit.com",
       "features": [
-        "Fixed monthly payments — no surprises",
-        "Loan amounts from $1,000 to $100,000",
-        "Terms from 24 to 84 months",
-        "No prepayment penalties",
-        "Check your rate with no impact to credit score"
+        "Quick, easy application",
+        "Checking won't affect your credit score",
+        "High approval rates",
+        "Flexible monthly payment options",
+        "Apply in our office"
       ],
-      "eligibility": "Credit approval required. Rates and terms vary by creditworthiness.",
-      "interestRate": {
-        "range": "7.99% - 24.99% APR",
-        "note": "Rate based on creditworthiness and loan term"
-      }
+      "eligibility": "Subject to approval. Terms and conditions apply."
     },
     {
       "id": "fin-003",
       "name": "In-House Payment Plans",
       "type": "in-house",
       "description": {
-        "en": "We offer flexible in-house payment plans for qualifying patients. No credit check required. Spread the cost of your treatment over 3-12 months with no interest. We believe finances should never be a barrier to getting the dental care you need.",
-        "es": "Ofrecemos planes de pago internos flexibles para pacientes que califiquen. No se requiere verificación de crédito. Distribuya el costo de su tratamiento en 3-12 meses sin intereses. Creemos que las finanzas nunca deben ser una barrera para obtener el cuidado dental que necesita."
+        "en": "We offer flexible in-house payment plans to help make dental care accessible. We believe finances should never be a barrier to getting the dental care you need. Talk to Missie about setting up a payment plan that works for your budget.",
+        "es": "Ofrecemos planes de pago internos flexibles para ayudar a hacer el cuidado dental accesible. Creemos que las finanzas nunca deben ser una barrera para obtener el cuidado dental que necesita. Hable con Missie sobre establecer un plan de pago que funcione para su presupuesto."
       },
       "features": [
-        "No credit check required",
-        "0% interest for 3-12 months",
         "Flexible monthly payments",
-        "Available for treatment plans over $500",
-        "Automatic payment options available"
+        "Personalized payment plans",
+        "Talk to Missie to get started"
       ],
-      "eligibility": "Available for established patients. Down payment may be required based on treatment total.",
-      "interestRate": {
-        "promotional": "0% for 3-12 months",
-        "standard": "N/A"
-      },
-      "terms": {
-        "minimumTreatment": 500,
-        "maximumTerm": "12 months",
-        "downPayment": "10-25% depending on treatment total",
-        "autoPayDiscount": "Additional 5% courtesy discount for auto-pay enrollment"
-      }
+      "eligibility": "Available for patients. Contact our office to discuss options."
     }
   ],
   "paymentMethods": [
@@ -396,24 +103,26 @@
     "American Express",
     "Discover",
     "CareCredit",
-    "LendingClub",
+    "Sunbit",
     "Health Savings Account (HSA)",
     "Flexible Spending Account (FSA)"
   ],
   "insuranceTips": {
     "en": [
-      "Use your benefits before year-end — most plans reset January 1 and unused benefits don't roll over.",
+      "Even though we are out-of-network, many PPO plans still provide significant coverage for dental care at our office.",
+      "Contact Missie at (336) 545-4281 to verify your out-of-network benefits before your visit.",
+      "We handle all insurance paperwork — we submit claims directly to your insurance on your behalf.",
       "If you need extensive work, we can phase treatment across benefit years to maximize coverage.",
-      "Pre-authorization is recommended for major procedures to confirm coverage before treatment.",
-      "Don't let insurance dictate your treatment — we'll help you find a way to afford the best care.",
-      "HSA and FSA funds can be used for dental treatment and are a great way to pay with pre-tax dollars."
+      "HSA and FSA funds can be used for dental treatment and are a great way to pay with pre-tax dollars.",
+      "Don't let insurance dictate your treatment — we'll help you find a way to afford the best care with CareCredit, Sunbit, or in-house payment plans."
     ],
     "es": [
-      "Use sus beneficios antes de fin de año — la mayoría de los planes se reinician el 1 de enero y los beneficios no utilizados no se acumulan.",
+      "Aunque estamos fuera de la red, muchos planes PPO aún proporcionan cobertura significativa para cuidado dental en nuestra oficina.",
+      "Contacte a Missie al (336) 545-4281 para verificar sus beneficios fuera de la red antes de su visita.",
+      "Manejamos todo el papeleo de seguro — enviamos reclamaciones directamente a su seguro en su nombre.",
       "Si necesita trabajo extenso, podemos dividir el tratamiento en varios años de beneficios para maximizar la cobertura.",
-      "Se recomienda la pre-autorización para procedimientos mayores para confirmar la cobertura antes del tratamiento.",
-      "No deje que el seguro dicte su tratamiento — le ayudaremos a encontrar una manera de pagar el mejor cuidado.",
-      "Los fondos HSA y FSA se pueden usar para tratamiento dental y son una excelente manera de pagar con dólares antes de impuestos."
+      "Los fondos HSA y FSA se pueden usar para tratamiento dental y son una excelente manera de pagar con dólares antes de impuestos.",
+      "No deje que el seguro dicte su tratamiento — le ayudaremos a encontrar una manera de pagar el mejor cuidado con CareCredit, Sunbit o planes de pago internos."
     ]
   }
 }

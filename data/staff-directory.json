@@ -15,8 +15,8 @@
     "photo": "/images/dr-brenes.jpg",
     "email": "dr.brenes@ljfamilydentist.com",
     "bio": {
-      "en": "Dr. Christian Brenes is a board-eligible prosthodontist and the founder of Lake Jeanette Family & Implant Dentistry. After earning his Doctor of Dental Surgery degree, he completed a rigorous three-year residency in Prosthodontics, gaining advanced expertise in dental implants, full-mouth rehabilitation, complex restorative cases, and digital dentistry workflows. Dr. Brenes is passionate about leveraging cutting-edge technology — including intraoral scanning, 3D printing, AI-assisted diagnostics, and CAD/CAM design — to deliver predictable, beautiful results for every patient. As a Key Opinion Leader for Medit, SprintRay, Exocad, and BlueSkyBio, he regularly lectures nationally and internationally on digital dentistry workflows and implant prosthodontics. His philosophy centers on precision, patient education, and making advanced dental care accessible to the Greensboro community.",
-      "es": "El Dr. Christian Brenes es un prostodoncista y fundador de Lake Jeanette Family & Implant Dentistry. Después de obtener su título de Doctor en Cirugía Dental, completó una rigurosa residencia de tres años en Prostodoncia, adquiriendo experiencia avanzada en implantes dentales, rehabilitación oral completa, casos restaurativos complejos y flujos de trabajo de odontología digital. El Dr. Brenes es apasionado por aprovechar la tecnología de vanguardia — incluyendo escaneo intraoral, impresión 3D, diagnósticos asistidos por IA y diseño CAD/CAM — para ofrecer resultados predecibles y hermosos a cada paciente. Como Líder de Opinión Clave para Medit, SprintRay, Exocad y BlueSkyBio, dicta conferencias regularmente a nivel nacional e internacional sobre flujos de trabajo de odontología digital y prostodoncia sobre implantes."
+      "en": "Dr. Christian Brenes is a Prosthodontist specializing in esthetics and advanced dental implant solutions and the founder of Lake Jeanette Family & Implant Dentistry. He serves as Program Director of a Digital Dentistry Master Program and has been a university faculty member for over 9 years. Dr. Brenes is passionate about delivering personalized care — every treatment is meticulously planned and designed to achieve a NATURAL CUSTOM SMILE, each one unique. He is a Key Opinion Leader for Medit, SprintRay, Exocad, and BlueSkyBio, and regularly lectures nationally and internationally on digital dentistry workflows and implant prosthodontics. Originally from Costa Rica, he is fluent in both English and Spanish.",
+      "es": "El Dr. Christian Brenes es un Prostodoncista especializado en estética y soluciones avanzadas de implantes dentales, y fundador de Lake Jeanette Family & Implant Dentistry. Es Director de Programa de un Máster en Odontología Digital y ha sido profesor universitario por más de 9 años. El Dr. Brenes es apasionado por ofrecer cuidado personalizado — cada tratamiento es meticulosamente planificado y diseñado para lograr una SONRISA NATURAL PERSONALIZADA, cada una única. Es Líder de Opinión Clave para Medit, SprintRay, Exocad y BlueSkyBio."
     },
     "education": [
       {
@@ -129,96 +129,95 @@
       "id": "staff-001",
       "firstName": "Missie",
       "lastName": "",
-      "role": "Lead Dental Assistant",
-      "title": "Certified Dental Assistant (CDA)",
+      "role": "Patient Coordinator",
+      "title": "Patient Coordinator",
       "photo": "/images/team-1.jpg",
-      "yearsWithPractice": 5,
+      "yearsWithPractice": 20,
       "bio": {
-        "en": "Missie is our Lead Dental Assistant and has been with Dr. Brenes since the practice opened. With over 12 years of experience in clinical dentistry, she is a master of chairside efficiency and patient comfort. Missie specializes in implant surgery assistance, digital scanning, and 3D printing operations. She's known for putting nervous patients at ease with her calm, reassuring presence and genuine warmth.",
-        "es": "Missie es nuestra Asistente Dental Principal y ha estado con el Dr. Brenes desde que se abrió la práctica. Con más de 12 años de experiencia en odontología clínica, es experta en eficiencia al lado del sillón y comodidad del paciente. Missie se especializa en asistencia en cirugía de implantes, escaneo digital y operaciones de impresión 3D. Es conocida por tranquilizar a los pacientes nerviosos con su presencia calmada y reconfortante."
+        "en": "Missie is our Patient Coordinator and has been part of the dental family for over 20 years. She is the friendly face that greets you and helps with all aspects of scheduling, benefits verification, and making sure your experience is seamless from start to finish. Missie's warmth and extensive knowledge make her an invaluable resource for patients navigating their insurance benefits and appointment logistics.",
+        "es": "Missie es nuestra Coordinadora de Pacientes y ha sido parte de la familia dental por más de 20 años. Es el rostro amigable que le da la bienvenida y ayuda con todos los aspectos de programación, verificación de beneficios y asegurar que su experiencia sea perfecta de principio a fin."
       },
-      "specialties": ["Implant surgery assistance", "Digital scanning (Medit i700)", "3D printing operations", "Patient comfort management"],
-      "certifications": ["Certified Dental Assistant (CDA)", "CPR/BLS Certified", "Radiology Certified"],
+      "specialties": ["Scheduling", "Insurance benefits verification", "Patient coordination", "Office management"],
+      "certifications": ["CPR/BLS Certified"],
       "funFact": {
-        "en": "Missie can complete a full-arch digital scan in under 3 minutes — faster than most dentists!",
-        "es": "¡Missie puede completar un escaneo digital de arco completo en menos de 3 minutos — más rápido que la mayoría de los dentistas!"
+        "en": "Missie has been with the practice for over 20 years — she knows our patients like family!",
+        "es": "¡Missie ha estado con la práctica por más de 20 años — conoce a nuestros pacientes como familia!"
       }
     },
     {
       "id": "staff-002",
       "firstName": "Logan",
       "lastName": "",
-      "role": "Dental Assistant / Digital Workflow Specialist",
-      "title": "Registered Dental Assistant (RDA)",
+      "role": "Hygienist",
+      "title": "Registered Dental Hygienist (RDH)",
       "photo": "/images/team-2.jpg",
       "yearsWithPractice": 3,
       "bio": {
-        "en": "Logan serves as both a skilled dental assistant and the practice's digital workflow specialist. He manages the SprintRay 3D printer operations, Exocad design queue, and ensures seamless integration between our digital systems. Logan's technical aptitude and attention to detail make him invaluable for complex cases requiring same-day restorations and surgical guide fabrication.",
-        "es": "Logan sirve como asistente dental hábil y especialista en flujo de trabajo digital de la práctica. Gestiona las operaciones de la impresora 3D SprintRay, la cola de diseño de Exocad, y asegura la integración perfecta entre nuestros sistemas digitales. La aptitud técnica y atención al detalle de Logan lo hacen invaluable para casos complejos que requieren restauraciones el mismo día y fabricación de guías quirúrgicas."
+        "en": "Logan is one of our dedicated dental hygienists known for building strong patient relationships. His thoroughness and genuine care for each patient's oral health make every cleaning and checkup a positive experience. Logan takes the time to educate patients about their oral health and create personalized hygiene plans.",
+        "es": "Logan es uno de nuestros dedicados higienistas dentales conocido por construir relaciones sólidas con los pacientes. Su minuciosidad y cuidado genuino por la salud oral de cada paciente hacen que cada limpieza y chequeo sea una experiencia positiva."
       },
-      "specialties": ["SprintRay 3D printer operations", "Exocad CAD design assistance", "Digital workflow management", "Surgical guide fabrication"],
-      "certifications": ["Registered Dental Assistant (RDA)", "CPR/BLS Certified", "SprintRay Certified Operator"],
+      "specialties": ["Patient hygiene education", "Preventive care", "Strong patient relationships", "Oral health assessment"],
+      "certifications": ["Registered Dental Hygienist (RDH)", "CPR/BLS Certified"],
       "funFact": {
-        "en": "Logan built a custom 3D-printed organizer for all our dental burs — it's color-coded and everything.",
-        "es": "Logan construyó un organizador personalizado impreso en 3D para todas nuestras fresas dentales — con código de colores y todo."
+        "en": "Logan is known for building such strong relationships that patients specifically request him for their cleanings.",
+        "es": "Logan es conocido por construir relaciones tan fuertes que los pacientes lo solicitan específicamente para sus limpiezas."
       }
     },
     {
       "id": "staff-003",
       "firstName": "Emily",
       "lastName": "",
-      "role": "Dental Assistant / Patient Coordinator",
-      "title": "Expanded Duties Dental Assistant (EDDA)",
+      "role": "Hygienist",
+      "title": "Registered Dental Hygienist (RDH)",
       "photo": "/images/team-3.jpg",
       "yearsWithPractice": 2,
       "bio": {
-        "en": "Emily wears two hats with grace — she's both a clinically skilled dental assistant and a patient experience coordinator. She manages treatment presentations, helps patients understand their insurance benefits, and coordinates complex multi-visit treatment plans. Emily's bilingual skills in English and Spanish make her an essential bridge for our Spanish-speaking patients and families.",
-        "es": "Emily cumple dos roles con gracia — es tanto una asistente dental clínicamente hábil como coordinadora de experiencia del paciente. Gestiona presentaciones de tratamiento, ayuda a los pacientes a entender sus beneficios de seguro, y coordina planes de tratamiento complejos de múltiples visitas. Sus habilidades bilingües en inglés y español la convierten en un puente esencial para nuestros pacientes y familias hispanohablantes."
+        "en": "Emily is one of our talented dental hygienists known for her gentle approach. She takes extra care to ensure patient comfort during cleanings and procedures, making even the most anxious patients feel at ease. Emily's thoroughness and compassionate chair-side manner have made her a patient favorite.",
+        "es": "Emily es una de nuestras talentosas higienistas dentales conocida por su enfoque gentil. Tiene un cuidado extra para asegurar la comodidad del paciente durante limpiezas y procedimientos, haciendo que incluso los pacientes más ansiosos se sientan a gusto."
       },
-      "specialties": ["Treatment presentation", "Insurance coordination", "Bilingual patient communication", "Multi-visit case management"],
-      "certifications": ["Expanded Duties Dental Assistant (EDDA)", "CPR/BLS Certified", "Bilingual Patient Communication Certificate"],
-      "languages": ["English", "Spanish"],
+      "specialties": ["Gentle hygiene technique", "Patient comfort management", "Preventive care", "Oral health education"],
+      "certifications": ["Registered Dental Hygienist (RDH)", "CPR/BLS Certified"],
       "funFact": {
-        "en": "Emily volunteers as a dental health educator at local elementary schools every quarter.",
-        "es": "Emily es voluntaria como educadora de salud dental en escuelas primarias locales cada trimestre."
+        "en": "Emily's gentle touch has converted many dental-anxious patients into regular visitors who actually look forward to their cleanings!",
+        "es": "¡El toque gentil de Emily ha convertido a muchos pacientes con ansiedad dental en visitantes regulares que realmente esperan con ganas sus limpiezas!"
       }
     },
     {
       "id": "staff-004",
       "firstName": "Michelle",
       "lastName": "",
-      "role": "Dental Assistant / Sterilization Coordinator",
-      "title": "Certified Dental Assistant (CDA)",
+      "role": "Clinical Assistant",
+      "title": "Clinical Assistant",
       "photo": "/images/team-4.jpg",
-      "yearsWithPractice": 4,
+      "yearsWithPractice": 20,
       "bio": {
-        "en": "Michelle is the backbone of our clinical operations — ensuring every instrument is perfectly sterilized, every operatory is immaculately prepared, and every infection control protocol is followed to the letter. With a background in healthcare compliance, she also manages our OSHA and HIPAA compliance programs. Patients love Michelle for her warm smile and her ability to explain even the most complex procedures in simple, comforting terms.",
-        "es": "Michelle es la columna vertebral de nuestras operaciones clínicas — asegurando que cada instrumento esté perfectamente esterilizado, cada operatorio esté impecablemente preparado, y cada protocolo de control de infecciones se siga al pie de la letra. Con experiencia en cumplimiento sanitario, también gestiona nuestros programas de cumplimiento OSHA e HIPAA. Los pacientes adoran a Michelle por su cálida sonrisa y su capacidad para explicar incluso los procedimientos más complejos en términos simples y reconfortantes."
+        "en": "Michelle is a dedicated Clinical Assistant who has been with the practice for over 20 years. Her extensive experience and deep knowledge of dental procedures make her an essential part of the clinical team. Michelle's calm, professional demeanor and genuine warmth help patients feel comfortable and confident throughout their treatment.",
+        "es": "Michelle es una Asistente Clínica dedicada que ha estado con la práctica por más de 20 años. Su amplia experiencia y profundo conocimiento de los procedimientos dentales la convierten en una parte esencial del equipo clínico."
       },
-      "specialties": ["Sterilization protocols", "Infection control management", "OSHA/HIPAA compliance", "Operatory preparation"],
-      "certifications": ["Certified Dental Assistant (CDA)", "CPR/BLS Certified", "OSHA Compliance Officer Certification", "Infection Control Certified"],
+      "specialties": ["Clinical chairside assistance", "Patient comfort management", "Procedure preparation", "Over 20 years clinical experience"],
+      "certifications": ["CPR/BLS Certified"],
       "funFact": {
-        "en": "Michelle maintains a 100% compliance rate on every infection control audit the practice has ever had.",
-        "es": "Michelle mantiene una tasa de cumplimiento del 100% en cada auditoría de control de infecciones que la práctica ha tenido."
+        "en": "Michelle has been with the practice for over 20 years — her experience and dedication are unmatched!",
+        "es": "¡Michelle ha estado con la práctica por más de 20 años — su experiencia y dedicación son incomparables!"
       }
     },
     {
       "id": "staff-005",
       "firstName": "Cameron",
       "lastName": "",
-      "role": "Dental Assistant / Social Media Coordinator",
-      "title": "Registered Dental Assistant (RDA)",
+      "role": "Clinical Assistant",
+      "title": "Clinical Assistant",
       "photo": "/images/team-5.jpg",
       "yearsWithPractice": 1,
       "bio": {
-        "en": "Cameron is the newest member of our team but has quickly become an integral part of the Lake Jeanette family. In addition to providing excellent chairside assistance, Cameron manages the practice's social media presence — capturing behind-the-scenes content, patient smile reveals (with consent!), and educational posts about digital dentistry. His energy and creativity bring a fresh perspective to the practice.",
-        "es": "Cameron es el miembro más nuevo de nuestro equipo pero rápidamente se ha convertido en parte integral de la familia Lake Jeanette. Además de proporcionar excelente asistencia al lado del sillón, Cameron gestiona la presencia en redes sociales de la práctica — capturando contenido detrás de cámaras, revelaciones de sonrisas de pacientes (¡con consentimiento!) y publicaciones educativas sobre odontología digital. Su energía y creatividad traen una perspectiva fresca a la práctica."
+        "en": "Cameron is a Clinical Assistant who has quickly become an integral part of the Lake Jeanette family. He provides excellent chairside assistance and supports Dr. Brenes and the clinical team across a wide range of procedures. Cameron's energy and dedication to patient care bring a fresh perspective to the practice.",
+        "es": "Cameron es un Asistente Clínico que rápidamente se ha convertido en parte integral de la familia Lake Jeanette. Proporciona excelente asistencia al lado del sillón y apoya al Dr. Brenes y al equipo clínico en una amplia gama de procedimientos."
       },
-      "specialties": ["Chairside assistance", "Social media content creation", "Patient photography", "Practice marketing"],
-      "certifications": ["Registered Dental Assistant (RDA)", "CPR/BLS Certified"],
+      "specialties": ["Chairside assistance", "Clinical support", "Patient care"],
+      "certifications": ["CPR/BLS Certified"],
       "funFact": {
-        "en": "Cameron's TikTok video of Dr. Brenes 3D-printing a crown got over 500K views!",
-        "es": "¡El video de TikTok de Cameron donde el Dr. Brenes imprime una corona en 3D obtuvo más de 500K vistas!"
+        "en": "Cameron brings great energy to the team and patients love his positive attitude!",
+        "es": "¡Cameron aporta gran energía al equipo y a los pacientes les encanta su actitud positiva!"
       }
     }
   ],
