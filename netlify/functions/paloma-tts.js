@@ -38,7 +38,7 @@ exports.handler = async (event) => {
         const voiceName = voice || DEFAULT_VOICE;
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1/models/${TTS_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
