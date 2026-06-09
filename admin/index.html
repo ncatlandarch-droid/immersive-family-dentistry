@@ -1225,6 +1225,97 @@
     @media (max-width: 480px) {
         .fin-achievements { grid-template-columns: 1fr; }
     }
+    /* ═══ Onboarding Wizard ═══ */
+    .wizard-progress {
+        width: 100%; height: 6px; border-radius: 3px;
+        background: rgba(255,255,255,0.06); margin-bottom: 16px; overflow: hidden;
+    }
+    .wizard-progress-bar {
+        height: 100%; border-radius: 3px;
+        background: linear-gradient(90deg, var(--admin-teal-dark), var(--admin-teal));
+        transition: width 0.4s ease;
+    }
+    .wizard-steps-nav {
+        display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .wizard-step-dot {
+        padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+        color: var(--admin-muted); background: rgba(255,255,255,0.03);
+        border: 1px solid var(--admin-border); transition: var(--admin-transition);
+    }
+    .wizard-step-dot.active {
+        color: var(--admin-teal); background: var(--admin-teal-glow);
+        border-color: rgba(20,184,166,0.3);
+    }
+    .wizard-step-dot.completed { color: var(--admin-green); }
+
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+    .wizard-step-title {
+        font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600;
+        color: var(--admin-text); margin-bottom: 20px;
+    }
+    .wizard-form-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .wizard-field label {
+        display: block; font-size: 12px; font-weight: 600;
+        color: var(--admin-muted); text-transform: uppercase;
+        letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+    .wizard-hours-grid { display: flex; flex-direction: column; gap: 8px; }
+    .wizard-hour-row {
+        display: flex; align-items: center; gap: 12px;
+    }
+    .wizard-hour-row span {
+        width: 90px; font-size: 13px; font-weight: 500; color: var(--admin-text-secondary);
+    }
+    .wizard-hour-row input { flex: 1; }
+
+    .wizard-services-list { display: flex; flex-direction: column; gap: 8px; }
+    .wizard-checkbox {
+        display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+        border-radius: var(--admin-radius-sm); background: rgba(255,255,255,0.02);
+        border: 1px solid var(--admin-border); cursor: pointer;
+        font-size: 14px; color: var(--admin-text); transition: var(--admin-transition);
+    }
+    .wizard-checkbox:hover { background: rgba(255,255,255,0.04); }
+    .wizard-checkbox input[type="checkbox"] {
+        width: 18px; height: 18px; accent-color: var(--admin-teal);
+    }
+
+    .wizard-team-list { display: flex; flex-direction: column; gap: 8px; }
+    .wizard-team-card {
+        display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+        border-radius: var(--admin-radius-sm); background: var(--admin-surface);
+        border: 1px solid var(--admin-glass-border);
+    }
+    .wizard-team-avatar {
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    .wizard-team-card strong { font-size: 14px; color: var(--admin-text); }
+
+    .wizard-nav {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-top: 32px; padding-top: 20px;
+        border-top: 1px solid var(--admin-border);
+    }
+    .wizard-step-counter { font-size: 13px; color: var(--admin-muted); }
+    .btn-secondary {
+        padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+        background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border);
+        color: var(--admin-text-secondary); transition: var(--admin-transition);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+    .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    @media (max-width: 768px) {
+        .wizard-form-grid { grid-template-columns: 1fr; }
+        .wizard-steps-nav { gap: 6px; }
+        .wizard-step-dot { font-size: 11px; padding: 6px 10px; }
+    }
 
     </style>
 </head>
@@ -1292,6 +1383,9 @@
                 </button>
                 <button class="sidebar-item owner-only" id="sidebar-financial" data-view="financial-intelligence">
                     <span>💰</span> Financial Intelligence
+                </button>
+                <button class="sidebar-item owner-only" id="sidebar-onboarding" data-view="onboarding-wizard">
+                    <span>🧙</span> Practice Setup
                 </button>
                 <button class="sidebar-item" data-view="data-editor">
                     <span>📝</span> Data Editor
@@ -1551,6 +1645,196 @@
 
                 <div class="info-note" style="margin-top:16px">
                     🔒 Financial data is analyzed in real-time and never stored on our servers. Reports are processed by PALOMA's AI and discarded after analysis.
+                </div>
+            </div>
+
+            <!-- ═══ View: Onboarding Wizard ═══ -->
+            <div id="view-onboarding-wizard" class="view">
+                <div class="view-header">
+                    <h2>🧙 Practice Setup Wizard</h2>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-top:4px">Configure PALOMA for your practice in under 30 minutes</p>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="wizard-progress">
+                    <div class="wizard-progress-bar" id="wizard-progress-bar" style="width:20%"></div>
+                </div>
+                <div class="wizard-steps-nav" id="wizard-steps-nav">
+                    <button class="wizard-step-dot active" data-step="1">1. Practice Info</button>
+                    <button class="wizard-step-dot" data-step="2">2. Services</button>
+                    <button class="wizard-step-dot" data-step="3">3. Team</button>
+                    <button class="wizard-step-dot" data-step="4">4. Insurance</button>
+                    <button class="wizard-step-dot" data-step="5">5. PALOMA</button>
+                </div>
+
+                <!-- Step 1: Practice Info -->
+                <div class="wizard-step active" id="wizard-step-1">
+                    <h3 class="wizard-step-title">📋 Practice Information</h3>
+                    <div class="wizard-form-grid">
+                        <div class="wizard-field">
+                            <label>Practice Name</label>
+                            <input type="text" id="wiz-name" class="auth-input" value="Lake Jeanette Family & Implant Dentistry" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Phone</label>
+                            <input type="tel" id="wiz-phone" class="auth-input" value="(336) 545-4281" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Email</label>
+                            <input type="email" id="wiz-email" class="auth-input" value="Contact@LJFamilyDentist.com" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Address</label>
+                            <input type="text" id="wiz-address" class="auth-input" value="3810 North Elm Street #201, Greensboro, NC 27455" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Website</label>
+                            <input type="url" id="wiz-website" class="auth-input" value="https://ljfamilydentist-paloma.netlify.app" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Languages</label>
+                            <input type="text" id="wiz-languages" class="auth-input" value="English, Spanish" />
+                        </div>
+                    </div>
+                    <h4 style="margin:20px 0 12px;color:var(--admin-text)">Office Hours</h4>
+                    <div class="wizard-hours-grid" id="wiz-hours">
+                        <div class="wizard-hour-row"><span>Monday</span><input type="text" class="auth-input" value="8:00 AM - 5:00 PM" /></div>
+                        <div class="wizard-hour-row"><span>Tuesday</span><input type="text" class="auth-input" value="8:00 AM - 5:00 PM" /></div>
+                        <div class="wizard-hour-row"><span>Wednesday</span><input type="text" class="auth-input" value="8:00 AM - 5:00 PM" /></div>
+                        <div class="wizard-hour-row"><span>Thursday</span><input type="text" class="auth-input" value="8:00 AM - 3:00 PM" /></div>
+                        <div class="wizard-hour-row"><span>Friday</span><input type="text" class="auth-input" value="Closed" /></div>
+                        <div class="wizard-hour-row"><span>Saturday</span><input type="text" class="auth-input" value="Closed" /></div>
+                        <div class="wizard-hour-row"><span>Sunday</span><input type="text" class="auth-input" value="Closed" /></div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Services -->
+                <div class="wizard-step" id="wizard-step-2">
+                    <h3 class="wizard-step-title">🦷 Services Offered</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Check the services your practice offers. PALOMA will learn to discuss these with patients.</p>
+                    <div class="wizard-services-list" id="wiz-services">
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> Crowns & Full Arch Rehabilitations</label>
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> Dental Implants</label>
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> All-on-4 Full Arch Implant Prosthesis</label>
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> Veneers & Smile Design</label>
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> Prosthodontics</label>
+                        <label class="wizard-checkbox"><input type="checkbox" checked /> Routine Checkups & Preventive Care</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> Orthodontics / Invisalign</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> Teeth Whitening</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> Pediatric Dentistry</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> Periodontics / Gum Treatment</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> Oral Surgery</label>
+                        <label class="wizard-checkbox"><input type="checkbox" /> TMJ / TMD Treatment</label>
+                    </div>
+                    <div style="margin-top:16px">
+                        <label style="color:var(--admin-text-secondary);font-size:13px">Add custom service:</label>
+                        <div style="display:flex;gap:8px;margin-top:6px">
+                            <input type="text" id="wiz-custom-service" class="auth-input" placeholder="e.g., Emergency Dentistry" style="flex:1" />
+                            <button class="btn-primary" id="wiz-add-service" style="white-space:nowrap">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Team -->
+                <div class="wizard-step" id="wizard-step-3">
+                    <h3 class="wizard-step-title">👥 Team Directory</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Add your team members so PALOMA can introduce them to patients.</p>
+                    <div class="wizard-team-list" id="wiz-team">
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#14B8A6">CB</div>
+                            <div><strong>Dr. Christian Brenes</strong><br><span style="color:var(--admin-muted);font-size:12px">Prosthodontist — Lead Dentist</span></div>
+                        </div>
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#8B5CF6">E</div>
+                            <div><strong>Emily</strong><br><span style="color:var(--admin-muted);font-size:12px">Hygienist — Gentle approach</span></div>
+                        </div>
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#3B82F6">L</div>
+                            <div><strong>Logan</strong><br><span style="color:var(--admin-muted);font-size:12px">Hygienist — Strong patient relationships</span></div>
+                        </div>
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#F59E0B">M</div>
+                            <div><strong>Michelle</strong><br><span style="color:var(--admin-muted);font-size:12px">Clinical Assistant — 20+ years</span></div>
+                        </div>
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#EC4899">M</div>
+                            <div><strong>Missie</strong><br><span style="color:var(--admin-muted);font-size:12px">Patient Coordinator — 20+ years</span></div>
+                        </div>
+                        <div class="wizard-team-card">
+                            <div class="wizard-team-avatar" style="background:#10B981">C</div>
+                            <div><strong>Cameron</strong><br><span style="color:var(--admin-muted);font-size:12px">Clinical Assistant</span></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;display:flex;gap:8px">
+                        <input type="text" id="wiz-team-name" class="auth-input" placeholder="Name" style="flex:1" />
+                        <input type="text" id="wiz-team-role" class="auth-input" placeholder="Role" style="flex:1" />
+                        <button class="btn-primary" id="wiz-add-team">+ Add</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Insurance -->
+                <div class="wizard-step" id="wizard-step-4">
+                    <h3 class="wizard-step-title">🏥 Insurance & Financing</h3>
+                    <div class="wizard-form-grid">
+                        <div class="wizard-field" style="grid-column:1/-1">
+                            <label>Insurance Policy</label>
+                            <textarea id="wiz-insurance" class="auth-input" rows="3" style="resize:vertical">We accept all dental insurance plans that allow out-of-network providers. We are NOT in-network with any specific insurance company. Many PPO plans offer out-of-network benefits that cover a significant portion of treatment costs.</textarea>
+                        </div>
+                        <div class="wizard-field">
+                            <label>Financing Options</label>
+                            <input type="text" id="wiz-financing" class="auth-input" value="CareCredit, Sunbit, In-house payment plans" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>Emergency Policy</label>
+                            <input type="text" id="wiz-emergency" class="auth-input" value="Same-day emergency appointments available" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: PALOMA Config -->
+                <div class="wizard-step" id="wizard-step-5">
+                    <h3 class="wizard-step-title">🕊️ PALOMA Configuration</h3>
+                    <div class="wizard-form-grid">
+                        <div class="wizard-field">
+                            <label>PALOMA's Greeting</label>
+                            <textarea id="wiz-greeting" class="auth-input" rows="2" style="resize:vertical">¡Hola! I'm PALOMA 🕊️ — your AI dental assistant at Lake Jeanette Family & Implant Dentistry. How can I help you today?</textarea>
+                        </div>
+                        <div class="wizard-field">
+                            <label>Tone</label>
+                            <select id="wiz-tone" class="auth-input">
+                                <option value="warm" selected>Warm & Professional</option>
+                                <option value="clinical">Clinical & Precise</option>
+                                <option value="casual">Casual & Friendly</option>
+                            </select>
+                        </div>
+                        <div class="wizard-field">
+                            <label>Default Language</label>
+                            <select id="wiz-lang" class="auth-input">
+                                <option value="bilingual" selected>Bilingual (EN/ES auto-detect)</option>
+                                <option value="en">English Only</option>
+                                <option value="es">Spanish Only</option>
+                            </select>
+                        </div>
+                        <div class="wizard-field">
+                            <label>Key Differentiator</label>
+                            <textarea id="wiz-differentiator" class="auth-input" rows="2" style="resize:vertical">Dr. Brenes is a board-certified Prosthodontist and university faculty member for 9+ years. Every smile is custom-designed for natural results.</textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top:24px;padding:20px;border-radius:var(--admin-radius);background:var(--admin-teal-glow);border:1px solid rgba(20,184,166,0.2)">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                            <span style="font-size:20px">✅</span>
+                            <strong style="color:var(--admin-teal)">Setup Complete!</strong>
+                        </div>
+                        <p style="font-size:13px;color:var(--admin-text-secondary);margin-bottom:12px">PALOMA is configured and ready. She'll use all the information above to answer patient questions accurately.</p>
+                        <button class="btn-primary" id="wiz-save-all">💾 Save & Activate PALOMA</button>
+                    </div>
+                </div>
+
+                <!-- Wizard Navigation -->
+                <div class="wizard-nav">
+                    <button class="btn-secondary" id="wiz-prev" disabled>← Previous</button>
+                    <span class="wizard-step-counter" id="wiz-counter">Step 1 of 5</span>
+                    <button class="btn-primary" id="wiz-next">Next →</button>
                 </div>
             </div>
 
@@ -3937,6 +4221,140 @@
         });
 
         console.log('[Financial Intelligence] Module loaded');
+    })();
+
+    /* ═══════════════════════════════════════════════════════════
+       ONBOARDING WIZARD — Step Navigation & Logic
+       ═══════════════════════════════════════════════════════════ */
+    (function() {
+        'use strict';
+        const TOTAL_STEPS = 5;
+        let currentStep = 1;
+
+        const progressBar = document.getElementById('wizard-progress-bar');
+        const stepsNav = document.getElementById('wizard-steps-nav');
+        const prevBtn = document.getElementById('wiz-prev');
+        const nextBtn = document.getElementById('wiz-next');
+        const counter = document.getElementById('wiz-counter');
+
+        if (!prevBtn || !nextBtn) return;
+
+        function goToStep(step) {
+            currentStep = Math.max(1, Math.min(TOTAL_STEPS, step));
+
+            // Hide all steps, show current
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(`wizard-step-${currentStep}`);
+            if (target) target.classList.add('active');
+
+            // Update progress bar
+            progressBar.style.width = (currentStep / TOTAL_STEPS * 100) + '%';
+
+            // Update step dots
+            stepsNav.querySelectorAll('.wizard-step-dot').forEach(dot => {
+                const s = parseInt(dot.dataset.step);
+                dot.classList.toggle('active', s === currentStep);
+                dot.classList.toggle('completed', s < currentStep);
+            });
+
+            // Update buttons
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.textContent = currentStep === TOTAL_STEPS ? '✅ Finish' : 'Next →';
+            counter.textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+        }
+
+        prevBtn.addEventListener('click', () => goToStep(currentStep - 1));
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < TOTAL_STEPS) {
+                goToStep(currentStep + 1);
+            }
+        });
+
+        // Dot navigation
+        stepsNav.querySelectorAll('.wizard-step-dot').forEach(dot => {
+            dot.addEventListener('click', () => goToStep(parseInt(dot.dataset.step)));
+        });
+
+        // Add custom service
+        const addServiceBtn = document.getElementById('wiz-add-service');
+        if (addServiceBtn) {
+            addServiceBtn.addEventListener('click', () => {
+                const input = document.getElementById('wiz-custom-service');
+                if (!input.value.trim()) return;
+                const label = document.createElement('label');
+                label.className = 'wizard-checkbox';
+                label.innerHTML = `<input type="checkbox" checked /> ${input.value.trim()}`;
+                document.getElementById('wiz-services').appendChild(label);
+                input.value = '';
+            });
+        }
+
+        // Add team member
+        const addTeamBtn = document.getElementById('wiz-add-team');
+        if (addTeamBtn) {
+            addTeamBtn.addEventListener('click', () => {
+                const nameInput = document.getElementById('wiz-team-name');
+                const roleInput = document.getElementById('wiz-team-role');
+                if (!nameInput.value.trim()) return;
+                const colors = ['#14B8A6','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#10B981','#6366F1'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const initials = nameInput.value.trim().split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+                const card = document.createElement('div');
+                card.className = 'wizard-team-card';
+                card.innerHTML = `
+                    <div class="wizard-team-avatar" style="background:${color}">${initials}</div>
+                    <div><strong>${nameInput.value.trim()}</strong><br><span style="color:var(--admin-muted);font-size:12px">${roleInput.value.trim() || 'Team Member'}</span></div>
+                `;
+                document.getElementById('wiz-team').appendChild(card);
+                nameInput.value = '';
+                roleInput.value = '';
+            });
+        }
+
+        // Save all
+        const saveBtn = document.getElementById('wiz-save-all');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                // Collect all wizard data
+                const data = {
+                    name: document.getElementById('wiz-name')?.value,
+                    phone: document.getElementById('wiz-phone')?.value,
+                    email: document.getElementById('wiz-email')?.value,
+                    address: document.getElementById('wiz-address')?.value,
+                    greeting: document.getElementById('wiz-greeting')?.value,
+                    tone: document.getElementById('wiz-tone')?.value,
+                    lang: document.getElementById('wiz-lang')?.value,
+                    savedAt: new Date().toISOString()
+                };
+                localStorage.setItem('paloma-wizard-data', JSON.stringify(data));
+
+                // Show success toast
+                const toastContainer = document.getElementById('toast-container');
+                if (toastContainer) {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast success';
+                    toast.textContent = '✅ Practice setup saved! PALOMA is configured.';
+                    toastContainer.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                }
+                saveBtn.textContent = '✅ Saved!';
+                setTimeout(() => { saveBtn.textContent = '💾 Save & Activate PALOMA'; }, 3000);
+            });
+        }
+
+        // Also make onboarding visible for owner role
+        const loginForm2 = document.getElementById('login-form');
+        if (loginForm2) {
+            loginForm2.addEventListener('submit', () => {
+                const role = document.getElementById('login-role')?.value;
+                if (role === 'admin') {
+                    const ob = document.getElementById('sidebar-onboarding');
+                    if (ob) ob.classList.add('visible');
+                }
+            });
+        }
+
+        console.log('[Onboarding Wizard] Module loaded');
     })();
     </script>
 </body>
