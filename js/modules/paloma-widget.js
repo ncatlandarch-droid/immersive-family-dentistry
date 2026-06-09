@@ -189,7 +189,7 @@ class PalomaWidget {
             </div>
             <div class="paloma-input-area">
                 <button class="paloma-mic" aria-label="Speak to PALOMA" title="Tap to speak">🎤</button>
-                <input class="paloma-input" type="text" placeholder="${s.placeholder}" aria-label="${s.placeholder}" />
+                <input class="paloma-input" id="paloma-chat-input" name="message" type="text" placeholder="${s.placeholder}" aria-label="${s.placeholder}" />
                 <button class="paloma-send" aria-label="${s.sendAria}">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
