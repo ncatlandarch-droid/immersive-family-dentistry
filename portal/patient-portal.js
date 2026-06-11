@@ -15,7 +15,7 @@ let currentLang = 'en';
 
 // ─── DOM Elements ───
 const portal = document.getElementById('portal');
-const patientWelcome = document.getElementById('patient-welcome');
+const patientWelcome = document.querySelector('.portal-subtitle');
 
 // ─── Auto-initialize on load (no auth needed) ───
 document.addEventListener('DOMContentLoaded', async () => {
@@ -41,7 +41,7 @@ async function loadPatientData() {
         timeline = timelineRes;
 
         // Update welcome
-        if (patientData?.patient) {
+        if (patientData?.patient && patientWelcome) {
             patientWelcome.textContent = `Welcome, ${patientData.patient.firstName}! 🕊️`;
         }
 
@@ -91,7 +91,7 @@ function loadFallbackData() {
         ]
     };
 
-    patientWelcome.textContent = 'Welcome, Chris! 🕊️';
+    if (patientWelcome) patientWelcome.textContent = 'Demo Patient: Chris Harrison';
 }
 
 // ─── Initialize Portal ───
