@@ -299,13 +299,14 @@ function initHealthSummary() {
         const lowerTeeth = dentalChart.teeth.filter(t => t.toothNumber > 16).sort((a,b) => b.toothNumber - a.toothNumber);
 
         chartContainer.innerHTML = `
-            <h3 style="font-family:'Outfit',sans-serif;font-size:16px;margin-bottom:12px;">Dental Chart</h3>
+            <h3 style="font-family:'Outfit',sans-serif;font-size:16px;margin-bottom:12px;">Dental Chart <span style="font-size:12px;color:var(--portal-muted);font-weight:400;">— click any tooth</span></h3>
             <p style="font-size:11px;color:var(--portal-muted);margin-bottom:12px;">Upper Arch (1-16)</p>
             <div class="dental-grid">
                 ${upperTeeth.map(t => `
                     <div class="dental-grid__tooth ${t.color} ${t.status === 'extracted' ? 'extracted' : ''}"
                          title="#${t.toothNumber} — ${t.name}: ${t.status}"
-                         data-tooth="${t.toothNumber}">
+                         data-tooth="${t.toothNumber}"
+                         style="cursor:pointer;">
                         ${t.toothNumber}
                     </div>
                 `).join('')}
@@ -315,7 +316,8 @@ function initHealthSummary() {
                 ${lowerTeeth.map(t => `
                     <div class="dental-grid__tooth ${t.color} ${t.status === 'extracted' ? 'extracted' : ''}"
                          title="#${t.toothNumber} — ${t.name}: ${t.status}"
-                         data-tooth="${t.toothNumber}">
+                         data-tooth="${t.toothNumber}"
+                         style="cursor:pointer;">
                         ${t.toothNumber}
                     </div>
                 `).join('')}
@@ -326,7 +328,50 @@ function initHealthSummary() {
                 <span>🔴 Needs Treatment</span>
                 <span>⬜ Extracted</span>
             </div>
+            <div id="health-tooth-detail" style="display:none;margin-top:16px;padding:16px 20px;background:var(--portal-surface-alt);border-radius:12px;border:1px solid var(--portal-border);animation:slideUp 0.25s ease;">
+                <button id="health-tooth-close" style="float:right;background:none;border:none;font-size:16px;color:var(--portal-muted);cursor:pointer;">✕</button>
+                <h4 id="health-tooth-name" style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;"></h4>
+                <span id="health-tooth-badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px;"></span>
+                <div id="health-tooth-findings" style="font-size:13px;color:#475569;line-height:1.7;"></div>
+            </div>
         `;
+
+        // Click handlers for dental chart
+        chartContainer.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-tooth]');
+            if (!el) return;
+            const num = parseInt(el.dataset.tooth);
+            const t = dentalChart.teeth.find(t => t.toothNumber === num);
+            if (!t) return;
+
+            // Highlight
+            chartContainer.querySelectorAll('.dental-grid__tooth').forEach(el => el.style.outline = '');
+            el.style.outline = '3px solid #0D4F4F';
+
+            document.getElementById('health-tooth-name').textContent = `Tooth #${num} — ${t.name}`;
+
+            const badge = document.getElementById('health-tooth-badge');
+            badge.textContent = capitalize(t.status);
+            if (t.status === 'healthy') { badge.style.background = '#D1FAE5'; badge.style.color = '#065F46'; }
+            else if (t.status === 'restored') { badge.style.background = '#DBEAFE'; badge.style.color = '#1E40AF'; }
+            else if (t.status === 'monitor') { badge.style.background = '#FEF3C7'; badge.style.color = '#92400E'; }
+            else if (t.status === 'extracted') { badge.style.background = '#F1F5F9'; badge.style.color = '#475569'; }
+
+            const findings = t.findings || ['No findings'];
+            document.getElementById('health-tooth-findings').innerHTML = `
+                <ul style="list-style:none;padding:0;margin:4px 0 0;">
+                    ${findings.map(f => `<li style="padding:3px 0;">• ${f}</li>`).join('')}
+                </ul>
+                ${t.notes ? `<p style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748B;font-style:italic;">📝 ${t.notes}</p>` : ''}
+            `;
+
+            document.getElementById('health-tooth-detail').style.display = 'block';
+        });
+
+        document.getElementById('health-tooth-close')?.addEventListener('click', () => {
+            document.getElementById('health-tooth-detail').style.display = 'none';
+            chartContainer.querySelectorAll('.dental-grid__tooth').forEach(el => el.style.outline = '');
+        });
     }
 }
 
