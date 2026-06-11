@@ -1134,3 +1134,126 @@ a { color: var(--portal-teal); text-decoration: none; }
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ═══ Visual Vertical Timeline ═══ */
+.vt-timeline { display: flex; flex-direction: column; gap: 0; }
+
+.vt-card {
+    display: flex;
+    gap: 16px;
+    position: relative;
+}
+
+.vt-card__line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+    flex-shrink: 0;
+    padding-top: 4px;
+}
+
+.vt-card__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    z-index: 1;
+}
+.vt-card__dot.past { background: var(--portal-teal); box-shadow: 0 0 0 3px rgba(13,79,79,0.15); }
+.vt-card__dot.upcoming { background: #fff; border: 3px solid var(--portal-teal); box-shadow: 0 0 0 3px rgba(13,79,79,0.1); }
+
+.vt-card__connector {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(to bottom, var(--portal-teal), var(--portal-border));
+    margin: 4px 0;
+    min-height: 20px;
+}
+
+.vt-card__content {
+    flex: 1;
+    background: var(--portal-surface);
+    border: 1px solid var(--portal-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+.vt-card__content:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: var(--portal-teal); }
+.vt-upcoming .vt-card__content { border-left: 3px solid var(--portal-teal); background: linear-gradient(135deg, #F0FDF4, var(--portal-surface)); }
+
+.vt-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.vt-card__icon { font-size: 24px; }
+.vt-card__date { font-size: 13px; font-weight: 700; color: var(--portal-text); }
+.vt-card__type { font-size: 11px; color: var(--portal-muted); font-weight: 500; }
+
+.vt-card__status {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.vt-card__status.completed { background: #D1FAE5; color: #065F46; }
+.vt-card__status.upcoming { background: #FEF3C7; color: #92400E; }
+
+.vt-card__title { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; color: var(--portal-text); margin-bottom: 6px; }
+.vt-card__desc { font-size: 13px; color: var(--portal-muted); line-height: 1.6; }
+.vt-card__provider { font-size: 12px; color: var(--portal-muted); margin-top: 8px; font-weight: 500; }
+
+.vt-card__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.vt-chip { padding: 3px 10px; background: #F0FDF4; border-radius: 20px; font-size: 11px; color: #065F46; font-weight: 500; }
+
+/* ═══ Secure Messages ═══ */
+.msg-thread {
+    border: 1px solid var(--portal-border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+.msg-thread:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.msg-unread { border-left: 3px solid var(--portal-teal); }
+
+.msg-thread__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--portal-surface);
+    gap: 12px;
+}
+
+.msg-thread__left { display: flex; align-items: center; gap: 10px; }
+.msg-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--portal-teal); flex-shrink: 0; }
+.msg-thread__subject { font-size: 14px; font-weight: 700; color: var(--portal-text); }
+.msg-thread__preview { font-size: 12px; color: var(--portal-muted); margin-top: 2px; }
+.msg-thread__date { font-size: 11px; color: var(--portal-muted); white-space: nowrap; font-weight: 500; }
+
+.msg-thread__body {
+    display: none;
+    padding: 12px 18px 18px;
+    background: var(--portal-surface-alt);
+    border-top: 1px solid var(--portal-border);
+}
+.msg-expanded .msg-thread__body { display: block; }
+
+.msg-bubble {
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    max-width: 85%;
+}
+.msg-received { background: #fff; border: 1px solid var(--portal-border); }
+.msg-sent { background: #D1FAE5; margin-left: auto; }
+
+.msg-bubble__from { font-size: 11px; font-weight: 700; color: var(--portal-text); margin-bottom: 4px; }
+.msg-bubble__time { font-weight: 400; color: var(--portal-muted); }
+.msg-bubble__text { font-size: 13px; color: #475569; line-height: 1.6; }

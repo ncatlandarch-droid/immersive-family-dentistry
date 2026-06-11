@@ -104,6 +104,7 @@ function initPortal() {
     try { initTimeline(); } catch(e) { console.error('Timeline init error:', e); }
     try { initCostCenter(); } catch(e) { console.error('Cost init error:', e); }
     try { initTreatmentPlan(); } catch(e) { console.error('Plan init error:', e); }
+    try { initMessages(); } catch(e) { console.error('Messages init error:', e); }
     try { initTimelineBar(); } catch(e) { console.error('TimelineBar init error:', e); }
     try { initPortalChat(); } catch(e) { console.error('Chat init error:', e); }
 }
@@ -375,16 +376,96 @@ function initHealthSummary() {
     }
 }
 
-// ─── Timeline ───
+// ─── Timeline (Visual Vertical) ───
 function initTimeline() {
     const container = document.getElementById('timeline-container');
     const visits = timeline?.visits || [];
 
-    container.innerHTML = visits.map(v => `
-        <div class="timeline-item ${v.status === 'upcoming' ? 'upcoming' : ''}">
-            <div class="timeline-item__date">${formatDate(v.date)} • ${v.type}</div>
-            <div class="timeline-item__title">${v.title}</div>
-            <div class="timeline-item__desc">${v.description}</div>
+    const typeIcons = { 'New Patient': '👋', 'Diagnostic': '🔬', 'Restorative': '🔧', 'Preventive': '✨' };
+
+    container.innerHTML = visits.map((v, i) => `
+        <div class="vt-card ${v.status === 'upcoming' ? 'vt-upcoming' : ''}">
+            <div class="vt-card__line">
+                <div class="vt-card__dot ${v.status === 'upcoming' ? 'upcoming' : 'past'}"></div>
+                ${i < visits.length - 1 ? '<div class="vt-card__connector"></div>' : ''}
+            </div>
+            <div class="vt-card__content">
+                <div class="vt-card__header">
+                    <span class="vt-card__icon">${typeIcons[v.type] || '📅'}</span>
+                    <div>
+                        <div class="vt-card__date">${formatDate(v.date)}</div>
+                        <div class="vt-card__type">${v.type}</div>
+                    </div>
+                    <span class="vt-card__status ${v.status}">${v.status === 'upcoming' ? '🔔 Upcoming' : '✓ Completed'}</span>
+                </div>
+                <div class="vt-card__title">${v.title}</div>
+                <div class="vt-card__desc">${v.description}</div>
+                <div class="vt-card__provider">👤 ${v.provider || 'Dr. Brenes'}</div>
+                ${v.highlights?.length ? `
+                    <div class="vt-card__chips">
+                        ${v.highlights.map(h => `<span class="vt-chip">${h}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// ─── Messages (Demo) ───
+function initMessages() {
+    const container = document.getElementById('messages-container');
+    if (!container) return;
+
+    const threads = [
+        {
+            subject: 'Crown #30 — Treatment Options',
+            date: '2026-05-14',
+            unread: true,
+            messages: [
+                { from: 'Dr. Brenes', time: 'May 14, 2:30 PM', text: 'Hi Chris! After today\'s scan, I wanted to follow up on tooth #30. The AI detected a hairline fracture on the ML cusp (82% confidence). I recommend a zirconia crown to prevent further damage. Happy to discuss options at your next visit or feel free to reply here!' },
+                { from: 'Chris Harrison', time: 'May 14, 4:15 PM', text: 'Thanks Dr. Brenes! I saw that on my MouthMap — really helpful to visualize it. What\'s the timeline if I decide to go ahead? And what would insurance cover?' },
+                { from: 'Dr. Brenes', time: 'May 15, 9:00 AM', text: 'Great question! It\'s a two-visit process — digital prep + scan (visit 1), then crown delivery ~2 weeks later. Your Delta Dental PPO covers 50%, so your out-of-pocket would be approximately $700. No rush on the decision — the fracture is stable for now. Let me know! 🙂' },
+            ]
+        },
+        {
+            subject: 'Appointment Confirmation — Sept 10',
+            date: '2026-06-01',
+            unread: false,
+            messages: [
+                { from: 'Lake Jeanette Family Dentistry', time: 'Jun 1, 10:00 AM', text: 'Hi Chris! This is a confirmation for your upcoming appointment:\\n\\n📅 September 10, 2026 at 9:00 AM\\n🦷 Periodontal Maintenance & AI Scan\\n👤 Emily (Hygienist) + Dr. Brenes\\n\\nReply to confirm or reschedule. See you then! 🕊️' },
+                { from: 'Chris Harrison', time: 'Jun 1, 11:22 AM', text: 'Confirmed! See you then.' },
+            ]
+        },
+        {
+            subject: 'Night Guard Recommendation',
+            date: '2026-05-16',
+            unread: false,
+            messages: [
+                { from: 'Dr. Brenes', time: 'May 16, 3:00 PM', text: 'Hi Chris, one more thing from your last visit — I noticed moderate wear facets on your canines and premolars, which suggests bruxism (teeth grinding). I recommend a custom night guard to protect your crown on #14 and prevent further issues with #30. It\'s a single visit for the digital scan, then we fabricate it in about 2 weeks. Let me know if you\'d like to add this to your treatment plan!' },
+            ]
+        }
+    ];
+
+    container.innerHTML = threads.map((t, i) => `
+        <div class="msg-thread ${t.unread ? 'msg-unread' : ''}" data-thread="${i}">
+            <div class="msg-thread__header" style="cursor:pointer;" onclick="this.parentElement.classList.toggle('msg-expanded')">
+                <div class="msg-thread__left">
+                    ${t.unread ? '<span class="msg-dot"></span>' : ''}
+                    <div>
+                        <div class="msg-thread__subject">${t.subject}</div>
+                        <div class="msg-thread__preview">${t.messages[t.messages.length - 1].text.substring(0, 80)}...</div>
+                    </div>
+                </div>
+                <div class="msg-thread__date">${formatDate(t.date)}</div>
+            </div>
+            <div class="msg-thread__body">
+                ${t.messages.map(m => `
+                    <div class="msg-bubble ${m.from === 'Chris Harrison' ? 'msg-sent' : 'msg-received'}">
+                        <div class="msg-bubble__from">${m.from} <span class="msg-bubble__time">• ${m.time}</span></div>
+                        <div class="msg-bubble__text">${m.text.replace(/\\n/g, '<br>')}</div>
+                    </div>
+                `).join('')}
+            </div>
         </div>
     `).join('');
 }
