@@ -398,57 +398,211 @@
   </section>
 
   <!-- ============================
-       INTERACTIVE 3D MODEL
+       INTERACTIVE 3D MOUTHMAP
        ============================ -->
   <section class="section" id="digital-twin-demo">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Digital Technology</span>
-        <h2>Advanced 3D Scanning &amp; Digital Workflow</h2>
-        <p>This is the level of digital detail we capture for every patient using advanced 3D scanning technology. Click and drag to rotate. Scroll to zoom.</p>
+        <span class="section-label">MouthMap Technology</span>
+        <h2>Your Teeth in Interactive 3D</h2>
+        <p>This is the level of digital detail we capture for every patient. Click any tooth to see its status. Drag to rotate. Scroll to zoom. This is <strong>MouthMap</strong> — your personal dental digital twin.</p>
       </div>
 
-      <div class="sketchfab-embed-wrapper reveal" style="position:relative; width:100%; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-xl);">
-        <iframe 
-          title="Human mouth detailed" 
-          frameborder="0" 
-          allowfullscreen 
-          mozallowfullscreen="true" 
-          webkitallowfullscreen="true" 
-          allow="autoplay; fullscreen; xr-spatial-tracking" 
-          xr-spatial-tracking 
-          execution-while-out-of-viewport 
-          execution-while-not-rendered 
-          web-share 
-          style="width:100%; height:550px; border-radius:var(--radius-lg);"
-          src="https://sketchfab.com/models/522eda0ec0e3413a914b1b298a791320/embed?autostart=1&transparent=1&ui_theme=dark&dnt=1">
-        </iframe>
-        <p style="font-size: 12px; font-weight: normal; margin: 8px 0 0; color: var(--color-slate); text-align:center;">
-          <a href="https://sketchfab.com/3d-models/human-mouth-detailed-522eda0ec0e3413a914b1b298a791320" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Human mouth detailed</a> by 
-          <a href="https://sketchfab.com/Mince" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Mince</a> on 
-          <a href="https://sketchfab.com" target="_blank" rel="nofollow" style="font-weight: bold; color: var(--color-cyan);">Sketchfab</a>
-        </p>
+      <div class="reveal" id="homepage-mouth-wrapper" style="position:relative; width:100%; height:500px; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-xl); background:#f1f5f9;">
+        <div id="homepage-mouth-viewer" style="width:100%;height:100%;"></div>
+        <div id="homepage-mouth-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#64748B;">
+          <div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#0D4F4F;border-radius:50%;animation:spin 1s linear infinite;"></div>
+          <p>Loading 3D MouthMap...</p>
+        </div>
+        <div id="homepage-tooth-info" style="display:none;position:absolute;bottom:16px;left:16px;right:16px;background:white;border-radius:12px;padding:16px 20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);border:1px solid #e2e8f0;z-index:10;">
+          <button id="homepage-tooth-close" style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:16px;color:#64748B;cursor:pointer;">✕</button>
+          <h4 id="homepage-tooth-name" style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;"></h4>
+          <span id="homepage-tooth-status" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px;"></span>
+          <div id="homepage-tooth-detail" style="font-size:13px;color:#64748B;line-height:1.6;"></div>
+        </div>
+        <button id="homepage-reset-btn" style="position:absolute;bottom:12px;left:12px;z-index:5;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;color:#64748B;border:1px solid #e2e8f0;background:white;cursor:pointer;">↺ Reset View</button>
       </div>
 
       <div style="display:flex; justify-content:center; gap:var(--space-lg); margin-top:var(--space-2xl); flex-wrap:wrap;">
         <div class="reveal" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
           <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">🖱️</div>
-          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Click + Drag</div>
-          <div style="font-size:var(--text-sm); color:var(--color-slate);">Rotate the model</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Click a Tooth</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">See diagnostics & status</div>
         </div>
         <div class="reveal reveal-delay-1" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
           <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">🔍</div>
-          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Scroll</div>
-          <div style="font-size:var(--text-sm); color:var(--color-slate);">Zoom in and out</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Scroll to Zoom</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">Examine every detail</div>
         </div>
         <div class="reveal reveal-delay-2" style="text-align:center; padding:var(--space-lg) var(--space-xl); background:var(--color-surface); border-radius:var(--radius-md); flex:1; min-width:200px; max-width:280px;">
-          <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">👆</div>
-          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">Right-Click + Drag</div>
-          <div style="font-size:var(--text-sm); color:var(--color-slate);">Pan the view</div>
+          <div style="font-size:1.5rem; margin-bottom:var(--space-sm);">🦷</div>
+          <div style="font-weight:600; font-family:var(--font-heading); margin-bottom:4px;">AI-Powered Analysis</div>
+          <div style="font-size:var(--text-sm); color:var(--color-slate);">Color-coded health status</div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Three.js for homepage 3D viewer -->
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+  (function() {
+    // Wait for DOM + Three.js
+    window.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('homepage-mouth-viewer');
+      const loading = document.getElementById('homepage-mouth-loading');
+      if (!container || typeof THREE === 'undefined') return;
+
+      try {
+        // Scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf1f5f9);
+
+        const { width, height } = container.getBoundingClientRect();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 120);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.rotateSpeed = 0.8;
+        controls.minDistance = 30;
+        controls.maxDistance = 250;
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+        dir.position.set(50, 50, 50);
+        scene.add(dir);
+        scene.add(new THREE.DirectionalLight(0xffffff, 0.3).translateX(-30));
+
+        // Demo chart
+        const chart = [
+          { n:14, status:'restored', color:0x10b981, label:'Crown (Zirconia)', detail:'Crown placed 2026-03-12. AI: No recurrent decay. Excellent margins.' },
+          { n:19, status:'restored', color:0x10b981, label:'Composite Filling', detail:'Composite restoration (2021). AI: Stable, no secondary caries.' },
+          { n:30, status:'monitor', color:0xf59e0b, label:'Hairline Fracture', detail:'AI: Hairline ML cusp fracture detected (82% confidence). Crown recommended.' },
+          { n:16, status:'extracted', color:0x94a3b8, label:'Extracted', detail:'Wisdom tooth extracted prior to becoming patient.' },
+        ];
+
+        const toothNames = {1:'Upper R. 3rd Molar',2:'Upper R. 2nd Molar',3:'Upper R. 1st Molar',4:'Upper R. 2nd Premolar',5:'Upper R. 1st Premolar',6:'Upper R. Canine',7:'Upper R. Lat. Incisor',8:'Upper R. Cent. Incisor',9:'Upper L. Cent. Incisor',10:'Upper L. Lat. Incisor',11:'Upper L. Canine',12:'Upper L. 1st Premolar',13:'Upper L. 2nd Premolar',14:'Upper L. 1st Molar',15:'Upper L. 2nd Molar',16:'Upper L. 3rd Molar',17:'Lower L. 3rd Molar',18:'Lower L. 2nd Molar',19:'Lower L. 1st Molar',20:'Lower L. 2nd Premolar',21:'Lower L. 1st Premolar',22:'Lower L. Canine',23:'Lower L. Lat. Incisor',24:'Lower L. Cent. Incisor',25:'Lower R. Cent. Incisor',26:'Lower R. Lat. Incisor',27:'Lower R. Canine',28:'Lower R. 1st Premolar',29:'Lower R. 2nd Premolar',30:'Lower R. 1st Molar',31:'Lower R. 2nd Molar',32:'Lower R. 3rd Molar'};
+
+        const markers = [];
+
+        function createArch(archType, yPos, flipX) {
+          const group = new THREE.Group();
+          for (let i = 0; i < 16; i++) {
+            const toothNum = archType === 'upper' ? i + 1 : 32 - i;
+            const angle = (Math.PI * 0.85) * (i / 15) - (Math.PI * 0.85 / 2);
+            const x = Math.sin(angle) * 35;
+            const z = Math.cos(angle) * 35 - 35;
+
+            let geo;
+            if (i < 2 || i > 13) geo = new THREE.BoxGeometry(4, 5, 4.5, 2, 2, 2);
+            else if (i < 5 || i > 10) geo = new THREE.BoxGeometry(3.5, 5.5, 3.5, 2, 2, 2);
+            else if (i === 5 || i === 10) geo = new THREE.ConeGeometry(2, 6, 6);
+            else geo = new THREE.BoxGeometry(3, 6, 2.5, 2, 2, 2);
+
+            const entry = chart.find(c => c.n === toothNum);
+            const color = entry ? entry.color : 0xf5e6d3;
+
+            const mat = new THREE.MeshPhysicalMaterial({ color, roughness: 0.35, metalness: 0.05, clearcoat: 0.3 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, 0, z);
+            mesh.rotation.y = -angle;
+            mesh.userData = { toothNumber: toothNum, entry: entry || null };
+            group.add(mesh);
+            markers.push(mesh);
+          }
+          group.position.y = yPos;
+          if (flipX) group.rotation.x = Math.PI;
+          return group;
+        }
+
+        scene.add(createArch('upper', 8, false));
+        scene.add(createArch('lower', -8, true));
+        loading.style.display = 'none';
+
+        // Click handling
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        renderer.domElement.addEventListener('click', function(e) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          const hits = raycaster.intersectObjects(markers);
+          if (hits.length > 0) {
+            const t = hits[0].object;
+            const num = t.userData.toothNumber;
+            const entry = t.userData.entry;
+            markers.forEach(m => m.material.emissive.setHex(0x000000));
+            t.material.emissive.setHex(0x4A7FB5);
+            t.material.emissiveIntensity = 0.3;
+
+            document.getElementById('homepage-tooth-name').textContent = 'Tooth #' + num + ' — ' + (toothNames[num] || '');
+            const badge = document.getElementById('homepage-tooth-status');
+            if (entry) {
+              badge.textContent = entry.status.charAt(0).toUpperCase() + entry.status.slice(1);
+              badge.style.background = entry.color === 0x10b981 ? '#D1FAE5' : entry.color === 0xf59e0b ? '#FEF3C7' : '#F1F5F9';
+              badge.style.color = entry.color === 0x10b981 ? '#065F46' : entry.color === 0xf59e0b ? '#92400E' : '#475569';
+              document.getElementById('homepage-tooth-detail').innerHTML = entry.detail;
+            } else {
+              badge.textContent = 'Healthy';
+              badge.style.background = '#D1FAE5';
+              badge.style.color = '#065F46';
+              document.getElementById('homepage-tooth-detail').innerHTML = 'No findings. This tooth looks healthy! ✓';
+            }
+            document.getElementById('homepage-tooth-info').style.display = 'block';
+          }
+        });
+
+        renderer.domElement.addEventListener('mousemove', function(e) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          renderer.domElement.style.cursor = raycaster.intersectObjects(markers).length > 0 ? 'pointer' : 'grab';
+        });
+
+        document.getElementById('homepage-tooth-close').addEventListener('click', function() {
+          document.getElementById('homepage-tooth-info').style.display = 'none';
+          markers.forEach(m => m.material.emissive.setHex(0x000000));
+        });
+
+        document.getElementById('homepage-reset-btn').addEventListener('click', function() {
+          camera.position.set(0, 0, 120);
+          controls.reset();
+        });
+
+        // Resize
+        window.addEventListener('resize', function() {
+          const { width: w, height: h } = container.getBoundingClientRect();
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h);
+        });
+
+        // Animate
+        (function animate() {
+          requestAnimationFrame(animate);
+          controls.update();
+          renderer.render(scene, camera);
+        })();
+
+      } catch(err) {
+        loading.innerHTML = '<p style="font-size:16px;color:#64748B;">🦷 Interactive 3D viewer — <a href="/portal/patient" style="color:#0D4F4F;font-weight:600;">try the full demo →</a></p>';
+        console.error('Homepage 3D:', err);
+      }
+    });
+  })();
+  </script>
 
   <!-- ============================
        YOUR VISIT
