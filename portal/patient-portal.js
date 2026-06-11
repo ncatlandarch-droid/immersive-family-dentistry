@@ -13,12 +13,14 @@ let timeline = null;
 let mouthViewer = null;
 let currentLang = 'en';
 
-// ─── DOM Elements ───
-const portal = document.getElementById('portal');
-const patientWelcome = document.querySelector('.portal-subtitle');
+// ─── DOM Elements (set on load) ───
+let portalEl = null;
+let patientWelcome = null;
 
 // ─── Auto-initialize on load (no auth needed) ───
 document.addEventListener('DOMContentLoaded', async () => {
+    portalEl = document.getElementById('portal');
+    patientWelcome = document.querySelector('.portal-subtitle');
     await loadPatientData();
     initPortal();
 });
