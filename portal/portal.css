@@ -1257,3 +1257,46 @@ a { color: var(--portal-teal); text-decoration: none; }
 .msg-bubble__from { font-size: 11px; font-weight: 700; color: var(--portal-text); margin-bottom: 4px; }
 .msg-bubble__time { font-weight: 400; color: var(--portal-muted); }
 .msg-bubble__text { font-size: 13px; color: #475569; line-height: 1.6; }
+
+/* ═══ Inbox Header ═══ */
+.inbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.inbox-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inbox-badge {
+    display: none;
+    padding: 3px 10px;
+    background: var(--portal-teal);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.inbox-search {
+    padding: 8px 14px;
+    border: 1px solid var(--portal-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    background: var(--portal-surface);
+    color: var(--portal-text);
+    width: 200px;
+    transition: all 0.2s ease;
+}
+.inbox-search:focus {
+    outline: none;
+    border-color: var(--portal-teal);
+    box-shadow: 0 0 0 3px rgba(13,79,79,0.1);
+}

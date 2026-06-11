@@ -443,6 +443,24 @@ function initMessages() {
             messages: [
                 { from: 'Dr. Brenes', time: 'May 16, 3:00 PM', text: 'Hi Chris, one more thing from your last visit — I noticed moderate wear facets on your canines and premolars, which suggests bruxism (teeth grinding). I recommend a custom night guard to protect your crown on #14 and prevent further issues with #30. It\'s a single visit for the digital scan, then we fabricate it in about 2 weeks. Let me know if you\'d like to add this to your treatment plan!' },
             ]
+        },
+        {
+            subject: 'Insurance EOB — May Visit',
+            date: '2026-05-28',
+            unread: true,
+            messages: [
+                { from: 'Billing Team', time: 'May 28, 8:00 AM', text: 'Hi Chris, your Explanation of Benefits for your May 14 visit has been processed by Delta Dental PPO. Here\'s a summary:\\n\\n• Preventive Cleaning (D1110): $0 patient cost — covered 100%\\n• Periodic Exam (D0120): $0 patient cost — covered 100%\\n• Full Mouth Scan (D0330): $45 patient cost — covered 80%\\n\\nTotal due: $45.00\\nAccount balance: $45.00\\n\\nYou can pay online through the Cost Center tab or call us. Thanks!' },
+                { from: 'Chris Harrison', time: 'May 28, 12:15 PM', text: 'Thanks! I\'ll pay through the portal. Can I set up autopay for future visits?' },
+                { from: 'Billing Team', time: 'May 29, 9:30 AM', text: 'Absolutely! We\'re rolling out autopay with our new PALOMA system this fall. For now, you can pay per visit in the Cost Center. We\'ll notify you as soon as autopay is live! 🕊️' },
+            ]
+        },
+        {
+            subject: 'Welcome to My MouthMap! 🕊️',
+            date: '2025-10-15',
+            unread: false,
+            messages: [
+                { from: 'Lake Jeanette Family Dentistry', time: 'Oct 15, 10:00 AM', text: 'Welcome to My MouthMap, Chris! 👋\\n\\nYour patient portal is now active. Here\'s what you can do:\\n\\n🦷 My Scan — View your 3D digital twin\\n❤️ Health Summary — Track dental health at a glance\\n📅 Timeline — See your full visit history\\n💰 Cost Center — View costs, insurance, and balances\\n📋 Treatment Plan — Review recommended treatments\\n💬 Messages — Secure messaging with our team\\n\\nAnd of course, PALOMA — your AI dental guide — is always here to answer questions about your health.\\n\\nWe\'re so glad you\'re part of the Lake Jeanette family!' },
+            ]
         }
     ];
 
@@ -468,6 +486,26 @@ function initMessages() {
             </div>
         </div>
     `).join('');
+
+    // Unread badge
+    const unreadCount = threads.filter(t => t.unread).length;
+    const badge = document.getElementById('inbox-unread-badge');
+    if (badge && unreadCount > 0) {
+        badge.textContent = `${unreadCount} unread`;
+        badge.style.display = 'inline-block';
+    }
+
+    // Search filter
+    const searchInput = document.getElementById('inbox-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase();
+            container.querySelectorAll('.msg-thread').forEach(el => {
+                const text = el.textContent.toLowerCase();
+                el.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+    }
 }
 
 // ─── Cost Center ───

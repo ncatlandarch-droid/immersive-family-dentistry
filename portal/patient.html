@@ -61,7 +61,7 @@
                     <span class="nav-icon">📋</span> Treatment Plan
                 </button>
                 <button class="nav-item" data-view="messages">
-                    <span class="nav-icon">💬</span> Messages
+                    <span class="nav-icon">💬</span> Inbox
                 </button>
             </nav>
 
@@ -140,12 +140,15 @@
 
                 <!-- View: Messages -->
                 <div id="view-messages" class="portal-view">
-                    <h2>💬 Messages</h2>
+                    <div class="inbox-header">
+                        <h2>💬 Inbox</h2>
+                        <div class="inbox-controls">
+                            <span class="inbox-badge" id="inbox-unread-badge"></span>
+                            <input type="text" class="inbox-search" id="inbox-search" placeholder="Search messages..." />
+                        </div>
+                    </div>
                     <div id="messages-container"></div>
                 </div>
-
-                <!-- Bottom Timeline Bar -->
-                <div id="portal-timeline-bar" class="portal-timeline-bar"></div>
             </main>
 
             <!-- Right: PALOMA Personal Chat -->
