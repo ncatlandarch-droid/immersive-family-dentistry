@@ -461,20 +461,74 @@ function initTreatmentPlan() {
     `).join('');
 }
 
-// ─── Bottom Timeline Bar ───
+// ─── Bottom Timeline Bar (Interactive + Scrollable) ───
 function initTimelineBar() {
     const container = document.getElementById('portal-timeline-bar');
     const visits = timeline?.visits || [];
+    if (!visits.length) return;
 
     container.innerHTML = `
-        <div class="timeline-bar-track">
-            ${visits.map(v => `
-                <div class="timeline-bar-dot ${v.status === 'upcoming' ? 'upcoming' : 'past'}" title="${v.title} — ${v.date}">
-                    <span class="timeline-bar-dot__label">${v.date ? new Date(v.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' }) : '?'}</span>
-                </div>
-            `).join('')}
+        <button class="tl-arrow tl-arrow--left" id="tl-scroll-left">‹</button>
+        <div class="timeline-bar-scroll" id="tl-scroll-area">
+            <div class="timeline-bar-track">
+                ${visits.map((v, i) => `
+                    <div class="timeline-bar-dot ${v.status === 'upcoming' ? 'upcoming' : 'past'}" 
+                         data-visit-idx="${i}" 
+                         title="${v.title}"
+                         style="cursor:pointer;">
+                        <span class="timeline-bar-dot__label">${v.date ? new Date(v.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: '2-digit' }) : '?'}</span>
+                        <span class="timeline-bar-dot__type">${v.type || ''}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        <button class="tl-arrow tl-arrow--right" id="tl-scroll-right">›</button>
+        <div class="tl-detail-popup" id="tl-detail" style="display:none;">
+            <button class="tl-detail-close" id="tl-detail-close">✕</button>
+            <div class="tl-detail-date" id="tl-detail-date"></div>
+            <div class="tl-detail-title" id="tl-detail-title"></div>
+            <div class="tl-detail-desc" id="tl-detail-desc"></div>
+            <div class="tl-detail-highlights" id="tl-detail-highlights"></div>
         </div>
     `;
+
+    // Scroll arrows
+    const scrollArea = document.getElementById('tl-scroll-area');
+    document.getElementById('tl-scroll-left').addEventListener('click', () => {
+        scrollArea.scrollBy({ left: -150, behavior: 'smooth' });
+    });
+    document.getElementById('tl-scroll-right').addEventListener('click', () => {
+        scrollArea.scrollBy({ left: 150, behavior: 'smooth' });
+    });
+
+    // Click dots
+    container.addEventListener('click', (e) => {
+        const dot = e.target.closest('[data-visit-idx]');
+        if (!dot) return;
+        const idx = parseInt(dot.dataset.visitIdx);
+        const v = visits[idx];
+        if (!v) return;
+
+        // Highlight active
+        container.querySelectorAll('.timeline-bar-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+
+        document.getElementById('tl-detail-date').textContent = `${formatDate(v.date)} • ${v.type}`;
+        document.getElementById('tl-detail-title').textContent = v.title;
+        document.getElementById('tl-detail-desc').textContent = v.description;
+        
+        const highlights = v.highlights || [];
+        document.getElementById('tl-detail-highlights').innerHTML = highlights.length 
+            ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${highlights.map(h => `<span style="padding:3px 10px;background:#F0FDF4;border-radius:20px;font-size:11px;color:#065F46;font-weight:500;">${h}</span>`).join('')}</div>`
+            : '';
+
+        document.getElementById('tl-detail').style.display = 'block';
+    });
+
+    document.getElementById('tl-detail-close').addEventListener('click', () => {
+        document.getElementById('tl-detail').style.display = 'none';
+        container.querySelectorAll('.timeline-bar-dot').forEach(d => d.classList.remove('active'));
+    });
 }
 
 // ─── PALOMA Personal Chat ───
