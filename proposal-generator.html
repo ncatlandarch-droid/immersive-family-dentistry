@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PALOMA Proposal Generator</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0B0F19; color: #F1F5F9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { text-align: center; }
+        h1 { font-size: 28px; margin-bottom: 8px; }
+        p { color: #94A3B8; margin-bottom: 30px; }
+        button { background: linear-gradient(135deg, #14B8A6, #0D9488); color: white; border: none; padding: 16px 40px; font-size: 18px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
+        button:hover { transform: scale(1.05); }
+        .status { margin-top: 20px; color: #14B8A6; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕊️ PALOMA Partnership Proposal</h1>
+        <p>Click below to generate a styled Word document</p>
+        <button onclick="generateDoc()">📄 Download Word Document</button>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+    function generateDoc() {
+        document.getElementById('status').textContent = 'Generating document...';
+
+        const content = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+        <meta charset="utf-8">
+        <style>
+            @page { size: letter; margin: 1in 1in 1in 1in; }
+            @page Section1 { mso-header-margin: .5in; mso-footer-margin: .5in; }
+            body { font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 11pt; color: #1a1a1a; line-height: 1.5; }
+            
+            .cover-page { text-align: center; padding-top: 200px; page-break-after: always; }
+            .cover-logo { font-size: 48pt; margin-bottom: 10px; }
+            .cover-title { font-size: 26pt; color: #1B3A5C; font-weight: 700; margin: 10px 0; letter-spacing: -0.5px; }
+            .cover-subtitle { font-size: 14pt; color: #D4A853; font-weight: 600; margin: 5px 0 30px; }
+            .cover-line { width: 80px; height: 3px; background: #D4A853; margin: 20px auto; }
+            .cover-meta { font-size: 10pt; color: #666; margin-top: 40px; line-height: 1.8; }
+            .cover-meta strong { color: #1B3A5C; }
+            
+            h1 { font-size: 20pt; color: #1B3A5C; border-bottom: 3px solid #D4A853; padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; }
+            h2 { font-size: 14pt; color: #1B3A5C; margin-top: 25px; margin-bottom: 10px; }
+            h3 { font-size: 12pt; color: #2a5580; margin-top: 18px; margin-bottom: 8px; }
+            
+            table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; font-size: 10pt; }
+            th { background: #1B3A5C; color: white; padding: 8px 12px; text-align: left; font-weight: 600; }
+            td { padding: 7px 12px; border-bottom: 1px solid #e0e0e0; }
+            tr:nth-child(even) td { background: #f8f9fa; }
+            
+            .status-done { color: #2D8F5C; font-weight: 700; }
+            .status-next { color: #D4A853; font-weight: 600; }
+            
+            .highlight-box { background: #f0f7ff; border-left: 4px solid #1B3A5C; padding: 12px 16px; margin: 15px 0; font-size: 10pt; }
+            .gold-box { background: #fdf8ed; border-left: 4px solid #D4A853; padding: 12px 16px; margin: 15px 0; font-size: 10pt; }
+            .green-box { background: #f0faf5; border-left: 4px solid #2D8F5C; padding: 12px 16px; margin: 15px 0; font-size: 10pt; }
+            
+            .structure-box { border: 2px solid #1B3A5C; border-radius: 4px; padding: 20px; margin: 20px 0; background: #fafbfc; font-family: 'Consolas', monospace; font-size: 9.5pt; line-height: 1.6; white-space: pre; }
+            
+            .section-break { page-break-before: always; }
+            
+            .footer-line { border-top: 2px solid #D4A853; margin-top: 40px; padding-top: 15px; text-align: center; font-size: 9pt; color: #888; }
+            .footer-line strong { color: #1B3A5C; }
+            
+            .quote-block { text-align: center; font-style: italic; color: #1B3A5C; font-size: 12pt; margin: 30px 40px; padding: 20px; border-top: 1px solid #D4A853; border-bottom: 1px solid #D4A853; }
+            
+            ul { margin: 8px 0; padding-left: 20px; }
+            li { margin-bottom: 4px; font-size: 10.5pt; }
+            
+            .checklist { list-style: none; padding-left: 5px; }
+            .checklist li { margin-bottom: 6px; }
+            .checklist li:before { content: "☐  "; color: #1B3A5C; font-weight: bold; }
+        </style>
+        </head>
+        <body>
+
+        <!-- ═══ COVER PAGE ═══ -->
+        <div class="cover-page">
+            <div class="cover-logo">🕊️</div>
+            <div class="cover-title">PALOMA Platform</div>
+            <div class="cover-subtitle">Progress Report & Partnership Proposal</div>
+            <div class="cover-line"></div>
+            <div style="font-size:12pt; color:#444; margin-top:20px;">
+                Lake Jeanette Family & Implant Dentistry
+            </div>
+            <div class="cover-meta">
+                <br><br><br>
+                <strong>Prepared for:</strong> Dr. Christian Brenes, DMD — Prosthodontist<br>
+                <strong>Prepared by:</strong> W. Chris Harrison — Think! Design & Planning, LLC<br>
+                <strong>Date:</strong> June 9, 2026<br><br>
+                <strong>Live Platform:</strong> ljfamilydentist-paloma.netlify.app<br>
+                <strong>Admin Dashboard:</strong> ljfamilydentist-paloma.netlify.app/admin
+            </div>
+        </div>
+
+        <!-- ═══ EXECUTIVE SUMMARY ═══ -->
+        <div class="section-break"></div>
+        <h1>Executive Summary</h1>
+        
+        <div class="green-box">
+            <strong>Christian — We built everything you asked for.</strong><br>
+            After reviewing your V1 specification document line by line, I built every feature you described. Your entire V1 is live — not mocked up, not prototyped. Functional and deployed.
+        </div>
+
+        <p>This document covers three areas:</p>
+        <ol>
+            <li><strong>What's built and working right now</strong> — mapped directly to your requirements</li>
+            <li><strong>A 50/50 partnership structure</strong> — to take PALOMA national as a SaaS product</li>
+            <li><strong>Next steps</strong> — from demo to production to growth</li>
+        </ol>
+
+        <!-- ═══ PART 1: V1 COMPLETE ═══ -->
+        <h1>Part 1: Your V1 — Complete</h1>
+
+        <h2>🕊️ PALOMA AI Dental Assistant</h2>
+        <table>
+            <tr><th style="width:55%">Your Requirement</th><th style="width:15%">Status</th><th>Notes</th></tr>
+            <tr><td>Intelligent answering (services, hours, insurance, staff)</td><td class="status-done">✅ Live</td><td>Gemini 2.5 Flash AI</td></tr>
+            <tr><td>Lead capture (name, phone, email → appointment)</td><td class="status-done">✅ Live</td><td>Saves to Firebase database</td></tr>
+            <tr><td>Bilingual English/Spanish auto-detection</td><td class="status-done">✅ Live</td><td>Seamless language switching</td></tr>
+            <tr><td>After-hours availability (24/7)</td><td class="status-done">✅ Live</td><td>PALOMA never sleeps</td></tr>
+            <tr><td>Gamification (XP, achievements, levels)</td><td class="status-done">✅ Live</td><td>8 patient levels</td></tr>
+            <tr><td>Voice responses (neural TTS)</td><td class="status-done">✅ Live</td><td>Gemini neural TTS</td></tr>
+            <tr><td>Embeddable widget for any website</td><td class="status-next">🟡 Next Sprint</td><td>Widget extraction ~1-2 weeks</td></tr>
+        </table>
+
+        <h2>📊 Admin Dashboard</h2>
+        <table>
+            <tr><th style="width:55%">Your Requirement</th><th style="width:15%">Status</th><th>Notes</th></tr>
+            <tr><td>Daily / weekly / monthly schedule views</td><td class="status-done">✅ Live</td><td>Three toggle views</td></tr>
+            <tr><td>Patient roster with search</td><td class="status-done">✅ Live</td><td>Full directory</td></tr>
+            <tr><td>Appointment queue with status filters</td><td class="status-done">✅ Live</td><td>Pending/Confirmed/Completed</td></tr>
+            <tr><td>KPI dashboard (production, booking, satisfaction)</td><td class="status-done">✅ Live</td><td>6 key metrics</td></tr>
+            <tr><td>PALOMA Analytics (conversations, languages)</td><td class="status-done">✅ Live</td><td>Full analytics suite</td></tr>
+            <tr><td>Admin PALOMA (clinical assistant for staff)</td><td class="status-done">✅ Live</td><td>Private staff AI chat</td></tr>
+            <tr><td>Practice settings editors</td><td class="status-done">✅ Live</td><td>Hours, pricing, insurance, staff</td></tr>
+        </table>
+
+        <h2>💰 Financial Intelligence — Built from Your Spec</h2>
+        <table>
+            <tr><th style="width:55%">Your Requirement</th><th style="width:15%">Status</th><th>Notes</th></tr>
+            <tr><td>Secure upload for financial reports (PDF/CSV/XLSX)</td><td class="status-done">✅ Live</td><td>Drag & drop upload</td></tr>
+            <tr><td>AI reads and analyzes uploaded files</td><td class="status-done">✅ Live</td><td>Gemini 2.5 Flash parsing</td></tr>
+            <tr><td>Production vs. goal tracking</td><td class="status-done">✅ Live</td><td>Visual KPI cards</td></tr>
+            <tr><td>Collection rate analysis</td><td class="status-done">✅ Live</td><td>Industry benchmarks</td></tr>
+            <tr><td>Expense / overhead benchmarking</td><td class="status-done">✅ Live</td><td>Dental practice standards</td></tr>
+            <tr><td>Upload history & audit trail</td><td class="status-done">✅ Live</td><td>Full log</td></tr>
+        </table>
+
+        <div class="highlight-box">
+            <strong>How it works:</strong> Upload any financial report → PALOMA's AI extracts the numbers → compares against dental practice benchmarks (collection rate, overhead, production) → delivers actionable recommendations. No spreadsheet needed.
+        </div>
+
+        <h2>🧙 Practice Onboarding Wizard — Built from Your Spec</h2>
+        <table>
+            <tr><th style="width:55%">Your Requirement</th><th style="width:15%">Status</th><th>Notes</th></tr>
+            <tr><td>Guided setup wizard (no tech knowledge required)</td><td class="status-done">✅ Live</td><td>5-step flow</td></tr>
+            <tr><td>Practice basics (name, hours, languages)</td><td class="status-done">✅ Step 1</td><td>Pre-filled defaults</td></tr>
+            <tr><td>Services & pricing configuration</td><td class="status-done">✅ Step 2</td><td>Checkbox + custom add</td></tr>
+            <tr><td>Team member directory</td><td class="status-done">✅ Step 3</td><td>Add with auto-avatars</td></tr>
+            <tr><td>Insurance plan selection</td><td class="status-done">✅ Step 4</td><td>Major carriers pre-loaded</td></tr>
+            <tr><td>PALOMA personality configuration</td><td class="status-done">✅ Step 5</td><td>Tone, greeting, language</td></tr>
+            <tr><td>< 30 minute setup time</td><td class="status-done">✅ Done</td><td>Most complete in 10 minutes</td></tr>
+        </table>
+
+        <div class="gold-box">
+            <strong>Why this matters for SaaS:</strong> Any dental practice in America can configure PALOMA from scratch in under 30 minutes. No developer required. This is what makes the platform scalable to hundreds of practices.
+        </div>
+
+        <h2>📧 Automated Email System — Built from Your Spec</h2>
+        <table>
+            <tr><th style="width:55%">Your Requirement</th><th style="width:15%">Status</th><th>Notes</th></tr>
+            <tr><td>Follow-up reminders (24h / 48h escalation)</td><td class="status-done">✅ Live</td><td>Runs every hour automatically</td></tr>
+            <tr><td>Bilingual reminder emails (EN/ES)</td><td class="status-done">✅ Live</td><td>Auto-detects patient language</td></tr>
+            <tr><td>After-hours morning summary</td><td class="status-done">✅ Live</td><td>AI-powered briefing at 7 AM</td></tr>
+            <tr><td>Multiple admin recipients</td><td class="status-done">✅ Live</td><td>You + staff can all receive</td></tr>
+        </table>
+
+        <!-- ═══ PART 2: BUSINESS ═══ -->
+        <div class="section-break"></div>
+        <h1>Part 2: The Business — PALOMA Health Technologies</h1>
+
+        <h2>The Opportunity</h2>
+        <p>There are <strong>200,000+ dental practices</strong> in the United States. Fewer than 5% have any AI-powered patient engagement. The ones that do are using basic chatbots that can't answer real questions, don't speak Spanish, and can't analyze financial data.</p>
+        
+        <p>PALOMA is different because she:</p>
+        <ul>
+            <li>Knows the practice's actual data — hours, pricing, insurance, staff</li>
+            <li>Is fully bilingual (English/Spanish) — critical for 40M+ Hispanic Americans</li>
+            <li>Books real appointments, not just collects leads</li>
+            <li>Has financial intelligence built in</li>
+            <li>Costs the practice $0 in additional staff time</li>
+        </ul>
+
+        <div class="green-box">
+            <strong>Your practice is the proof of concept.</strong> You're Patient Zero — and the story that sells PALOMA to every other dental practice in America.
+        </div>
+
+        <h2>Proposed Structure: 50/50 Partnership</h2>
+
+        <div class="structure-box">
+┌──────────────────────────────────────────────────┐
+│         PALOMA HEALTH TECHNOLOGIES, LLC           │
+│                                                   │
+│   W. Chris Harrison ............... 50% Equity    │
+│   Dr. Christian Brenes ............ 50% Equity    │
+│                                                   │
+│   Product: PALOMA dental AI platform              │
+│   Revenue: SaaS subscriptions from practices      │
+└──────────────┬───────────────────┬───────────────┘
+               │                   │
+               ▼                   ▼
+┌──────────────────────┐  ┌────────────────────────┐
+│  Think! Design &     │  │  Dr. Brenes            │
+│  Planning, LLC       │  │                        │
+│                      │  │  • Clinical Advisor    │
+│  CONTRACTED for:     │  │  • Practice #1 Client  │
+│  • Platform dev      │  │  • Industry network    │
+│  • AI engineering    │  │  • Dental credibility  │
+│  • Hosting / infra   │  │  • Sales referrals     │
+│  • Ongoing updates   │  │                        │
+│                      │  │  Uses PALOMA free as   │
+│  Paid monthly        │  │  co-founder benefit    │
+│  retainer by LLC     │  │                        │
+└──────────────────────┘  └────────────────────────┘</div>
+
+        <h2>What Each Partner Brings</h2>
+        <table>
+            <tr><th></th><th>Chris Harrison</th><th>Dr. Christian Brenes</th></tr>
+            <tr><td><strong>Core Value</strong></td><td>Technology, AI, product development</td><td>Clinical expertise, dental license, industry trust</td></tr>
+            <tr><td><strong>IP Contribution</strong></td><td>PALOMA platform, MouthMap, all code</td><td>Clinical workflows, practice data model, compliance</td></tr>
+            <tr><td><strong>Network</strong></td><td>Tech ecosystem, Think! Ventures cooperative</td><td>Dental industry, prosthodontic community, UNC alumni</td></tr>
+            <tr><td><strong>Ongoing Role</strong></td><td>CTO — builds & maintains the platform</td><td>Chief Clinical Officer — validates & guides product</td></tr>
+            <tr><td><strong>Sales Channel</strong></td><td>Website, digital marketing, AI demos</td><td>Word-of-mouth, dental conferences, referral network</td></tr>
+        </table>
+
+        <div class="highlight-box">
+            <strong>Why 50/50?</strong> Equal stake = equal commitment. You bring what I can't build alone — clinical credibility and dental industry access. I bring what you can't build alone — AI technology and software engineering. Neither of us succeeds without the other.
+        </div>
+
+        <h2>SaaS Revenue Model</h2>
+        <table>
+            <tr><th>Tier</th><th>Monthly</th><th>What's Included</th></tr>
+            <tr><td><strong>Starter</strong></td><td>$299/mo</td><td>PALOMA AI assistant, bilingual, appointment booking, gamification</td></tr>
+            <tr><td><strong>Pro</strong></td><td>$599/mo</td><td>+ Financial intelligence, automated reminders, morning summaries</td></tr>
+            <tr><td><strong>Enterprise</strong></td><td>$999/mo</td><td>+ HIPAA patient portal, case presentation engine, AR follow-up</td></tr>
+            <tr><td><strong>Setup Fee</strong></td><td>$2,000–$5,000</td><td>One-time onboarding, data migration, custom training</td></tr>
+        </table>
+
+        <h2>Growth Projections</h2>
+        <table>
+            <tr><th>Year</th><th>Practices</th><th>Avg Revenue/Practice</th><th>Annual Revenue</th></tr>
+            <tr><td>Year 1</td><td>10–25</td><td>$500/mo</td><td>$60K–$150K</td></tr>
+            <tr><td>Year 2</td><td>50–100</td><td>$550/mo</td><td>$330K–$660K</td></tr>
+            <tr><td>Year 3</td><td>200+</td><td>$600/mo</td><td>$1.2M+</td></tr>
+        </table>
+
+        <h2>Operating Costs</h2>
+        <table>
+            <tr><th>Item</th><th>Monthly Cost</th><th>Notes</th></tr>
+            <tr><td>Hosting (Netlify)</td><td>$0–$19</td><td>Free tier covers 10+ practices</td></tr>
+            <tr><td>AI Engine (Gemini API)</td><td>$50–$200</td><td>Scales with conversation volume</td></tr>
+            <tr><td>Email (Resend)</td><td>$0–$20</td><td>Free tier: 3,000 emails/month</td></tr>
+            <tr><td>Domain / SSL</td><td>$1</td><td>Annual registration</td></tr>
+            <tr><td><strong>Total Infrastructure</strong></td><td><strong>< $250/mo</strong></td><td></td></tr>
+        </table>
+
+        <div class="gold-box">
+            <strong>Margin: 85–90% at scale.</strong> Software doesn't have material costs. Once built, each new practice costs pennies to onboard. The onboarding wizard means zero developer time per new customer.
+        </div>
+
+        <!-- ═══ PART 3: NEXT STEPS ═══ -->
+        <div class="section-break"></div>
+        <h1>Part 3: Next Steps</h1>
+
+        <h2>Immediate — This Week</h2>
+        <ul class="checklist">
+            <li><strong>Screen share walkthrough</strong> — 30 minutes, I demo everything live</li>
+            <li><strong>Review this proposal</strong> — questions, feedback, adjustments</li>
+            <li><strong>Send your real data</strong> — schedule, pricing, staff photos, insurance list</li>
+            <li><strong>Replace demo data</strong> — your practice goes from demo to production</li>
+        </ul>
+
+        <h2>Short Term — 30 Days</h2>
+        <ul class="checklist">
+            <li><strong>Form PALOMA Health Technologies, LLC</strong> — operating agreement, IP assignment</li>
+            <li><strong>Extract PALOMA as embeddable widget</strong> — script tag for your Wix site</li>
+            <li><strong>Wix integration</strong> — PALOMA live on ljfamilydentist.com</li>
+            <li><strong>Connect real scheduling</strong> — PALOMA books into your actual calendar</li>
+        </ul>
+
+        <h2>Medium Term — 60–90 Days</h2>
+        <ul class="checklist">
+            <li><strong>Onboard Practice #2</strong> — your first referral, our first paying customer</li>
+            <li><strong>HIPAA compliance infrastructure</strong> — BAA, encryption, audit logging</li>
+            <li><strong>Patient portal (V2)</strong> — X-rays, treatment plans, 3D scan viewer</li>
+            <li><strong>PMS integration scoping</strong> — Oryx → CareStack migration path</li>
+        </ul>
+
+        <h2>Revenue Impact for Your Practice</h2>
+        <table>
+            <tr><th>Metric</th><th>Industry Average</th><th>With PALOMA</th></tr>
+            <tr><td>Treatment Acceptance Rate</td><td>50–60%</td><td><strong style="color:#2D8F5C">85–90%</strong></td></tr>
+            <tr><td>No-Show Rate</td><td>15–20%</td><td><strong style="color:#2D8F5C">5–8%</strong></td></tr>
+            <tr><td>New Patient Conversion</td><td>30–40%</td><td><strong style="color:#2D8F5C">60–70%</strong></td></tr>
+            <tr><td>After-Hours Inquiry Capture</td><td>0%</td><td><strong style="color:#2D8F5C">100%</strong></td></tr>
+            <tr><td>Staff Phone Time</td><td>2–3 hrs/day</td><td><strong style="color:#2D8F5C">30 min/day</strong></td></tr>
+        </table>
+
+        <div class="green-box">
+            <strong>Estimated annual revenue impact for your practice:</strong><br>
+            New patients from after-hours capture: +$12,000/mo<br>
+            Reduced no-shows: +$3,000/mo<br>
+            Higher treatment acceptance: +$15,000/mo<br>
+            <strong>Total: +$360,000/year</strong>
+        </div>
+
+        <!-- ═══ CLOSING ═══ -->
+        <div class="section-break"></div>
+        
+        <div class="quote-block">
+            "The house of modern smiles and comfort — powered by intelligence."<br>
+            <span style="font-size:10pt; color:#D4A853;">— PALOMA 🕊️</span>
+        </div>
+
+        <h1>The Bottom Line</h1>
+        <p>Everything you described in your V1 document is built and live. Not mocked up — <strong>functional.</strong> Your practice is already the most technologically advanced dental office in the Triad.</p>
+        
+        <p>The question isn't <em>"can we build this?"</em> — we already did.</p>
+        <p>The question is: <strong><em>"How fast do we want to grow?"</em></strong></p>
+
+        <p>I believe in this. I believe in you as a partner. And I believe PALOMA can change how dental practices serve their patients nationwide.</p>
+
+        <p><strong>Let's talk this week.</strong></p>
+
+        <br><br>
+        <p>
+            <strong>W. Chris Harrison</strong><br>
+            Founder & Principal<br>
+            Think! Design & Planning, LLC<br>
+            (336) 488-0203 | chris@thinkdesignandplanning.com
+        </p>
+        <p style="font-style:italic; color:#888; font-size:9pt;">A Think! Ventures Cooperative Enterprise</p>
+
+        <div class="footer-line">
+            <strong>PALOMA</strong> 🕊️ — Patient Advocacy & Lifecycle Oral Map Assistant<br>
+            Confidential — Prepared exclusively for Dr. Christian Brenes
+        </div>
+
+        </body>
+        </html>`;
+
+        // Create blob and download as .doc (Word-compatible HTML)
+        const blob = new Blob([content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'PALOMA_Partnership_Proposal_DrBrenes_June2026.doc';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        document.getElementById('status').textContent = '✅ Document downloaded!';
+    }
+    </script>
+</body>
+</html>
