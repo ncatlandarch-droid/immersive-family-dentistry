@@ -98,14 +98,89 @@ function loadFallbackData() {
 
 // ─── Initialize Portal ───
 function initPortal() {
-    initNavigation();
-    init3DViewer();
-    initHealthSummary();
-    initTimeline();
-    initCostCenter();
-    initTreatmentPlan();
-    initTimelineBar();
-    initPortalChat();
+    try { initNavigation(); } catch(e) { console.error('Nav init error:', e); }
+    try { initOdontogram(); } catch(e) { console.error('Odontogram init error:', e); }
+    try { initHealthSummary(); } catch(e) { console.error('Health init error:', e); }
+    try { initTimeline(); } catch(e) { console.error('Timeline init error:', e); }
+    try { initCostCenter(); } catch(e) { console.error('Cost init error:', e); }
+    try { initTreatmentPlan(); } catch(e) { console.error('Plan init error:', e); }
+    try { initTimelineBar(); } catch(e) { console.error('TimelineBar init error:', e); }
+    try { initPortalChat(); } catch(e) { console.error('Chat init error:', e); }
+}
+
+// ─── Interactive Odontogram (2D Dental Chart) ───
+function initOdontogram() {
+    const upperRow = document.getElementById('upper-arch');
+    const lowerRow = document.getElementById('lower-arch');
+    if (!upperRow || !lowerRow) return;
+
+    const teeth = dentalChart?.teeth || [];
+
+    function getStatus(num) {
+        const t = teeth.find(t => t.toothNumber === num);
+        return t ? t.status : 'healthy';
+    }
+
+    // Upper arch: 1-16
+    for (let i = 1; i <= 16; i++) {
+        const status = getStatus(i);
+        const btn = document.createElement('button');
+        btn.className = `tooth-btn status-${status}`;
+        btn.textContent = i;
+        btn.dataset.tooth = i;
+        btn.addEventListener('click', () => selectTooth(i));
+        upperRow.appendChild(btn);
+    }
+
+    // Lower arch: 32-17 (reversed)
+    for (let i = 32; i >= 17; i--) {
+        const status = getStatus(i);
+        const btn = document.createElement('button');
+        btn.className = `tooth-btn status-${status}`;
+        btn.textContent = i;
+        btn.dataset.tooth = i;
+        btn.addEventListener('click', () => selectTooth(i));
+        lowerRow.appendChild(btn);
+    }
+
+    // Close button
+    document.getElementById('tooth-info-close')?.addEventListener('click', () => {
+        document.getElementById('tooth-info').style.display = 'none';
+        document.querySelectorAll('.tooth-btn.active').forEach(b => b.classList.remove('active'));
+    });
+}
+
+function selectTooth(num) {
+    const teeth = dentalChart?.teeth || [];
+    const t = teeth.find(t => t.toothNumber === num);
+
+    // Highlight active
+    document.querySelectorAll('.tooth-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tooth-btn[data-tooth="${num}"]`)?.classList.add('active');
+
+    const panel = document.getElementById('tooth-info');
+    document.getElementById('tooth-name').textContent = `Tooth #${num} — ${t?.name || getToothName(num)}`;
+
+    const badge = document.getElementById('tooth-status');
+    const status = t?.status || 'healthy';
+    badge.textContent = capitalize(status);
+    badge.className = 'tooth-badge';
+    if (status === 'healthy') { badge.style.background = '#D1FAE5'; badge.style.color = '#065F46'; }
+    else if (status === 'restored') { badge.style.background = '#DBEAFE'; badge.style.color = '#1E40AF'; }
+    else if (status === 'monitor') { badge.style.background = '#FEF3C7'; badge.style.color = '#92400E'; }
+    else if (status === 'extracted') { badge.style.background = '#F1F5F9'; badge.style.color = '#475569'; }
+    else { badge.style.background = '#FEE2E2'; badge.style.color = '#991B1B'; }
+
+    const findings = t?.findings || ['No findings — this tooth looks healthy ✓'];
+    const notes = t?.notes || '';
+    document.getElementById('tooth-findings').innerHTML = `
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+            ${findings.map(f => `<li style="padding:4px 0;font-size:13px;color:#475569;">• ${f}</li>`).join('')}
+        </ul>
+        ${notes ? `<p style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748B;font-style:italic;">📝 ${notes}</p>` : ''}
+    `;
+
+    panel.style.display = 'block';
 }
 
 // ─── Navigation ───

@@ -931,3 +931,113 @@ a { color: var(--portal-teal); text-decoration: none; }
         height: 300px;
     }
 }
+
+/* ═══ Odontogram (Interactive 2D Dental Chart) ═══ */
+.odontogram-section {
+    padding: 0 4px;
+}
+
+.odontogram {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 8px;
+    background: var(--portal-surface);
+    border-radius: 12px;
+    border: 1px solid var(--portal-border);
+}
+
+.odontogram-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: center;
+}
+
+.arch-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--portal-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 36px;
+    text-align: right;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+
+.tooth-btn {
+    width: 30px;
+    height: 34px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.tooth-btn:hover {
+    transform: scale(1.15);
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.tooth-btn.active {
+    border-color: var(--portal-teal);
+    transform: scale(1.2);
+    z-index: 3;
+    box-shadow: 0 0 0 3px var(--portal-teal-glow);
+}
+
+.tooth-btn.status-healthy { background: #10B981; }
+.tooth-btn.status-restored { background: #3B82F6; }
+.tooth-btn.status-monitor { background: #F59E0B; color: #1E293B; }
+.tooth-btn.status-extracted { background: #CBD5E1; color: #64748B; }
+.tooth-btn.status-urgent { background: #EF4444; }
+
+.odontogram-legend {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    padding: 8px 0 4px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--portal-muted);
+    font-weight: 500;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Tooth info panel styling for odontogram context */
+.tooth-info {
+    margin-top: 12px;
+    background: var(--portal-surface);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--portal-border);
+    box-shadow: var(--portal-shadow-lg);
+    position: relative;
+    animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
