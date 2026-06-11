@@ -1,273 +1,58 @@
 {
-  "schemaVersion": "1.0.0",
-  "lastUpdated": "2026-06-06T07:00:00-04:00",
-  "patientId": "PAT-2026-0042",
-  "patientName": "Chris Harrison",
-  "totalVisits": 4,
-  "nextScheduled": {
-    "date": "2026-09-10T09:00:00-04:00",
-    "type": "Periodontal Maintenance + Periodic Exam",
-    "provider": "Dr. Christian Brenes",
-    "duration": "60 min",
-    "status": "confirmed",
-    "remindersSent": 0,
-    "notes": "Will also re-evaluate #30 fracture line and discuss crown decision. Bitewing X-rays due."
-  },
   "visits": [
     {
-      "id": "visit-001",
+      "date": "2025-10-08",
+      "type": "New Patient",
+      "title": "Initial Comprehensive Exam",
+      "description": "Welcome visit! Full comprehensive exam with Dr. Brenes. Intraoral photos, medical history review. Initial assessment: overall dental health good with some areas needing attention. Patient interested in digital dentistry approach.",
+      "status": "completed",
+      "provider": "Dr. Brenes",
+      "highlights": ["Medical history recorded", "Intraoral photos taken", "Treatment plan discussion"]
+    },
+    {
       "date": "2026-01-15",
-      "type": "New Patient Comprehensive Exam",
+      "type": "Diagnostic",
+      "title": "Full Mouth X-Rays & 3D Scan",
+      "description": "Full mouth X-ray series and Medit i-700 digital scan. AI analysis identified hairline fracture line on tooth #30 (ML cusp, 82% confidence). Crown #14 area shows prior restoration failing. Treatment plan updated.",
       "status": "completed",
-      "provider": "Dr. Christian Brenes, DDS, MS",
-      "assistant": "Missie",
-      "duration": "75 min",
-      "procedures": [
-        {
-          "cdtCode": "D0150",
-          "description": "Comprehensive oral evaluation — new patient",
-          "fee": 95,
-          "insurancePaid": 95,
-          "patientPaid": 0,
-          "tooth": null
-        },
-        {
-          "cdtCode": "D0210",
-          "description": "Intraoral — complete series of radiographic images (FMX)",
-          "fee": 175,
-          "insurancePaid": 175,
-          "patientPaid": 0,
-          "tooth": null
-        },
-        {
-          "cdtCode": "D0470",
-          "description": "Diagnostic casts (digital scan)",
-          "fee": 65,
-          "insurancePaid": 0,
-          "patientPaid": 65,
-          "tooth": null
-        }
-      ],
-      "totalFee": 335,
-      "totalInsurancePaid": 270,
-      "totalPatientPaid": 65,
-      "clinicalNotes": {
-        "chiefComplaint": "New patient. Interested in digital dentistry approach. Concerned about sensitivity on lower right molar (#30). Also wants to evaluate old amalgam restoration on #19.",
-        "findings": [
-          "Complete series of digital radiographs taken and analyzed with Pearl AI and Overjet.",
-          "Full-mouth digital scan performed with Medit i700 — 3D models archived in Medit Link.",
-          "Tooth #14 (UL first molar): Large failing MOD amalgam restoration with recurrent decay detected on mesial margin. AI confidence: 91%. Restoration is 15+ years old with significant marginal breakdown. RECOMMENDATION: Full coverage zirconia crown.",
-          "Tooth #19 (LL first molar): Existing MO composite restoration. Placed approximately 2021. Margins intact. No recurrent decay (AI confidence 94%). Some occlusal wear — age-appropriate. RECOMMENDATION: Monitor.",
-          "Tooth #30 (LR first molar): Hairline fracture line detected on mesio-lingual cusp. AI confidence: 78%. Confirmed with transillumination and explorer. No decay. Currently asymptomatic. RECOMMENDATION: Crown recommended — monitor for now, crown if symptoms develop.",
-          "Tooth #16 (UL wisdom tooth): Previously extracted. Healed socket. No pathology.",
-          "Periodontal: Generalized 2-3mm probing depths. Localized mild gingivitis lower anteriors with slight calculus. No significant bone loss (Overjet bone level analysis: WNL).",
-          "Soft tissue: Oral cancer screening negative. No suspicious lesions.",
-          "TMJ: No clicking, popping, or deviation. Full range of motion.",
-          "Occlusion: Class I molar relationship. Mild wear facets on upper molars suggestive of mild bruxism.",
-          "Overall assessment: Generally healthy dentition. Patient maintains good oral hygiene with daily brushing and flossing."
-        ],
-        "treatmentPlanDiscussed": true,
-        "treatmentPlanAccepted": "Partial — accepted crown on #14. Wants to monitor #30. Will discuss night guard at future visit.",
-        "radiographsReviewed": true,
-        "aiPlatformsUsed": ["Pearl Second Opinion AI", "Overjet"]
-      },
-      "vitals": {
-        "bloodPressure": "120/76",
-        "pulse": 70
-      },
-      "patientFeedback": "Chris was very impressed with the digital scan experience and loved seeing his teeth on screen in 3D. He asked detailed questions about the AI analysis and appreciated the transparency. Expressed excitement about the same-day crown capability.",
-      "nextSteps": "Schedule crown prep for #14. Continue monitoring #30.",
-      "followUpScheduled": "2026-02-19 — Crown preparation #14"
+      "provider": "Dr. Brenes",
+      "highlights": ["Full mouth X-rays (18 images)", "3D intraoral scan (Medit i-700)", "AI fracture detection — Tooth #30", "Crown recommended — Tooth #14"]
     },
     {
-      "id": "visit-002",
       "date": "2026-02-19",
-      "type": "Crown Preparation",
+      "type": "Restorative",
+      "title": "Crown Preparation — Tooth #14",
+      "description": "Prepared upper left first molar for zirconia crown. Digital impression taken with Medit i-700 — no messy trays needed. Temporary crown placed. Lab fabrication: 2 weeks. Patient comfortable throughout procedure.",
       "status": "completed",
-      "provider": "Dr. Christian Brenes, DDS, MS",
-      "assistant": "Logan",
-      "duration": "90 min",
-      "procedures": [
-        {
-          "cdtCode": "D2740",
-          "description": "Crown — porcelain/ceramic substrate (preparation phase)",
-          "fee": 1400,
-          "insurancePaid": 700,
-          "patientPaid": 700,
-          "tooth": 14,
-          "notes": "Insurance covers 50% under major services. $50 deductible already met."
-        }
-      ],
-      "totalFee": 1400,
-      "totalInsurancePaid": 700,
-      "totalPatientPaid": 700,
-      "clinicalNotes": {
-        "chiefComplaint": "Scheduled appointment — crown preparation #14",
-        "findings": [
-          "Tooth #14 prepared for full coverage zirconia crown.",
-          "Removed failing MOD amalgam restoration. Confirmed recurrent decay on mesial margin — removed all decay.",
-          "Adequate remaining tooth structure for crown retention. No pulpal exposure. Cold vitality test positive — tooth is vital.",
-          "Digital scan of preparation taken with Medit i700. Scan quality score: 98/100.",
-          "Crown designed in Exocad DentalCAD. Shade match: A2. Bite registration recorded digitally.",
-          "Design sent to SprintRay Pro 95S for printing. Estimated print time: 35 minutes.",
-          "Temporary crown fabricated and cemented with TempBond NE. Bite adjusted. Patient comfortable.",
-          "NOTE: Due to schedule, final crown delivery scheduled for separate appointment rather than same-day to allow lab-quality zirconia sintering."
-        ],
-        "anesthesia": "2% Lidocaine with 1:100,000 epinephrine — 1.7mL infiltration + 1.7mL buccal",
-        "complications": "None",
-        "postOpInstructionsGiven": true,
-        "postOpInstructionsLanguage": "English"
-      },
-      "vitals": {
-        "bloodPressure": "124/78",
-        "pulse": 74
-      },
-      "patientFeedback": "Chris watched the Exocad design process on the screen and was fascinated. He appreciated the real-time explanation of each design step. Said: 'This is like watching a 3D artist work.'",
-      "nextSteps": "Final crown delivery in 3 weeks.",
-      "followUpScheduled": "2026-03-12 — Crown delivery #14"
+      "provider": "Dr. Brenes",
+      "highlights": ["Tooth #14 prepared", "Digital impression (no goop!)", "Temporary crown placed", "Zirconia crown sent to lab"]
     },
     {
-      "id": "visit-003",
       "date": "2026-03-12",
-      "type": "Crown Delivery",
+      "type": "Restorative",
+      "title": "Crown Delivery — Tooth #14",
+      "description": "Permanent BruxZir zirconia crown cemented on tooth #14. Perfect fit confirmed by digital scan overlay — less than 50-micron marginal gap. Occlusion adjusted and verified. Patient very happy with natural color match.",
       "status": "completed",
-      "provider": "Dr. Christian Brenes, DDS, MS",
-      "assistant": "Logan",
-      "duration": "45 min",
-      "procedures": [
-        {
-          "cdtCode": "D2740",
-          "description": "Crown delivery — porcelain/ceramic substrate (delivery phase, included in original fee)",
-          "fee": 0,
-          "insurancePaid": 0,
-          "patientPaid": 0,
-          "tooth": 14,
-          "notes": "Fee billed at preparation visit. This is the delivery appointment."
-        }
-      ],
-      "totalFee": 0,
-      "totalInsurancePaid": 0,
-      "totalPatientPaid": 0,
-      "clinicalNotes": {
-        "chiefComplaint": "Scheduled appointment — crown delivery #14",
-        "findings": [
-          "Temporary crown removed. Preparation cleaned and inspected — no issues.",
-          "Zirconia crown (BruxZir, shade A2) tried in. Marginal fit: excellent (confirmed with explorer). Proximal contacts: firm and appropriate. Occlusal contacts: adjusted minimally with diamond bur.",
-          "Periapical radiograph taken — margins well-adapted. No open margins. Adequate cement space.",
-          "Crown cemented with RelyX Unicem 2 resin cement. Excess cement removed. Final occlusal check with articulating paper — balanced contacts.",
-          "Patient reported immediate comfort with bite. No adjustment needed after initial check.",
-          "Post-operative instructions given: avoid sticky foods for 24 hours, slight sensitivity normal for 1-2 weeks.",
-          "Final photographs taken for record."
-        ],
-        "anesthesia": "None required — patient comfortable without anesthesia during try-in and cementation",
-        "complications": "None",
-        "postOpInstructionsGiven": true
-      },
-      "vitals": {
-        "bloodPressure": "118/74",
-        "pulse": 68
-      },
-      "patientFeedback": "Chris was very pleased with the result. He said the crown 'feels completely natural' and was amazed at the shade match. He took a mirror selfie and posted it on his Instagram stories.",
-      "nextSteps": "Schedule routine cleaning in 8-10 weeks.",
-      "followUpScheduled": "2026-05-14 — Cleaning + periodic exam"
+      "provider": "Dr. Brenes",
+      "highlights": ["Crown cemented ✓", "Digital fit verification ✓", "Color match: perfect", "Patient satisfaction: 10/10"]
     },
     {
-      "id": "visit-004",
       "date": "2026-05-14",
-      "type": "Periodontal Maintenance + Periodic Exam + AI Scan",
+      "type": "Preventive",
+      "title": "Cleaning & AI Diagnostic Scan",
+      "description": "Routine prophylaxis and full AI diagnostic scan. Crown #14 showing excellent integration — margins sealed, no recurrent decay. Tooth #30 fracture stable — no progression since January. Mild calculus on lower anteriors cleaned. Gum health: good. Next visit: September 2026.",
       "status": "completed",
-      "provider": "Dr. Christian Brenes, DDS, MS",
-      "assistant": "Missie",
-      "duration": "60 min",
-      "procedures": [
-        {
-          "cdtCode": "D0120",
-          "description": "Periodic oral evaluation — established patient",
-          "fee": 65,
-          "insurancePaid": 65,
-          "patientPaid": 0,
-          "tooth": null
-        },
-        {
-          "cdtCode": "D4910",
-          "description": "Periodontal maintenance",
-          "fee": 195,
-          "insurancePaid": 156,
-          "patientPaid": 39,
-          "tooth": null,
-          "notes": "Covered at 80% under basic services (periodontal maintenance vs. prophylaxis distinction)."
-        },
-        {
-          "cdtCode": "D0274",
-          "description": "Bitewings — four radiographic images",
-          "fee": 75,
-          "insurancePaid": 75,
-          "patientPaid": 0,
-          "tooth": null
-        }
-      ],
-      "totalFee": 335,
-      "totalInsurancePaid": 296,
-      "totalPatientPaid": 39,
-      "clinicalNotes": {
-        "chiefComplaint": "Routine cleaning and follow-up. No complaints. Tooth #14 crown feeling great.",
-        "findings": [
-          "Bitewing radiographs taken and analyzed with Pearl AI and Overjet. No new pathology detected.",
-          "Crown #14: Excellent adaptation. No recurrent decay. Periapical WNL. AI confidence 96%.",
-          "Tooth #19 (composite): Stable. Margins intact. No recurrent decay. AI confidence 94%.",
-          "Tooth #30: Re-evaluated fracture line. Crack appears unchanged. AI confidence now 82% (slightly higher than January's 78%, suggesting the detection algorithm is more confident but the crack itself is stable based on clinical evaluation). Tooth remains asymptomatic. Patient declines crown at this time — wants to monitor one more cycle.",
-          "Periodontal charting completed: All probing depths 1-3mm. No progression. Localized BOP on lower anteriors (#23, 24, 25) — mild gingivitis persists. Calculus removed.",
-          "Full-mouth digital scan performed with Medit i700 for PALOMA baseline and monitoring records.",
-          "Overjet bone level analysis: No bone loss progression. All levels WNL.",
-          "Oral cancer screening: Negative.",
-          "Occlusion: Mild wear facets noted on #3, #14 (crown), and #30. Consistent with mild bruxism. Discussed night guard — patient interested but wants to address #30 first.",
-          "Home care review: Patient brushing 2x/day, flossing daily. Recommended Sonicare power toothbrush for lower anteriors. Suggested Sensodyne toothpaste as a precaution.",
-          "Medical history updated: No changes. NKDA confirmed. Only medication: daily multivitamin.",
-          "Insurance benefits review: $1,240 of $2,000 annual max used. $760 remaining. Benefits reset January 1, 2027. Emily discussed timing strategy for #30 crown."
-        ],
-        "aiPlatformsUsed": ["Pearl Second Opinion AI", "Overjet"],
-        "postOpInstructionsGiven": false,
-        "treatmentPlanUpdated": true
-      },
-      "vitals": {
-        "bloodPressure": "122/78",
-        "pulse": 72
-      },
-      "patientFeedback": "Chris continues to be an engaged, ideal patient. He asked if we could show him the AI analysis side-by-side from January vs. May to see if the #30 crack had changed — we showed him the comparison and he appreciated the transparency. He mentioned he's thinking about the crown but wants one more monitoring period.",
-      "nextSteps": "Next cleaning in ~4 months. Re-evaluate #30. Discuss night guard.",
-      "followUpScheduled": "2026-09-10 — Periodontal maintenance + re-evaluation #30"
+      "provider": "Emily (Hygienist) + Dr. Brenes",
+      "highlights": ["Prophylaxis completed", "Crown #14: excellent ✓", "Tooth #30: stable (monitoring)", "Oral hygiene score: 88/100"]
+    },
+    {
+      "date": "2026-09-10",
+      "type": "Preventive",
+      "title": "Periodontal Maintenance & Review",
+      "description": "Scheduled routine cleaning and 6-month check-up. AI scan will reassess tooth #30 fracture progression. Night guard consult if patient is ready.",
+      "status": "upcoming",
+      "provider": "Emily (Hygienist) + Dr. Brenes",
+      "highlights": ["6-month cleaning", "AI scan — Tooth #30 re-assessment", "Night guard discussion"]
     }
-  ],
-  "timelineSummary": {
-    "patientSince": "2026-01-15",
-    "totalVisits": 4,
-    "totalProduction": 2070,
-    "totalInsurancePaid": 1266,
-    "totalPatientPaid": 804,
-    "completedProcedures": [
-      "Comprehensive exam + FMX (Jan 2026)",
-      "Digital scan + diagnostic models (Jan 2026)",
-      "Crown preparation #14 (Feb 2026)",
-      "Crown delivery #14 — zirconia (Mar 2026)",
-      "Periodontal maintenance + bitewings (May 2026)"
-    ],
-    "pendingDecisions": [
-      "Crown on #30 — patient monitoring, will decide at September visit",
-      "Night guard — discussed, patient interested but deferred"
-    ],
-    "upcomingAppointments": [
-      {
-        "date": "2026-09-10",
-        "type": "Periodontal Maintenance + Periodic Exam + Re-evaluation #30",
-        "status": "confirmed"
-      }
-    ],
-    "recallSchedule": "Every 6 months",
-    "nextRecallDue": "2026-11-14",
-    "complianceRating": "Excellent — patient has attended all scheduled appointments on time"
-  },
-  "palomaTimelineNarrative": {
-    "en": "Here's a summary of your dental journey with us, Chris:\n\n🗓️ **January 15, 2026** — Your first visit! We did a comprehensive exam with digital X-rays analyzed by our AI. We discovered that your crown on tooth #14 needed replacing and found a tiny crack on #30 to keep an eye on.\n\n🦷 **February 19, 2026** — We prepped your tooth #14 for a new crown. You got to watch the digital design process on screen — pretty cool, right?\n\n👑 **March 12, 2026** — Crown day! Your new zirconia crown on #14 was delivered and fit perfectly. You said it felt 'completely natural.'\n\n✨ **May 14, 2026** — Cleaning + AI scan. Everything looked great! The crack on #30 is stable, your crown on #14 is performing beautifully, and your overall oral health score is 92 out of 100.\n\n📅 **September 10, 2026** — Your next visit is scheduled. We'll do your regular cleaning, take new X-rays, and take another look at #30.\n\nYou're doing a great job with your home care, Chris! Keep up the brushing and flossing. 😊",
-    "es": "Aquí está un resumen de su camino dental con nosotros, Chris:\n\n🗓️ **15 de enero de 2026** — ¡Su primera visita! Hicimos un examen completo con radiografías digitales analizadas por nuestra IA. Descubrimos que su corona en el diente #14 necesitaba reemplazo y encontramos una pequeña grieta en #30 para vigilar.\n\n🦷 **19 de febrero de 2026** — Preparamos su diente #14 para una nueva corona. Pudo ver el proceso de diseño digital en pantalla — ¡bastante genial, ¿verdad?!\n\n👑 **12 de marzo de 2026** — ¡Día de la corona! Su nueva corona de zirconia en #14 fue entregada y ajustó perfectamente. Dijo que se sentía 'completamente natural.'\n\n✨ **14 de mayo de 2026** — Limpieza + escaneo de IA. ¡Todo se veía excelente! La grieta en #30 está estable, su corona en #14 está funcionando maravillosamente, y su puntaje general de salud oral es 92 de 100.\n\n📅 **10 de septiembre de 2026** — Su próxima visita está programada. Haremos su limpieza regular, tomaremos nuevas radiografías y revisaremos #30 de nuevo.\n\n¡Está haciendo un gran trabajo con su cuidado en casa, Chris! Siga con el cepillado y el hilo dental. 😊"
-  }
+  ]
 }

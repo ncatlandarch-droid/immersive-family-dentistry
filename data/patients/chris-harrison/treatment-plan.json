@@ -1,243 +1,95 @@
 {
-  "schemaVersion": "1.0.0",
-  "lastUpdated": "2026-05-14T10:30:00-04:00",
-  "patientId": "PAT-2026-0042",
-  "patientName": "Chris Harrison",
-  "planCreatedDate": "2026-05-14",
-  "planCreatedBy": "Dr. Christian Brenes, DDS, MS",
-  "planStatus": "active",
-  "overallPriority": "routine",
-  "insuranceInfo": {
-    "carrier": "BlueCross BlueShield of NC",
-    "plan": "Blue Dental PPO Plus",
-    "annualMaximum": 2000,
-    "annualMaximumUsed": 1240,
-    "annualMaximumRemaining": 760,
-    "deductible": 50,
-    "deductibleMet": true,
-    "benefitYearReset": "2027-01-01"
-  },
-  "treatmentItems": [
+  "pending": [
     {
-      "id": "tx-001",
-      "tooth": null,
-      "procedure": "Periodontal Maintenance",
-      "description": {
-        "en": "Routine periodontal maintenance cleaning. This visit includes thorough cleaning above and below the gum line, polishing, oral cancer screening, and review of home care. Recommended every 6 months based on your current periodontal status. Your lower anterior teeth show mild calculus buildup — we'll pay special attention to that area.",
-        "es": "Limpieza de mantenimiento periodontal de rutina. Esta visita incluye limpieza minuciosa por encima y debajo de la línea de las encías, pulido, examen de cáncer oral y revisión del cuidado en casa. Recomendado cada 6 meses según su estado periodontal actual. Sus dientes anteriores inferiores muestran acumulación leve de sarro — prestaremos especial atención a esa área."
-      },
-      "cdtCode": "D4910",
-      "cdtDescription": "Periodontal maintenance",
+      "procedure": "Periodontal Maintenance & AI Scan",
+      "tooth": "Full mouth",
       "priority": "routine",
-      "urgency": "scheduled",
-      "status": "scheduled",
-      "scheduledDate": "2026-09-10T09:00:00-04:00",
-      "estimatedDuration": "45 min",
-      "provider": "Dr. Christian Brenes",
-      "assistant": "Missie",
-      "financials": {
-        "fee": 195,
-        "insuranceCoverage": {
-          "tier": "preventive/basic",
-          "coveragePercent": 80,
-          "estimatedInsurancePays": 156,
-          "estimatedPatientPays": 39,
-          "notes": "Periodontal maintenance may be covered at 80% (basic tier) rather than 100% (preventive). Coverage depends on diagnosis code submitted."
-        },
-        "estimatedTotal": 195,
-        "estimatedOutOfPocket": 39
-      },
-      "prerequisites": [],
-      "notes": "Routine maintenance. Will also re-evaluate #30 fracture line during this visit.",
-      "palomaExplanation": {
-        "en": "This is your regular cleaning appointment, Chris. Since you have some mild calculus buildup on your lower front teeth, our team will do a thorough cleaning both above and below the gum line. We'll also take a fresh look at that hairline crack we've been monitoring on tooth #30. Think of this visit as your regular dental 'tune-up' — keeping everything healthy and catching any changes early.",
-        "es": "Esta es su cita de limpieza regular, Chris. Como tiene una leve acumulación de sarro en sus dientes frontales inferiores, nuestro equipo hará una limpieza minuciosa tanto por encima como por debajo de la línea de las encías. También daremos un vistazo fresco a esa línea de fractura que hemos estado monitoreando en el diente #30. Piense en esta visita como su 'afinación' dental regular — manteniendo todo saludable y detectando cualquier cambio temprano."
-      }
+      "estimatedCost": 250,
+      "insuranceEstimate": 200,
+      "patientEstimate": 50,
+      "scheduledDate": "2026-09-10",
+      "notes": "Routine 6-month cleaning & prophylaxis. AI diagnostic scan included. Insurance covers 80% of preventive care.",
+      "cptCode": "D1110"
     },
     {
-      "id": "tx-002",
-      "tooth": 30,
-      "procedure": "Full Coverage Crown — Tooth #30",
-      "description": {
-        "en": "A zirconia crown is recommended for tooth #30 (lower right first molar) to protect against a hairline fracture line detected on the mesio-lingual cusp. The tooth is currently asymptomatic (no pain), but the fracture line could progress under chewing forces, potentially leading to a painful cusp fracture that would require more extensive treatment. A crown now is a preventive measure — much simpler and less costly than treating a fractured tooth.",
-        "es": "Se recomienda una corona de zirconia para el diente #30 (primer molar inferior derecho) para proteger contra una línea de fractura detectada en la cúspide mesio-lingual. El diente actualmente es asintomático (sin dolor), pero la línea de fractura podría progresar bajo las fuerzas de masticación, potencialmente llevando a una fractura dolorosa de la cúspide que requeriría un tratamiento más extenso. Una corona ahora es una medida preventiva — mucho más simple y menos costosa que tratar un diente fracturado."
-      },
-      "cdtCode": "D2740",
-      "cdtDescription": "Crown — porcelain/ceramic substrate",
+      "procedure": "Zirconia Crown — Tooth #30",
+      "tooth": "#30 (Lower Right First Molar)",
       "priority": "moderate",
-      "urgency": "elective-recommended",
-      "status": "pending-patient-decision",
-      "scheduledDate": null,
-      "estimatedDuration": "2 hours (same-day crown possible)",
-      "provider": "Dr. Christian Brenes",
-      "assistant": "Logan",
-      "financials": {
-        "fee": 1400,
-        "insuranceCoverage": {
-          "tier": "major",
-          "coveragePercent": 50,
-          "estimatedInsurancePays": 700,
-          "estimatedPatientPays": 700,
-          "notes": "Crown covered at 50% under major services. Note: Only $760 remains in annual maximum. Insurance would pay up to $700 (50% of $1,400), but this is limited by remaining annual maximum. If scheduled before January 1, 2027, insurance pays $700. If scheduled after benefit reset, full 50% ($700) available without annual max concern.",
-          "benefitYearStrategy": "Patient may benefit from scheduling in January 2027 when benefits reset, or scheduling now and applying $700 to this year's remaining benefits."
-        },
-        "estimatedTotal": 1400,
-        "estimatedOutOfPocket": 700,
-        "financingAvailable": true,
-        "financingOptions": ["CareCredit (0% for 6 months)", "In-house payment plan (2 payments)"]
-      },
-      "prerequisites": ["Re-evaluation of fracture line at September appointment"],
-      "alternativeOptions": [
-        {
-          "option": "Continue monitoring",
-          "description": "Monitor the fracture line every 6 months. Risk: the crack may propagate, leading to a painful fracture that could require root canal + crown or extraction + implant.",
-          "cost": 0,
-          "risk": "Moderate — unpredictable timing of potential fracture"
-        },
-        {
-          "option": "Onlay instead of full crown",
-          "description": "A partial coverage restoration (onlay) preserves more natural tooth structure but provides less protection against crack propagation.",
-          "cost": 1200,
-          "risk": "Low-moderate — less protective than full crown for cracked teeth"
-        }
-      ],
-      "notes": "Chris was informed at the May visit. He wants to monitor one more cycle before deciding. Will re-evaluate at September appointment. If symptoms develop before then, patient will call for earlier appointment.",
-      "palomaExplanation": {
-        "en": "Chris, Dr. Brenes found a tiny hairline crack on the inner cusp of your lower right molar (#30). Right now it's not causing any pain, which is good news! However, cracks like this can sometimes get worse over time — especially with the forces of chewing. Think of it like a small crack in a windshield: it might stay the same, or it might spread. A crown would act like a protective 'helmet' for the tooth, holding everything together and preventing the crack from spreading. This is completely your decision, and there's no emergency. Dr. Brenes will take another look at your September appointment, and you can decide then.",
-        "es": "Chris, el Dr. Brenes encontró una pequeña grieta en la cúspide interna de su molar inferior derecho (#30). Ahora mismo no está causando dolor, ¡lo cual es una buena noticia! Sin embargo, grietas como esta pueden empeorar con el tiempo — especialmente con las fuerzas de la masticación. Piénselo como una pequeña grieta en un parabrisas: puede quedarse igual o puede extenderse. Una corona actuaría como un 'casco' protector para el diente, manteniendo todo unido y previniendo que la grieta se extienda. Esta es completamente su decisión, y no hay emergencia. El Dr. Brenes la revisará de nuevo en su cita de septiembre, y puede decidir entonces."
-      }
+      "estimatedCost": 1400,
+      "insuranceEstimate": 700,
+      "patientEstimate": 700,
+      "scheduledDate": "TBD — awaiting patient decision",
+      "notes": "Recommended due to AI-detected hairline mesiolingual cusp fracture (82% confidence). Zirconia crown will prevent catastrophic fracture and possible extraction. Two-visit process: digital prep + scan → crown delivery (2 weeks).",
+      "cptCode": "D2740"
     },
     {
-      "id": "tx-003",
-      "tooth": null,
-      "procedure": "Night Guard Consultation",
-      "description": {
-        "en": "Dr. Brenes noted mild signs of bruxism (teeth grinding) including slight wear facets on your upper molars. While not severe at this time, a custom-fitted night guard could protect your teeth — especially the new crown on #14 and the existing filling on #19 — from future grinding damage. We'll discuss this at your next visit.",
-        "es": "El Dr. Brenes notó signos leves de bruxismo (rechinar de dientes) incluyendo facetas de desgaste leve en sus molares superiores. Aunque no es severo en este momento, un protector nocturno hecho a medida podría proteger sus dientes — especialmente la nueva corona en #14 y el empaste existente en #19 — de daño futuro por rechinamiento. Discutiremos esto en su próxima visita."
-      },
-      "cdtCode": "D9944",
-      "cdtDescription": "Occlusal guard — hard appliance — full arch",
+      "procedure": "Custom Night Guard",
+      "tooth": "Upper arch",
       "priority": "low",
-      "urgency": "elective",
-      "status": "discussed-not-scheduled",
-      "scheduledDate": null,
-      "estimatedDuration": "2 visits — 15 min scan + 20 min delivery",
-      "provider": "Dr. Christian Brenes",
-      "assistant": "Logan",
-      "financials": {
-        "fee": 550,
-        "insuranceCoverage": {
-          "tier": "basic",
-          "coveragePercent": 50,
-          "estimatedInsurancePays": 275,
-          "estimatedPatientPays": 275,
-          "notes": "Night guards are sometimes covered under basic services at 50%. Some plans limit to one every 2-3 years. Should verify with BCBS specifically."
-        },
-        "estimatedTotal": 550,
-        "estimatedOutOfPocket": 275,
-        "financingAvailable": false
-      },
-      "prerequisites": [],
-      "notes": "Low priority. Discuss at September visit after addressing #30 decision.",
-      "palomaExplanation": {
-        "en": "Dr. Brenes noticed some mild wear patterns on your back teeth that suggest you might be grinding or clenching in your sleep. It's nothing to worry about right now, but a custom night guard is like an insurance policy for your teeth — it protects your new crown on #14, your filling on #19, and all your natural teeth from grinding wear. It's a small investment that can save you from much bigger expenses down the road. We can talk more about this at your next visit if you're interested.",
-        "es": "El Dr. Brenes notó algunos patrones de desgaste leve en sus dientes posteriores que sugieren que podría estar rechinando o apretando mientras duerme. No es algo de qué preocuparse ahora, pero un protector nocturno personalizado es como una póliza de seguro para sus dientes — protege su nueva corona en #14, su empaste en #19, y todos sus dientes naturales del desgaste por rechinamiento. Es una pequeña inversión que puede ahorrarle gastos mucho mayores en el futuro. Podemos hablar más sobre esto en su próxima visita si está interesado."
-      }
+      "estimatedCost": 550,
+      "insuranceEstimate": 0,
+      "patientEstimate": 550,
+      "scheduledDate": "TBD",
+      "notes": "Moderate bruxism noted — wear facets on canines and premolars. Custom-fitted occlusal guard recommended to protect crown #14 and prevent further fracturing on #30. Single visit: digital scan → lab fabrication → delivery.",
+      "cptCode": "D9944"
     },
     {
-      "id": "tx-004",
-      "tooth": null,
-      "procedure": "Bitewing Radiographs",
-      "description": {
-        "en": "Routine bitewing X-rays recommended at the September appointment to check for decay between teeth and monitor bone levels. These are typically taken once per year.",
-        "es": "Radiografías de mordida de rutina recomendadas para la cita de septiembre para verificar caries entre dientes y monitorear niveles óseos. Estas se toman típicamente una vez al año."
-      },
-      "cdtCode": "D0274",
-      "cdtDescription": "Bitewings — four radiographic images",
+      "procedure": "Comprehensive X-Rays (Full Mouth Series)",
+      "tooth": "Full mouth",
       "priority": "routine",
-      "urgency": "scheduled",
-      "status": "scheduled",
-      "scheduledDate": "2026-09-10T09:00:00-04:00",
-      "estimatedDuration": "5 min",
-      "provider": "Dr. Christian Brenes",
-      "assistant": "Missie",
-      "financials": {
-        "fee": 75,
-        "insuranceCoverage": {
-          "tier": "preventive",
-          "coveragePercent": 100,
-          "estimatedInsurancePays": 75,
-          "estimatedPatientPays": 0,
-          "notes": "Bitewing X-rays are covered at 100% under preventive services. Typically covered once per year."
-        },
-        "estimatedTotal": 75,
-        "estimatedOutOfPocket": 0
-      },
-      "prerequisites": [],
-      "notes": "Annual bitewings. Will be analyzed with Pearl AI for AI-assisted cavity detection."
-    },
-    {
-      "id": "tx-005",
-      "tooth": null,
-      "procedure": "Periodic Oral Evaluation",
-      "description": {
-        "en": "Comprehensive periodic exam by Dr. Brenes including oral cancer screening, TMJ evaluation, bite assessment, and review of all teeth and existing restorations.",
-        "es": "Examen periódico completo por el Dr. Brenes incluyendo examen de cáncer oral, evaluación de ATM, evaluación de mordida y revisión de todos los dientes y restauraciones existentes."
-      },
-      "cdtCode": "D0120",
-      "cdtDescription": "Periodic oral evaluation — established patient",
-      "priority": "routine",
-      "urgency": "scheduled",
-      "status": "scheduled",
-      "scheduledDate": "2026-09-10T09:00:00-04:00",
-      "estimatedDuration": "15 min",
-      "provider": "Dr. Christian Brenes",
-      "financials": {
-        "fee": 65,
-        "insuranceCoverage": {
-          "tier": "preventive",
-          "coveragePercent": 100,
-          "estimatedInsurancePays": 65,
-          "estimatedPatientPays": 0,
-          "notes": "Covered at 100% under preventive services."
-        },
-        "estimatedTotal": 65,
-        "estimatedOutOfPocket": 0
-      },
-      "prerequisites": [],
-      "notes": "Will re-evaluate #30 fracture line. Also assess bruxism wear patterns."
+      "estimatedCost": 180,
+      "insuranceEstimate": 180,
+      "patientEstimate": 0,
+      "scheduledDate": "2027-01-15",
+      "notes": "Due January 2027. Full mouth series recommended every 3 years. 100% covered by Delta Dental PPO.",
+      "cptCode": "D0210"
     }
   ],
-  "treatmentPlanSummary": {
-    "totalItems": 5,
-    "scheduledItems": 3,
-    "pendingDecisionItems": 1,
-    "discussedNotScheduledItems": 1,
-    "totalEstimatedFees": 2285,
-    "totalEstimatedInsurancePays": 1271,
-    "totalEstimatedPatientPays": 1014,
-    "nextAppointmentDate": "2026-09-10T09:00:00-04:00",
-    "nextAppointmentItems": ["Periodic Oral Evaluation (D0120)", "Bitewing Radiographs (D0274)", "Periodontal Maintenance (D4910)", "Re-evaluate #30"],
-    "nextAppointmentEstimatedDuration": "60 min",
-    "nextAppointmentEstimatedCost": {
-      "totalFee": 335,
-      "insurancePays": 296,
-      "patientPays": 39
+  "completed": [
+    {
+      "procedure": "Comprehensive Exam & Digital Scan",
+      "tooth": "Full mouth",
+      "date": "2025-10-08",
+      "cost": 350,
+      "insurancePaid": 280,
+      "patientPaid": 70,
+      "cptCode": "D0150"
+    },
+    {
+      "procedure": "Full Mouth X-Rays",
+      "tooth": "Full mouth",
+      "date": "2026-01-15",
+      "cost": 180,
+      "insurancePaid": 180,
+      "patientPaid": 0,
+      "cptCode": "D0210"
+    },
+    {
+      "procedure": "Crown Prep — Tooth #14",
+      "tooth": "#14 (Upper Left First Molar)",
+      "date": "2026-02-19",
+      "cost": 700,
+      "insurancePaid": 350,
+      "patientPaid": 350,
+      "cptCode": "D2740"
+    },
+    {
+      "procedure": "Crown Delivery — Tooth #14 (Zirconia)",
+      "tooth": "#14 (Upper Left First Molar)",
+      "date": "2026-03-12",
+      "cost": 700,
+      "insurancePaid": 350,
+      "patientPaid": 350,
+      "cptCode": "D2740"
+    },
+    {
+      "procedure": "Prophylaxis & AI Diagnostic Scan",
+      "tooth": "Full mouth",
+      "date": "2026-05-14",
+      "cost": 250,
+      "insurancePaid": 200,
+      "patientPaid": 50,
+      "cptCode": "D1110"
     }
-  },
-  "patientCommunication": {
-    "lastDiscussionDate": "2026-05-14",
-    "discussedBy": "Dr. Brenes + Emily",
-    "patientUnderstanding": "Excellent — Chris asked thoughtful questions about the #30 fracture line and understood the crown recommendation. He wants to wait and monitor, which Dr. Brenes agreed is reasonable given the tooth is asymptomatic.",
-    "concerns": [
-      "Chris asked if the #30 crack could get worse suddenly — Dr. Brenes explained it's unpredictable but typically progresses slowly. Advised calling immediately if he experiences any sensitivity to biting or cold.",
-      "Chris asked about the cost timing relative to insurance benefits — Emily explained the annual max strategy."
-    ],
-    "consentStatus": {
-      "informedConsentSigned": true,
-      "consentDate": "2026-01-15",
-      "hipaaConsentSigned": true,
-      "financialPolicyAcknowledged": true
-    }
-  }
+  ]
 }
