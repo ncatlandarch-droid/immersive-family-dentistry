@@ -129,22 +129,42 @@ function init3DViewer() {
     const container = document.getElementById('mouth-viewer');
     const loading = document.getElementById('viewer-loading');
 
-    mouthViewer = new MouthViewer(container);
-    mouthViewer.loadDemoModel(dentalChart);
+    try {
+        // Check if Three.js loaded
+        if (typeof THREE === 'undefined') {
+            throw new Error('Three.js not loaded');
+        }
+        if (typeof THREE.OrbitControls === 'undefined') {
+            throw new Error('OrbitControls not loaded');
+        }
 
-    loading.style.display = 'none';
+        mouthViewer = new MouthViewer(container);
+        mouthViewer.loadDemoModel(dentalChart);
 
-    mouthViewer.onToothClick = (toothData) => {
-        showToothInfo(toothData);
-    };
+        loading.style.display = 'none';
 
-    document.getElementById('reset-view-btn').addEventListener('click', () => {
-        mouthViewer.resetView();
-    });
+        mouthViewer.onToothClick = (toothData) => {
+            showToothInfo(toothData);
+        };
 
-    document.getElementById('tooth-info-close').addEventListener('click', () => {
-        document.getElementById('tooth-info').style.display = 'none';
-    });
+        document.getElementById('reset-view-btn').addEventListener('click', () => {
+            mouthViewer.resetView();
+        });
+
+        document.getElementById('tooth-info-close').addEventListener('click', () => {
+            document.getElementById('tooth-info').style.display = 'none';
+        });
+    } catch (err) {
+        console.error('MouthMap 3D Viewer error:', err);
+        loading.innerHTML = `
+            <div style="text-align:center;padding:40px;">
+                <p style="font-size:40px;margin-bottom:12px;">🦷</p>
+                <p style="font-size:16px;font-weight:600;color:#1E293B;">Interactive 3D MouthMap</p>
+                <p style="font-size:13px;color:#64748B;margin-top:8px;">3D viewer loading issue — click <strong>Health Summary</strong> to see your dental chart.</p>
+                <p style="font-size:11px;color:#94A3B8;margin-top:12px;">Error: ${err.message}</p>
+            </div>
+        `;
+    }
 }
 
 function showToothInfo(toothData) {
