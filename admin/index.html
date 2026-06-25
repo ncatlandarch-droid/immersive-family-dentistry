@@ -1581,6 +1581,13 @@
                     <i data-lucide="settings-2"></i> Settings
                 </button>
             </nav>
+            <div class="sidebar-paloma-trigger" id="sidebar-paloma-trigger" title="Ask PALOMA">
+                <img src="/images/paloma/paloma-hero.png" alt="PALOMA" class="sidebar-paloma-avatar" />
+                <div class="sidebar-paloma-info">
+                    <span class="sidebar-paloma-name">PALOMA</span>
+                    <span class="sidebar-paloma-status">● Online — Ask me anything</span>
+                </div>
+            </div>
             <div class="sidebar-footer">
                 <a href="/" class="sidebar-link">← Back to Website</a>
                 <button id="logout-btn" class="sidebar-logout">Sign Out</button>
@@ -4385,28 +4392,48 @@
 
     <!-- ═══ PALOMA Admin Assistant ═══ -->
     <style>
-    .admin-paloma-fab {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
-        border: 2px solid rgba(20, 184, 166, 0.6);
-        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4);
-        cursor: pointer;
-        z-index: 1000;
-        overflow: hidden;
+    /* PALOMA FAB — hidden on desktop (sidebar trigger replaces it) */
+    .admin-paloma-fab { display: none; }
+
+    /* Sidebar PALOMA trigger */
+    .sidebar-paloma-trigger {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 20px; margin: 8px 12px;
+        background: rgba(20, 184, 166, 0.08);
+        border: 1px solid rgba(20, 184, 166, 0.2);
+        border-radius: 14px; cursor: pointer;
         transition: all 0.3s ease;
     }
-    .admin-paloma-fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(20, 184, 166, 0.5); }
-    .admin-paloma-fab img { width: 100%; height: 100%; object-fit: cover; }
-    .admin-paloma-fab .admin-paloma-badge {
-        position: absolute; top: -2px; right: -2px;
-        background: var(--admin-gold); color: #000; font-size: 10px; font-weight: 700;
-        width: 20px; height: 20px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
+    .sidebar-paloma-trigger:hover {
+        background: rgba(20, 184, 166, 0.15);
+        border-color: rgba(20, 184, 166, 0.4);
+        transform: translateY(-1px);
+    }
+    .sidebar-paloma-avatar {
+        width: 44px; height: 44px; border-radius: 50%;
+        object-fit: cover; border: 2px solid var(--admin-teal);
+        box-shadow: 0 0 12px rgba(20, 184, 166, 0.3);
+    }
+    .sidebar-paloma-info { display: flex; flex-direction: column; }
+    .sidebar-paloma-name {
+        font-family: 'Outfit', sans-serif; font-size: 14px;
+        font-weight: 600; color: var(--admin-teal);
+    }
+    .sidebar-paloma-status {
+        font-size: 11px; color: #4ade80; opacity: 0.9;
+    }
+
+    /* Chat panel — now opens from left */
+    .admin-paloma-panel.from-sidebar {
+        left: 260px; right: auto;
+        bottom: 80px;
+    }
+    @media (max-width: 768px) {
+        .admin-paloma-fab { display: block; position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--admin-teal); border: 2px solid rgba(20,184,166,0.6); box-shadow: 0 4px 20px rgba(20,184,166,0.4); cursor: pointer; z-index: 1000; overflow: hidden; }
+        .admin-paloma-fab img { width: 100%; height: 100%; object-fit: cover; }
+        .admin-paloma-fab .admin-paloma-badge { position: absolute; top: -2px; right: -2px; background: var(--admin-gold); color: #000; font-size: 10px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .sidebar-paloma-trigger { display: none; }
+        .admin-paloma-panel.from-sidebar { left: 16px; right: 16px; bottom: 88px; width: auto; }
     }
 
     .admin-paloma-panel {
@@ -4549,14 +4576,18 @@
         let chatHistory = [];
 
         // Toggle
-        fab.addEventListener('click', () => {
+        function togglePanel() {
             isOpen = !isOpen;
             panel.classList.toggle('open', isOpen);
+            panel.classList.add('from-sidebar');
             if (isOpen && messagesEl.children.length === 0) {
                 addBotMsg("Good morning, Dr. Brenes! 🕊️ I'm in **Clinical Assistant Mode** — I have access to your full patient database and schedule. Ask me anything about your patients or today's lineup.");
             }
             if (isOpen) input.focus();
-        });
+        }
+        fab.addEventListener('click', togglePanel);
+        const sidebarTrigger = document.getElementById('sidebar-paloma-trigger');
+        if (sidebarTrigger) sidebarTrigger.addEventListener('click', togglePanel);
         closeBtn.addEventListener('click', () => { isOpen = false; panel.classList.remove('open'); });
 
         // Chips
