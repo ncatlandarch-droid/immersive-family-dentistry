@@ -10,7 +10,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 const FIRESTORE_PROJECT = 'paloma-590b6';
-const FIRESTORE_API_KEY = 'AIzaSyBQx0FT_ebBOlAIa97Q9xMUL7lXSgY4xyw';
+const FIRESTORE_API_KEY = process.env.FIREBASE_API_KEY;
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIRESTORE_PROJECT}/databases/(default)/documents`;
 
 // ─── Schedule: Every hour on the hour ───

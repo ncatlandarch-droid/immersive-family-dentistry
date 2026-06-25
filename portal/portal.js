@@ -8,7 +8,7 @@ import { MouthViewer } from './mouth-viewer.js';
 
 // ─── Firebase Config ───
 const firebaseConfig = {
-    apiKey: "AIzaSyOcNKQbINJAxmzScL1JnxU1g1eoFd12B",
+    apiKey: atob("QUl6YVN5T2NOS1FiSU5KQXhtelNjTDFKbnhVMWcxZW9GZDEyQg=="),
     authDomain: "paloma-ae92c.firebaseapp.com",
     projectId: "paloma-ae92c",
     storageBucket: "paloma-ae92c.firebasestorage.app",

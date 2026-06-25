@@ -9,7 +9,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 const FIRESTORE_PROJECT = 'paloma-590b6';
-const FIRESTORE_API_KEY = 'AIzaSyBQx0FT_ebBOlAIa97Q9xMUL7lXSgY4xyw';
+const FIRESTORE_API_KEY = process.env.FIREBASE_API_KEY;
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIRESTORE_PROJECT}/databases/(default)/documents`;
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';

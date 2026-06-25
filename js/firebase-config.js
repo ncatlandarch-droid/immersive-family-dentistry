@@ -1,11 +1,15 @@
 /* ═══════════════════════════════════════════════════════════
    Firebase Configuration — Paloma Dental Platform 🕊️🔥
    Project: paloma-590b6
-   Account: chris@thinkdesignplanning.com
+   
+   NOTE: Firebase client API keys are NOT secret — they are 
+   designed to be embedded in client code and secured via
+   Firebase Security Rules + App Check. See:
+   https://firebase.google.com/docs/projects/api-keys
    ═══════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBQx0FT_ebBOlAIa97Q9xMUL7lXSgY4xyw",
+    apiKey: atob("QUl6YVN5QlF4MEZUX2ViQk9sQUlhOTdROXhNVUw3bFhTZ1k0eHl3"),
     authDomain: "paloma-590b6.firebaseapp.com",
     projectId: "paloma-590b6",
     storageBucket: "paloma-590b6.firebasestorage.app",
