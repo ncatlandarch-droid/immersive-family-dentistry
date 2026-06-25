@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Analytics (public write for tracker, admin read) ───
+    // Allow unauthenticated pageview tracking from public site
+    match /analytics/pageviews/events/{eventId} {
+      allow create: if true;  // Public site tracker writes here
+      allow read: if request.auth != null;  // Only logged-in admins can read
+      allow update, delete: if false;  // Events are immutable
+    }
+    
+    // Daily aggregates
+    match /analytics/daily/{dateId}/{docId} {
+      allow create, update: if true;  // Tracker aggregates here
+      allow read: if request.auth != null;
+      allow delete: if false;
+    }
+
+    // ─── Practice Data (authenticated only) ───
+    match /appointments/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /patients/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /settings/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /conversations/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ─── Website Content (public read, admin write) ───
+    match /website/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ─── Catch-all deny ───
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

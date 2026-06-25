@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /portal/
+Disallow: /staff/
+Disallow: /data/
+
+Sitemap: https://ljfamilydentist-paloma.netlify.app/sitemap.xml
