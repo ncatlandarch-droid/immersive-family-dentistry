@@ -1534,7 +1534,7 @@
                 <img src="/images/paloma/paloma-icon.png" alt="" class="sidebar-logo" />
                 <div>
                     <h2 class="sidebar-title">Admin</h2>
-                    <p class="sidebar-subtitle">MouthMap Platform</p>
+                    <p class="sidebar-subtitle">PALOMA Platform</p>
                 </div>
             </div>
             <nav class="sidebar-nav">
@@ -3035,6 +3035,10 @@
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(`view-${view}`).classList.add('active');
                 document.getElementById('page-title').textContent = btn.textContent.trim();
+
+                // Hide PALOMA FAB during wizard (blocks Next button)
+                const fab = document.getElementById('admin-paloma-fab');
+                if (fab) fab.style.display = (view === 'onboarding-wizard') ? 'none' : '';
 
                 // Load data when switching to these views
                 if (view === 'appointments') loadAppointments();
@@ -5509,7 +5513,7 @@
                 statusEl.style.display = 'block';
                 resultsEl.style.display = 'none';
                 scanBtn.disabled = true;
-                scanBtn.textContent = 'Scanning...';
+                scanBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px;"></span> PALOMA is scanning...';
 
                 // Animated progress
                 const steps = [
