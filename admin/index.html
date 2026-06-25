@@ -3995,157 +3995,120 @@
         });
     }
 
-    // ─── Site Analytics (Firestore-powered) ───
+    // ─── Site Analytics (Netlify baseline + Firestore live) ───
     let siteTrafficChart = null;
     let siteSourcesChart = null;
 
     async function renderSiteAnalytics() {
-        if (!_db) return;
-        
-        try {
-            // Query last 30 days of pageview events
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
-
-            const snapshot = await _db.collection('analytics').doc('pageviews')
-                .collection('events')
-                .where('date', '>=', cutoffDate)
-                .orderBy('date', 'desc')
-                .limit(5000)
-                .get();
-
-            const events = [];
-            snapshot.forEach(doc => events.push(doc.data()));
-
-            if (events.length === 0) {
-                document.getElementById('sa-pageviews').textContent = '0';
-                document.getElementById('sa-visitors').textContent = '0';
-                document.getElementById('sa-avg-daily').textContent = '0';
-                document.getElementById('sa-top-source').textContent = 'N/A';
-                document.getElementById('sa-top-pages').innerHTML = '<p style="color:var(--admin-muted);">No analytics data yet. Visit the public website to start tracking!</p>';
-                return;
+        // ── Netlify Analytics Baseline (May 26 – Jun 25, 2026) ──
+        const baseline = {
+            totalPageviews: 192, totalVisitors: 64, bandwidth: '598 MB',
+            topPages: { '/': 122, '/admin/': 37, '/portal/patient': 24, '/portal/': 7, '/staff/': 2 },
+            topSources: { 'Direct': 133 },
+            daily: {
+                '2026-05-29':{pv:2,vis:1},'2026-05-30':{pv:3,vis:2},'2026-05-31':{pv:1,vis:1},
+                '2026-06-02':{pv:4,vis:2},'2026-06-03':{pv:5,vis:3},'2026-06-04':{pv:3,vis:2},
+                '2026-06-05':{pv:2,vis:1},'2026-06-06':{pv:93,vis:40},'2026-06-07':{pv:18,vis:5},
+                '2026-06-08':{pv:3,vis:1},'2026-06-09':{pv:12,vis:4},'2026-06-10':{pv:5,vis:2},
+                '2026-06-11':{pv:8,vis:3},'2026-06-12':{pv:2,vis:1},'2026-06-13':{pv:1,vis:1},
+                '2026-06-14':{pv:3,vis:2},'2026-06-16':{pv:2,vis:1},'2026-06-17':{pv:1,vis:1},
+                '2026-06-19':{pv:1,vis:1},'2026-06-22':{pv:2,vis:1},'2026-06-23':{pv:1,vis:1},
+                '2026-06-24':{pv:2,vis:1},'2026-06-25':{pv:18,vis:6}
             }
+        };
 
-            // Aggregate data
-            const totalPageviews = events.length;
-            const uniqueVisitors = new Set(events.map(e => e.visitorId)).size;
-            const dailyMap = {};
-            const pageMap = {};
-            const sourceMap = {};
+        // ── Merge with live Firestore ──
+        let livePageviews = 0, liveVisitors = 0;
+        const livePageMap = {}, liveSourceMap = {}, liveDailyMap = {};
 
-            events.forEach(e => {
-                // Daily aggregation
-                const d = e.date || 'unknown';
-                if (!dailyMap[d]) dailyMap[d] = { views: 0, visitors: new Set() };
-                dailyMap[d].views++;
-                dailyMap[d].visitors.add(e.visitorId);
-
-                // Page aggregation
-                const page = e.page || '/';
-                pageMap[page] = (pageMap[page] || 0) + 1;
-
-                // Source aggregation
-                const source = e.source || 'direct';
-                sourceMap[source] = (sourceMap[source] || 0) + 1;
-            });
-
-            const dayCount = Object.keys(dailyMap).length || 1;
-            const avgDaily = Math.round(totalPageviews / dayCount);
-            const topSource = Object.entries(sourceMap).sort((a,b) => b[1] - a[1])[0];
-
-            // Update KPIs
-            document.getElementById('sa-pageviews').textContent = totalPageviews.toLocaleString();
-            document.getElementById('sa-visitors').textContent = uniqueVisitors.toLocaleString();
-            document.getElementById('sa-avg-daily').textContent = avgDaily.toLocaleString();
-            document.getElementById('sa-top-source').textContent = topSource ? topSource[0].charAt(0).toUpperCase() + topSource[0].slice(1) : 'N/A';
-
-            // Build sorted daily timeseries
-            const sortedDays = Object.keys(dailyMap).sort();
-            const labels = sortedDays.map(d => {
-                const [,m,day] = d.split('-');
-                return `${parseInt(m)}/${parseInt(day)}`;
-            });
-            const pvData = sortedDays.map(d => dailyMap[d].views);
-            const visData = sortedDays.map(d => dailyMap[d].visitors.size);
-
-            // Traffic chart
-            if (siteTrafficChart) siteTrafficChart.destroy();
-            siteTrafficChart = new Chart(document.getElementById('chart-site-traffic'), {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [
-                        {
-                            label: 'Pageviews',
-                            data: pvData,
-                            borderColor: 'rgba(20, 184, 166, 1)',
-                            backgroundColor: 'rgba(20, 184, 166, 0.1)',
-                            fill: true, tension: 0.4, borderWidth: 2,
-                            pointRadius: 3, pointBackgroundColor: 'rgba(20, 184, 166, 1)',
-                        },
-                        {
-                            label: 'Visitors',
-                            data: visData,
-                            borderColor: 'rgba(245, 158, 11, 1)',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            fill: true, tension: 0.4, borderWidth: 2,
-                            pointRadius: 3, pointBackgroundColor: 'rgba(245, 158, 11, 1)',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'top', labels: { color: '#94A3B8', usePointStyle: true } } },
-                    scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B', maxTicksLimit: 10 } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B' }, beginAtZero: true }
-                    }
-                }
-            });
-
-            // Top Pages table
-            const sortedPages = Object.entries(pageMap).sort((a,b) => b[1] - a[1]).slice(0, 8);
-            const pageNames = { '/': 'Homepage', '/admin/': 'Admin', '/portal/': 'Patient Portal' };
-            document.getElementById('sa-top-pages').innerHTML = `
-                <table style="width:100%;border-collapse:collapse;">
-                    <thead><tr style="border-bottom:1px solid var(--admin-border);">
-                        <th style="text-align:left;padding:8px;color:var(--admin-muted);font-size:12px;">Page</th>
-                        <th style="text-align:right;padding:8px;color:var(--admin-muted);font-size:12px;">Views</th>
-                    </tr></thead>
-                    <tbody>${sortedPages.map(([page, count]) => `
-                        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                            <td style="padding:8px;color:var(--admin-text);">${pageNames[page] || page}</td>
-                            <td style="text-align:right;padding:8px;color:var(--admin-teal);font-weight:600;">${count}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>`;
-
-            // Sources doughnut chart
-            const sortedSources = Object.entries(sourceMap).sort((a,b) => b[1] - a[1]).slice(0, 6);
-            const sourceColors = [
-                'rgba(20, 184, 166, 0.8)', 'rgba(245, 158, 11, 0.8)',
-                'rgba(59, 130, 246, 0.8)', 'rgba(139, 92, 246, 0.8)',
-                'rgba(236, 72, 153, 0.8)', 'rgba(34, 197, 94, 0.8)'
-            ];
-            if (siteSourcesChart) siteSourcesChart.destroy();
-            siteSourcesChart = new Chart(document.getElementById('chart-site-sources'), {
-                type: 'doughnut',
-                data: {
-                    labels: sortedSources.map(([s]) => s.charAt(0).toUpperCase() + s.slice(1)),
-                    datasets: [{
-                        data: sortedSources.map(([,c]) => c),
-                        backgroundColor: sourceColors.slice(0, sortedSources.length),
-                        borderWidth: 0, borderRadius: 4,
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8', padding: 12 } } } }
-            });
-
-        } catch(err) {
-            console.error('[Site Analytics] Error:', err);
-            document.getElementById('sa-top-pages').innerHTML = '<p style="color:var(--admin-muted);">Unable to load analytics. Check Firestore permissions.</p>';
+        if (_db) {
+            try {
+                const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+                const cutoffDate = cutoff.toISOString().split('T')[0];
+                const snap = await _db.collection('analytics').doc('pageviews')
+                    .collection('events').where('date', '>=', cutoffDate)
+                    .orderBy('date', 'desc').limit(5000).get();
+                const events = []; snap.forEach(d => events.push(d.data()));
+                livePageviews = events.length;
+                liveVisitors = new Set(events.map(e => e.visitorId)).size;
+                events.forEach(e => {
+                    const d = e.date || 'unknown';
+                    if (!liveDailyMap[d]) liveDailyMap[d] = { pv: 0, visitors: new Set() };
+                    liveDailyMap[d].pv++; liveDailyMap[d].visitors.add(e.visitorId);
+                    const page = e.page || '/'; livePageMap[page] = (livePageMap[page] || 0) + 1;
+                    const src = (e.source || 'direct'); const srcKey = src.charAt(0).toUpperCase() + src.slice(1);
+                    liveSourceMap[srcKey] = (liveSourceMap[srcKey] || 0) + 1;
+                });
+            } catch(e) { console.warn('[Site Analytics] Firestore:', e); }
         }
+
+        // ── Combine ──
+        const totalPV = baseline.totalPageviews + livePageviews;
+        const totalVis = baseline.totalVisitors + liveVisitors;
+        const mergedPages = { ...baseline.topPages };
+        Object.entries(livePageMap).forEach(([k,v]) => { mergedPages[k] = (mergedPages[k]||0) + v; });
+        const mergedSources = { ...baseline.topSources };
+        Object.entries(liveSourceMap).forEach(([k,v]) => { mergedSources[k] = (mergedSources[k]||0) + v; });
+        const mergedDaily = {};
+        Object.entries(baseline.daily).forEach(([d,{pv,vis}]) => { mergedDaily[d] = {pv,vis}; });
+        Object.entries(liveDailyMap).forEach(([d,obj]) => {
+            if (!mergedDaily[d]) mergedDaily[d] = {pv:0,vis:0};
+            mergedDaily[d].pv += obj.pv; mergedDaily[d].vis = (mergedDaily[d].vis||0) + obj.visitors.size;
+        });
+        const dayCount = Object.keys(mergedDaily).length || 1;
+        const avgDaily = Math.round(totalPV / dayCount);
+        const topSrc = Object.entries(mergedSources).sort((a,b) => b[1]-a[1])[0];
+
+        // ── KPIs ──
+        document.getElementById('sa-pageviews').textContent = totalPV.toLocaleString();
+        document.getElementById('sa-visitors').textContent = totalVis.toLocaleString();
+        document.getElementById('sa-avg-daily').textContent = avgDaily.toLocaleString();
+        document.getElementById('sa-top-source').textContent = topSrc ? topSrc[0] : 'N/A';
+
+        // ── Traffic chart ──
+        const sortedDays = Object.keys(mergedDaily).sort();
+        const labels = sortedDays.map(d => { const [,m,day] = d.split('-'); return `${parseInt(m)}/${parseInt(day)}`; });
+        if (siteTrafficChart) siteTrafficChart.destroy();
+        siteTrafficChart = new Chart(document.getElementById('chart-site-traffic'), {
+            type: 'line', data: { labels, datasets: [
+                { label: 'Pageviews', data: sortedDays.map(d => mergedDaily[d].pv),
+                  borderColor: 'rgba(20,184,166,1)', backgroundColor: 'rgba(20,184,166,0.1)',
+                  fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: 'rgba(20,184,166,1)' },
+                { label: 'Visitors', data: sortedDays.map(d => mergedDaily[d].vis),
+                  borderColor: 'rgba(245,158,11,1)', backgroundColor: 'rgba(245,158,11,0.1)',
+                  fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: 'rgba(245,158,11,1)' }
+            ]}, options: { responsive: true,
+                plugins: { legend: { position: 'top', labels: { color: '#94A3B8', usePointStyle: true } } },
+                scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B', maxTicksLimit: 10 } },
+                          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B' }, beginAtZero: true } }
+            }
+        });
+
+        // ── Top Pages ──
+        const pageNames = { '/': 'Homepage', '/admin/': 'Admin Dashboard', '/portal/patient': 'Patient Portal', '/portal/': 'Portal Landing', '/staff/': 'Staff Portal' };
+        const sortedPg = Object.entries(mergedPages).sort((a,b) => b[1]-a[1]).slice(0, 8);
+        document.getElementById('sa-top-pages').innerHTML = `
+            <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="border-bottom:1px solid var(--admin-border);">
+                    <th style="text-align:left;padding:8px;color:var(--admin-muted);font-size:12px;">Page</th>
+                    <th style="text-align:right;padding:8px;color:var(--admin-muted);font-size:12px;">Views</th>
+                </tr></thead>
+                <tbody>${sortedPg.map(([p,c]) => `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td style="padding:8px;color:var(--admin-text);">${pageNames[p]||p}</td>
+                    <td style="text-align:right;padding:8px;color:var(--admin-teal);font-weight:600;">${c}</td>
+                </tr>`).join('')}</tbody>
+            </table>`;
+
+        // ── Sources doughnut ──
+        const sortedSrc = Object.entries(mergedSources).sort((a,b) => b[1]-a[1]).slice(0, 6);
+        const srcColors = ['rgba(20,184,166,0.8)','rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(236,72,153,0.8)','rgba(34,197,94,0.8)'];
+        if (siteSourcesChart) siteSourcesChart.destroy();
+        siteSourcesChart = new Chart(document.getElementById('chart-site-sources'), {
+            type: 'doughnut', data: {
+                labels: sortedSrc.map(([s]) => s),
+                datasets: [{ data: sortedSrc.map(([,c]) => c), backgroundColor: srcColors.slice(0, sortedSrc.length), borderWidth: 0, borderRadius: 4 }]
+            }, options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8', padding: 12 } } } }
+        });
     }
 
     // ═══════════════════════════════════════════════════════════
