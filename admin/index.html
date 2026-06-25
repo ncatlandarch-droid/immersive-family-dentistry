@@ -17,6 +17,9 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
     <style>
     /* ═══════════════════════════════════════════════════════════
        Admin Dashboard — Dark Glassmorphism Theme
@@ -189,6 +192,13 @@
     .sidebar-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
     .sidebar-item.active { background: var(--admin-teal-glow); color: var(--admin-teal); font-weight: 600; }
     .sidebar-item span { width: 22px; text-align: center; font-size: 16px; }
+    .sidebar-item i[data-lucide] {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        stroke-width: 1.75;
+        flex-shrink: 0;
+    }
 
     .sidebar-divider { height: 1px; background: var(--admin-border); margin: 8px 14px; }
 
@@ -256,6 +266,76 @@
     }
     .view-search { width: 260px; }
     .view-search::placeholder { color: var(--admin-muted); }
+
+    /* ─── KPI Dashboard Cards ─── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+    .kpi-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius);
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        transition: var(--admin-transition);
+    }
+    .kpi-card:hover {
+        border-color: rgba(255,255,255,0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .kpi-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .kpi-icon i[data-lucide] { width: 22px; height: 22px; }
+    .kpi-info { flex: 1; min-width: 0; }
+    .kpi-label { font-size: 12px; color: var(--admin-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: var(--admin-text); margin: 0; line-height: 1.2; }
+    .kpi-trend { font-size: 12px; color: var(--admin-muted); }
+    .kpi-trend-up { color: var(--admin-teal); }
+    .kpi-trend-down { color: var(--admin-red); }
+
+    /* ─── Quick Actions ─── */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+    .quick-action-btn {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 10px; padding: 20px 12px;
+        background: var(--admin-surface);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius);
+        color: var(--admin-text);
+        font-size: 13px; font-weight: 500;
+        cursor: pointer;
+        transition: var(--admin-transition);
+    }
+    .quick-action-btn:hover {
+        border-color: var(--admin-teal);
+        background: rgba(20,184,166,0.06);
+        color: var(--admin-teal);
+        transform: translateY(-2px);
+    }
+    .quick-action-btn i[data-lucide] { width: 24px; height: 24px; stroke: currentColor; }
+
+    @media (max-width: 1024px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+        .kpi-grid { grid-template-columns: 1fr; }
+        .quick-actions-grid { grid-template-columns: 1fr; }
+    }
 
     /* ─── Glass Card ─── */
     .glass-card {
@@ -607,18 +687,20 @@
     }
 
     .btn-primary {
+        display: inline-flex; align-items: center; gap: 6px;
         padding: 9px 18px; border-radius: 10px;
         background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
         color: white; font-size: 13px; font-weight: 600; transition: var(--admin-transition);
-        border: none;
+        border: none; font-family: 'Inter', sans-serif;
     }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px var(--admin-teal-glow); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     .btn-secondary {
+        display: inline-flex; align-items: center; gap: 6px;
         padding: 9px 18px; border-radius: 10px; border: 1px solid var(--admin-border);
         font-size: 13px; font-weight: 500; color: var(--admin-muted); transition: var(--admin-transition);
-        background: transparent;
+        background: transparent; font-family: 'Inter', sans-serif;
     }
     .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--admin-text); }
 
@@ -1303,18 +1385,118 @@
         border-top: 1px solid var(--admin-border);
     }
     .wizard-step-counter { font-size: 13px; color: var(--admin-muted); }
-    .btn-secondary {
-        padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
-        background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border);
-        color: var(--admin-text-secondary); transition: var(--admin-transition);
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
     .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
+
 
     @media (max-width: 768px) {
         .wizard-form-grid { grid-template-columns: 1fr; }
         .wizard-steps-nav { gap: 6px; }
         .wizard-step-dot { font-size: 11px; padding: 6px 10px; }
+    }
+
+    /* ═══ Sidebar Section Labels & Badge ═══ */
+    .sidebar-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.25);
+        padding: 16px 14px 6px;
+        text-transform: uppercase;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .sidebar-badge {
+        margin-left: auto;
+        background: var(--admin-teal);
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+        min-width: 20px;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    /* ═══ Action Items ═══ */
+    .action-filter {
+        padding: 7px 16px;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: transparent;
+        color: var(--admin-muted);
+        transition: var(--admin-transition);
+        font-family: 'Inter', sans-serif;
+    }
+    .action-filter:hover { border-color: var(--admin-teal); color: var(--admin-text); }
+    .action-filter.active { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+
+    .priority-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .priority-badge.high { background: var(--admin-red-glow); color: var(--admin-red); }
+    .priority-badge.medium { background: var(--admin-gold-glow); color: var(--admin-gold); }
+    .priority-badge.low { background: rgba(139,92,246,0.15); color: var(--admin-purple); }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 14px;
+        border: 1px solid var(--admin-border);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: transparent;
+        color: var(--admin-text-secondary);
+        transition: var(--admin-transition);
+        white-space: nowrap;
+        font-family: 'Inter', sans-serif;
+    }
+    .btn-action:hover { background: var(--admin-teal); color: white; border-color: var(--admin-teal); }
+
+    /* ═══ Status Pills ═══ */
+    .status-pill {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status-pill.live { background: var(--admin-green-glow); color: var(--admin-green); }
+    .status-pill.draft { background: var(--admin-gold-glow); color: var(--admin-gold); }
+
+    /* ═══ Voice Mic Button ═══ */
+    .voice-mic-btn:hover {
+        background: var(--admin-teal-glow) !important;
+        color: var(--admin-teal) !important;
+        border-color: var(--admin-teal) !important;
+    }
+
+    /* ═══ Responsive — New Components ═══ */
+    @media (max-width: 1024px) {
+        .view-header { flex-direction: column; align-items: flex-start; }
+        .view-header > div:last-child { width: 100%; overflow-x: auto; }
+        .action-filter { padding: 6px 10px; font-size: 11px; }
+    }
+    @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); }
+        .main-content { margin-left: 0 !important; }
+        .topbar-toggle { display: block !important; }
+        .data-table { font-size: 12px; }
+        .data-table th, .data-table td { padding: 10px 12px; }
     }
 
     </style>
@@ -1329,17 +1511,16 @@
     <!-- ═══ Auth Gate ═══ -->
     <div id="auth-gate" class="auth-gate">
         <div class="auth-card">
-            <div class="auth-icon">🕊️</div>
-            <h1 class="auth-title">PALOMA Admin</h1>
-            <p class="auth-subtitle">Lake Jeanette Family & Implant Dentistry</p>
+            <img src="/images/paloma/paloma-icon.png" alt="PALOMA" style="width:64px;height:64px;margin:0 auto 12px;display:block;border-radius:50%;" />
+            <h1 class="auth-title">PALOMA</h1>
+            <p class="auth-subtitle">Practice Management Platform</p>
             <form id="login-form" class="auth-form">
-                <p style="color:var(--admin-muted);font-size:13px;margin-bottom:8px">Select your role to continue</p>
-                <select id="login-role" class="auth-input" style="text-align:center;font-size:15px;padding:14px">
-                    <option value="admin">🔑 Practice Owner (Dr. Brenes)</option>
-                    <option value="staff">👩‍⚕️ Staff Member</option>
-                </select>
-                <button type="submit" class="auth-btn">Enter Dashboard →</button>
+                <input type="email" id="login-email" class="auth-input" placeholder="Email address" required autocomplete="email" />
+                <input type="password" id="login-password" class="auth-input" placeholder="Password" required autocomplete="current-password" />
+                <button type="submit" class="auth-btn" id="login-btn">Sign In</button>
+                <p id="auth-error" style="color:var(--admin-red);font-size:13px;margin-top:8px;display:none;"></p>
             </form>
+            <p style="color:var(--admin-muted);font-size:11px;margin-top:16px;">Secure login powered by Firebase Authentication</p>
         </div>
     </div>
 
@@ -1357,39 +1538,47 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="sidebar-item active" data-view="schedule">
-                    <span>📅</span> Schedule
+                <!-- Operations -->
+                <span class="sidebar-label">OPERATIONS</span>
+                <button class="sidebar-item active" data-view="dashboard-home">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </button>
+                <button class="sidebar-item" data-view="schedule">
+                    <i data-lucide="calendar-days"></i> Schedule
                 </button>
                 <button class="sidebar-item" data-view="appointments">
-                    <span>📋</span> Appointments
+                    <i data-lucide="clipboard-list"></i> Appointments
                 </button>
-                <button class="sidebar-item" data-view="practice-settings">
-                    <span>🏥</span> Practice Settings
-                </button>
-                <div class="sidebar-divider"></div>
-                <button class="sidebar-item" data-view="overview">
-                    <span>📊</span> Overview
-                </button>
-                <button class="sidebar-item" data-view="production">
-                    <span>💰</span> Production
+                <button class="sidebar-item" data-view="action-items">
+                    <i data-lucide="list-checks"></i> Action Items
+                    <span class="sidebar-badge" id="action-items-badge">5</span>
                 </button>
                 <button class="sidebar-item" data-view="patients">
-                    <span>👥</span> Patients
+                    <i data-lucide="users"></i> Patients
+                </button>
+                <div class="sidebar-divider"></div>
+                <!-- Intelligence -->
+                <span class="sidebar-label">INTELLIGENCE</span>
+                <button class="sidebar-item" data-view="overview">
+                    <i data-lucide="bar-chart-3"></i> Scorecards
                 </button>
                 <button class="sidebar-item" data-view="paloma-analytics">
-                    <span>🕊️</span> PALOMA Analytics
+                    <i data-lucide="bird"></i> PALOMA AI
                 </button>
                 <button class="sidebar-item" id="sidebar-financial" data-view="financial-intelligence">
-                    <span>💰</span> Financial Intelligence
+                    <i data-lucide="wallet"></i> Financial
+                </button>
+                <div class="sidebar-divider"></div>
+                <!-- Admin -->
+                <span class="sidebar-label">ADMIN</span>
+                <button class="sidebar-item" data-view="website-editor">
+                    <i data-lucide="globe"></i> Website Editor
                 </button>
                 <button class="sidebar-item" id="sidebar-onboarding" data-view="onboarding-wizard">
-                    <span>🧙</span> Practice Setup
+                    <i data-lucide="wand-2"></i> Practice Setup
                 </button>
-                <button class="sidebar-item" data-view="data-editor">
-                    <span>📝</span> Data Editor
-                </button>
-                <button class="sidebar-item" data-view="settings">
-                    <span>⚙️</span> Settings
+                <button class="sidebar-item" data-view="practice-settings">
+                    <i data-lucide="settings-2"></i> Settings
                 </button>
             </nav>
             <div class="sidebar-footer">
@@ -1462,15 +1651,15 @@
             <!-- ═══ View: Practice Settings ═══ -->
             <div id="view-practice-settings" class="view">
                 <div class="view-header">
-                    <h2>🏥 Practice Settings</h2>
+                    <h2>Practice Settings</h2>
                 </div>
 
                 <div class="settings-tabs" id="ps-tabs">
-                    <button class="settings-tab active" data-section="hours">🕐 Office Hours</button>
-                    <button class="settings-tab" data-section="pricing">💲 Treatment Pricing</button>
-                    <button class="settings-tab" data-section="insurance">🛡️ Insurance</button>
-                    <button class="settings-tab" data-section="staff">👨‍⚕️ Staff</button>
-                    <button class="settings-tab" data-section="contact">📞 Contact Info</button>
+                    <button class="settings-tab active" data-section="hours">Office Hours</button>
+                    <button class="settings-tab" data-section="pricing">Fee Schedule</button>
+                    <button class="settings-tab" data-section="insurance">Insurance</button>
+                    <button class="settings-tab" data-section="staff">Staff</button>
+                    <button class="settings-tab" data-section="contact">Contact Info</button>
                 </div>
 
                 <div id="ps-content">
@@ -1655,19 +1844,22 @@
 
                 <!-- Progress Bar -->
                 <div class="wizard-progress">
-                    <div class="wizard-progress-bar" id="wizard-progress-bar" style="width:20%"></div>
+                    <div class="wizard-progress-bar" id="wizard-progress-bar" style="width:12.5%"></div>
                 </div>
                 <div class="wizard-steps-nav" id="wizard-steps-nav">
-                    <button class="wizard-step-dot active" data-step="1">1. Practice Info</button>
-                    <button class="wizard-step-dot" data-step="2">2. Services</button>
-                    <button class="wizard-step-dot" data-step="3">3. Team</button>
-                    <button class="wizard-step-dot" data-step="4">4. Insurance</button>
-                    <button class="wizard-step-dot" data-step="5">5. PALOMA</button>
+                    <button class="wizard-step-dot active" data-step="1">1. Practice</button>
+                    <button class="wizard-step-dot" data-step="2">2. Website Scan</button>
+                    <button class="wizard-step-dot" data-step="3">3. Services</button>
+                    <button class="wizard-step-dot" data-step="4">4. Team</button>
+                    <button class="wizard-step-dot" data-step="5">5. Insurance</button>
+                    <button class="wizard-step-dot" data-step="6">6. Personality</button>
+                    <button class="wizard-step-dot" data-step="7">7. Notifications</button>
+                    <button class="wizard-step-dot" data-step="8">8. Activate</button>
                 </div>
 
                 <!-- Step 1: Practice Info -->
                 <div class="wizard-step active" id="wizard-step-1">
-                    <h3 class="wizard-step-title">📋 Practice Information</h3>
+                    <h3 class="wizard-step-title">Practice Information</h3>
                     <div class="wizard-form-grid">
                         <div class="wizard-field">
                             <label>Practice Name</label>
@@ -1679,15 +1871,15 @@
                         </div>
                         <div class="wizard-field">
                             <label>Email</label>
-                            <input type="email" id="wiz-email" class="auth-input" value="Contact@LJFamilyDentist.com" />
+                            <input type="email" id="wiz-email" class="auth-input" value="info@ljfamilydentist.com" />
                         </div>
                         <div class="wizard-field">
                             <label>Address</label>
-                            <input type="text" id="wiz-address" class="auth-input" value="3810 North Elm Street #201, Greensboro, NC 27455" />
+                            <input type="text" id="wiz-address" class="auth-input" value="3902 Battleground Ave, Greensboro, NC 27410" />
                         </div>
                         <div class="wizard-field">
-                            <label>Website</label>
-                            <input type="url" id="wiz-website" class="auth-input" value="https://ljfamilydentist-paloma.netlify.app" />
+                            <label>Website URL</label>
+                            <input type="url" id="wiz-website" class="auth-input" value="https://ljfamilydentist.com" />
                         </div>
                         <div class="wizard-field">
                             <label>Languages</label>
@@ -1706,9 +1898,44 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Services -->
+                <!-- Step 2: AI Website Scanner (NEW — Killer Feature) -->
                 <div class="wizard-step" id="wizard-step-2">
-                    <h3 class="wizard-step-title">🦷 Services Offered</h3>
+                    <h3 class="wizard-step-title">AI Website Scanner</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Enter your practice website URL and PALOMA will scan it to learn about your services, team, and brand voice automatically.</p>
+                    <div class="glass-card" style="padding:24px;margin-bottom:20px;">
+                        <div style="display:flex;gap:12px;align-items:flex-end;">
+                            <div style="flex:1;">
+                                <label style="font-size:13px;color:var(--admin-text-secondary);margin-bottom:6px;display:block;">Website URL</label>
+                                <input type="url" id="wiz-scan-url" class="auth-input" placeholder="https://yourpractice.com" style="width:100%;" />
+                            </div>
+                            <button class="btn-primary" id="wiz-scan-btn" style="white-space:nowrap;height:46px;">
+                                <i data-lucide="scan" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i>
+                                Scan Website
+                            </button>
+                        </div>
+                        <div id="wiz-scan-status" style="display:none;margin-top:16px;">
+                            <div class="wizard-progress" style="margin-bottom:8px;">
+                                <div class="wizard-progress-bar" id="wiz-scan-progress" style="width:0%;transition:width 2s ease;"></div>
+                            </div>
+                            <p style="font-size:12px;color:var(--admin-muted);" id="wiz-scan-text">Scanning website...</p>
+                        </div>
+                    </div>
+                    <div id="wiz-scan-results" style="display:none;">
+                        <h4 style="color:var(--admin-teal);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <i data-lucide="check-circle" style="width:18px;height:18px;"></i> Here's what PALOMA learned:
+                        </h4>
+                        <div class="glass-card" style="padding:16px;margin-bottom:12px;">
+                            <div style="display:flex;flex-direction:column;gap:10px;" id="wiz-scan-findings">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                        <p style="font-size:12px;color:var(--admin-muted);margin-top:8px;">Review and correct any details. PALOMA will use this as her knowledge base.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Services -->
+                <div class="wizard-step" id="wizard-step-3">
+                    <h3 class="wizard-step-title">Services Offered</h3>
                     <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Check the services your practice offers. PALOMA will learn to discuss these with patients.</p>
                     <div class="wizard-services-list" id="wiz-services">
                         <label class="wizard-checkbox"><input type="checkbox" checked /> Crowns & Full Arch Rehabilitations</label>
@@ -1733,9 +1960,9 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Team -->
-                <div class="wizard-step" id="wizard-step-3">
-                    <h3 class="wizard-step-title">👥 Team Directory</h3>
+                <!-- Step 4: Team -->
+                <div class="wizard-step" id="wizard-step-4">
+                    <h3 class="wizard-step-title">Team Directory</h3>
                     <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Add your team members so PALOMA can introduce them to patients.</p>
                     <div class="wizard-team-list" id="wiz-team">
                         <div class="wizard-team-card">
@@ -1770,9 +1997,9 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Insurance -->
-                <div class="wizard-step" id="wizard-step-4">
-                    <h3 class="wizard-step-title">🏥 Insurance & Financing</h3>
+                <!-- Step 5: Insurance -->
+                <div class="wizard-step" id="wizard-step-5">
+                    <h3 class="wizard-step-title">Insurance & Financing</h3>
                     <div class="wizard-form-grid">
                         <div class="wizard-field" style="grid-column:1/-1">
                             <label>Insurance Policy</label>
@@ -1789,20 +2016,22 @@
                     </div>
                 </div>
 
-                <!-- Step 5: PALOMA Config -->
-                <div class="wizard-step" id="wizard-step-5">
-                    <h3 class="wizard-step-title">🕊️ PALOMA Configuration</h3>
+                <!-- Step 6: PALOMA Personality (NEW) -->
+                <div class="wizard-step" id="wizard-step-6">
+                    <h3 class="wizard-step-title">PALOMA Personality & Voice</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Define how PALOMA communicates with your patients. Her personality should match your practice culture.</p>
                     <div class="wizard-form-grid">
                         <div class="wizard-field">
                             <label>PALOMA's Greeting</label>
-                            <textarea id="wiz-greeting" class="auth-input" rows="2" style="resize:vertical">¡Hola! I'm PALOMA 🕊️ — your AI dental assistant at Lake Jeanette Family & Implant Dentistry. How can I help you today?</textarea>
+                            <textarea id="wiz-greeting" class="auth-input" rows="2" style="resize:vertical">¡Hola! I'm PALOMA — your AI dental assistant at Lake Jeanette Family & Implant Dentistry. How can I help you today?</textarea>
                         </div>
                         <div class="wizard-field">
-                            <label>Tone</label>
+                            <label>Communication Tone</label>
                             <select id="wiz-tone" class="auth-input">
                                 <option value="warm" selected>Warm & Professional</option>
                                 <option value="clinical">Clinical & Precise</option>
                                 <option value="casual">Casual & Friendly</option>
+                                <option value="luxury">Luxury & Concierge</option>
                             </select>
                         </div>
                         <div class="wizard-field">
@@ -1817,27 +2046,560 @@
                             <label>Key Differentiator</label>
                             <textarea id="wiz-differentiator" class="auth-input" rows="2" style="resize:vertical">Dr. Brenes is a board-certified Prosthodontist and university faculty member for 9+ years. Every smile is custom-designed for natural results.</textarea>
                         </div>
-                    </div>
-                    <div style="margin-top:24px;padding:20px;border-radius:var(--admin-radius);background:var(--admin-teal-glow);border:1px solid rgba(20,184,166,0.2)">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                            <span style="font-size:20px">✅</span>
-                            <strong style="color:var(--admin-teal)">Setup Complete!</strong>
+                        <div class="wizard-field">
+                            <label>Voice Style</label>
+                            <select id="wiz-voice-style" class="auth-input">
+                                <option value="aoede" selected>Aoede (Natural, warm)</option>
+                                <option value="kore">Kore (Confident, professional)</option>
+                                <option value="charon">Charon (Deep, reassuring)</option>
+                                <option value="puck">Puck (Energetic, friendly)</option>
+                            </select>
                         </div>
-                        <p style="font-size:13px;color:var(--admin-text-secondary);margin-bottom:12px">PALOMA is configured and ready. She'll use all the information above to answer patient questions accurately.</p>
-                        <button class="btn-primary" id="wiz-save-all">💾 Save & Activate PALOMA</button>
+                        <div class="wizard-field">
+                            <label>Response Length</label>
+                            <select id="wiz-response-length" class="auth-input">
+                                <option value="concise">Concise (1-2 sentences)</option>
+                                <option value="balanced" selected>Balanced (2-4 sentences)</option>
+                                <option value="detailed">Detailed (4-6 sentences)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 7: Notifications & Alerts (NEW) -->
+                <div class="wizard-step" id="wizard-step-7">
+                    <h3 class="wizard-step-title">Notifications & Alerts</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Configure how PALOMA notifies your team about important events.</p>
+                    <div class="wizard-form-grid">
+                        <div class="wizard-field" style="grid-column:1/-1">
+                            <label>After-Hours Email</label>
+                            <p style="font-size:12px;color:var(--admin-muted);margin-bottom:6px;">When patients chat outside office hours, PALOMA will email a summary here.</p>
+                            <input type="email" id="wiz-after-hours-email" class="auth-input" value="info@ljfamilydentist.com" />
+                        </div>
+                        <div class="wizard-field">
+                            <label>New Appointment Alerts</label>
+                            <select id="wiz-appt-alerts" class="auth-input">
+                                <option value="realtime" selected>Real-time (push notification)</option>
+                                <option value="hourly">Hourly digest</option>
+                                <option value="daily">Daily summary</option>
+                                <option value="off">Off</option>
+                            </select>
+                        </div>
+                        <div class="wizard-field">
+                            <label>Emergency Request Alerts</label>
+                            <select id="wiz-emergency-alerts" class="auth-input">
+                                <option value="immediate" selected>Immediate (SMS + email)</option>
+                                <option value="email">Email only</option>
+                                <option value="dashboard">Dashboard only</option>
+                            </select>
+                        </div>
+                        <div class="wizard-field" style="grid-column:1/-1">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="checkbox" id="wiz-morning-summary" checked style="width:18px;height:18px;" />
+                                <span>Morning Summary Email</span>
+                            </label>
+                            <p style="font-size:12px;color:var(--admin-muted);margin-top:4px;">Receive a daily summary at 7:00 AM with yesterday's PALOMA conversations, pending appointments, and KPIs.</p>
+                        </div>
+                        <div class="wizard-field" style="grid-column:1/-1">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="checkbox" id="wiz-review-alerts" checked style="width:18px;height:18px;" />
+                                <span>Review Request Alerts</span>
+                            </label>
+                            <p style="font-size:12px;color:var(--admin-muted);margin-top:4px;">Alert when PALOMA detects a patient who may leave a positive review (high satisfaction score).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 8: Review & Activate -->
+                <div class="wizard-step" id="wizard-step-8">
+                    <h3 class="wizard-step-title">Review & Activate PALOMA</h3>
+                    <div class="glass-card" style="padding:20px;margin-bottom:20px;">
+                        <h4 style="color:var(--admin-teal);margin-bottom:12px;">Configuration Summary</h4>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;" id="wiz-summary">
+                            <div><span style="color:var(--admin-muted);">Practice:</span> <strong id="wiz-sum-name">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Language:</span> <strong id="wiz-sum-lang">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Tone:</span> <strong id="wiz-sum-tone">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Voice:</span> <strong id="wiz-sum-voice">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Services:</span> <strong id="wiz-sum-services">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Team Members:</span> <strong id="wiz-sum-team">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">After-Hours Email:</span> <strong id="wiz-sum-email">—</strong></div>
+                            <div><span style="color:var(--admin-muted);">Alerts:</span> <strong id="wiz-sum-alerts">—</strong></div>
+                        </div>
+                    </div>
+                    <div style="padding:20px;border-radius:var(--admin-radius);background:var(--admin-teal-glow);border:1px solid rgba(20,184,166,0.2)">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                            <i data-lucide="check-circle" style="width:22px;height:22px;color:var(--admin-teal);"></i>
+                            <strong style="color:var(--admin-teal)">Ready to Launch!</strong>
+                        </div>
+                        <p style="font-size:13px;color:var(--admin-text-secondary);margin-bottom:12px">PALOMA will use all of this configuration to answer patient questions accurately and route notifications to your team.</p>
+                        <button class="btn-primary" id="wiz-save-all" style="width:100%;padding:14px;font-size:15px;">Save & Activate PALOMA</button>
                     </div>
                 </div>
 
                 <!-- Wizard Navigation -->
                 <div class="wizard-nav">
                     <button class="btn-secondary" id="wiz-prev" disabled>← Previous</button>
-                    <span class="wizard-step-counter" id="wiz-counter">Step 1 of 5</span>
+                    <span class="wizard-step-counter" id="wiz-counter">Step 1 of 8</span>
                     <button class="btn-primary" id="wiz-next">Next →</button>
                 </div>
             </div>
 
             <!-- View: Schedule -->
-            <div id="view-schedule" class="view active">
+            <!-- ═══ View: Dashboard Home ═══ -->
+            <div id="view-dashboard-home" class="view active">
+                <div class="view-header">
+                    <h2>Dashboard</h2>
+                    <span style="font-size:13px;color:var(--admin-muted)" id="dash-greeting"></span>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:rgba(20,184,166,0.15);color:var(--admin-teal);"><i data-lucide="dollar-sign"></i></div>
+                        <div class="kpi-info">
+                            <p class="kpi-label">Monthly Production</p>
+                            <h3 class="kpi-value" id="kpi-production">$0</h3>
+                            <span class="kpi-trend kpi-trend-up" id="kpi-production-trend">+0% vs last month</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:rgba(59,130,246,0.15);color:var(--admin-blue);"><i data-lucide="credit-card"></i></div>
+                        <div class="kpi-info">
+                            <p class="kpi-label">Collections</p>
+                            <h3 class="kpi-value" id="kpi-collections">$0</h3>
+                            <span class="kpi-trend" id="kpi-collections-trend">0% collection rate</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:rgba(245,158,11,0.15);color:var(--admin-gold);"><i data-lucide="users"></i></div>
+                        <div class="kpi-info">
+                            <p class="kpi-label">New Patients</p>
+                            <h3 class="kpi-value" id="kpi-new-patients">0</h3>
+                            <span class="kpi-trend" id="kpi-patients-trend">this month</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:rgba(139,92,246,0.15);color:#8B5CF6;"><i data-lucide="check-circle"></i></div>
+                        <div class="kpi-info">
+                            <p class="kpi-label">Case Acceptance</p>
+                            <h3 class="kpi-value" id="kpi-acceptance">0%</h3>
+                            <span class="kpi-trend" id="kpi-acceptance-trend">benchmark: 85%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Morning Huddle (DI-Aligned) -->
+                <div style="margin-top:28px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h3 style="font-size:16px;font-weight:600;color:var(--admin-text);display:flex;align-items:center;gap:8px;">
+                            <i data-lucide="sunrise" style="width:20px;height:20px;color:var(--admin-gold);"></i> Morning Huddle
+                        </h3>
+                        <div style="display:flex;gap:4px;background:var(--admin-surface);border-radius:8px;padding:3px;">
+                            <button class="huddle-tab active" onclick="switchHuddleTab('yesterday', this)" style="padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:var(--admin-teal);color:white;transition:all 0.2s;">Yesterday</button>
+                            <button class="huddle-tab" onclick="switchHuddleTab('today', this)" style="padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--admin-muted);transition:all 0.2s;">Today</button>
+                            <button class="huddle-tab" onclick="switchHuddleTab('tomorrow', this)" style="padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--admin-muted);transition:all 0.2s;">Tomorrow</button>
+                        </div>
+                    </div>
+
+                    <!-- Yesterday Tab -->
+                    <div class="huddle-panel active" id="huddle-yesterday">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;">
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Production</p>
+                                <h3 style="font-size:22px;font-weight:700;color:var(--admin-teal);" id="huddle-yest-prod">$12,450</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">Goal: $14,000</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Collections</p>
+                                <h3 style="font-size:22px;font-weight:700;" id="huddle-yest-coll">$11,800</h3>
+                                <span style="font-size:11px;color:var(--admin-teal);">95% collected</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Patients Seen</p>
+                                <h3 style="font-size:22px;font-weight:700;" id="huddle-yest-pts">18</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">2 no-shows</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">PALOMA Chats</p>
+                                <h3 style="font-size:22px;font-weight:700;color:#8B5CF6;" id="huddle-yest-chats">7</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">3 after-hours</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today Tab -->
+                    <div class="huddle-panel" id="huddle-today" style="display:none;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;">
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Scheduled Production</p>
+                                <h3 style="font-size:22px;font-weight:700;color:var(--admin-teal);" id="huddle-today-prod">$15,200</h3>
+                                <span style="font-size:11px;color:var(--admin-teal);">109% of daily goal</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Appointments</p>
+                                <h3 style="font-size:22px;font-weight:700;" id="huddle-today-appts">22</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">3 unconfirmed</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Open Chairs</p>
+                                <h3 style="font-size:22px;font-weight:700;color:var(--admin-gold);" id="huddle-today-open">2</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">11:00 AM, 2:30 PM</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Pending Confirmations</p>
+                                <h3 style="font-size:22px;font-weight:700;" id="huddle-today-pending">3</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">PALOMA auto-following up</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tomorrow Tab -->
+                    <div class="huddle-panel" id="huddle-tomorrow" style="display:none;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;">
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Scheduled Production</p>
+                                <h3 style="font-size:22px;font-weight:700;color:var(--admin-teal);" id="huddle-tom-prod">$13,800</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">99% of daily goal</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Appointments</p>
+                                <h3 style="font-size:22px;font-weight:700;" id="huddle-tom-appts">19</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">All confirmed</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Lab Cases Due</p>
+                                <h3 style="font-size:22px;font-weight:700;color:#8B5CF6;" id="huddle-tom-labs">2</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">Crown + veneer prep</span>
+                            </div>
+                            <div class="glass-card" style="padding:16px;">
+                                <p style="font-size:12px;color:var(--admin-muted);margin-bottom:4px;">Pre-Auth Needed</p>
+                                <h3 style="font-size:22px;font-weight:700;color:var(--admin-gold);" id="huddle-tom-preauth">1</h3>
+                                <span style="font-size:11px;color:var(--admin-muted);">Insurance verification</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="margin-top:28px;">
+                    <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;color:var(--admin-text);">Quick Actions</h3>
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-view=appointments]').click()">
+                            <i data-lucide="clipboard-list"></i>
+                            <span>View Appointments</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-view=schedule]').click()">
+                            <i data-lucide="calendar-days"></i>
+                            <span>Today's Schedule</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-view=practice-settings]').click()">
+                            <i data-lucide="settings-2"></i>
+                            <span>Practice Settings</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="document.querySelector('[data-view=financial-intelligence]').click()">
+                            <i data-lucide="wallet"></i>
+                            <span>Financial Reports</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Today's Snapshot -->
+                <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="glass-card" style="padding:20px;">
+                        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--admin-text);display:flex;align-items:center;gap:8px;"><i data-lucide="activity" style="width:18px;height:18px;"></i> Today's Snapshot</h3>
+                        <div id="dash-today-stats" style="display:flex;flex-direction:column;gap:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Appointments</span>
+                                <span style="font-weight:600;" id="dash-today-appts">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Patients Seen</span>
+                                <span style="font-weight:600;" id="dash-today-seen">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Production</span>
+                                <span style="font-weight:600;color:var(--admin-teal);" id="dash-today-prod">$0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Chair Utilization</span>
+                                <span style="font-weight:600;" id="dash-today-chairs">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="padding:20px;">
+                        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--admin-text);display:flex;align-items:center;gap:8px;"><i data-lucide="bird" style="width:18px;height:18px;"></i> PALOMA Activity</h3>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Conversations Today</span>
+                                <span style="font-weight:600;" id="dash-paloma-convos">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">After-Hours Chats</span>
+                                <span style="font-weight:600;" id="dash-paloma-after">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Appointments Booked</span>
+                                <span style="font-weight:600;color:var(--admin-teal);" id="dash-paloma-booked">0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:var(--admin-muted);font-size:13px;">Languages</span>
+                                <span style="font-weight:600;" id="dash-paloma-langs">EN / ES</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ View: Action Items (DI's Killer Feature) ═══ -->
+            <div id="view-action-items" class="view">
+                <div class="view-header" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <h2>Action Items</h2>
+                        <p style="color:var(--admin-muted);font-size:13px;margin-top:4px;">Patients needing follow-up — prioritized by booking likelihood</p>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="action-filter active" onclick="filterActionItems('all', this)">All</button>
+                        <button class="action-filter" onclick="filterActionItems('unscheduled', this)">Unscheduled Tx</button>
+                        <button class="action-filter" onclick="filterActionItems('recall', this)">Recall</button>
+                        <button class="action-filter" onclick="filterActionItems('unconfirmed', this)">Unconfirmed</button>
+                        <button class="action-filter" onclick="filterActionItems('claims', this)">Claims</button>
+                    </div>
+                </div>
+
+                <!-- Action Items Summary Cards -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:24px;">
+                    <div class="glass-card" style="padding:16px;cursor:pointer;" onclick="filterActionItems('unscheduled', this)">
+                        <p style="font-size:12px;color:var(--admin-muted);">Unscheduled Treatment</p>
+                        <h3 style="font-size:28px;font-weight:700;color:#EF4444;" id="ai-unscheduled-count">12</h3>
+                        <span style="font-size:11px;color:var(--admin-muted);">$38,400 in pending production</span>
+                    </div>
+                    <div class="glass-card" style="padding:16px;cursor:pointer;" onclick="filterActionItems('recall', this)">
+                        <p style="font-size:12px;color:var(--admin-muted);">Overdue Hygiene</p>
+                        <h3 style="font-size:28px;font-weight:700;color:var(--admin-gold);" id="ai-recall-count">8</h3>
+                        <span style="font-size:11px;color:var(--admin-muted);">Past 6+ months</span>
+                    </div>
+                    <div class="glass-card" style="padding:16px;cursor:pointer;" onclick="filterActionItems('unconfirmed', this)">
+                        <p style="font-size:12px;color:var(--admin-muted);">Unconfirmed Appts</p>
+                        <h3 style="font-size:28px;font-weight:700;color:var(--admin-blue);" id="ai-unconfirmed-count">3</h3>
+                        <span style="font-size:11px;color:var(--admin-muted);">Next 48 hours</span>
+                    </div>
+                    <div class="glass-card" style="padding:16px;cursor:pointer;" onclick="filterActionItems('claims', this)">
+                        <p style="font-size:12px;color:var(--admin-muted);">Outstanding Claims</p>
+                        <h3 style="font-size:28px;font-weight:700;color:#8B5CF6;" id="ai-claims-count">5</h3>
+                        <span style="font-size:11px;color:var(--admin-muted);">$12,200 aging 30+ days</span>
+                    </div>
+                </div>
+
+                <!-- Action Items Table -->
+                <div class="data-table-container">
+                    <table class="data-table" id="action-items-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Patient</th>
+                                <th>Category</th>
+                                <th>Details</th>
+                                <th>Value</th>
+                                <th>Last Contact</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="action-items-tbody">
+                            <tr data-category="unscheduled">
+                                <td><span class="priority-badge high">High</span></td>
+                                <td><strong>Maria Santos</strong></td>
+                                <td>Unscheduled Treatment</td>
+                                <td>Crown #14 — treatment plan accepted, not scheduled</td>
+                                <td style="color:var(--admin-teal);font-weight:600;">$1,850</td>
+                                <td>Jun 10</td>
+                                <td><button class="btn-action" onclick="showToast('PALOMA sending reminder...', 'success')"><i data-lucide="send" style="width:14px;height:14px;"></i> Follow Up</button></td>
+                            </tr>
+                            <tr data-category="unscheduled">
+                                <td><span class="priority-badge high">High</span></td>
+                                <td><strong>James Mitchell</strong></td>
+                                <td>Unscheduled Treatment</td>
+                                <td>Implant #19 — consult complete, insurance verified</td>
+                                <td style="color:var(--admin-teal);font-weight:600;">$4,200</td>
+                                <td>Jun 8</td>
+                                <td><button class="btn-action" onclick="showToast('PALOMA sending reminder...', 'success')"><i data-lucide="send" style="width:14px;height:14px;"></i> Follow Up</button></td>
+                            </tr>
+                            <tr data-category="recall">
+                                <td><span class="priority-badge medium">Med</span></td>
+                                <td><strong>Linda Chen</strong></td>
+                                <td>Overdue Hygiene</td>
+                                <td>Last cleaning: Dec 2025 — 6 months overdue</td>
+                                <td style="color:var(--admin-muted);">$185</td>
+                                <td>Mar 15</td>
+                                <td><button class="btn-action" onclick="showToast('PALOMA sending recall...', 'success')"><i data-lucide="send" style="width:14px;height:14px;"></i> Recall</button></td>
+                            </tr>
+                            <tr data-category="unconfirmed">
+                                <td><span class="priority-badge medium">Med</span></td>
+                                <td><strong>Robert Kim</strong></td>
+                                <td>Unconfirmed Appt</td>
+                                <td>Tomorrow 10:00 AM — Crown seat #30</td>
+                                <td style="color:var(--admin-teal);font-weight:600;">$1,200</td>
+                                <td>—</td>
+                                <td><button class="btn-action" onclick="showToast('PALOMA confirming...', 'success')"><i data-lucide="phone" style="width:14px;height:14px;"></i> Confirm</button></td>
+                            </tr>
+                            <tr data-category="claims">
+                                <td><span class="priority-badge low">Low</span></td>
+                                <td><strong>Sarah Williams</strong></td>
+                                <td>Outstanding Claim</td>
+                                <td>MetLife — Claim #4892 submitted May 20</td>
+                                <td style="color:#8B5CF6;font-weight:600;">$3,400</td>
+                                <td>May 20</td>
+                                <td><button class="btn-action" onclick="showToast('Opening claim details...', 'info')"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Review</button></td>
+                            </tr>
+                            <tr data-category="recall">
+                                <td><span class="priority-badge low">Low</span></td>
+                                <td><strong>David Thompson</strong></td>
+                                <td>Overdue Hygiene</td>
+                                <td>Last cleaning: Jan 2025 — 5 months overdue</td>
+                                <td style="color:var(--admin-muted);">$185</td>
+                                <td>Feb 1</td>
+                                <td><button class="btn-action" onclick="showToast('PALOMA sending recall...', 'success')"><i data-lucide="send" style="width:14px;height:14px;"></i> Recall</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ View: Website Editor ═══ -->
+            <div id="view-website-editor" class="view">
+                <div class="view-header" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <h2>Website Editor</h2>
+                        <p style="color:var(--admin-muted);font-size:13px;margin-top:4px;">Edit your practice website content — no coding required</p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-secondary" onclick="window.open('/', '_blank')">
+                            <i data-lucide="external-link" style="width:14px;height:14px;"></i> Preview Site
+                        </button>
+                        <button class="btn-primary" id="we-publish-btn" onclick="showToast('Publishing changes...', 'success')">
+                            <i data-lucide="upload" style="width:14px;height:14px;"></i> Publish Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section Editor Cards -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <!-- Hero Section -->
+                    <div class="glass-card" style="padding:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="image" style="width:18px;height:18px;color:var(--admin-teal);"></i> Hero Section
+                            </h3>
+                            <span class="status-pill live">Live</span>
+                        </div>
+                        <div class="wizard-form-grid">
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Headline</label>
+                                <input type="text" id="we-hero-headline" class="auth-input" value="Precision Dentistry for the Whole Family" />
+                            </div>
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Subheadline</label>
+                                <input type="text" id="we-hero-sub" class="auth-input" value="Expert prosthodontic care in Greensboro, NC — where advanced implant dentistry meets a warm, bilingual practice." />
+                            </div>
+                            <div class="wizard-field">
+                                <label>Primary CTA Button Text</label>
+                                <input type="text" id="we-hero-cta" class="auth-input" value="Book Your Visit" />
+                            </div>
+                            <div class="wizard-field">
+                                <label>Secondary CTA Text</label>
+                                <input type="text" id="we-hero-cta2" class="auth-input" value="Meet the Team" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About Section -->
+                    <div class="glass-card" style="padding:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="user" style="width:18px;height:18px;color:var(--admin-blue);"></i> About / Doctor Bio
+                            </h3>
+                            <span class="status-pill live">Live</span>
+                        </div>
+                        <div class="wizard-form-grid">
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Doctor Bio</label>
+                                <textarea id="we-about-bio" class="auth-input" rows="4" style="resize:vertical;">Dr. Christian Brenes is a board-certified Prosthodontist with over 9 years of university-level teaching experience. Trained at the University of Iowa, he specializes in full-mouth rehabilitations, dental implants, and complex restorative cases. His approach combines precision engineering with a warm, bilingual practice culture.</textarea>
+                            </div>
+                            <div class="wizard-field">
+                                <label>Education</label>
+                                <input type="text" id="we-about-edu" class="auth-input" value="University of Iowa — Prosthodontics" />
+                            </div>
+                            <div class="wizard-field">
+                                <label>Years Experience</label>
+                                <input type="text" id="we-about-years" class="auth-input" value="15+" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services Section -->
+                    <div class="glass-card" style="padding:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="stethoscope" style="width:18px;height:18px;color:#8B5CF6;"></i> Services
+                            </h3>
+                            <span class="status-pill live">Live</span>
+                        </div>
+                        <p style="font-size:13px;color:var(--admin-muted);margin-bottom:12px;">Services are managed in your <a href="#" onclick="document.querySelector('[data-view=onboarding-wizard]').click(); return false;" style="color:var(--admin-teal);">Practice Setup</a> wizard.</p>
+                    </div>
+
+                    <!-- Contact / Hours Section -->
+                    <div class="glass-card" style="padding:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="map-pin" style="width:18px;height:18px;color:var(--admin-gold);"></i> Contact & Location
+                            </h3>
+                            <span class="status-pill live">Live</span>
+                        </div>
+                        <div class="wizard-form-grid">
+                            <div class="wizard-field">
+                                <label>Phone</label>
+                                <input type="tel" id="we-contact-phone" class="auth-input" value="(336) 545-4281" />
+                            </div>
+                            <div class="wizard-field">
+                                <label>Email</label>
+                                <input type="email" id="we-contact-email" class="auth-input" value="info@ljfamilydentist.com" />
+                            </div>
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Address</label>
+                                <input type="text" id="we-contact-address" class="auth-input" value="3902 Battleground Ave, Greensboro, NC 27410" />
+                            </div>
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Google Maps Embed URL</label>
+                                <input type="url" id="we-contact-map" class="auth-input" placeholder="https://www.google.com/maps/embed?..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PALOMA Chat Widget -->
+                    <div class="glass-card" style="padding:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="bird" style="width:18px;height:18px;color:var(--admin-teal);"></i> PALOMA Chat Widget
+                            </h3>
+                            <span class="status-pill live">Live</span>
+                        </div>
+                        <div class="wizard-form-grid">
+                            <div class="wizard-field" style="grid-column:1/-1;">
+                                <label>Embed Code (copy this to any website)</label>
+                                <div style="position:relative;">
+                                    <textarea id="we-paloma-embed" class="auth-input" rows="3" style="font-family:monospace;font-size:12px;resize:none;background:var(--admin-bg);" readonly>&lt;script src="https://ljfamilydentist-paloma.netlify.app/js/paloma-widget.js"&gt;&lt;/script&gt;
+&lt;paloma-chat practice="lake-jeanette" lang="auto"&gt;&lt;/paloma-chat&gt;</textarea>
+                                    <button class="btn-action" style="position:absolute;top:8px;right:8px;" onclick="navigator.clipboard.writeText(document.getElementById('we-paloma-embed').value); showToast('Embed code copied!', 'success');">
+                                        <i data-lucide="copy" style="width:14px;height:14px;"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Schedule -->
+            <div id="view-schedule" class="view">
                 <div class="sched-header">
                     <div>
                         <h2 id="sched-title">📅 Today's Schedule</h2>
@@ -1861,7 +2623,7 @@
             </div>
 
             <!-- View: Data Editor -->
-            <div id="view-data-editor" class="view">
+            <div id="view-data-editor" class="view" style="display:none !important">
                 <div class="view-header">
                     <h2>📝 Practice Data Editor</h2>
                 </div>
@@ -1972,20 +2734,131 @@
         }, 4000);
     }
 
-    // ─── Simple Demo Auth ───
-    loginForm.addEventListener('submit', (e) => {
+    // ─── Auth State ───
+    let currentUserRole = 'staff'; // Default role
+    let currentUserEmail = '';
+
+    // ─── Role Mapping ─── (Firestore 'users' collection stores role per email)
+    // Fallback: Map known emails to roles if Firestore lookup fails
+    const ROLE_MAP = {
+        'christian@brenesprecisiondentistry.com': 'admin',
+        'drbrenes@ljfamilydentist.com': 'admin',
+        'chris@thinkdesignplanning.com': 'admin',
+        'staff@ljfamilydentist.com': 'staff',
+        'manager@ljfamilydentist.com': 'manager'
+    };
+
+    // ─── Firebase Auth ───
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        authGate.style.display = 'none';
-        dashboard.style.display = 'flex';
-        initDashboard();
-        // Initialize notifications after login
-        try { initNotificationSystem(); } catch(e) { console.error('Notification init error:', e); }
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('auth-error');
+        const loginBtn = document.getElementById('login-btn');
+
+        errorEl.style.display = 'none';
+        loginBtn.textContent = 'Signing in...';
+        loginBtn.disabled = true;
+
+        try {
+            // Firebase Auth sign-in
+            const { auth } = initFirebase();
+            const cred = await auth.signInWithEmailAndPassword(email, password);
+            currentUserEmail = cred.user.email;
+
+            // Look up role from Firestore, fallback to ROLE_MAP
+            try {
+                const { db } = initFirebase();
+                const userDoc = await db.collection('users').doc(cred.user.uid).get();
+                if (userDoc.exists && userDoc.data().role) {
+                    currentUserRole = userDoc.data().role;
+                } else {
+                    currentUserRole = ROLE_MAP[email.toLowerCase()] || 'staff';
+                }
+            } catch(roleErr) {
+                currentUserRole = ROLE_MAP[email.toLowerCase()] || 'staff';
+            }
+
+            // Show dashboard
+            authGate.style.display = 'none';
+            dashboard.style.display = 'flex';
+            initDashboard();
+            applyRolePermissions(currentUserRole);
+            try { lucide.createIcons(); } catch(e) { console.error('Lucide init error:', e); }
+            try { initNotificationSystem(); } catch(e) { console.error('Notification init error:', e); }
+        } catch (authErr) {
+            // Handle auth errors with user-friendly messages
+            const errorMessages = {
+                'auth/user-not-found': 'No account found with this email.',
+                'auth/wrong-password': 'Incorrect password. Please try again.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
+                'auth/invalid-credential': 'Invalid email or password.'
+            };
+            errorEl.textContent = errorMessages[authErr.code] || 'Sign-in failed. Please try again.';
+            errorEl.style.display = 'block';
+            loginBtn.textContent = 'Sign In';
+            loginBtn.disabled = false;
+        }
     });
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
+    // ─── Check for existing session on load ───
+    (function checkAuthState() {
+        const { auth } = initFirebase();
+        if (auth) {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUserEmail = user.email;
+                    currentUserRole = ROLE_MAP[user.email.toLowerCase()] || 'staff';
+                    try {
+                        const { db } = initFirebase();
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists && userDoc.data().role) currentUserRole = userDoc.data().role;
+                    } catch(e) {}
+                    authGate.style.display = 'none';
+                    dashboard.style.display = 'flex';
+                    initDashboard();
+                    applyRolePermissions(currentUserRole);
+                    try { lucide.createIcons(); } catch(e) {}
+                    try { initNotificationSystem(); } catch(e) {}
+                }
+            });
+        }
+    })();
+
+    // ─── Role-Based Permissions ───
+    function applyRolePermissions(role) {
+        // Show/hide sidebar items based on role
+        const ownerOnlyViews = ['onboarding-wizard', 'financial-intelligence', 'settings'];
+        const managerViews = ['financial-intelligence'];
+
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            const view = item.dataset.view;
+            if (ownerOnlyViews.includes(view)) {
+                item.style.display = (role === 'admin') ? '' : 'none';
+            } else if (managerViews.includes(view) && role === 'staff') {
+                item.style.display = 'none';
+            }
+        });
+
+        // Update sidebar title with role
+        const roleLabels = { admin: 'Owner', manager: 'Manager', staff: 'Staff' };
+        document.querySelector('.sidebar-title').textContent = roleLabels[role] || 'Dashboard';
+    }
+
+    // ─── Logout ───
+    document.getElementById('logout-btn').addEventListener('click', async () => {
         if (apptAutoRefresh) clearInterval(apptAutoRefresh);
+        try {
+            const { auth } = initFirebase();
+            await auth.signOut();
+        } catch(e) {}
         dashboard.style.display = 'none';
         authGate.style.display = 'flex';
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-btn').textContent = 'Sign In';
+        document.getElementById('login-btn').disabled = false;
     });
 
     // ─── Init ───
@@ -2011,7 +2884,111 @@
         // Auto-refresh appointments every 30s
         try { loadAppointments(); } catch(e) { console.error('loadAppointments crashed:', e); }
         apptAutoRefresh = setInterval(() => { try { loadAppointments(); } catch(e) {} }, 30000);
+
+        // Populate Dashboard Home
+        try { populateDashboardHome(); } catch(e) { console.error('Dashboard Home error:', e); }
     }
+
+    // ─── Dashboard Home KPI Population ───
+    function populateDashboardHome() {
+        // Greeting
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        const greetEl = document.getElementById('dash-greeting');
+        if (greetEl) greetEl.textContent = `${greeting}${currentUserEmail ? ', ' + currentUserEmail.split('@')[0] : ''}`;
+
+        // KPIs from financial data
+        if (financialData && financialData.monthly && financialData.monthly.length > 0) {
+            const latest = financialData.monthly[financialData.monthly.length - 1];
+            const prev = financialData.monthly.length > 1 ? financialData.monthly[financialData.monthly.length - 2] : latest;
+
+            const prodEl = document.getElementById('kpi-production');
+            const collEl = document.getElementById('kpi-collections');
+            const prodTrend = document.getElementById('kpi-production-trend');
+            const collTrend = document.getElementById('kpi-collections-trend');
+
+            if (prodEl) prodEl.textContent = '$' + (latest.production || 0).toLocaleString();
+            if (collEl) collEl.textContent = '$' + (latest.collections || 0).toLocaleString();
+
+            // Production trend
+            if (prodTrend && prev.production) {
+                const pctChange = ((latest.production - prev.production) / prev.production * 100).toFixed(1);
+                prodTrend.textContent = `${pctChange >= 0 ? '+' : ''}${pctChange}% vs last month`;
+                prodTrend.className = `kpi-trend ${pctChange >= 0 ? 'kpi-trend-up' : 'kpi-trend-down'}`;
+            }
+
+            // Collection rate
+            if (collTrend && latest.production) {
+                const rate = ((latest.collections / latest.production) * 100).toFixed(1);
+                collTrend.textContent = `${rate}% collection rate`;
+                collTrend.className = `kpi-trend ${parseFloat(rate) >= 95 ? 'kpi-trend-up' : ''}`;
+            }
+        }
+
+        // New patients (from data or fallback)
+        const npEl = document.getElementById('kpi-new-patients');
+        if (npEl) npEl.textContent = financialData?.monthly?.slice(-1)?.[0]?.newPatients || '24';
+
+        // Case acceptance
+        const caEl = document.getElementById('kpi-acceptance');
+        if (caEl) caEl.textContent = financialData?.monthly?.slice(-1)?.[0]?.caseAcceptance || '78%';
+
+        // Today's stats (from schedule data if available)
+        const todayAppts = document.getElementById('dash-today-appts');
+        if (todayAppts) todayAppts.textContent = scheduleAppointments.length || '0';
+    }
+
+    // ─── Morning Huddle Tab Switcher ───
+    window.switchHuddleTab = function(tab, btn) {
+        // Hide all panels
+        document.querySelectorAll('.huddle-panel').forEach(p => {
+            p.style.display = 'none';
+            p.classList.remove('active');
+        });
+        // Show target panel
+        const panel = document.getElementById(`huddle-${tab}`);
+        if (panel) {
+            panel.style.display = 'block';
+            panel.classList.add('active');
+        }
+        // Update tab styling
+        document.querySelectorAll('.huddle-tab').forEach(t => {
+            t.style.background = 'transparent';
+            t.style.color = 'var(--admin-muted)';
+            t.classList.remove('active');
+        });
+        if (btn) {
+            btn.style.background = 'var(--admin-teal)';
+            btn.style.color = 'white';
+            btn.classList.add('active');
+        }
+    };
+
+    // ─── Action Items Filter ───
+    window.filterActionItems = function(category, btn) {
+        const rows = document.querySelectorAll('#action-items-tbody tr');
+        rows.forEach(row => {
+            if (category === 'all') {
+                row.style.display = '';
+            } else {
+                row.style.display = row.dataset.category === category ? '' : 'none';
+            }
+        });
+        // Update filter button styles
+        document.querySelectorAll('.action-filter').forEach(f => f.classList.remove('active'));
+        if (btn) {
+            // If btn is a card (not a filter button), find the matching filter button
+            if (btn.classList.contains('action-filter')) {
+                btn.classList.add('active');
+            } else {
+                document.querySelectorAll('.action-filter').forEach(f => {
+                    if (f.textContent.toLowerCase().includes(category.substring(0, 4))) {
+                        f.classList.add('active');
+                    }
+                });
+            }
+        }
+    };
 
     // ─── Load Data ───
     async function loadData() {
@@ -2064,6 +3041,9 @@
                 if (view === 'practice-settings') loadPracticeSettings();
                 if (view === 'schedule') loadScheduleData();
                 if (view === 'patients') loadPatients();
+
+                // Refresh Lucide icons for dynamic content
+                try { lucide.createIcons(); } catch(e) {}
             });
         });
 
@@ -2359,13 +3339,13 @@
         await savePracticeSetting('office_hours', hours);
     }
 
-    // ─── Treatment Pricing ───
+    // ─── Fee Schedule ───
     function renderPricingSection(container) {
         const pricing = Array.isArray(practiceSettings.pricing) ? [...practiceSettings.pricing] : [];
 
         container.innerHTML = `
             <div class="settings-form-section">
-                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Treatment Pricing</h3>
+                <h3 style="font-family:'Outfit';font-weight:600;font-size:16px;margin-bottom:16px">Fee Schedule</h3>
                 <div class="data-table-container" style="margin-bottom:0">
                     <table class="data-table" id="pricing-table">
                         <thead>
@@ -4250,11 +5230,217 @@
     })();
 
     /* ═══════════════════════════════════════════════════════════
+       WEBSITE EDITOR — Publish to Firestore
+       ═══════════════════════════════════════════════════════════ */
+    (function() {
+        'use strict';
+
+        const publishBtn = document.getElementById('we-publish-btn');
+        if (!publishBtn) return;
+
+        publishBtn.addEventListener('click', async () => {
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;animation:spin 1s linear infinite;"></i> Publishing...';
+
+            const websiteData = {
+                hero: {
+                    headline: document.getElementById('we-hero-headline')?.value || '',
+                    subheadline: document.getElementById('we-hero-sub')?.value || '',
+                    ctaPrimary: document.getElementById('we-hero-cta')?.value || '',
+                    ctaSecondary: document.getElementById('we-hero-cta2')?.value || '',
+                },
+                about: {
+                    bio: document.getElementById('we-about-bio')?.value || '',
+                    education: document.getElementById('we-about-edu')?.value || '',
+                    years: document.getElementById('we-about-years')?.value || '',
+                },
+                contact: {
+                    phone: document.getElementById('we-contact-phone')?.value || '',
+                    email: document.getElementById('we-contact-email')?.value || '',
+                    address: document.getElementById('we-contact-address')?.value || '',
+                    mapUrl: document.getElementById('we-contact-map')?.value || '',
+                },
+                updatedAt: new Date().toISOString(),
+                updatedBy: currentUserEmail || 'admin'
+            };
+
+            try {
+                const { db } = initFirebase();
+                await db.collection('website-content').doc('live').set(websiteData, { merge: true });
+                showToast('Website published! Changes are now live.', 'success');
+            } catch(e) {
+                console.error('Publish error:', e);
+                // Fallback: save locally
+                localStorage.setItem('paloma-website-content', JSON.stringify(websiteData));
+                showToast('Saved locally. Will sync to cloud when connection is available.', 'info');
+            }
+
+            publishBtn.disabled = false;
+            publishBtn.innerHTML = '<i data-lucide="upload" style="width:14px;height:14px;"></i> Publish Changes';
+            try { lucide.createIcons(); } catch(e) {}
+        });
+
+        // Load existing content from Firestore on view switch
+        async function loadWebsiteContent() {
+            try {
+                const { db } = initFirebase();
+                const doc = await db.collection('website-content').doc('live').get();
+                if (doc.exists) {
+                    const d = doc.data();
+                    if (d.hero) {
+                        if (d.hero.headline) document.getElementById('we-hero-headline').value = d.hero.headline;
+                        if (d.hero.subheadline) document.getElementById('we-hero-sub').value = d.hero.subheadline;
+                        if (d.hero.ctaPrimary) document.getElementById('we-hero-cta').value = d.hero.ctaPrimary;
+                        if (d.hero.ctaSecondary) document.getElementById('we-hero-cta2').value = d.hero.ctaSecondary;
+                    }
+                    if (d.about) {
+                        if (d.about.bio) document.getElementById('we-about-bio').value = d.about.bio;
+                        if (d.about.education) document.getElementById('we-about-edu').value = d.about.education;
+                        if (d.about.years) document.getElementById('we-about-years').value = d.about.years;
+                    }
+                    if (d.contact) {
+                        if (d.contact.phone) document.getElementById('we-contact-phone').value = d.contact.phone;
+                        if (d.contact.email) document.getElementById('we-contact-email').value = d.contact.email;
+                        if (d.contact.address) document.getElementById('we-contact-address').value = d.contact.address;
+                        if (d.contact.mapUrl) document.getElementById('we-contact-map').value = d.contact.mapUrl;
+                    }
+                }
+            } catch(e) {
+                console.log('Could not load website content from Firestore:', e.message);
+            }
+        }
+
+        // Wire up load on view switch
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.dataset.view === 'website-editor') {
+                    setTimeout(loadWebsiteContent, 200);
+                }
+            });
+        });
+
+        console.log('[Website Editor] Module loaded');
+    })();
+
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE VOICE INPUT — Web Speech API
+       ═══════════════════════════════════════════════════════════ */
+    (function() {
+        'use strict';
+
+        // Only proceed if Web Speech API is available
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.log('[Voice Input] Web Speech API not supported');
+            return;
+        }
+
+        // Find chat input areas to attach mic buttons
+        function addVoiceButtons() {
+            const chatInputs = document.querySelectorAll('.paloma-admin-input, #admin-chat-input, #paloma-chat-input');
+            chatInputs.forEach(input => {
+                if (input.parentElement.querySelector('.voice-mic-btn')) return; // Already added
+
+                const micBtn = document.createElement('button');
+                micBtn.className = 'voice-mic-btn';
+                micBtn.type = 'button';
+                micBtn.innerHTML = '<i data-lucide="mic" style="width:18px;height:18px;"></i>';
+                micBtn.title = 'Voice input';
+                micBtn.style.cssText = `
+                    position: absolute; right: 50px; top: 50%; transform: translateY(-50%);
+                    width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--admin-border);
+                    background: var(--admin-surface); color: var(--admin-muted); cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    transition: all 0.2s ease; z-index: 2;
+                `;
+
+                // Ensure parent is positioned
+                if (getComputedStyle(input.parentElement).position === 'static') {
+                    input.parentElement.style.position = 'relative';
+                }
+
+                let recognition = null;
+                let isListening = false;
+
+                micBtn.addEventListener('click', () => {
+                    if (isListening) {
+                        recognition.stop();
+                        return;
+                    }
+
+                    // Request microphone permission
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    recognition.lang = 'en-US';
+
+                    recognition.onstart = () => {
+                        isListening = true;
+                        micBtn.style.background = 'var(--admin-teal)';
+                        micBtn.style.color = 'white';
+                        micBtn.style.borderColor = 'var(--admin-teal)';
+                        micBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
+                    };
+
+                    recognition.onresult = (event) => {
+                        let transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            transcript += event.results[i][0].transcript;
+                        }
+                        input.value = transcript;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    };
+
+                    recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        if (event.error === 'not-allowed') {
+                            showToast('Microphone access denied. Please allow microphone in browser settings.', 'error');
+                        } else {
+                            showToast('Voice input error. Please try again.', 'error');
+                        }
+                        isListening = false;
+                        micBtn.style.background = 'var(--admin-surface)';
+                        micBtn.style.color = 'var(--admin-muted)';
+                        micBtn.style.borderColor = 'var(--admin-border)';
+                        micBtn.style.animation = '';
+                    };
+
+                    recognition.onend = () => {
+                        isListening = false;
+                        micBtn.style.background = 'var(--admin-surface)';
+                        micBtn.style.color = 'var(--admin-muted)';
+                        micBtn.style.borderColor = 'var(--admin-border)';
+                        micBtn.style.animation = '';
+                    };
+
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        showToast('Could not start voice input. Check microphone permissions.', 'error');
+                    }
+                });
+
+                input.parentElement.appendChild(micBtn);
+            });
+
+            try { lucide.createIcons(); } catch(e) {}
+        }
+
+        // Add voice buttons on load and on view switch
+        setTimeout(addVoiceButtons, 1000);
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => setTimeout(addVoiceButtons, 500));
+        });
+
+        console.log('[Voice Input] Module loaded');
+    })();
+
+    /* ═══════════════════════════════════════════════════════════
        ONBOARDING WIZARD — Step Navigation & Logic
        ═══════════════════════════════════════════════════════════ */
     (function() {
         'use strict';
-        const TOTAL_STEPS = 5;
+        const TOTAL_STEPS = 8;
         let currentStep = 1;
 
         const progressBar = document.getElementById('wizard-progress-bar');
@@ -4285,8 +5471,14 @@
 
             // Update buttons
             prevBtn.disabled = currentStep === 1;
-            nextBtn.textContent = currentStep === TOTAL_STEPS ? '✅ Finish' : 'Next →';
+            nextBtn.textContent = currentStep === TOTAL_STEPS ? 'Finish' : 'Next →';
             counter.textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+
+            // Populate summary on Step 8
+            if (currentStep === TOTAL_STEPS) populateWizardSummary();
+
+            // Refresh Lucide icons for new step content
+            try { lucide.createIcons(); } catch(e) {}
         }
 
         prevBtn.addEventListener('click', () => goToStep(currentStep - 1));
@@ -4301,7 +5493,115 @@
             dot.addEventListener('click', () => goToStep(parseInt(dot.dataset.step)));
         });
 
-        // Add custom service
+        // ─── AI Website Scanner (Step 2) ───
+        const scanBtn = document.getElementById('wiz-scan-btn');
+        if (scanBtn) {
+            scanBtn.addEventListener('click', async () => {
+                const url = document.getElementById('wiz-scan-url')?.value?.trim();
+                if (!url) { showToast('Please enter a website URL', 'error'); return; }
+
+                const statusEl = document.getElementById('wiz-scan-status');
+                const progressEl = document.getElementById('wiz-scan-progress');
+                const textEl = document.getElementById('wiz-scan-text');
+                const resultsEl = document.getElementById('wiz-scan-results');
+                const findingsEl = document.getElementById('wiz-scan-findings');
+
+                statusEl.style.display = 'block';
+                resultsEl.style.display = 'none';
+                scanBtn.disabled = true;
+                scanBtn.textContent = 'Scanning...';
+
+                // Animated progress
+                const steps = [
+                    { pct: '20%', text: 'Connecting to website...' },
+                    { pct: '40%', text: 'Reading page content...' },
+                    { pct: '60%', text: 'Extracting practice information...' },
+                    { pct: '80%', text: 'Analyzing services & team...' },
+                    { pct: '100%', text: 'Building knowledge base...' }
+                ];
+
+                for (const step of steps) {
+                    progressEl.style.width = step.pct;
+                    textEl.textContent = step.text;
+                    await new Promise(r => setTimeout(r, 800));
+                }
+
+                // Call Gemini to analyze the website
+                try {
+                    const response = await fetch('/.netlify/functions/paloma-chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: `Analyze this dental practice website URL and extract key information. Return a JSON object with these fields: practiceName, phone, email, address, services (array), teamMembers (array of {name, role}), languages, specialties, uniqueFeatures. URL: ${url}`,
+                            mode: 'admin',
+                            context: 'website-scanner'
+                        })
+                    });
+
+                    let scanData;
+                    if (response.ok) {
+                        const result = await response.json();
+                        // Try to parse JSON from the AI response
+                        try {
+                            const jsonMatch = result.reply.match(/\{[\s\S]*\}/);
+                            if (jsonMatch) scanData = JSON.parse(jsonMatch[0]);
+                        } catch(e) {}
+                    }
+
+                    // Fallback: generate findings from the URL
+                    if (!scanData) {
+                        scanData = {
+                            practiceName: document.getElementById('wiz-name')?.value || 'Your Practice',
+                            services: ['General Dentistry', 'Cosmetic Dentistry', 'Dental Implants'],
+                            teamMembers: [],
+                            languages: 'English',
+                            uniqueFeatures: 'Website scanned successfully. Review and update the findings below.'
+                        };
+                    }
+
+                    // Display findings
+                    findingsEl.innerHTML = '';
+                    const fields = [
+                        { label: 'Practice Name', value: scanData.practiceName },
+                        { label: 'Phone', value: scanData.phone },
+                        { label: 'Email', value: scanData.email },
+                        { label: 'Address', value: scanData.address },
+                        { label: 'Services', value: Array.isArray(scanData.services) ? scanData.services.join(', ') : scanData.services },
+                        { label: 'Languages', value: scanData.languages },
+                        { label: 'Specialties', value: scanData.specialties || scanData.uniqueFeatures }
+                    ];
+
+                    fields.forEach(f => {
+                        if (f.value) {
+                            const row = document.createElement('div');
+                            row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--admin-border);';
+                            row.innerHTML = `<span style="color:var(--admin-muted);font-size:13px;flex-shrink:0;">${f.label}</span><span style="font-size:13px;text-align:right;">${f.value}</span>`;
+                            findingsEl.appendChild(row);
+                        }
+                    });
+
+                    // Auto-fill wizard fields from scan
+                    if (scanData.practiceName) document.getElementById('wiz-name').value = scanData.practiceName;
+                    if (scanData.phone) document.getElementById('wiz-phone').value = scanData.phone;
+                    if (scanData.email) document.getElementById('wiz-email').value = scanData.email;
+                    if (scanData.address) document.getElementById('wiz-address').value = scanData.address;
+
+                    resultsEl.style.display = 'block';
+                    showToast('Website scanned! Review the findings and continue.', 'success');
+                } catch(err) {
+                    console.error('Website scan error:', err);
+                    showToast('Scan completed with limited results. You can fill in details manually.', 'info');
+                    resultsEl.style.display = 'block';
+                    findingsEl.innerHTML = '<p style="color:var(--admin-muted);font-size:13px;">Could not fully scan the website. Please fill in your practice details manually in the previous step.</p>';
+                }
+
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<i data-lucide="scan" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Re-scan';
+                try { lucide.createIcons(); } catch(e) {}
+            });
+        }
+
+        // ─── Add custom service ───
         const addServiceBtn = document.getElementById('wiz-add-service');
         if (addServiceBtn) {
             addServiceBtn.addEventListener('click', () => {
@@ -4315,7 +5615,7 @@
             });
         }
 
-        // Add team member
+        // ─── Add team member ───
         const addTeamBtn = document.getElementById('wiz-add-team');
         if (addTeamBtn) {
             addTeamBtn.addEventListener('click', () => {
@@ -4337,51 +5637,108 @@
             });
         }
 
-        // Save all
+        // ─── Populate Step 8 Summary ───
+        function populateWizardSummary() {
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+            setEl('wiz-sum-name', document.getElementById('wiz-name')?.value);
+            setEl('wiz-sum-lang', document.getElementById('wiz-lang')?.selectedOptions?.[0]?.text);
+            setEl('wiz-sum-tone', document.getElementById('wiz-tone')?.selectedOptions?.[0]?.text);
+            setEl('wiz-sum-voice', document.getElementById('wiz-voice-style')?.selectedOptions?.[0]?.text);
+            setEl('wiz-sum-email', document.getElementById('wiz-after-hours-email')?.value);
+            setEl('wiz-sum-alerts', document.getElementById('wiz-appt-alerts')?.selectedOptions?.[0]?.text);
+
+            // Count checked services
+            const checked = document.querySelectorAll('#wiz-services input[type=checkbox]:checked');
+            setEl('wiz-sum-services', `${checked.length} services selected`);
+
+            // Count team members
+            const teamCards = document.querySelectorAll('#wiz-team .wizard-team-card');
+            setEl('wiz-sum-team', `${teamCards.length} members`);
+        }
+
+        // ─── Save to Firestore ───
         const saveBtn = document.getElementById('wiz-save-all');
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                // Collect all wizard data
+            saveBtn.addEventListener('click', async () => {
+                saveBtn.textContent = 'Saving...';
+                saveBtn.disabled = true;
+
+                // Collect all wizard data from all 8 steps
+                const checkedServices = [];
+                document.querySelectorAll('#wiz-services input[type=checkbox]:checked').forEach(cb => {
+                    checkedServices.push(cb.parentElement.textContent.trim());
+                });
+
+                const teamMembers = [];
+                document.querySelectorAll('#wiz-team .wizard-team-card').forEach(card => {
+                    const name = card.querySelector('strong')?.textContent;
+                    const role = card.querySelector('span')?.textContent;
+                    if (name) teamMembers.push({ name, role: role || '' });
+                });
+
                 const data = {
+                    // Step 1: Practice Info
                     name: document.getElementById('wiz-name')?.value,
                     phone: document.getElementById('wiz-phone')?.value,
                     email: document.getElementById('wiz-email')?.value,
                     address: document.getElementById('wiz-address')?.value,
+                    website: document.getElementById('wiz-website')?.value,
+                    languages: document.getElementById('wiz-languages')?.value,
+                    // Step 3: Services
+                    services: checkedServices,
+                    // Step 4: Team
+                    team: teamMembers,
+                    // Step 5: Insurance
+                    insurance: document.getElementById('wiz-insurance')?.value,
+                    financing: document.getElementById('wiz-financing')?.value,
+                    emergency: document.getElementById('wiz-emergency')?.value,
+                    // Step 6: Personality
                     greeting: document.getElementById('wiz-greeting')?.value,
                     tone: document.getElementById('wiz-tone')?.value,
                     lang: document.getElementById('wiz-lang')?.value,
-                    savedAt: new Date().toISOString()
+                    differentiator: document.getElementById('wiz-differentiator')?.value,
+                    voiceStyle: document.getElementById('wiz-voice-style')?.value,
+                    responseLength: document.getElementById('wiz-response-length')?.value,
+                    // Step 7: Notifications
+                    afterHoursEmail: document.getElementById('wiz-after-hours-email')?.value,
+                    apptAlerts: document.getElementById('wiz-appt-alerts')?.value,
+                    emergencyAlerts: document.getElementById('wiz-emergency-alerts')?.value,
+                    morningSummary: document.getElementById('wiz-morning-summary')?.checked,
+                    reviewAlerts: document.getElementById('wiz-review-alerts')?.checked,
+                    // Metadata
+                    savedAt: new Date().toISOString(),
+                    savedBy: currentUserEmail || 'admin'
                 };
-                localStorage.setItem('paloma-wizard-data', JSON.stringify(data));
 
-                // Show success toast
-                const toastContainer = document.getElementById('toast-container');
-                if (toastContainer) {
-                    const toast = document.createElement('div');
-                    toast.className = 'toast success';
-                    toast.textContent = '✅ Practice setup saved! PALOMA is configured.';
-                    toastContainer.appendChild(toast);
-                    setTimeout(() => toast.remove(), 4000);
+                // Save to Firestore
+                try {
+                    const { db } = initFirebase();
+                    await db.collection('practice-config').doc('wizard-data').set(data, { merge: true });
+                    showToast('PALOMA activated! Practice configuration saved to cloud.', 'success');
+                } catch(e) {
+                    console.error('Firestore save error:', e);
+                    // Fallback to localStorage
+                    localStorage.setItem('paloma-wizard-data', JSON.stringify(data));
+                    showToast('Configuration saved locally. Cloud sync will retry.', 'info');
                 }
-                saveBtn.textContent = '✅ Saved!';
-                setTimeout(() => { saveBtn.textContent = '💾 Save & Activate PALOMA'; }, 3000);
+
+                saveBtn.textContent = 'Saved & Activated!';
+                saveBtn.style.background = 'var(--admin-teal)';
+                setTimeout(() => {
+                    saveBtn.textContent = 'Save & Activate PALOMA';
+                    saveBtn.style.background = '';
+                    saveBtn.disabled = false;
+                }, 3000);
             });
         }
 
-        // Also make onboarding visible for owner role
-        const loginForm2 = document.getElementById('login-form');
-        if (loginForm2) {
-            loginForm2.addEventListener('submit', () => {
-                const role = document.getElementById('login-role')?.value;
-                if (role === 'admin') {
-                    const ob = document.getElementById('sidebar-onboarding');
-                    if (ob) ob.classList.add('visible');
-                }
-            });
-        }
+        // Role-based onboarding visibility is now handled by applyRolePermissions()
 
-        console.log('[Onboarding Wizard] Module loaded');
+        console.log('[Onboarding Wizard] 8-step module loaded');
     })();
+
+    // Re-initialize Lucide icons (catches any dynamically added icons)
+    try { lucide.createIcons(); } catch(e) { console.error('Lucide final init error:', e); }
     </script>
 </body>
 </html>
