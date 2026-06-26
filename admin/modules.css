@@ -477,16 +477,18 @@
 /* ─── KPI Scorecard Cards ─── */
 .kpi-scorecard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
 }
 
 .kpi-card {
   background: var(--card-bg, #1e1e2e);
   border: 1px solid var(--border-color, #2a2a3a);
   border-radius: 12px;
-  padding: 18px;
+  padding: 16px;
   transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .kpi-card:hover {
@@ -506,11 +508,15 @@
 }
 
 .kpi-label {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted, #888);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .kpi-source {
@@ -519,10 +525,13 @@
 }
 
 .kpi-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary, #e0e0e0);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kpi-benchmark {
@@ -550,9 +559,10 @@
 .kpi-target-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
+  gap: 6px;
+  font-size: 0.7rem;
   color: var(--text-muted, #888);
+  flex-wrap: wrap;
 }
 
 .kpi-status-dot {
