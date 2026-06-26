@@ -6,6 +6,8 @@ const PatientProfiles = (function() {
   let currentFilter = 'all';
   let selectedPatientId = null;
   let searchQuery = '';
+  let currentDocTab = 'xrays';
+  let currentDetailPatientId = null;
 
   async function init() {
     await loadPatients();
@@ -139,6 +141,8 @@ const PatientProfiles = (function() {
 
   async function selectPatient(patientId) {
     selectedPatientId = patientId;
+    currentDetailPatientId = patientId;
+    currentDocTab = 'xrays';
     renderPatientList();
 
     const detailPanel = document.getElementById('patient-detail-panel');
@@ -224,6 +228,29 @@ const PatientProfiles = (function() {
               <h4><i data-lucide="brain" style="width:16px;height:16px"></i> PALOMA AI Notes</h4>
               <p class="ai-notes">${patient.paloma_notes}</p>
             </div>` : ''}
+
+          <div style="margin-top:20px;border-top:1px solid var(--border-color,#2a2a3a);padding-top:16px;">
+            <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+              <i data-lucide="file-scan" style="width:16px;height:16px;color:var(--admin-teal,#2dd4bf)"></i>
+              Clinical Documents
+            </h4>
+            <div style="display:flex;gap:4px;margin-bottom:12px;">
+              <button class="doc-tab active" onclick="switchDocTab('xrays', this)" style="padding:4px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--admin-teal,#2dd4bf);color:#000;">X-Rays</button>
+              <button class="doc-tab" onclick="switchDocTab('photos', this)" style="padding:4px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--admin-muted,#888);">Photos</button>
+              <button class="doc-tab" onclick="switchDocTab('documents', this)" style="padding:4px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--admin-muted,#888);">Documents</button>
+            </div>
+            <div id="clinical-files-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:12px;min-height:60px;">
+              <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--admin-muted,#666);font-size:0.8rem;border:1px dashed var(--border-color,#2a2a3a);border-radius:8px;">
+                No files uploaded yet
+              </div>
+            </div>
+            <div id="clinical-upload-zone" style="border:2px dashed var(--border-color,#2a2a3a);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;" onclick="document.getElementById('clinical-file-input').click()">
+              <i data-lucide="upload-cloud" style="width:24px;height:24px;color:var(--admin-teal,#2dd4bf);margin-bottom:6px;"></i>
+              <p style="font-size:0.8rem;color:var(--admin-muted,#888);margin:0;">Click or drag files to upload</p>
+              <p style="font-size:0.65rem;color:var(--admin-muted,#555);margin:4px 0 0;">X-rays, photos, PDFs — Max 25MB</p>
+              <input type="file" id="clinical-file-input" accept="image/*,.pdf" multiple style="display:none" onchange="uploadClinicalFiles(this.files)">
+            </div>
+          </div>
         </div>
 
         <div class="patient-tab-content" id="patient-tab-conversations" style="display:none">
@@ -244,10 +271,33 @@ const PatientProfiles = (function() {
         </div>`;
 
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      
+
+      // Set up drag-and-drop on the upload zone
+      setTimeout(() => {
+        const dropZone = document.getElementById('clinical-upload-zone');
+        if (dropZone) {
+          dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--admin-teal,#2dd4bf)';
+            dropZone.style.background = 'rgba(45,212,191,0.05)';
+          });
+          dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = 'var(--border-color,#2a2a3a)';
+            dropZone.style.background = 'transparent';
+          });
+          dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color,#2a2a3a)';
+            dropZone.style.background = 'transparent';
+            if (e.dataTransfer.files.length) uploadClinicalFiles(e.dataTransfer.files);
+          });
+        }
+      }, 50);
+
       // Load conversations tab data in background
       loadPatientConversations(patientId);
       loadPatientAppointments(patientId);
+      loadClinicalFiles(patientId, 'xrays');
     } catch (err) {
       detailPanel.innerHTML = '<p class="text-muted">Error loading patient</p>';
       console.error('Error loading patient detail:', err);
@@ -528,6 +578,102 @@ const PatientProfiles = (function() {
     }
   }
 
+  // ═══ Clinical Documents Functions ═══
+
+  function switchDocTab(tab, btn) {
+    currentDocTab = tab;
+    document.querySelectorAll('.doc-tab').forEach(b => {
+      b.style.background = 'transparent';
+      b.style.color = 'var(--admin-muted,#888)';
+    });
+    btn.style.background = 'var(--admin-teal,#2dd4bf)';
+    btn.style.color = '#000';
+    loadClinicalFiles(currentDetailPatientId, tab);
+  }
+
+  async function uploadClinicalFiles(files) {
+    if (!currentDetailPatientId || !files.length) return;
+    const storage = firebase.storage();
+
+    for (const file of files) {
+      if (file.size > 25 * 1024 * 1024) {
+        showToast(`File "${file.name}" exceeds 25MB limit`, 'error');
+        continue;
+      }
+      try {
+        const path = `patients/${currentDetailPatientId}/${currentDocTab}/${Date.now()}_${file.name}`;
+        const ref = storage.ref(path);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+
+        // Save metadata to Firestore
+        const db = firebase.firestore();
+        await db.collection('patients').doc(currentDetailPatientId)
+          .collection('files').add({
+            name: file.name,
+            type: currentDocTab,
+            url: url,
+            path: path,
+            size: file.size,
+            content_type: file.type,
+            uploaded_by: firebase.auth().currentUser?.email || 'unknown',
+            uploaded_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        // HIPAA audit log
+        if (window.HIPAAAudit) {
+          HIPAAAudit.log('upload_file', 'patient_file', currentDetailPatientId, `${currentDocTab}: ${file.name}`);
+        }
+
+        console.log('[Files] Uploaded:', file.name);
+        showToast(`Uploaded ${file.name}`, 'success');
+      } catch (err) {
+        console.error('[Files] Upload failed:', file.name, err);
+        showToast(`Upload failed: ${file.name}`, 'error');
+      }
+    }
+
+    // Reload file grid
+    loadClinicalFiles(currentDetailPatientId, currentDocTab);
+  }
+
+  async function loadClinicalFiles(patientId, type) {
+    if (!patientId) return;
+    const grid = document.getElementById('clinical-files-grid');
+    if (!grid) return;
+
+    try {
+      const db = firebase.firestore();
+      const snap = await db.collection('patients').doc(patientId)
+        .collection('files').where('type', '==', type)
+        .orderBy('uploaded_at', 'desc').get();
+
+      if (snap.empty) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--admin-muted,#666);font-size:0.8rem;border:1px dashed var(--border-color,#2a2a3a);border-radius:8px;">No ${type} uploaded yet</div>`;
+        return;
+      }
+
+      grid.innerHTML = snap.docs.map(doc => {
+        const f = doc.data();
+        const isImage = f.content_type && f.content_type.startsWith('image/');
+        const escapedUrl = (f.url || '').replace(/'/g, "\\'");
+        const escapedName = (f.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        return `<div style="border-radius:8px;overflow:hidden;border:1px solid var(--border-color,#2a2a3a);cursor:pointer;" onclick="window.open('${escapedUrl}','_blank')" title="${escapedName}">
+          ${isImage
+            ? `<img src="${f.url}" style="width:100%;height:80px;object-fit:cover;display:block;" alt="${escapedName}">`
+            : `<div style="height:80px;display:flex;align-items:center;justify-content:center;background:var(--admin-surface,#161625);"><i data-lucide="file-text" style="width:24px;height:24px;color:var(--admin-muted)"></i></div>`
+          }
+          <div style="padding:4px 6px;font-size:0.6rem;color:var(--admin-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name || 'Untitled'}</div>
+        </div>`;
+      }).join('');
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    } catch (err) {
+      console.error('[Files] Load failed:', err);
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:#ef4444;font-size:0.8rem;">Error loading files</div>`;
+    }
+  }
+
   // Utility functions
   function getInitials(name) {
     if (!name) return '?';
@@ -591,6 +737,14 @@ const PatientProfiles = (function() {
     saveNotes,
     editPatient,
     cancelAdd,
-    switchTab
+    switchTab,
+    switchDocTab,
+    uploadClinicalFiles,
+    loadClinicalFiles
   };
 })();
+
+// Expose clinical document functions globally for inline onclick handlers
+window.switchDocTab = function(tab, btn) { PatientProfiles.switchDocTab(tab, btn); };
+window.uploadClinicalFiles = function(files) { PatientProfiles.uploadClinicalFiles(files); };
+window.loadClinicalFiles = function(pid, type) { PatientProfiles.loadClinicalFiles(pid, type); };
