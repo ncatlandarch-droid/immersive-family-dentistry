@@ -34,3 +34,11 @@
   for = "/admin/*"
   [headers.values]
     Cache-Control = "no-store"
+
+# Embeddable widget — must be loadable cross-origin
+[[headers]]
+  for = "/embed/paloma-embed.js"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "application/javascript; charset=utf-8"

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brenes Precision Dentistry — PALOMA Widget Demo</title>
+  <style>
+    /* ── Demo page styles (the widget injects its OWN CSS) ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b; background: #f8fafc; line-height: 1.6;
+    }
+    a { color: #0d9488; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    .demo-nav {
+      background: #fff; border-bottom: 1px solid #e2e8f0;
+      padding: 16px 24px; display: flex; align-items: center; gap: 16px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-nav-logo {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, #2dd4bf, #0d9488);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff; flex-shrink: 0;
+    }
+    .demo-nav-text h1 { font-size: 1.15rem; font-weight: 700; color: #0f172a; }
+    .demo-nav-text p  { font-size: 0.75rem; color: #64748b; }
+    .demo-nav-links { margin-left: auto; display: flex; gap: 24px; font-size: 0.9rem; }
+    .demo-nav-links a { color: #334155; font-weight: 500; }
+
+    /* Hero */
+    .demo-hero {
+      background: linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+      color: #fff; padding: 80px 24px; text-align: center;
+    }
+    .demo-hero h2 {
+      font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .demo-hero p { font-size: 1.15rem; max-width: 600px; margin: 0 auto 32px; opacity: 0.9; }
+    .demo-hero-btn {
+      display: inline-block; background: #fff; color: #0d9488;
+      padding: 14px 36px; border-radius: 50px; font-weight: 700; font-size: 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15); transition: transform 0.2s;
+    }
+    .demo-hero-btn:hover { transform: translateY(-2px); text-decoration: none; }
+
+    /* Sections */
+    .demo-section {
+      max-width: 1000px; margin: 0 auto;
+      padding: 64px 24px;
+    }
+    .demo-section h3 {
+      font-size: 1.6rem; font-weight: 700; margin-bottom: 12px;
+      color: #0f172a;
+    }
+    .demo-section > p { color: #475569; margin-bottom: 32px; }
+
+    /* Service cards */
+    .demo-services {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .demo-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 28px 20px; text-align: center;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .demo-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+    }
+    .demo-card-icon { font-size: 2.2rem; margin-bottom: 12px; }
+    .demo-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .demo-card p  { font-size: 0.82rem; color: #64748b; }
+
+    /* About */
+    .demo-about {
+      background: #fff; border-top: 1px solid #e2e8f0;
+    }
+    .demo-about-inner {
+      max-width: 1000px; margin: 0 auto;
+      padding: 64px 24px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: center;
+    }
+    .demo-about-img {
+      width: 100%; aspect-ratio: 4/3; border-radius: 16px;
+      background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+    }
+    .demo-about h3 { font-size: 1.6rem; font-weight: 700; margin-bottom: 12px; }
+    .demo-about p { color: #475569; margin-bottom: 14px; }
+
+    /* CTA */
+    .demo-cta {
+      background: linear-gradient(135deg, #134e4a, #0d9488);
+      padding: 60px 24px; text-align: center; color: #fff;
+    }
+    .demo-cta h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 12px; }
+    .demo-cta p { opacity: 0.9; margin-bottom: 28px; }
+    .demo-cta a {
+      display: inline-block; background: #fff; color: #0d9488;
+      padding: 14px 36px; border-radius: 50px; font-weight: 700;
+    }
+
+    /* Footer */
+    .demo-footer {
+      background: #0f172a; color: #94a3b8; padding: 32px 24px;
+      text-align: center; font-size: 0.82rem;
+    }
+
+    /* Banner */
+    .demo-banner {
+      background: #fef3c7; border-bottom: 1px solid #fbbf24;
+      padding: 10px 24px; text-align: center;
+      font-size: 0.82rem; color: #92400e;
+    }
+    .demo-banner code {
+      background: #fff; padding: 2px 8px; border-radius: 4px;
+      font-family: 'SF Mono', Consolas, monospace; font-size: 0.78rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-hero h2 { font-size: 1.8rem; }
+      .demo-about-inner { grid-template-columns: 1fr; }
+      .demo-nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DEMO BANNER -->
+  <div class="demo-banner">
+    🧪 <strong>Widget Demo</strong> — The PALOMA chat widget is loaded via
+    <code>&lt;script src="paloma-embed.js"&gt;</code> at the bottom of this page.
+    Click the dove 🕊️ in the bottom-right corner!
+  </div>
+
+  <!-- NAV -->
+  <nav class="demo-nav">
+    <div class="demo-nav-logo">🦷</div>
+    <div class="demo-nav-text">
+      <h1>Brenes Precision Dentistry</h1>
+      <p>Dr. Christian Brenes — Prosthodontist</p>
+    </div>
+    <div class="demo-nav-links">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="demo-hero">
+    <h2>The House of Modern<br>Smiles &amp; Comfort</h2>
+    <p>Every treatment is meticulously planned and designed to achieve a <strong>natural custom smile</strong> — each one unique.</p>
+    <a href="#contact" class="demo-hero-btn">Book Your Consultation</a>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="demo-section" id="services">
+    <h3>Our Services</h3>
+    <p>Advanced prosthodontic care with digital precision and a personal touch.</p>
+    <div class="demo-services">
+      <div class="demo-card">
+        <div class="demo-card-icon">🦷</div>
+        <h4>Dental Implants</h4>
+        <p>Permanent, titanium-post solutions that look and feel like natural teeth.</p>
+      </div>
+      <div class="demo-card">
+        <div class="demo-card-icon">✨</div>
+        <h4>Veneers &amp; Smile Design</h4>
+        <p>Thin porcelain restorations for a flawless, custom smile makeover.</p>
+      </div>
+      <div class="demo-card">
+        <div class="demo-card-icon">🔬</div>
+        <h4>All-on-4 Full Arch</h4>
+        <p>Complete arch restoration with just 4–6 implants per arch.</p>
+      </div>
+      <div class="demo-card">
+        <div class="demo-card-icon">🛡️</div>
+        <h4>Crowns &amp; Rehabilitations</h4>
+        <p>Comprehensive treatment for worn, broken, or missing teeth.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="demo-about" id="about">
+    <div class="demo-about-inner">
+      <div class="demo-about-img">🏥</div>
+      <div>
+        <h3>Meet Dr. Christian Brenes</h3>
+        <p>Dr. Brenes is a board-certified Prosthodontist and Program Director of a Digital Dentistry Master Program with 9+ years of university faculty experience.</p>
+        <p>His philosophy: <em>"Patient experience and treatment quality are our main goals. A beautiful smile follows oral health."</em></p>
+        <p>📍 3810 North Elm Street, Suite 201, Greensboro, NC 27455</p>
+        <p>📞 <a href="tel:3365454281">(336) 545-4281</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="demo-cta" id="contact">
+    <h3>Ready for Your Best Smile?</h3>
+    <p>Schedule your consultation today — or ask PALOMA 🕊️ anything using the chat below.</p>
+    <a href="tel:3365454281">Call (336) 545-4281</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="demo-footer">
+    <p>© 2026 Brenes Precision Dentistry. All rights reserved.</p>
+    <p style="margin-top: 6px; font-size: 0.72rem; color: #64748b;">
+      Powered by <strong>PALOMA AI</strong> — Built by Think! Design and Planning, LLC
+    </p>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       THIS IS THE ONLY LINE A PRACTICE NEEDS TO ADD TO THEIR SITE:
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script src="paloma-embed.js" data-practice="brenes"></script>
+
+</body>
+</html>
