@@ -2134,22 +2134,81 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Insurance -->
+                <!-- Step 5: Insurance & Financing -->
                 <div class="wizard-step" id="wizard-step-5">
-                    <h3 class="wizard-step-title">Insurance & Financing</h3>
-                    <div class="wizard-form-grid">
-                        <div class="wizard-field" style="grid-column:1/-1">
-                            <label>Insurance Policy</label>
-                            <textarea id="wiz-insurance" class="auth-input" rows="3" style="resize:vertical">We accept all dental insurance plans that allow out-of-network providers. We are NOT in-network with any specific insurance company. Many PPO plans offer out-of-network benefits that cover a significant portion of treatment costs.</textarea>
+                    <h3 class="wizard-step-title"><i data-lucide="shield-check" style="width:18px;height:18px"></i> Insurance & Financing</h3>
+                    <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Select the PPO plans that provide out-of-network benefits to your patients. This helps PALOMA guide patients on coverage.</p>
+
+                    <!-- Insurance Approach -->
+                    <div class="wizard-field" style="margin-bottom:20px">
+                        <label>Insurance Approach</label>
+                        <select id="wiz-insurance-approach" class="auth-input">
+                            <option value="oon" selected>Out-of-Network Only (we accept OON benefits)</option>
+                            <option value="mixed">Mixed (some in-network, some OON)</option>
+                            <option value="in-network">Mostly In-Network</option>
+                            <option value="fee-for-service">Fee-for-Service / Cash Practice</option>
+                        </select>
+                    </div>
+
+                    <!-- PPO Insurance Chip Grid -->
+                    <div class="wizard-field" style="margin-bottom:20px">
+                        <label>PPO Plans with Out-of-Network Benefits <span style="font-weight:400;color:var(--admin-muted)">(click to toggle)</span></label>
+                        <div id="wiz-insurance-chips" class="chip-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+                            <button type="button" class="insurance-chip active" data-plan="Delta Dental PPO">Delta Dental PPO</button>
+                            <button type="button" class="insurance-chip active" data-plan="MetLife PDP Plus">MetLife PDP Plus</button>
+                            <button type="button" class="insurance-chip active" data-plan="Cigna DPPO">Cigna DPPO</button>
+                            <button type="button" class="insurance-chip active" data-plan="Aetna PPO">Aetna PPO</button>
+                            <button type="button" class="insurance-chip active" data-plan="Guardian PPO">Guardian PPO</button>
+                            <button type="button" class="insurance-chip active" data-plan="BlueCross BlueShield">BlueCross BlueShield</button>
+                            <button type="button" class="insurance-chip active" data-plan="United Healthcare PPO">United Healthcare PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="Humana PPO">Humana PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="Principal PPO">Principal PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="Ameritas PPO">Ameritas PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="Lincoln Financial">Lincoln Financial</button>
+                            <button type="button" class="insurance-chip" data-plan="Sun Life PPO">Sun Life PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="Anthem BCBS">Anthem BCBS</button>
+                            <button type="button" class="insurance-chip" data-plan="GEHA PPO">GEHA PPO</button>
+                            <button type="button" class="insurance-chip" data-plan="TRICARE">TRICARE</button>
                         </div>
-                        <div class="wizard-field">
-                            <label>Financing Options</label>
-                            <input type="text" id="wiz-financing" class="auth-input" value="CareCredit, Sunbit, In-house payment plans" />
+                        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+                            <input type="text" id="wiz-custom-insurance" class="auth-input" placeholder="Add custom plan..." style="flex:1" />
+                            <button type="button" class="btn-secondary" onclick="addCustomInsuranceChip()" style="white-space:nowrap">+ Add</button>
                         </div>
-                        <div class="wizard-field">
-                            <label>Emergency Policy</label>
-                            <input type="text" id="wiz-emergency" class="auth-input" value="Same-day emergency appointments available" />
+                    </div>
+
+                    <!-- Insurance Policy Statement -->
+                    <div class="wizard-field" style="margin-bottom:20px">
+                        <label>Insurance Policy Statement <span style="font-weight:400;color:var(--admin-muted)">(shown to patients)</span></label>
+                        <textarea id="wiz-insurance" class="auth-input" rows="3" style="resize:vertical">We accept all dental insurance plans that allow out-of-network providers. We are NOT in-network with any specific insurance company. Many PPO plans offer out-of-network benefits that cover a significant portion of treatment costs.</textarea>
+                    </div>
+
+                    <!-- Financing Options -->
+                    <div class="wizard-field">
+                        <label><i data-lucide="credit-card" style="width:14px;height:14px;vertical-align:-2px"></i> Financing Options</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
+                            <label class="financing-toggle">
+                                <input type="checkbox" id="wiz-carecredit" checked />
+                                <span class="financing-label">💳 CareCredit</span>
+                            </label>
+                            <label class="financing-toggle">
+                                <input type="checkbox" id="wiz-sunbit" checked />
+                                <span class="financing-label">☀️ Sunbit</span>
+                            </label>
+                            <label class="financing-toggle">
+                                <input type="checkbox" id="wiz-inhouse" checked />
+                                <span class="financing-label">🏠 In-House Payment Plans</span>
+                            </label>
+                            <label class="financing-toggle">
+                                <input type="checkbox" id="wiz-membership" />
+                                <span class="financing-label">🎫 Membership/Discount Plan</span>
+                            </label>
                         </div>
+                    </div>
+
+                    <!-- Emergency Policy -->
+                    <div class="wizard-field" style="margin-top:16px">
+                        <label>Emergency Policy</label>
+                        <input type="text" id="wiz-emergency" class="auth-input" value="Same-day emergency appointments available" />
                     </div>
                 </div>
 
@@ -6016,10 +6075,47 @@
             });
         }
 
+        // ─── Insurance Chip Toggle ───
+        document.querySelectorAll('.insurance-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('active');
+            });
+        });
+
         // Role-based onboarding visibility is now handled by applyRolePermissions()
 
         console.log('[Onboarding Wizard] 8-step module loaded');
     })();
+
+    // ─── Insurance Chip Helper (global scope for onclick) ───
+    function addCustomInsuranceChip() {
+        const input = document.getElementById('wiz-custom-insurance');
+        if (!input || !input.value.trim()) return;
+        const chipGrid = document.getElementById('wiz-insurance-chips');
+        if (!chipGrid) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'insurance-chip active';
+        btn.dataset.plan = input.value.trim();
+        btn.textContent = input.value.trim();
+        btn.addEventListener('click', () => btn.classList.toggle('active'));
+        chipGrid.appendChild(btn);
+        input.value = '';
+    }
+
+    function getSelectedInsurancePlans() {
+        const chips = document.querySelectorAll('.insurance-chip.active');
+        return Array.from(chips).map(c => c.dataset.plan);
+    }
+
+    function getSelectedFinancing() {
+        const options = [];
+        if (document.getElementById('wiz-carecredit')?.checked) options.push('CareCredit');
+        if (document.getElementById('wiz-sunbit')?.checked) options.push('Sunbit');
+        if (document.getElementById('wiz-inhouse')?.checked) options.push('In-House Payment Plans');
+        if (document.getElementById('wiz-membership')?.checked) options.push('Membership/Discount Plan');
+        return options;
+    }
 
     // Re-initialize Lucide icons (catches any dynamically added icons)
     try { lucide.createIcons(); } catch(e) { console.error('Lucide final init error:', e); }
