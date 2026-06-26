@@ -3163,6 +3163,69 @@
         }
     };
 
+    // ─── Morning Huddle: Load Real Data ───
+    async function loadHuddleData() {
+        try {
+            const db = firebase.firestore();
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+            const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+            const dayAfter = new Date(today); dayAfter.setDate(today.getDate() + 2);
+
+            // Get today's appointments
+            const todayAppts = await db.collection('appointments')
+                .where('created_at', '>=', today)
+                .where('created_at', '<', tomorrow)
+                .get();
+
+            // Get yesterday's appointments  
+            const yestAppts = await db.collection('appointments')
+                .where('created_at', '>=', yesterday)
+                .where('created_at', '<', today)
+                .get();
+
+            // Get PALOMA conversations from yesterday
+            const yestChats = await db.collection('conversations')
+                .where('created_at', '>=', yesterday)
+                .where('created_at', '<', today)
+                .get();
+
+            // Get today's conversations
+            const todayChats = await db.collection('conversations')
+                .where('created_at', '>=', today)
+                .where('created_at', '<', tomorrow)
+                .get();
+
+            // Update Yesterday panel
+            const yestProd = document.getElementById('huddle-yest-prod');
+            const yestColl = document.getElementById('huddle-yest-coll');
+            const yestPts = document.getElementById('huddle-yest-pts');
+            const yestChatsEl = document.getElementById('huddle-yest-chats');
+            if (yestPts) yestPts.textContent = yestAppts.size || '0';
+            if (yestChatsEl) yestChatsEl.textContent = yestChats.size || '0';
+
+            // Update Today panel
+            const todayApptsEl = document.getElementById('huddle-today-appts');
+            const todayPending = document.getElementById('huddle-today-pending');
+            if (todayApptsEl) todayApptsEl.textContent = todayAppts.size || '0';
+
+            // Count pending confirmations
+            let pending = 0;
+            todayAppts.forEach(doc => {
+                if (doc.data().status === 'pending' || doc.data().status === 'unconfirmed') pending++;
+            });
+            if (todayPending) todayPending.textContent = pending;
+
+            console.log('[Huddle] Real data loaded - Yesterday:', yestAppts.size, 'appts,', yestChats.size, 'chats | Today:', todayAppts.size, 'appts');
+        } catch (err) {
+            console.warn('[Huddle] Could not load real data, using defaults:', err.message);
+        }
+    }
+
+    // Auto-load huddle data when dashboard is visible
+    setTimeout(loadHuddleData, 1500);
+
     // ─── Action Items Filter ───
     window.filterActionItems = function(category, btn) {
         const rows = document.querySelectorAll('#action-items-tbody tr');
@@ -6175,6 +6238,15 @@
                 }).catch(() => {});
             }
         }, 2000);
+
+        // Auto-init KPI Dashboard since Overview is the default landing view
+        setTimeout(() => {
+            if (typeof KPIDashboard !== 'undefined' && !moduleState.kpiDashboardInit) {
+                KPIDashboard.init();
+                moduleState.kpiDashboardInit = true;
+                console.log('[Modules] KPIDashboard auto-initialized (default view)');
+            }
+        }, 1000);
 
         console.log('[Modules] Chat History, Patient Profiles, KPI Dashboard loaded');
     })();
