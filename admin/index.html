@@ -24,6 +24,29 @@
     <link rel="stylesheet" href="modules.css">
 
     <style>
+    /* ═══ HIPAA Session Timeout Modal ═══ */
+    .hipaa-timeout-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.85); z-index: 99999;
+        display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(8px);
+    }
+    .hipaa-timeout-modal {
+        background: var(--admin-card-bg, #1e1e2e);
+        border: 1px solid rgba(239,68,68,0.4);
+        border-radius: 16px; padding: 32px; text-align: center;
+        max-width: 420px; width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .hipaa-timeout-modal h3 { color: #ef4444; font-size: 18px; margin-bottom: 12px; }
+    .hipaa-timeout-modal p { color: var(--admin-muted, #888); font-size: 14px; margin-bottom: 20px; }
+    .hipaa-timeout-modal .countdown { font-size: 36px; font-weight: 700; color: #ef4444; margin: 16px 0; font-family: 'JetBrains Mono', monospace; }
+    .hipaa-timeout-modal .btn-continue { background: var(--admin-teal, #2dd4bf); color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 12px; }
+    .hipaa-timeout-modal .btn-logout { background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .hipaa-banner { position: fixed; top: 0; left: 0; right: 0; height: 28px; background: linear-gradient(90deg, #1a1a2e, #16213e); color: rgba(255,255,255,0.6); font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 16px; z-index: 10000; border-bottom: 1px solid rgba(45,212,191,0.2); }
+    .hipaa-banner .session-timer { color: #2dd4bf; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    body.hipaa-active { padding-top: 28px; }
+
     /* ═══════════════════════════════════════════════════════════
        Admin Dashboard — Dark Glassmorphism Theme
        Lake Jeanette Family & Implant Dentistry
@@ -6251,5 +6274,7 @@
         console.log('[Modules] Chat History, Patient Profiles, KPI Dashboard loaded');
     })();
     </script>
+    <!-- HIPAA Safeguards -->
+    <script src="js/hipaa-safeguards.js"></script>
 </body>
 </html>
