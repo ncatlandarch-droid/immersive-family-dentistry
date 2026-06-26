@@ -70,6 +70,9 @@ class PalomaWidget {
         this.isLoading = false;
         this.messages = [];
         this.lang = localStorage.getItem(PALOMA_CONFIG.langKey) || 'en';
+        // Firestore conversation tracking
+        this.sessionId = null;
+        this.firestoreAvailable = typeof firebase !== 'undefined' && firebase.firestore;
         this.loadHistory();
         this.render();
         this.attachListeners();
@@ -479,6 +482,8 @@ class PalomaWidget {
         this.renderMessage(msg);
         this.saveHistory();
         this.scrollToBottom();
+        // Persist to Firestore
+        this.persistMessageToFirestore(msg);
     }
 
     addBotMessage(text) {
@@ -510,6 +515,8 @@ class PalomaWidget {
                 PalomaGamification.addXP(10, '💬 Conversation');
             }
         }
+        // Persist to Firestore
+        this.persistMessageToFirestore(msg);
     }
 
     renderMessage(msg) {
@@ -595,6 +602,86 @@ class PalomaWidget {
         }
     }
 
+    // ─── Firestore Conversation Persistence ───
+    async ensureSession() {
+        if (this.sessionId) return this.sessionId;
+        if (!this.firestoreAvailable) return null;
+        try {
+            const db = firebase.firestore();
+            const docRef = db.collection('conversations').doc();
+            await docRef.set({
+                session_id: docRef.id,
+                visitor_name: null,
+                visitor_phone: null,
+                visitor_email: null,
+                language: this.lang,
+                source: 'website',
+                status: 'active',
+                message_count: 0,
+                summary: null,
+                booked_appointment: false,
+                patient_id: null,
+                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            this.sessionId = docRef.id;
+            // Store session ID locally for page refreshes
+            try { sessionStorage.setItem('paloma-session-id', this.sessionId); } catch(e) {}
+            console.log('[PALOMA] Firestore session created:', this.sessionId);
+            return this.sessionId;
+        } catch (err) {
+            console.warn('[PALOMA] Could not create Firestore session:', err);
+            return null;
+        }
+    }
+
+    async persistMessageToFirestore(msg) {
+        if (!this.firestoreAvailable) return;
+        try {
+            const sessionId = await this.ensureSession();
+            if (!sessionId) return;
+            const db = firebase.firestore();
+            // Add message to subcollection
+            await db.collection('conversations').doc(sessionId)
+                .collection('messages').add({
+                    role: msg.role,
+                    content: msg.content,
+                    language: this.lang,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            // Update parent conversation metadata
+            const updates = {
+                message_count: firebase.firestore.FieldValue.increment(1),
+                language: this.lang,
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            // Try to extract visitor info from user messages
+            if (msg.role === 'user') {
+                const text = msg.content;
+                // Detect name patterns
+                const nameMatch = text.match(/(?:my name is|i'm|i am|me llamo|soy)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+                if (nameMatch) updates.visitor_name = nameMatch[1];
+                // Detect phone patterns
+                const phoneMatch = text.match(/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/);
+                if (phoneMatch) updates.visitor_phone = phoneMatch[0];
+                // Detect email patterns
+                const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                if (emailMatch) updates.visitor_email = emailMatch[0];
+            }
+            // Detect if an appointment was booked
+            if (msg.role === 'assistant' && msg.content) {
+                const lower = msg.content.toLowerCase();
+                if (lower.includes('appointment') && (lower.includes('booked') || lower.includes('confirmed') || lower.includes('scheduled'))) {
+                    updates.booked_appointment = true;
+                }
+            }
+            await db.collection('conversations').doc(sessionId).update(updates);
+        } catch (err) {
+            // Non-blocking — don't disrupt chat experience
+            console.warn('[PALOMA] Firestore message persist failed:', err);
+        }
+    }
+
     loadHistory() {
         try {
             // Version check — clear stale data from old versions
@@ -610,6 +697,12 @@ class PalomaWidget {
 
             const stored = localStorage.getItem(PALOMA_CONFIG.storageKey);
             this.messages = stored ? JSON.parse(stored) : [];
+
+            // Restore Firestore session if exists
+            try {
+                const savedSession = sessionStorage.getItem('paloma-session-id');
+                if (savedSession) this.sessionId = savedSession;
+            } catch(e) {}
         } catch (e) {
             console.warn('PALOMA: Failed to load history, starting fresh');
             localStorage.removeItem(PALOMA_CONFIG.storageKey);
