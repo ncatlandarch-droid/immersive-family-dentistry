@@ -96,6 +96,75 @@
     catch (_) {}
   }
 
+  // ── Remote Config Loader ─────────────────────────────────────────────
+  function loadConfig(callback) {
+    if (!PRACTICE) {
+      callback(null);
+      return;
+    }
+
+    var apiBase = (scriptTag.src || '').replace(/\/embed\/paloma-embed\.js.*$/, '');
+    var configUrl = apiBase + '/.netlify/functions/widget-config?practice=' + encodeURIComponent(PRACTICE);
+
+    // Check localStorage cache first (5 min TTL)
+    var cacheKey = 'paloma_config_' + PRACTICE;
+    var cached;
+    try { cached = localStorage.getItem(cacheKey); } catch (e) {}
+    if (cached) {
+      try {
+        var parsed = JSON.parse(cached);
+        if (parsed._ts && (Date.now() - parsed._ts) < 300000) {
+          delete parsed._ts;
+          callback(parsed);
+          return;
+        }
+      } catch (e) {}
+    }
+
+    fetch(configUrl)
+      .then(function (r) { return r.json(); })
+      .then(function (config) {
+        config._ts = Date.now();
+        try { localStorage.setItem(cacheKey, JSON.stringify(config)); } catch (e) {}
+        delete config._ts;
+        callback(config);
+      })
+      .catch(function () { callback(null); });
+  }
+
+  // ── Apply Remote Config ──────────────────────────────────────────────
+  function applyConfig(config) {
+    if (!config) return;
+
+    // Override greeting text
+    if (config.greeting_en) i18n.en.greeting = config.greeting_en;
+    if (config.greeting_es) i18n.es.greeting = config.greeting_es;
+
+    // Override assistant name in UI strings
+    if (config.name) {
+      var name = config.name;
+      i18n.en.placeholder = 'Ask ' + name + ' anything...';
+      i18n.es.placeholder = 'Pregunta a ' + name + '...';
+      i18n.en.openLbl = 'Open ' + name + ' chat';
+      i18n.es.openLbl = 'Abrir chat de ' + name;
+    }
+
+    // If practice_name is provided, ensure greetings reference it
+    if (config.practice_name) {
+      var pn = config.practice_name;
+      if (!config.greeting_en && i18n.en.greeting.indexOf('Brenes Precision Dentistry') !== -1) {
+        i18n.en.greeting = i18n.en.greeting.replace('Brenes Precision Dentistry', pn);
+      }
+      if (!config.greeting_es && i18n.es.greeting.indexOf('Brenes Precision Dentistry') !== -1) {
+        i18n.es.greeting = i18n.es.greeting.replace('Brenes Precision Dentistry', pn);
+      }
+    }
+
+    // Custom suggestion chips
+    if (config.chips_en && Array.isArray(config.chips_en)) i18n.en.chips = config.chips_en;
+    if (config.chips_es && Array.isArray(config.chips_es)) i18n.es.chips = config.chips_es;
+  }
+
   // ── Inject CSS ────────────────────────────────────────────────────────────
   function injectStyles() {
     var style = document.createElement('style');
@@ -704,11 +773,14 @@
   // ── Initialize ────────────────────────────────────────────────────────
   function init() {
     injectStyles();
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', buildWidget);
-    } else {
-      buildWidget();
-    }
+    loadConfig(function (config) {
+      applyConfig(config);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', buildWidget);
+      } else {
+        buildWidget();
+      }
+    });
   }
 
   init();
