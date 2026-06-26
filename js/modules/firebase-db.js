@@ -532,3 +532,182 @@ function getCurrentUser() {
     return auth ? auth.currentUser : null;
 }
 
+// ═══════════════════════════════════════════════════════════
+//  CONVERSATION MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+
+async function saveConversation(sessionData) {
+  try {
+    const db = firebase.firestore();
+    const docRef = sessionData.session_id 
+      ? db.collection('conversations').doc(sessionData.session_id)
+      : db.collection('conversations').doc();
+    
+    const data = {
+      ...sessionData,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (!sessionData.session_id) {
+      data.created_at = firebase.firestore.FieldValue.serverTimestamp();
+    }
+    await docRef.set(data, { merge: true });
+    return docRef.id;
+  } catch (err) {
+    console.error('Error saving conversation:', err);
+    throw err;
+  }
+}
+
+async function addMessage(sessionId, messageData) {
+  try {
+    const db = firebase.firestore();
+    const msgRef = db.collection('conversations').doc(sessionId)
+      .collection('messages').doc();
+    await msgRef.set({
+      ...messageData,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Update message count on parent
+    await db.collection('conversations').doc(sessionId).update({
+      message_count: firebase.firestore.FieldValue.increment(1),
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return msgRef.id;
+  } catch (err) {
+    console.error('Error adding message:', err);
+    throw err;
+  }
+}
+
+async function getConversations(filters = {}) {
+  try {
+    const db = firebase.firestore();
+    let query = db.collection('conversations').orderBy('created_at', 'desc');
+    
+    if (filters.status) query = query.where('status', '==', filters.status);
+    if (filters.source) query = query.where('source', '==', filters.source);
+    if (filters.language) query = query.where('language', '==', filters.language);
+    if (filters.limit) query = query.limit(filters.limit);
+    else query = query.limit(50);
+    
+    const snapshot = await query.get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error('Error getting conversations:', err);
+    return [];
+  }
+}
+
+async function getConversationMessages(sessionId) {
+  try {
+    const db = firebase.firestore();
+    const snapshot = await db.collection('conversations').doc(sessionId)
+      .collection('messages').orderBy('timestamp', 'asc').get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error('Error getting messages:', err);
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PATIENT MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+
+async function savePatient(patientData) {
+  try {
+    const db = firebase.firestore();
+    const docRef = patientData.patient_id
+      ? db.collection('patients').doc(patientData.patient_id)
+      : db.collection('patients').doc();
+    
+    const data = { ...patientData, updated_at: firebase.firestore.FieldValue.serverTimestamp() };
+    if (!patientData.patient_id) {
+      data.created_at = firebase.firestore.FieldValue.serverTimestamp();
+      data.status = data.status || 'potential';
+    }
+    delete data.patient_id; // Don't store ID inside doc
+    await docRef.set(data, { merge: true });
+    return docRef.id;
+  } catch (err) {
+    console.error('Error saving patient:', err);
+    throw err;
+  }
+}
+
+async function getPatients(filters = {}) {
+  try {
+    const db = firebase.firestore();
+    let query = db.collection('patients');
+    
+    if (filters.status && filters.status !== 'all') {
+      query = query.where('status', '==', filters.status);
+    }
+    query = query.orderBy('updated_at', 'desc');
+    if (filters.limit) query = query.limit(filters.limit);
+    else query = query.limit(100);
+    
+    const snapshot = await query.get();
+    return snapshot.docs.map(doc => ({ patient_id: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error('Error getting patients:', err);
+    return [];
+  }
+}
+
+async function getPatient(patientId) {
+  try {
+    const db = firebase.firestore();
+    const doc = await db.collection('patients').doc(patientId).get();
+    if (!doc.exists) return null;
+    return { patient_id: doc.id, ...doc.data() };
+  } catch (err) {
+    console.error('Error getting patient:', err);
+    return null;
+  }
+}
+
+async function linkConversationToPatient(sessionId, patientId) {
+  try {
+    const db = firebase.firestore();
+    const batch = db.batch();
+    batch.update(db.collection('conversations').doc(sessionId), { patient_id: patientId });
+    batch.update(db.collection('patients').doc(patientId), {
+      last_conversation_id: sessionId,
+      conversation_count: firebase.firestore.FieldValue.increment(1),
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error('Error linking conversation to patient:', err);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  KPI BENCHMARKS
+// ═══════════════════════════════════════════════════════════
+
+async function saveBenchmarks(specialty, data) {
+  try {
+    const db = firebase.firestore();
+    await db.collection('kpi_benchmarks').doc(specialty).set({
+      ...data,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (err) {
+    console.error('Error saving benchmarks:', err);
+  }
+}
+
+async function getBenchmarks(specialty) {
+  try {
+    const db = firebase.firestore();
+    const doc = await db.collection('kpi_benchmarks').doc(specialty).get();
+    if (!doc.exists) return null;
+    return doc.data();
+  } catch (err) {
+    console.error('Error getting benchmarks:', err);
+    return null;
+  }
+}
+

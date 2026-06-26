@@ -20,6 +20,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
+    <!-- Module Styles -->
+    <link rel="stylesheet" href="modules.css">
+
     <style>
     /* ═══════════════════════════════════════════════════════════
        Admin Dashboard — Dark Glassmorphism Theme
@@ -1681,6 +1684,22 @@
             <div id="view-overview" class="view">
                 <div class="kpi-row" id="overview-top-kpis"></div>
                 <div class="kpi-row" id="kpi-row"></div>
+                <!-- Specialty KPI Benchmarks -->
+                <div style="margin-top:24px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                        <h3 style="margin:0;display:flex;align-items:center;gap:8px"><i data-lucide="target" style="width:18px;height:18px"></i> Practice KPI Benchmarks <span id="kpi-specialty-label" style="font-size:0.8rem;color:#2dd4bf;font-weight:400">General Dentistry</span></h3>
+                        <select id="practice-specialty" style="padding:6px 12px;border-radius:8px;border:1px solid var(--admin-border,#2a2a3a);background:var(--admin-card-bg,#1e1e2e);color:var(--admin-text,#e0e0e0);font-size:0.85rem">
+                            <option value="general">General Dentistry</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="oral-surgery">Oral Surgery</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div id="kpi-scorecard-grid" class="kpi-scorecard-grid"></div>
+                </div>
                 <div class="charts-row">
                     <div class="chart-card">
                         <h3>Monthly Production</h3>
@@ -1735,24 +1754,81 @@
             <!-- View: Patients -->
             <div id="view-patients" class="view">
                 <div class="view-header">
-                    <h2>👥 Patient Roster</h2>
-                    <input type="search" id="patient-search" class="view-search" placeholder="Search patients..." oninput="filterPatients(this.value)" />
+                    <h2><i data-lucide="users" style="width:22px;height:22px"></i> Patient Profiles</h2>
+                    <button id="btn-add-patient" class="btn btn-primary" style="display:flex;align-items:center;gap:6px">
+                        <i data-lucide="user-plus" style="width:16px;height:16px"></i> Add Patient
+                    </button>
                 </div>
-                <div id="patients-content">
-                    <div class="spinner-overlay">
-                        <div class="spinner"></div>
-                        <span class="spinner-text">Loading patients…</span>
+                <div class="split-panel">
+                    <div class="split-panel-left">
+                        <div class="filter-tabs">
+                            <button class="patient-filter-tab active" data-filter="all">All</button>
+                            <button class="patient-filter-tab" data-filter="active">Active</button>
+                            <button class="patient-filter-tab" data-filter="potential">Potential</button>
+                            <button class="patient-filter-tab" data-filter="inactive">Inactive</button>
+                        </div>
+                        <div id="patient-stats-bar" class="patient-stats-bar"></div>
+                        <div class="panel-search">
+                            <input type="search" id="patient-search-input" placeholder="Search patients..." />
+                        </div>
+                        <div id="patient-list-container" style="overflow-y:auto;flex:1">
+                            <div class="empty-state">
+                                <i data-lucide="users" style="width:48px;height:48px;color:#888"></i>
+                                <p style="margin-top:12px;color:#888">Loading patients...</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="info-note">
-                    💡 Patient roster is built from appointment data in Firestore. Connect to Dentrix PMS for live patient record sync.
+                    <div class="split-panel-right">
+                        <div id="patient-detail-panel">
+                            <div class="empty-state">
+                                <i data-lucide="user" style="width:48px;height:48px;color:#888"></i>
+                                <p style="margin-top:12px;color:#888">Select a patient to view details</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- View: PALOMA Analytics -->
             <div id="view-paloma-analytics" class="view">
+                <!-- Chat History Section -->
                 <div class="view-header">
-                    <h2>🕊️ PALOMA Analytics</h2>
+                    <h2><i data-lucide="message-circle" style="width:22px;height:22px"></i> PALOMA Conversations</h2>
+                    <span style="position:relative">
+                        <span id="paloma-notification-badge" class="notification-badge">0</span>
+                    </span>
+                </div>
+                <div class="split-panel" style="height:500px;margin-bottom:32px">
+                    <div class="split-panel-left">
+                        <div class="filter-tabs">
+                            <button class="chat-filter-tab active" data-filter="all">All</button>
+                            <button class="chat-filter-tab" data-filter="active">Active</button>
+                            <button class="chat-filter-tab" data-filter="booked">Booked</button>
+                            <button class="chat-filter-tab" data-filter="ended">Ended</button>
+                        </div>
+                        <div class="panel-search">
+                            <input type="search" id="conversation-search" placeholder="Search conversations..." />
+                        </div>
+                        <div id="conversation-list" style="overflow-y:auto;flex:1">
+                            <div class="empty-state">
+                                <i data-lucide="message-square" style="width:48px;height:48px;color:#888"></i>
+                                <p style="margin-top:12px;color:#888">Loading conversations...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="split-panel-right">
+                        <div id="conversation-detail">
+                            <div class="empty-state">
+                                <i data-lucide="message-circle" style="width:48px;height:48px;color:#888"></i>
+                                <p style="margin-top:12px;color:#888">Select a conversation to view messages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="view-header">
+                    <h2><i data-lucide="bar-chart-2" style="width:22px;height:22px"></i> PALOMA Analytics</h2>
                 </div>
                 <div class="kpi-row" id="paloma-kpis"></div>
                 <div class="charts-row">
@@ -1766,7 +1842,7 @@
                     </div>
                 </div>
                 <div class="info-note">
-                    💡 Analytics based on PALOMA conversations since launch. 38% of all sessions are conducted in Spanish, reflecting our bilingual community outreach.
+                    <i data-lucide="info" style="width:14px;height:14px"></i> Analytics based on PALOMA conversations since launch. 38% of all sessions are conducted in Spanish, reflecting our bilingual community outreach.
                 </div>
 
                 <!-- ═══ Site Analytics ═══ -->
@@ -5947,6 +6023,65 @@
 
     // Re-initialize Lucide icons (catches any dynamically added icons)
     try { lucide.createIcons(); } catch(e) { console.error('Lucide final init error:', e); }
+    </script>
+    <!-- Admin Modules -->
+    <script src="js/chat-history.js"></script>
+    <script src="js/patient-profiles.js"></script>
+    <script src="js/kpi-dashboard.js"></script>
+    <script>
+    // ═══ Module Initialization Hooks ═══
+    // Lazy-initialize each module when its view is first displayed
+    (function() {
+        const moduleState = {
+            chatHistoryInit: false,
+            patientProfilesInit: false,
+            kpiDashboardInit: false
+        };
+
+        // Hook into sidebar navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const view = item.dataset.view;
+                setTimeout(() => {
+                    // Initialize Chat History when PALOMA Analytics view opens
+                    if (view === 'paloma-analytics' && !moduleState.chatHistoryInit) {
+                        if (typeof ChatHistory !== 'undefined') {
+                            ChatHistory.init();
+                            moduleState.chatHistoryInit = true;
+                            console.log('[Modules] ChatHistory initialized');
+                        }
+                    }
+                    // Initialize Patient Profiles when Patients view opens
+                    if (view === 'patients' && !moduleState.patientProfilesInit) {
+                        if (typeof PatientProfiles !== 'undefined') {
+                            PatientProfiles.init();
+                            moduleState.patientProfilesInit = true;
+                            console.log('[Modules] PatientProfiles initialized');
+                        }
+                    }
+                    // Initialize KPI Dashboard when Overview/Scorecards view opens
+                    if ((view === 'overview' || view === 'scorecards') && !moduleState.kpiDashboardInit) {
+                        if (typeof KPIDashboard !== 'undefined') {
+                            KPIDashboard.init();
+                            moduleState.kpiDashboardInit = true;
+                            console.log('[Modules] KPIDashboard initialized');
+                        }
+                    }
+                }, 200);
+            });
+        });
+
+        // Update notification badge on load (non-blocking)
+        setTimeout(() => {
+            if (typeof ChatHistory !== 'undefined') {
+                ChatHistory.loadConversations().then(() => {
+                    ChatHistory.updateNotificationBadge();
+                }).catch(() => {});
+            }
+        }, 2000);
+
+        console.log('[Modules] Chat History, Patient Profiles, KPI Dashboard loaded');
+    })();
     </script>
 </body>
 </html>

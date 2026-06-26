@@ -1,0 +1,93 @@
+{
+  "general": {
+    "label": "General Dentistry",
+    "metrics": {
+      "monthly_production": { "target": 75000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "Total production per provider per month" },
+      "collection_rate": { "target": 98, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Percentage of production actually collected" },
+      "new_patients_monthly": { "target": 25, "unit": "patients", "label": "New Patients/Month", "source": "Bulletproof Dental", "description": "New patient appointments per month" },
+      "case_acceptance": { "target": 85, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Percentage of presented treatment that patients accept" },
+      "overhead_rate": { "target": 60, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Operating expenses as percentage of collections" },
+      "hygiene_production_ratio": { "target": 33, "unit": "%", "label": "Hygiene Production", "source": "Dental Economics", "description": "Hygiene production as percentage of total production" },
+      "recall_rate": { "target": 85, "unit": "%", "label": "Recall Rate", "source": "Dental Intelligence", "description": "Percentage of patients returning for scheduled hygiene" },
+      "production_per_visit": { "target": 450, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Average production per patient visit" }
+    }
+  },
+  "prosthodontics": {
+    "label": "Prosthodontics",
+    "metrics": {
+      "monthly_production": { "target": 120000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "Higher due to complex restorative cases" },
+      "collection_rate": { "target": 96, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Slightly lower due to larger out-of-pocket cases" },
+      "new_patients_monthly": { "target": 15, "unit": "patients", "label": "New Patients/Month", "source": "Dental Economics", "description": "Fewer but higher-value referral patients" },
+      "case_acceptance": { "target": 75, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Lower due to higher treatment costs" },
+      "overhead_rate": { "target": 55, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Lab costs offset by higher production" },
+      "lab_cost_ratio": { "target": 12, "unit": "%", "label": "Lab Cost Ratio", "source": "Dental Economics", "description": "Lab fees as percentage of production" },
+      "full_arch_cases_monthly": { "target": 3, "unit": "cases", "label": "Full Arch Cases/Month", "source": "Bulletproof Dental", "description": "All-on-X and full mouth rehabilitation cases" },
+      "production_per_visit": { "target": 1200, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Significantly higher due to complex procedures" }
+    }
+  },
+  "periodontics": {
+    "label": "Periodontics",
+    "metrics": {
+      "monthly_production": { "target": 95000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "Surgical and implant placement procedures" },
+      "collection_rate": { "target": 97, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Mix of insurance and fee-for-service" },
+      "new_patients_monthly": { "target": 20, "unit": "patients", "label": "New Patients/Month", "source": "Dental Economics", "description": "Primarily referral-based" },
+      "case_acceptance": { "target": 80, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Treatment often perceived as optional" },
+      "overhead_rate": { "target": 58, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Moderate surgical supply costs" },
+      "implant_cases_monthly": { "target": 8, "unit": "cases", "label": "Implant Cases/Month", "source": "Bulletproof Dental", "description": "Implant placement procedures" },
+      "recall_rate": { "target": 90, "unit": "%", "label": "Recall Rate", "source": "Dental Intelligence", "description": "Perio maintenance compliance" },
+      "production_per_visit": { "target": 750, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Higher due to surgical procedures" }
+    }
+  },
+  "endodontics": {
+    "label": "Endodontics",
+    "metrics": {
+      "monthly_production": { "target": 100000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "High-volume root canal procedures" },
+      "collection_rate": { "target": 98, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Most procedures insurance-covered" },
+      "new_patients_monthly": { "target": 40, "unit": "patients", "label": "New Patients/Month", "source": "Dental Economics", "description": "High referral volume, emergency-driven" },
+      "case_acceptance": { "target": 95, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Pain-driven — patients accept quickly" },
+      "overhead_rate": { "target": 52, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Low material costs, high throughput" },
+      "cases_per_day": { "target": 5, "unit": "cases", "label": "Cases/Day", "source": "Bulletproof Dental", "description": "Root canal treatments per day" },
+      "retreatment_rate": { "target": 8, "unit": "%", "label": "Retreatment Rate", "source": "Dental Economics", "description": "Previously treated teeth requiring re-treatment" },
+      "production_per_visit": { "target": 850, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Per root canal procedure" }
+    }
+  },
+  "oral-surgery": {
+    "label": "Oral Surgery",
+    "metrics": {
+      "monthly_production": { "target": 150000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "High-value surgical procedures" },
+      "collection_rate": { "target": 95, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Mix of medical and dental insurance" },
+      "new_patients_monthly": { "target": 35, "unit": "patients", "label": "New Patients/Month", "source": "Dental Economics", "description": "Referral and emergency driven" },
+      "case_acceptance": { "target": 90, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Often medically necessary procedures" },
+      "overhead_rate": { "target": 62, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Higher due to anesthesia and OR costs" },
+      "extractions_per_day": { "target": 8, "unit": "cases", "label": "Extractions/Day", "source": "Bulletproof Dental", "description": "Surgical and simple extractions" },
+      "implant_cases_monthly": { "target": 12, "unit": "cases", "label": "Implant Cases/Month", "source": "Dental Economics", "description": "Implant placement procedures" },
+      "production_per_visit": { "target": 950, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Average surgical procedure value" }
+    }
+  },
+  "orthodontics": {
+    "label": "Orthodontics",
+    "metrics": {
+      "monthly_production": { "target": 85000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "Case starts and monthly adjustments" },
+      "collection_rate": { "target": 99, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Pre-paid or contracted payment plans" },
+      "new_starts_monthly": { "target": 15, "unit": "cases", "label": "New Starts/Month", "source": "Dental Economics", "description": "New orthodontic case starts" },
+      "case_acceptance": { "target": 80, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Elective treatment, price-sensitive" },
+      "overhead_rate": { "target": 55, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Low material costs per visit" },
+      "average_case_fee": { "target": 5500, "unit": "$", "label": "Average Case Fee", "source": "Bulletproof Dental", "description": "Average full treatment fee" },
+      "clear_aligner_ratio": { "target": 40, "unit": "%", "label": "Clear Aligner Ratio", "source": "Dental Economics", "description": "Percentage of cases using clear aligners" },
+      "production_per_visit": { "target": 250, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Lower per visit but predictable" }
+    }
+  },
+  "pediatric": {
+    "label": "Pediatric Dentistry",
+    "metrics": {
+      "monthly_production": { "target": 65000, "unit": "$", "label": "Monthly Production", "source": "Dental Economics", "description": "High volume, lower per-procedure value" },
+      "collection_rate": { "target": 97, "unit": "%", "label": "Collection Rate", "source": "Dental Intelligence", "description": "Mostly insurance-covered preventive care" },
+      "new_patients_monthly": { "target": 40, "unit": "patients", "label": "New Patients/Month", "source": "Dental Economics", "description": "Family referrals and school programs" },
+      "case_acceptance": { "target": 90, "unit": "%", "label": "Case Acceptance", "source": "Dental Economics", "description": "Parents generally accept recommended treatment" },
+      "overhead_rate": { "target": 65, "unit": "%", "label": "Overhead Rate", "source": "Dental Intelligence", "description": "Higher staffing needs, shorter appointments" },
+      "patients_per_day": { "target": 25, "unit": "patients", "label": "Patients/Day", "source": "Bulletproof Dental", "description": "High patient volume per day" },
+      "sealant_rate": { "target": 75, "unit": "%", "label": "Sealant Rate", "source": "Dental Economics", "description": "Percentage of eligible teeth sealed" },
+      "production_per_visit": { "target": 200, "unit": "$", "label": "Production/Visit", "source": "Bulletproof Dental", "description": "Lower due to preventive focus" }
+    }
+  }
+}
