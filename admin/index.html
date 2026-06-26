@@ -1701,6 +1701,69 @@
                         <span class="spinner-text">Loading settings…</span>
                     </div>
                 </div>
+
+                <!-- ═══ Chat Avatar Customizer ═══ -->
+                <div class="glass-card" style="padding:24px;margin-top:20px;">
+                    <h3 style="font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="user-circle" style="width:20px;height:20px;color:var(--admin-teal)"></i>
+                        Chat Avatar
+                    </h3>
+                    <p style="font-size:0.85rem;color:var(--admin-muted);margin-bottom:16px;">Customize how PALOMA appears in the chat widget. Choose the default dove icon or create a custom avatar.</p>
+                    
+                    <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start;">
+                        <!-- Avatar Preview -->
+                        <div style="text-align:center;">
+                            <div id="avatar-preview" style="width:120px;height:120px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;border:3px solid rgba(45,212,191,0.3);box-shadow:0 8px 32px rgba(45,212,191,0.2);overflow:hidden;">
+                                <img id="avatar-preview-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="Avatar">
+                                <span id="avatar-preview-icon" style="font-size:48px;">🕊️</span>
+                            </div>
+                            <span style="font-size:0.8rem;color:var(--admin-muted);">Widget Preview</span>
+                        </div>
+                        
+                        <!-- Avatar Options -->
+                        <div>
+                            <div style="margin-bottom:16px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Avatar Style</label>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                    <button type="button" class="insurance-chip active" data-avatar="dove" onclick="selectAvatarStyle('dove', this)">🕊️ Paloma Dove</button>
+                                    <button type="button" class="insurance-chip" data-avatar="tooth" onclick="selectAvatarStyle('tooth', this)">🦷 Tooth</button>
+                                    <button type="button" class="insurance-chip" data-avatar="doctor" onclick="selectAvatarStyle('doctor', this)">👨‍⚕️ Doctor</button>
+                                    <button type="button" class="insurance-chip" data-avatar="assistant" onclick="selectAvatarStyle('assistant', this)">👩‍⚕️ Assistant</button>
+                                    <button type="button" class="insurance-chip" data-avatar="custom" onclick="selectAvatarStyle('custom', this)">📸 Custom Photo</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Custom upload (hidden by default) -->
+                            <div id="avatar-custom-upload" style="display:none;margin-bottom:16px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Upload Custom Avatar</label>
+                                <input type="file" id="avatar-file-input" accept="image/*" onchange="previewCustomAvatar(this)" style="font-size:0.85rem;color:var(--admin-text);">
+                                <p style="font-size:0.7rem;color:var(--admin-muted);margin-top:4px;">Recommended: Square image, 200×200px minimum</p>
+                            </div>
+                            
+                            <div style="margin-bottom:16px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Avatar Name</label>
+                                <input type="text" id="avatar-name" class="auth-input" value="Paloma" placeholder="e.g., Paloma, Dr. B's Assistant" style="max-width:300px;">
+                            </div>
+                            
+                            <div style="margin-bottom:16px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Greeting Message</label>
+                                <input type="text" id="avatar-greeting" class="auth-input" value="Hi! I'm Paloma, your dental care assistant. How can I help you today?" placeholder="Enter greeting..." style="max-width:500px;">
+                            </div>
+                            
+                            <div style="margin-bottom:16px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Personality</label>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                    <button type="button" class="insurance-chip active" data-personality="friendly" onclick="selectPersonality('friendly', this)">😊 Friendly & Warm</button>
+                                    <button type="button" class="insurance-chip" data-personality="professional" onclick="selectPersonality('professional', this)">👔 Professional</button>
+                                    <button type="button" class="insurance-chip" data-personality="casual" onclick="selectPersonality('casual', this)">🤙 Casual & Fun</button>
+                                    <button type="button" class="insurance-chip" data-personality="bilingual" onclick="selectPersonality('bilingual', this)">🌎 Bilingual EN/ES</button>
+                                </div>
+                            </div>
+                            
+                            <button type="button" onclick="saveAvatarSettings()" style="padding:10px 24px;border-radius:8px;border:none;background:var(--admin-teal,#2dd4bf);color:#000;font-weight:600;cursor:pointer;font-size:0.9rem;">💾 Save Avatar Settings</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- ═══ View: Overview ═══ -->
@@ -6201,6 +6264,73 @@
         if (document.getElementById('wiz-inhouse')?.checked) options.push('In-House Payment Plans');
         if (document.getElementById('wiz-membership')?.checked) options.push('Membership/Discount Plan');
         return options;
+    }
+
+    // ─── Avatar Customizer Functions ───
+    const avatarEmojis = { dove: '🕊️', tooth: '🦷', doctor: '👨‍⚕️', assistant: '👩‍⚕️', custom: '📸' };
+    
+    function selectAvatarStyle(style, btn) {
+        // Toggle chips
+        document.querySelectorAll('[data-avatar]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Show/hide custom upload
+        const upload = document.getElementById('avatar-custom-upload');
+        if (upload) upload.style.display = style === 'custom' ? 'block' : 'none';
+        
+        // Update preview
+        const previewIcon = document.getElementById('avatar-preview-icon');
+        const previewImg = document.getElementById('avatar-preview-img');
+        if (style !== 'custom') {
+            if (previewIcon) { previewIcon.textContent = avatarEmojis[style]; previewIcon.style.display = ''; }
+            if (previewImg) previewImg.style.display = 'none';
+        }
+    }
+    
+    function selectPersonality(personality, btn) {
+        document.querySelectorAll('[data-personality]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    
+    function previewCustomAvatar(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('avatar-preview-img');
+                const previewIcon = document.getElementById('avatar-preview-icon');
+                if (previewImg) { previewImg.src = e.target.result; previewImg.style.display = 'block'; }
+                if (previewIcon) previewIcon.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    async function saveAvatarSettings() {
+        try {
+            const db = firebase.firestore();
+            const activeStyle = document.querySelector('[data-avatar].active');
+            const activePersonality = document.querySelector('[data-personality].active');
+            const settings = {
+                avatar_style: activeStyle ? activeStyle.dataset.avatar : 'dove',
+                avatar_name: document.getElementById('avatar-name')?.value || 'Paloma',
+                avatar_greeting: document.getElementById('avatar-greeting')?.value || '',
+                personality: activePersonality ? activePersonality.dataset.personality : 'friendly',
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await db.collection('practice-config').doc('avatar').set(settings, { merge: true });
+            
+            // Log for HIPAA audit
+            if (window.HIPAAAudit) HIPAAAudit.log('update_avatar', 'practice-config', 'avatar', JSON.stringify(settings));
+            
+            // Show success
+            const btn = event.target;
+            btn.textContent = '✅ Saved!';
+            btn.style.background = '#22c55e';
+            setTimeout(() => { btn.textContent = '💾 Save Avatar Settings'; btn.style.background = ''; }, 2000);
+        } catch (err) {
+            console.error('Failed to save avatar:', err);
+            alert('Failed to save avatar settings');
+        }
     }
 
     // Re-initialize Lucide icons (catches any dynamically added icons)
