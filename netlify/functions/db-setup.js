@@ -111,7 +111,7 @@ exports.handler = async (event) => {
                 })}::jsonb)
             `;
 
-            // Treatment Pricing
+            // Fee Schedule
             await sql`
                 INSERT INTO practice_settings (key, value) VALUES ('pricing', ${JSON.stringify([
                     { name: "New Patient Exam + X-rays", price: 199, category: "General" },

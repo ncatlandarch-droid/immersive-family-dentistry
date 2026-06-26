@@ -126,17 +126,32 @@ function initFAQ() {
 /* --- Counter Animations --- */
 function initCounterAnimations() {
   const statValues = document.querySelectorAll('.stat-value[data-target]');
-  
-  const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        counterObserver.unobserve(entry.target);
+
+  // Delay observation to ensure elements are fully rendered (fixes hero section visibility)
+  setTimeout(() => {
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    statValues.forEach(el => counterObserver.observe(el));
+  }, 500);
+
+  // Fallback: if counters still show '0' after 3 seconds, force-animate them
+  setTimeout(() => {
+    statValues.forEach(el => {
+      const target = parseFloat(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      const current = el.textContent.replace(suffix, '');
+      if (current === '0' || current === '0.0') {
+        animateCounter(el);
       }
     });
-  }, { threshold: 0.1 });
-
-  statValues.forEach(el => counterObserver.observe(el));
+  }, 3000);
 }
 
 function animateCounter(element) {

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PALOMA — Founders Meeting | June 25, 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal: #14B8A6;
+      --teal-dark: #0D9488;
+      --gold: #F59E0B;
+      --bg: #0B1120;
+      --card: #111827;
+      --card-border: rgba(20, 184, 166, 0.15);
+      --text: #E2E8F0;
+      --muted: #64748B;
+      --white: #F8FAFC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Slide System ── */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
+      border-bottom: 1px solid rgba(20, 184, 166, 0.1);
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(20,184,166,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Title Slide ── */
+    .title-slide {
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .title-slide .dove {
+      font-size: 80px;
+      margin-bottom: 16px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .title-slide h1 {
+      font-size: 64px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--teal), #5EEAD4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -2px;
+      margin-bottom: 8px;
+    }
+
+    .title-slide .subtitle {
+      font-size: 24px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .title-slide .meta {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .title-slide .meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .title-slide .meta .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(20,184,166,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(20,184,166,0); }
+    }
+
+    /* ── Section Headers ── */
+    .slide h2 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .slide h2 .accent { color: var(--teal); }
+
+    .slide .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* ── Cards Grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(20, 184, 166, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(20, 184, 166, 0.1);
+    }
+
+    .card .card-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status.done {
+      background: rgba(20, 184, 166, 0.15);
+      color: #5EEAD4;
+    }
+
+    .status.progress {
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+    }
+
+    .status.todo {
+      background: rgba(99, 102, 241, 0.15);
+      color: #A5B4FC;
+    }
+
+    .status.critical {
+      background: rgba(239, 68, 68, 0.15);
+      color: #FCA5A5;
+    }
+
+    /* ── Stats Row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-card .stat-num {
+      font-size: 42px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--teal), #5EEAD4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Timeline ── */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--teal), rgba(20,184,166,0.1));
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+      padding: 20px 28px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px; top: 28px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--teal);
+      border: 2px solid var(--bg);
+    }
+
+    .timeline-item h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--teal);
+      margin-bottom: 4px;
+    }
+
+    .timeline-item p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Checklist ── */
+    .checklist {
+      list-style: none;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 15px;
+    }
+
+    .checklist .check {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .check.done { background: rgba(20,184,166,0.2); color: #5EEAD4; }
+    .check.todo { background: rgba(99,102,241,0.2); color: #A5B4FC; }
+    .check.urgent { background: rgba(239,68,68,0.2); color: #FCA5A5; }
+
+    .checklist .item-title { font-weight: 500; color: var(--white); }
+    .checklist .item-sub { font-size: 13px; color: var(--muted); }
+
+    /* ── Two Column ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .col h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--teal);
+    }
+
+    /* ── Slide Number ── */
+    .slide-num {
+      position: absolute;
+      bottom: 24px;
+      right: 40px;
+      font-size: 13px;
+      color: rgba(100, 116, 139, 0.4);
+      font-weight: 500;
+    }
+
+    .brand-footer {
+      position: absolute;
+      bottom: 24px;
+      left: 40px;
+      font-size: 13px;
+      color: rgba(100, 116, 139, 0.3);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── CTA Slide ── */
+    .cta-slide {
+      text-align: center;
+      align-items: center;
+    }
+
+    .cta-slide h2 {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .action-items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 700px;
+      margin: 32px auto 0;
+      text-align: left;
+    }
+
+    .action-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .action-item .who {
+      color: var(--teal);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 40px; }
+      body { background: #fff; color: #1a1a1a; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SLIDE 1: Title ═══ -->
+<div class="slide title-slide">
+  <div class="dove">🕊️</div>
+  <h1>PALOMA</h1>
+  <div class="subtitle">Founders Meeting — Sprint Progress & Roadmap</div>
+  <div class="meta">
+    <span><span class="dot"></span> Live Platform</span>
+    <span>📅 June 25, 2026</span>
+    <span>👥 Dr. Christian Brenes & Chris Harrison</span>
+  </div>
+  <div class="slide-num">1</div>
+</div>
+
+<!-- ═══ SLIDE 2: Platform Status ═══ -->
+<div class="slide">
+  <h2>Platform <span class="accent">Status</span></h2>
+  <div class="section-sub">What's live right now at ljfamilydentist-paloma.netlify.app</div>
+  
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">192</div>
+      <div class="stat-label">Total Pageviews (30 days)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">64</div>
+      <div class="stat-label">Unique Visitors</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Portal Sections Live</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Languages (EN/ES)</div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Public Website</h3>
+      <p>Full responsive site with MouthMap 3D, PALOMA chatbot, learning center, and bilingual support.</p>
+      <div class="status done">✓ Deployed</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>Admin Dashboard</h3>
+      <p>Firebase auth, role-based access (Admin/Manager/Staff), 11 sidebar views, PALOMA clinical assistant.</p>
+      <div class="status done">✓ Live</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Site Analytics</h3>
+      <p>Firestore-powered visitor tracking with Chart.js dashboard merged with Netlify Analytics baseline.</p>
+      <div class="status done">✓ Tracking</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎙️</div>
+      <h3>PALOMA Voice</h3>
+      <p>Neural TTS voice engine with bilingual speech. PALOMA speaks answers aloud in EN and ES.</p>
+      <div class="status done">✓ Active</div>
+    </div>
+  </div>
+  <div class="brand-footer">🕊️ PALOMA Health Technologies</div>
+  <div class="slide-num">2</div>
+</div>
+
+<!-- ═══ SLIDE 3: Christian's Feedback Progress ═══ -->
+<div class="slide">
+  <h2>Christian's <span class="accent">Feedback</span> — Progress</h2>
+  <div class="section-sub">42 features across 4 priority tiers — here's where we stand</div>
+
+  <div class="two-col">
+    <div class="col">
+      <h3>✅ Priority 1 — Quick Wins (7 items)</h3>
+      <ul class="checklist">
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Replace emoji icons with SVG (Lucide)</div>
+            <div class="item-sub">Admin sidebar complete. Public site in progress today.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Rename "Treatment Pricing" → "Fee Schedule"</div>
+            <div class="item-sub">All instances updated across codebase.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Fix animated stat counters (showing 0)</div>
+            <div class="item-sub">Added delayed observer + 3s fallback. Fixed today.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Audit PALOMA acronym consistency</div>
+            <div class="item-sub">"Lifecycle" used consistently. No conflicts found.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Remove raw JSON editor from UI</div>
+            <div class="item-sub">Hide behind dev mode toggle.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Remove "hero" from image alt text</div>
+            <div class="item-sub">Audit all img tags.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Move Think! Cooperative content off site</div>
+            <div class="item-sub">Community modal needs scoping decision.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h3>🔧 Priority 1 — Medium Lifts (8 items)</h3>
+      <ul class="checklist">
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Real authentication system</div>
+            <div class="item-sub">Firebase Auth with Admin/Staff/Patient separation.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check done">✓</span>
+          <div>
+            <div class="item-title">Admin SPA redesign (sidebar → pages)</div>
+            <div class="item-sub">11 distinct views with switchView() routing.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Admin website content editor</div>
+            <div class="item-sub">Form-based, section-by-section editing.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">8-step onboarding wizard</div>
+            <div class="item-sub">Currently 5 steps. Expand with AI scanner.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">AI website scanner</div>
+            <div class="item-sub">Crawl URL → extract practice info → pre-fill. Killer feature.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Mobile mic for admin PALOMA chat</div>
+            <div class="item-sub">Voice input for Admin/Manager.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check todo">○</span>
+          <div>
+            <div class="item-title">Design system overhaul</div>
+            <div class="item-sub">Typography, colors, consistency pass.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check urgent">!</span>
+          <div>
+            <div class="item-title">HIPAA-compliant file storage (AWS S3 + BAA)</div>
+            <div class="item-sub">Required before any PHI touches the platform.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="brand-footer">🕊️ PALOMA Health Technologies</div>
+  <div class="slide-num">3</div>
+</div>
+
+<!-- ═══ SLIDE 4: KPI Benchmarks ═══ -->
+<div class="slide">
+  <h2>KPI <span class="accent">Benchmarks</span> — New Feature</h2>
+  <div class="section-sub">Christian's specialty dropdown concept for industry KPI targets</div>
+
+  <div class="cards-grid">
+    <div class="card" style="grid-column: span 2;">
+      <div class="card-icon">📐</div>
+      <h3>Specialty-Aware KPI Dashboard</h3>
+      <p>Settings dropdown selects practice specialty → auto-loads industry benchmark targets. Powered by data from Dental Economics, Dental Intelligence, and Bulletproof Dental Podcast.</p>
+      <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+        <span style="padding: 6px 14px; background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.3); border-radius: 20px; font-size: 13px; color: var(--teal);">General Practice</span>
+        <span style="padding: 6px 14px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 20px; font-size: 13px; color: var(--gold);">Prosthodontics</span>
+        <span style="padding: 6px 14px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; font-size: 13px; color: #A5B4FC;">Periodontics</span>
+        <span style="padding: 6px 14px; background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.3); border-radius: 20px; font-size: 13px; color: #F472B6;">Endodontics</span>
+        <span style="padding: 6px 14px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 20px; font-size: 13px; color: #4ADE80;">Oral Surgery</span>
+        <span style="padding: 6px 14px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); border-radius: 20px; font-size: 13px; color: #C084FC;">Orthodontics</span>
+        <span style="padding: 6px 14px; background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); border-radius: 20px; font-size: 13px; color: #FB923C;">Pediatric Dentistry</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📚</div>
+      <h3>Data Sources</h3>
+      <p>Christian recommended three authoritative benchmark sources:</p>
+      <ul style="margin-top: 12px; padding-left: 16px; color: var(--muted); font-size: 14px; line-height: 2;">
+        <li><strong style="color: var(--teal);">Dental Economics</strong> — KPI standards</li>
+        <li><strong style="color: var(--gold);">Dental Intelligence</strong> — Industry benchmarks</li>
+        <li><strong style="color: #A5B4FC;">Bulletproof Dental</strong> — Podcast KPIs</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>KPI Metrics Per Specialty</h3>
+      <p>Each specialty loads different targets for:</p>
+      <ul style="margin-top: 12px; padding-left: 16px; color: var(--muted); font-size: 14px; line-height: 2;">
+        <li>Production per provider</li>
+        <li>Collections percentage</li>
+        <li>New patients per month</li>
+        <li>Case acceptance rate</li>
+        <li>Overhead percentage</li>
+        <li>Hygiene production ratio</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px; padding: 16px 24px; background: rgba(20,184,166,0.06); border: 1px solid rgba(20,184,166,0.15); border-radius: 12px;">
+    <strong style="color: var(--teal);">⚡ Action:</strong> <span style="color: var(--muted);">Christian to send GP benchmark data + specialty-specific variations. Chris to build dropdown in Settings → practice type selector.</span>
+  </div>
+  <div class="brand-footer">🕊️ PALOMA Health Technologies</div>
+  <div class="slide-num">4</div>
+</div>
+
+<!-- ═══ SLIDE 5: Business Formation ═══ -->
+<div class="slide">
+  <h2>Business <span class="accent">Formation</span> & IP</h2>
+  <div class="section-sub">Critical legal and business infrastructure — needed before beta launch</div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <h4>Step 1 — Form Paloma Health Technologies LLC</h4>
+      <p>File LLC in North Carolina. Operating agreement reflecting 55/45 split (Christian/Chris). Registered agent, EIN, business bank account. <strong>Target: July 2026.</strong></p>
+    </div>
+    <div class="timeline-item">
+      <h4>Step 2 — Trademark Applications</h4>
+      <p><strong>PALOMA™</strong> — AI dental assistant brand name (Class 42: SaaS; Class 44: Healthcare).<br>
+      <strong>MouthMap™</strong> — 3D oral visualization technology (Class 9: Software; Class 42: SaaS).<br>
+      USPTO filing ~$250–350 per class per mark. <strong>Target: July–August 2026.</strong></p>
+    </div>
+    <div class="timeline-item">
+      <h4>Step 3 — Provisional Patent Application</h4>
+      <p>AI-powered dental assistant with real-time 3D oral mapping, bilingual patient interaction, and clinical decision support. Provisional patent: $1,500–3,000. <strong>12 months to file full patent.</strong></p>
+    </div>
+    <div class="timeline-item">
+      <h4>Step 4 — HIPAA Compliance Framework</h4>
+      <p>Business Associate Agreement (BAA) with AWS/Firebase. HIPAA-compliant file storage (S3). Privacy policy, consent forms, data handling procedures. <strong>Required before any PHI.</strong></p>
+    </div>
+    <div class="timeline-item">
+      <h4>Step 5 — Domain & Brand Assets</h4>
+      <p>Acquire production domain (palomahealth.com or similar). SSL certificate, professional email (team@palomahealth.com). Brand guidelines document.</p>
+    </div>
+  </div>
+  <div class="brand-footer">🕊️ PALOMA Health Technologies</div>
+  <div class="slide-num">5</div>
+</div>
+
+<!-- ═══ SLIDE 6: Sprint Roadmap ═══ -->
+<div class="slide">
+  <h2>Sprint <span class="accent">Roadmap</span></h2>
+  <div class="section-sub">8-week development sprint aligned with Christian's priority tiers</div>
+
+  <div class="cards-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="card">
+      <h3 style="color: var(--teal);">Weeks 1–2</h3>
+      <p style="font-size: 13px; color: var(--gold); margin-bottom: 8px; font-weight: 600;">Quick Wins + Auth</p>
+      <ul style="padding-left: 16px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+        <li>All 7 quick wins ✓</li>
+        <li>Auth system ✓</li>
+        <li>SPA redesign ✓</li>
+        <li>Site analytics ✓</li>
+      </ul>
+      <div class="status done" style="margin-top: 12px;">✓ Complete</div>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--teal);">Weeks 3–4</h3>
+      <p style="font-size: 13px; color: var(--gold); margin-bottom: 8px; font-weight: 600;">Onboarding + Editor</p>
+      <ul style="padding-left: 16px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+        <li>8-step onboarding wizard</li>
+        <li>AI website scanner</li>
+        <li>Website content editor</li>
+        <li>Design system overhaul</li>
+      </ul>
+      <div class="status progress" style="margin-top: 12px;">→ Next</div>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--teal);">Weeks 5–6</h3>
+      <p style="font-size: 13px; color: var(--gold); margin-bottom: 8px; font-weight: 600;">Conversations + Files</p>
+      <ul style="padding-left: 16px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+        <li>Conversation storage</li>
+        <li>AI chat summaries</li>
+        <li>After-hours email alerts</li>
+        <li>HIPAA file storage</li>
+      </ul>
+      <div class="status todo" style="margin-top: 12px;">○ Planned</div>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--teal);">Weeks 7–8</h3>
+      <p style="font-size: 13px; color: var(--gold); margin-bottom: 8px; font-weight: 600;">KPI + Polish</p>
+      <ul style="padding-left: 16px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+        <li>KPI dashboard + benchmarks</li>
+        <li>Specialty dropdown</li>
+        <li>Embed snippet</li>
+        <li>Beta deploy to LJ</li>
+      </ul>
+      <div class="status todo" style="margin-top: 12px;">○ Planned</div>
+    </div>
+  </div>
+  <div class="brand-footer">🕊️ PALOMA Health Technologies</div>
+  <div class="slide-num">6</div>
+</div>
+
+<!-- ═══ SLIDE 7: Action Items ═══ -->
+<div class="slide cta-slide">
+  <div class="dove" style="font-size: 60px;">🤝</div>
+  <h2>Today's <span class="accent">Action Items</span></h2>
+  <div class="section-sub">Who does what before our next check-in</div>
+
+  <div class="action-items">
+    <div class="action-item">
+      <div>
+        <div class="who">Christian</div>
+        <div>Send GP benchmark data (KPIs, targets, sources)</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Chris</div>
+        <div>Build specialty dropdown in Settings with KPI auto-load</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Christian</div>
+        <div>Send specialty-specific variations (Prostho, Perio, Endo, etc.)</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Chris</div>
+        <div>Complete emoji → SVG icon migration on public site</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Both</div>
+        <div>Decide: LLC filing — which state? NC or Delaware?</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Both</div>
+        <div>Decide: Production domain — palomahealth.com?</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Christian</div>
+        <div>Log into admin & test: brenes@ljfamilydentist.com</div>
+      </div>
+    </div>
+    <div class="action-item">
+      <div>
+        <div class="who">Chris</div>
+        <div>Begin trademark search for PALOMA™ and MouthMap™</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 48px; font-size: 14px; color: var(--muted);">
+    🕊️ Paloma Health Technologies LLC • Chris Harrison (CTO, 45%) & Dr. Christian Brenes (Clinical, 55%)
+  </div>
+  <div class="slide-num">7</div>
+</div>
+
+</body>
+</html>
