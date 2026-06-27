@@ -3996,9 +3996,10 @@
     // ═══════════════════════════════════════════════════════════
 
     function renderOverview() {
-        const data = financialData.monthly;
+        const data = financialData?.monthly;
+        if (!data || !data.length) return;
         const latest = data[data.length - 1];
-        const prev = data[data.length - 2];
+        const prev = data.length > 1 ? data[data.length - 2] : latest;
 
         // Top-level practice KPIs
         const topKpis = [
@@ -4159,7 +4160,8 @@
     // ─── Production Table ───
     function renderProduction() {
         const tbody = document.getElementById('production-tbody');
-        const data = financialData.monthly;
+        const data = financialData?.monthly;
+        if (!tbody || !data) return;
         tbody.innerHTML = data.map(d => `
             <tr>
                 <td><strong style="color:var(--admin-text)">${d.month}</strong></td>
@@ -4181,6 +4183,7 @@
 
     async function loadPatients() {
         const container = document.getElementById('patients-content');
+        if (!container) return;
         container.innerHTML = `<div class="spinner-overlay"><div class="spinner"></div><span class="spinner-text">Loading patients…</span></div>`;
         try {
             const appointments = await listAppointments();
@@ -6362,22 +6365,22 @@
                     // Step 4: Team
                     team: teamMembers,
                     // Step 5: Insurance
-                    insurance: document.getElementById('wiz-insurance')?.value,
-                    financing: document.getElementById('wiz-financing')?.value,
-                    emergency: document.getElementById('wiz-emergency')?.value,
+                    insurance: document.getElementById('wiz-insurance')?.value || '',
+                    financing: document.getElementById('wiz-financing')?.value || '',
+                    emergency: document.getElementById('wiz-emergency')?.value || '',
                     // Step 6: Personality
-                    greeting: document.getElementById('wiz-greeting')?.value,
-                    tone: document.getElementById('wiz-tone')?.value,
-                    lang: document.getElementById('wiz-lang')?.value,
-                    differentiator: document.getElementById('wiz-differentiator')?.value,
-                    voiceStyle: document.getElementById('wiz-voice-style')?.value,
-                    responseLength: document.getElementById('wiz-response-length')?.value,
+                    greeting: document.getElementById('wiz-greeting')?.value || '',
+                    tone: document.getElementById('wiz-tone')?.value || '',
+                    lang: document.getElementById('wiz-lang')?.value || '',
+                    differentiator: document.getElementById('wiz-differentiator')?.value || '',
+                    voiceStyle: document.getElementById('wiz-voice-style')?.value || '',
+                    responseLength: document.getElementById('wiz-response-length')?.value || '',
                     // Step 7: Notifications
-                    afterHoursEmail: document.getElementById('wiz-after-hours-email')?.value,
-                    apptAlerts: document.getElementById('wiz-appt-alerts')?.value,
-                    emergencyAlerts: document.getElementById('wiz-emergency-alerts')?.value,
-                    morningSummary: document.getElementById('wiz-morning-summary')?.checked,
-                    reviewAlerts: document.getElementById('wiz-review-alerts')?.checked,
+                    afterHoursEmail: document.getElementById('wiz-after-hours-email')?.value || '',
+                    apptAlerts: document.getElementById('wiz-appt-alerts')?.value || '',
+                    emergencyAlerts: document.getElementById('wiz-emergency-alerts')?.value || '',
+                    morningSummary: document.getElementById('wiz-morning-summary')?.checked || false,
+                    reviewAlerts: document.getElementById('wiz-review-alerts')?.checked || false,
                     // Metadata
                     savedAt: new Date().toISOString(),
                     savedBy: currentUserEmail || 'admin'
