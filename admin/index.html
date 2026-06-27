@@ -1608,7 +1608,7 @@
                 </button>
             </nav>
             <div class="sidebar-paloma-trigger" id="sidebar-paloma-trigger" title="Ask PALOMA">
-                <img src="/images/paloma/paloma-hero.png" alt="PALOMA" class="sidebar-paloma-avatar" />
+                <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="sidebar-paloma-avatar" style="background:linear-gradient(135deg,#2dd4bf,#0d9488);border-radius:50%;padding:4px;" />
                 <div class="sidebar-paloma-info">
                     <span class="sidebar-paloma-name">PALOMA</span>
                     <span class="sidebar-paloma-status">● Online — Ask me anything</span>
@@ -1702,47 +1702,28 @@
                     </div>
                 </div>
 
-                <!-- ═══ Chat Avatar Customizer ═══ -->
+                <!-- ═══ PALOMA Identity & Personality ═══ -->
                 <div class="glass-card" style="padding:24px;margin-top:20px;">
                     <h3 style="font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                        <i data-lucide="user-circle" style="width:20px;height:20px;color:var(--admin-teal)"></i>
-                        Chat Avatar
+                        <i data-lucide="bot" style="width:20px;height:20px;color:var(--admin-teal)"></i>
+                        PALOMA Identity
                     </h3>
-                    <p style="font-size:0.85rem;color:var(--admin-muted);margin-bottom:16px;">Customize how PALOMA appears in the chat widget. Choose the default dove icon or create a custom avatar.</p>
+                    <p style="font-size:0.85rem;color:var(--admin-muted);margin-bottom:16px;">PALOMA always uses the dove+tooth logo. Customize her name, greeting, and personality below.</p>
                     
                     <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start;">
-                        <!-- Avatar Preview -->
+                        <!-- Logo Preview (fixed, not editable) -->
                         <div style="text-align:center;">
-                            <div id="avatar-preview" style="width:120px;height:120px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;border:3px solid rgba(45,212,191,0.3);box-shadow:0 8px 32px rgba(45,212,191,0.2);overflow:hidden;">
-                                <img id="avatar-preview-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="Avatar">
-                                <span id="avatar-preview-icon" style="font-size:48px;">🕊️</span>
+                            <div style="width:120px;height:120px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;border:3px solid rgba(45,212,191,0.3);box-shadow:0 8px 32px rgba(45,212,191,0.2);overflow:hidden;">
+                                <img src="/images/paloma/paloma-icon.png" style="width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(255,255,255,0.4));" alt="PALOMA Logo">
                             </div>
-                            <span style="font-size:0.8rem;color:var(--admin-muted);">Widget Preview</span>
+                            <span style="font-size:0.8rem;color:var(--admin-muted);">PALOMA Logo</span>
                         </div>
                         
-                        <!-- Avatar Options -->
+                        <!-- Settings -->
                         <div>
                             <div style="margin-bottom:16px;">
-                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Avatar Style</label>
-                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                    <button type="button" class="insurance-chip active" data-avatar="dove" onclick="selectAvatarStyle('dove', this)">🕊️ Paloma Dove</button>
-                                    <button type="button" class="insurance-chip" data-avatar="tooth" onclick="selectAvatarStyle('tooth', this)">🦷 Tooth</button>
-                                    <button type="button" class="insurance-chip" data-avatar="doctor" onclick="selectAvatarStyle('doctor', this)">👨‍⚕️ Doctor</button>
-                                    <button type="button" class="insurance-chip" data-avatar="assistant" onclick="selectAvatarStyle('assistant', this)">👩‍⚕️ Assistant</button>
-                                    <button type="button" class="insurance-chip" data-avatar="custom" onclick="selectAvatarStyle('custom', this)">📸 Custom Photo</button>
-                                </div>
-                            </div>
-                            
-                            <!-- Custom upload (hidden by default) -->
-                            <div id="avatar-custom-upload" style="display:none;margin-bottom:16px;">
-                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Upload Custom Avatar</label>
-                                <input type="file" id="avatar-file-input" accept="image/*" onchange="previewCustomAvatar(this)" style="font-size:0.85rem;color:var(--admin-text);">
-                                <p style="font-size:0.7rem;color:var(--admin-muted);margin-top:4px;">Recommended: Square image, 200×200px minimum</p>
-                            </div>
-                            
-                            <div style="margin-bottom:16px;">
-                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Avatar Name</label>
-                                <input type="text" id="avatar-name" class="auth-input" value="Paloma" placeholder="e.g., Paloma, Dr. B's Assistant" style="max-width:300px;">
+                                <label style="font-size:0.8rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Assistant Name</label>
+                                <input type="text" id="avatar-name" class="auth-input" value="Paloma" placeholder="e.g., Paloma" style="max-width:300px;">
                             </div>
                             
                             <div style="margin-bottom:16px;">
@@ -1760,7 +1741,7 @@
                                 </div>
                             </div>
                             
-                            <button type="button" onclick="saveAvatarSettings()" style="padding:10px 24px;border-radius:8px;border:none;background:var(--admin-teal,#2dd4bf);color:#000;font-weight:600;cursor:pointer;font-size:0.9rem;">💾 Save Avatar Settings</button>
+                            <button type="button" onclick="saveAvatarSettings()" style="padding:10px 24px;border-radius:8px;border:none;background:var(--admin-teal,#2dd4bf);color:#000;font-weight:600;cursor:pointer;font-size:0.9rem;">💾 Save Settings</button>
                         </div>
                     </div>
                 </div>
@@ -2382,35 +2363,19 @@
                         </h4>
                         
                         <div style="display:flex;gap:20px;align-items:start;flex-wrap:wrap;">
-                            <!-- Avatar Preview -->
+                            <!-- Fixed Logo -->
                             <div style="text-align:center;flex-shrink:0;">
-                                <div id="wiz-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;border:3px solid rgba(45,212,191,0.3);box-shadow:0 4px 16px rgba(45,212,191,0.2);overflow:hidden;margin:0 auto 6px;">
-                                    <img id="wiz-avatar-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="Avatar">
-                                    <span id="wiz-avatar-icon" style="font-size:36px;">🕊️</span>
+                                <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;border:3px solid rgba(45,212,191,0.3);box-shadow:0 4px 16px rgba(45,212,191,0.2);overflow:hidden;margin:0 auto 6px;">
+                                    <img src="/images/paloma/paloma-icon.png" style="width:70%;height:70%;object-fit:contain;filter:drop-shadow(0 0 4px rgba(255,255,255,0.4));" alt="PALOMA">
                                 </div>
-                                <span style="font-size:0.7rem;color:var(--admin-muted);">Preview</span>
+                                <span style="font-size:0.7rem;color:var(--admin-muted);">PALOMA</span>
                             </div>
                             
-                            <!-- Options -->
+                            <!-- Name & Personality -->
                             <div style="flex:1;min-width:200px;">
-                                <label style="font-size:0.78rem;color:var(--admin-muted);display:block;margin-bottom:6px;">Choose Style</label>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-                                    <button type="button" class="insurance-chip active" data-avatar="dove" onclick="wizSelectAvatar('dove', this)">🕊️ Dove</button>
-                                    <button type="button" class="insurance-chip" data-avatar="tooth" onclick="wizSelectAvatar('tooth', this)">🦷 Tooth</button>
-                                    <button type="button" class="insurance-chip" data-avatar="doctor" onclick="wizSelectAvatar('doctor', this)">👨‍⚕️ Doctor</button>
-                                    <button type="button" class="insurance-chip" data-avatar="assistant" onclick="wizSelectAvatar('assistant', this)">👩‍⚕️ Assistant</button>
-                                    <button type="button" class="insurance-chip" data-avatar="custom" onclick="wizSelectAvatar('custom', this)">📸 Upload</button>
-                                </div>
-                                
-                                <!-- Custom upload (hidden by default) -->
-                                <div id="wiz-avatar-upload" style="display:none;margin-bottom:12px;">
-                                    <input type="file" id="wiz-avatar-file" accept="image/*" onchange="wizPreviewAvatar(this)" style="font-size:0.8rem;color:var(--admin-text);">
-                                    <p style="font-size:0.68rem;color:var(--admin-muted);margin-top:2px;">Square image, 200×200px minimum</p>
-                                </div>
-                                
                                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
                                     <div style="flex:1;min-width:140px;">
-                                        <label style="font-size:0.78rem;color:var(--admin-muted);display:block;margin-bottom:4px;">Avatar Name</label>
+                                        <label style="font-size:0.78rem;color:var(--admin-muted);display:block;margin-bottom:4px;">Assistant Name</label>
                                         <input type="text" id="wiz-avatar-name" class="auth-input" value="Paloma" placeholder="e.g., Paloma" style="font-size:0.85rem;">
                                     </div>
                                     <div style="flex:1;min-width:140px;">
@@ -5073,13 +5038,13 @@
     </style>
 
     <button class="admin-paloma-fab" id="admin-paloma-fab" title="Ask PALOMA about patients">
-        <img src="../images/paloma/paloma-hero.png" alt="PALOMA" />
+        <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
         <span class="admin-paloma-badge">AI</span>
     </button>
 
     <div class="admin-paloma-panel" id="admin-paloma-panel">
         <div class="admin-paloma-header">
-            <img src="../images/paloma/paloma-hero.png" alt="PALOMA" />
+            <img src="../images/paloma/paloma-icon.png" alt="PALOMA" />
             <div class="admin-paloma-header__info">
                 <h4>PALOMA</h4>
                 <p>🔒 Clinical Assistant Mode</p>
@@ -5148,7 +5113,7 @@
         function addBotMsg(text) {
             const div = document.createElement('div');
             div.className = 'admin-paloma-msg admin-paloma-msg--bot';
-            div.innerHTML = `<img src="../images/paloma/paloma-hero.png" alt="PALOMA" /><div class="admin-paloma-bubble">${formatMsg(text)}</div>`;
+            div.innerHTML = `<img src="../images/paloma/paloma-icon.png" alt="PALOMA" /><div class="admin-paloma-bubble">${formatMsg(text)}</div>`;
             messagesEl.appendChild(div);
             messagesEl.scrollTop = messagesEl.scrollHeight;
             chatHistory.push({ role: 'assistant', content: text });
@@ -5175,7 +5140,7 @@
             // Show typing
             const typing = document.createElement('div');
             typing.className = 'admin-paloma-typing';
-            typing.innerHTML = '<img src="../images/paloma/paloma-hero.png" alt="" /><div class="admin-paloma-typing-dots"><span></span><span></span><span></span></div>';
+            typing.innerHTML = '<img src="../images/paloma/paloma-icon.png" alt="" /><div class="admin-paloma-typing-dots"><span></span><span></span><span></span></div>';
             messagesEl.appendChild(typing);
             messagesEl.scrollTop = messagesEl.scrollHeight;
 

@@ -222,9 +222,9 @@
       <div class="paloma-hero-grid">
         <div class="paloma-hero-avatar-wrap reveal">
           <div class="paloma-hero-avatar" id="paloma-hero-avatar">
-            <img src="images/paloma/paloma-hero.png" alt="PALOMA — AI Dental Health Guide" />
+            <img src="images/paloma/paloma-icon.png" alt="PALOMA — AI Dental Health Guide" />
             <div class="paloma-hero-ring"></div>
-            <span class="paloma-hero-badge" title="Click to chat with PALOMA"><img src="/images/paloma/paloma-hero.png" alt="PALOMA" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" /></span>
+            <span class="paloma-hero-badge" title="Click to chat with PALOMA"><img src="/images/paloma/paloma-icon.png" alt="PALOMA" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" /></span>
           </div>
           <div class="paloma-hero-status">
             <span class="paloma-status-dot"></span>
@@ -1150,67 +1150,7 @@
   <script src="js/modules/paloma-voice.js?v=7"></script>
   <!-- PALOMA AI Chat Widget 🕊️ -->
   <script src="js/modules/paloma-widget.js?v=7"></script>
-  <!-- PALOMA Custom Avatar Loader -->
-  <script>
-  (function() {
-    // Load saved avatar from localStorage (instant) then Firestore (latest)
-    function applyCustomAvatar(settings) {
-      if (!settings || !settings.avatar_url || settings.avatar_style !== 'custom') return;
-      
-      // Update hero section avatar
-      var heroImgs = document.querySelectorAll('#paloma-hero-avatar img');
-      heroImgs.forEach(function(img) { img.src = settings.avatar_url; });
-      
-      // Update sidebar avatar
-      var sidebarAvatar = document.querySelector('.sidebar-paloma-avatar');
-      if (sidebarAvatar) sidebarAvatar.src = settings.avatar_url;
-      
-      // Update widget FAB after it renders
-      setTimeout(function() {
-        var fabImg = document.querySelector('.paloma-fab img');
-        if (fabImg) fabImg.src = settings.avatar_url;
-        var widgetAvatar = document.querySelector('.paloma-chat-avatar img');
-        if (widgetAvatar) widgetAvatar.src = settings.avatar_url;
-      }, 1000);
-    }
-    
-    // Instant load from cache
-    try {
-      var cached = localStorage.getItem('paloma_avatar_settings');
-      if (cached) applyCustomAvatar(JSON.parse(cached));
-    } catch(e) {}
-    
-    // Fetch latest from Firestore when Firebase is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        try {
-          if (typeof firebase !== 'undefined' && firebase.firestore) {
-            var db = firebase.firestore();
-            // Try tenant path first, then legacy path
-            db.collection('practices').doc('brenes').collection('config').doc('avatar').get()
-              .then(function(doc) {
-                if (doc.exists) {
-                  var settings = doc.data();
-                  localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
-                  applyCustomAvatar(settings);
-                } else {
-                  // Fallback to legacy path
-                  return db.collection('practice-config').doc('avatar').get();
-                }
-              })
-              .then(function(doc) {
-                if (doc && doc.exists) {
-                  var settings = doc.data();
-                  localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
-                  applyCustomAvatar(settings);
-                }
-              }).catch(function() {});
-          }
-        } catch(e) {}
-      }, 2000);
-    });
-  })();
-  </script>
+  <!-- PALOMA always uses dove+tooth logo (paloma-icon.png) -->
   <!-- Login Dropdown Toggle -->
   <script>
     (function() {
