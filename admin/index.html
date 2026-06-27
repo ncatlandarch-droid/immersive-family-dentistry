@@ -6509,7 +6509,7 @@
             if (settings.avatar_style === 'custom' && fileInput && fileInput.files && fileInput.files[0]) {
                 var file = fileInput.files[0];
                 var storageRef = firebase.storage().ref();
-                var avatarRef = storageRef.child('avatars/paloma-custom-avatar.' + file.name.split('.').pop());
+                var avatarRef = storageRef.child('practice/paloma-custom-avatar.' + file.name.split('.').pop());
                 
                 await avatarRef.put(file);
                 var downloadURL = await avatarRef.getDownloadURL();
@@ -6521,7 +6521,7 @@
             if (settings.avatar_style === 'custom' && wizFileInput && wizFileInput.files && wizFileInput.files[0]) {
                 var wizFile = wizFileInput.files[0];
                 var storageRef2 = firebase.storage().ref();
-                var avatarRef2 = storageRef2.child('avatars/paloma-custom-avatar.' + wizFile.name.split('.').pop());
+                var avatarRef2 = storageRef2.child('practice/paloma-custom-avatar.' + wizFile.name.split('.').pop());
                 
                 await avatarRef2.put(wizFile);
                 var downloadURL2 = await avatarRef2.getDownloadURL();
