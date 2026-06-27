@@ -2189,27 +2189,57 @@
                     <p style="color:var(--admin-muted);font-size:13px;margin-bottom:16px">Add your team members so PALOMA can introduce them to patients.</p>
                     <div class="wizard-team-list" id="wiz-team">
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#14B8A6">CB</div>
+                            <div class="wizard-team-avatar" style="background:#14B8A6;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">CB</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Dr. Christian Brenes</strong><br><span style="color:var(--admin-muted);font-size:12px">Prosthodontist — Lead Dentist</span></div>
                         </div>
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#8B5CF6">E</div>
+                            <div class="wizard-team-avatar" style="background:#8B5CF6;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">E</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Emily</strong><br><span style="color:var(--admin-muted);font-size:12px">Hygienist — Gentle approach</span></div>
                         </div>
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#3B82F6">L</div>
+                            <div class="wizard-team-avatar" style="background:#3B82F6;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">L</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Logan</strong><br><span style="color:var(--admin-muted);font-size:12px">Hygienist — Strong patient relationships</span></div>
                         </div>
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#F59E0B">M</div>
+                            <div class="wizard-team-avatar" style="background:#F59E0B;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">M</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Michelle</strong><br><span style="color:var(--admin-muted);font-size:12px">Clinical Assistant — 20+ years</span></div>
                         </div>
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#EC4899">M</div>
+                            <div class="wizard-team-avatar" style="background:#EC4899;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">M</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Missie</strong><br><span style="color:var(--admin-muted);font-size:12px">Patient Coordinator — 20+ years</span></div>
                         </div>
                         <div class="wizard-team-card">
-                            <div class="wizard-team-avatar" style="background:#10B981">C</div>
+                            <div class="wizard-team-avatar" style="background:#10B981;cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                                <span class="team-initials">C</span>
+                                <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                                <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                            </div>
                             <div><strong>Cameron</strong><br><span style="color:var(--admin-muted);font-size:12px">Clinical Assistant</span></div>
                         </div>
                     </div>
@@ -2345,6 +2375,9 @@
                                 <option value="detailed">Detailed (4-6 sentences)</option>
                             </select>
                         </div>
+                    </div>
+                    <div style="margin-top:20px;padding:16px;background:rgba(45,212,191,0.05);border:1px solid rgba(45,212,191,0.2);border-radius:10px;">
+                        <p style="font-size:0.85rem;color:var(--admin-muted);margin:0;">💡 <strong style="color:#e0e0e0">Want to customize PALOMA's avatar?</strong> After completing the wizard, go to <strong style="color:#2dd4bf">Practice Setup</strong> and scroll down to the <strong style="color:#2dd4bf">Chat Avatar</strong> section to choose a custom avatar, name, and personality.</p>
                     </div>
                 </div>
 
@@ -6108,6 +6141,21 @@
             });
         }
 
+        // ─── Team photo preview ───
+        window.previewTeamPhoto = function(input) {
+            if (!input.files || !input.files[0]) return;
+            var card = input.closest('.wizard-team-avatar');
+            var img = card.querySelector('.team-photo');
+            var initials = card.querySelector('.team-initials');
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+                if (initials) initials.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+
         // ─── Add team member ───
         const addTeamBtn = document.getElementById('wiz-add-team');
         if (addTeamBtn) {
@@ -6121,7 +6169,12 @@
                 const card = document.createElement('div');
                 card.className = 'wizard-team-card';
                 card.innerHTML = `
-                    <div class="wizard-team-avatar" style="background:${color}">${initials}</div>
+                    <div class="wizard-team-avatar" style="background:${color};cursor:pointer;position:relative;overflow:hidden;" onclick="this.querySelector('input').click()" title="Click to upload photo">
+                        <span class="team-initials">${initials}</span>
+                        <img class="team-photo" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;display:none;" />
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);padding:2px;text-align:center;font-size:8px;color:#fff;">📷</div>
+                        <input type="file" accept="image/*" style="display:none" onchange="previewTeamPhoto(this)" />
+                    </div>
                     <div><strong>${nameInput.value.trim()}</strong><br><span style="color:var(--admin-muted);font-size:12px">${roleInput.value.trim() || 'Team Member'}</span></div>
                 `;
                 document.getElementById('wiz-team').appendChild(card);
