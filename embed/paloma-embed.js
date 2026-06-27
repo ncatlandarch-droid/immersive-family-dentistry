@@ -28,6 +28,13 @@
   var MAX_HIST   = 20;
   var PREFIX     = 'paloma-embed-';
 
+  // ── Derive logo URL from script src ───────────────────────────────────
+  var _scriptSrc = (function () {
+    var tag = document.querySelector('script[src*="paloma-embed"]');
+    return tag ? tag.src.replace(/\/embed\/paloma-embed\.js.*$/, '') : '';
+  })();
+  var LOGO_URL = _scriptSrc + '/images/paloma/paloma-icon.png';
+
   // ── i18n Strings ─────────────────────────────────────────────────────────
   var i18n = {
     en: {
@@ -206,6 +213,11 @@
     + P + 'fab-icon {'
     + '  font-size: 28px; line-height: 1; pointer-events: none;'
     + '}'
+    + P + 'fab-icon img {'
+    + '  width: 36px; height: 36px; object-fit: contain;'
+    + '  filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));'
+    + '  pointer-events: none;'
+    + '}'
 
     // ─── Pulse ring animation ────────────────────────────────────────────
     + P + 'fab-ring {'
@@ -255,6 +267,11 @@
     + '  background: linear-gradient(135deg, #2dd4bf, #0d9488);'
     + '  display: flex; align-items: center; justify-content: center;'
     + '  font-size: 20px; flex-shrink: 0;'
+    + '  overflow: hidden;'
+    + '}'
+    + P + 'avatar img {'
+    + '  width: 28px; height: 28px; object-fit: contain;'
+    + '  filter: drop-shadow(0 0 2px rgba(255,255,255,0.4));'
     + '}'
     + P + 'header-text {'
     + '  flex: 1;'
@@ -478,7 +495,11 @@
       'type': 'button'
     });
     var fabIcon = el('span', 'fab-icon');
-    fabIcon.textContent = '🕊️';
+    var fabImg = document.createElement('img');
+    fabImg.src = LOGO_URL;
+    fabImg.alt = 'PALOMA';
+    fabImg.onerror = function () { fabIcon.textContent = '🕊️'; this.remove(); };
+    fabIcon.appendChild(fabImg);
     var fabRing = el('span', 'fab-ring');
     fab.appendChild(fabIcon);
     fab.appendChild(fabRing);
@@ -495,7 +516,11 @@
     // Header
     var header = el('div', 'header');
     var avatar = el('div', 'avatar');
-    avatar.textContent = '🕊️';
+    var avatarImg = document.createElement('img');
+    avatarImg.src = LOGO_URL;
+    avatarImg.alt = 'PALOMA';
+    avatarImg.onerror = function () { avatar.textContent = '🕊️'; this.remove(); };
+    avatar.appendChild(avatarImg);
     var headerText = el('div', 'header-text');
     var titleEl = el('div', 'title');
     titleEl.textContent = 'PALOMA';
