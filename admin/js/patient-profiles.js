@@ -397,6 +397,20 @@ const PatientProfiles = (function() {
     detailPanel.innerHTML = `
       <div class="add-patient-form">
         <h3><i data-lucide="user-plus" style="width:20px;height:20px"></i> Add New Patient</h3>
+        
+        <!-- Patient Photo Upload -->
+        <div style="text-align:center;margin-bottom:20px;">
+          <div id="new-patient-avatar" onclick="document.getElementById('new-patient-photo').click()" style="width:100px;height:100px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;cursor:pointer;border:3px solid rgba(99,102,241,0.3);box-shadow:0 4px 16px rgba(99,102,241,0.2);overflow:hidden;position:relative;transition:transform 0.2s;">
+            <img id="new-patient-photo-preview" style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0;" />
+            <div style="text-align:center;">
+              <i data-lucide="camera" style="width:28px;height:28px;color:rgba(255,255,255,0.8)"></i>
+              <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;">Add Photo</div>
+            </div>
+          </div>
+          <input type="file" id="new-patient-photo" accept="image/*" style="display:none" onchange="PatientProfiles.previewPatientPhoto(this)" />
+          <span style="font-size:0.75rem;color:var(--admin-muted);">Click to upload patient photo</span>
+        </div>
+        
         <div class="form-grid">
           <div class="form-group">
             <label>First Name *</label>
@@ -463,6 +477,18 @@ const PatientProfiles = (function() {
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
+  // Preview patient photo in the form
+  function previewPatientPhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const preview = document.getElementById('new-patient-photo-preview');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
   async function saveNewPatient() {
     const first = document.getElementById('new-patient-first')?.value?.trim();
     const last = document.getElementById('new-patient-last')?.value?.trim();
@@ -471,6 +497,24 @@ const PatientProfiles = (function() {
     if (!first || !last || !phone) {
       showToast('First name, last name, and phone are required', 'error');
       return;
+    }
+
+    // Upload patient photo if provided
+    let photoUrl = '';
+    const photoInput = document.getElementById('new-patient-photo');
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      try {
+        const file = photoInput.files[0];
+        const ext = file.name.split('.').pop() || 'png';
+        const safeName = `${first}-${last}`.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        const storageRef = firebase.storage().ref();
+        const photoRef = storageRef.child(`patients/${safeName}/photo.${ext}`);
+        await photoRef.put(file);
+        photoUrl = await photoRef.getDownloadURL();
+      } catch (err) {
+        console.error('[Patient Photo] Upload error:', err);
+        // Continue saving without photo
+      }
     }
 
     const data = {
@@ -485,6 +529,7 @@ const PatientProfiles = (function() {
       preferred_language: document.getElementById('new-patient-lang')?.value || 'en',
       status: document.getElementById('new-patient-status')?.value || 'potential',
       source: document.getElementById('new-patient-source')?.value || 'manual',
+      photo_url: photoUrl,
       outstanding_balance: 0,
       total_lifetime_value: 0,
       conversation_count: 0
@@ -733,6 +778,7 @@ const PatientProfiles = (function() {
     selectPatient,
     showAddPatientForm,
     saveNewPatient,
+    previewPatientPhoto,
     updateStatus,
     saveNotes,
     editPatient,
