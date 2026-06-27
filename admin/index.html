@@ -6487,10 +6487,15 @@
     }
     
     async function saveAvatarSettings() {
+        const btn = document.querySelector('[onclick*="saveAvatarSettings"]');
         try {
+            if (btn) { btn.textContent = '⏳ Saving...'; btn.disabled = true; }
+            
             const db = firebase.firestore();
-            const activeStyle = document.querySelector('[data-avatar].active');
+            const activeStyle = document.querySelector('#avatar-custom-upload')?.closest('.glass-card')?.querySelector('[data-avatar].active') 
+                || document.querySelector('[data-avatar].active');
             const activePersonality = document.querySelector('[data-personality].active');
+            
             const settings = {
                 avatar_style: activeStyle ? activeStyle.dataset.avatar : 'dove',
                 avatar_name: document.getElementById('avatar-name')?.value || 'Paloma',
@@ -6498,21 +6503,137 @@
                 personality: activePersonality ? activePersonality.dataset.personality : 'friendly',
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             };
-            await db.collection('practice-config').doc('avatar').set(settings, { merge: true });
+            
+            // If custom photo selected, upload to Firebase Storage
+            var fileInput = document.getElementById('avatar-file-input');
+            if (settings.avatar_style === 'custom' && fileInput && fileInput.files && fileInput.files[0]) {
+                var file = fileInput.files[0];
+                var storageRef = firebase.storage().ref();
+                var avatarRef = storageRef.child('avatars/paloma-custom-avatar.' + file.name.split('.').pop());
+                
+                await avatarRef.put(file);
+                var downloadURL = await avatarRef.getDownloadURL();
+                settings.avatar_url = downloadURL;
+            }
+            
+            // Also check wizard file input
+            var wizFileInput = document.getElementById('wiz-avatar-file');
+            if (settings.avatar_style === 'custom' && wizFileInput && wizFileInput.files && wizFileInput.files[0]) {
+                var wizFile = wizFileInput.files[0];
+                var storageRef2 = firebase.storage().ref();
+                var avatarRef2 = storageRef2.child('avatars/paloma-custom-avatar.' + wizFile.name.split('.').pop());
+                
+                await avatarRef2.put(wizFile);
+                var downloadURL2 = await avatarRef2.getDownloadURL();
+                settings.avatar_url = downloadURL2;
+            }
+            
+            // Save to Firestore
+            var configPath = (typeof TenantManager !== 'undefined' && TenantManager.getPracticeId())
+                ? 'practices/' + TenantManager.getPracticeId() + '/config'
+                : 'practice-config';
+            await db.collection(configPath).doc('avatar').set(settings, { merge: true });
+            
+            // Also save to localStorage for instant loading
+            localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
             
             // Log for HIPAA audit
-            if (window.HIPAAAudit) HIPAAAudit.log('update_avatar', 'practice-config', 'avatar', JSON.stringify(settings));
+            if (window.HIPAAAudit) HIPAAAudit.log('update_avatar', configPath, 'avatar', JSON.stringify(settings));
             
             // Show success
-            const btn = event.target;
-            btn.textContent = '✅ Saved!';
-            btn.style.background = '#22c55e';
-            setTimeout(() => { btn.textContent = '💾 Save Avatar Settings'; btn.style.background = ''; }, 2000);
+            if (btn) {
+                btn.textContent = '✅ Saved!';
+                btn.style.background = '#22c55e';
+                btn.disabled = false;
+                setTimeout(function() { btn.textContent = '💾 Save Avatar Settings'; btn.style.background = ''; }, 2000);
+            }
+            if (typeof showToast === 'function') showToast('Avatar settings saved!', 'success');
         } catch (err) {
             console.error('Failed to save avatar:', err);
-            alert('Failed to save avatar settings');
+            if (btn) { btn.textContent = '❌ Error'; btn.disabled = false; setTimeout(function() { btn.textContent = '💾 Save Avatar Settings'; }, 2000); }
+            if (typeof showToast === 'function') showToast('Failed to save: ' + err.message, 'error');
         }
     }
+    
+    // ─── Load saved avatar settings on page load ───
+    function loadAvatarSettings() {
+        try {
+            // Try localStorage first for instant load
+            var cached = localStorage.getItem('paloma_avatar_settings');
+            if (cached) {
+                applyAvatarSettings(JSON.parse(cached));
+            }
+            
+            // Then fetch from Firestore for latest
+            var db = firebase.firestore();
+            var configPath = (typeof TenantManager !== 'undefined' && TenantManager.getPracticeId())
+                ? 'practices/' + TenantManager.getPracticeId() + '/config'
+                : 'practice-config';
+            db.collection(configPath).doc('avatar').get().then(function(doc) {
+                if (doc.exists) {
+                    var settings = doc.data();
+                    localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
+                    applyAvatarSettings(settings);
+                }
+            }).catch(function(e) { console.log('[Avatar] Load error:', e); });
+        } catch(e) { console.log('[Avatar] Load error:', e); }
+    }
+    
+    function applyAvatarSettings(settings) {
+        if (!settings) return;
+        
+        // Set avatar style chip
+        if (settings.avatar_style) {
+            var styleBtn = document.querySelector('.glass-card [data-avatar="' + settings.avatar_style + '"]');
+            if (styleBtn) {
+                document.querySelectorAll('.glass-card [data-avatar]').forEach(function(b) { b.classList.remove('active'); });
+                styleBtn.classList.add('active');
+            }
+            // Show/hide upload section
+            var upload = document.getElementById('avatar-custom-upload');
+            if (upload) upload.style.display = settings.avatar_style === 'custom' ? 'block' : 'none';
+        }
+        
+        // Set preview
+        var previewIcon = document.getElementById('avatar-preview-icon');
+        var previewImg = document.getElementById('avatar-preview-img');
+        if (settings.avatar_url && settings.avatar_style === 'custom') {
+            if (previewImg) { previewImg.src = settings.avatar_url; previewImg.style.display = 'block'; }
+            if (previewIcon) previewIcon.style.display = 'none';
+        } else if (settings.avatar_style && avatarEmojis[settings.avatar_style]) {
+            if (previewIcon) { previewIcon.textContent = avatarEmojis[settings.avatar_style]; previewIcon.style.display = ''; }
+            if (previewImg) previewImg.style.display = 'none';
+        }
+        
+        // Set name and greeting
+        var nameInput = document.getElementById('avatar-name');
+        if (nameInput && settings.avatar_name) nameInput.value = settings.avatar_name;
+        var greetingInput = document.getElementById('avatar-greeting');
+        if (greetingInput && settings.avatar_greeting) greetingInput.value = settings.avatar_greeting;
+        
+        // Set personality chip
+        if (settings.personality) {
+            var persBtn = document.querySelector('[data-personality="' + settings.personality + '"]');
+            if (persBtn) {
+                document.querySelectorAll('[data-personality]').forEach(function(b) { b.classList.remove('active'); });
+                persBtn.classList.add('active');
+            }
+        }
+        
+        // Also update wizard avatar preview if it exists
+        var wizIcon = document.getElementById('wiz-avatar-icon');
+        var wizImg = document.getElementById('wiz-avatar-img');
+        if (settings.avatar_url && settings.avatar_style === 'custom') {
+            if (wizImg) { wizImg.src = settings.avatar_url; wizImg.style.display = 'block'; }
+            if (wizIcon) wizIcon.style.display = 'none';
+        } else if (settings.avatar_style && avatarEmojis[settings.avatar_style]) {
+            if (wizIcon) { wizIcon.textContent = avatarEmojis[settings.avatar_style]; wizIcon.style.display = ''; }
+            if (wizImg) wizImg.style.display = 'none';
+        }
+    }
+    
+    // Load avatar settings after a short delay (wait for Firebase)
+    setTimeout(loadAvatarSettings, 1500);
 
     // Re-initialize Lucide icons (catches any dynamically added icons)
     try { lucide.createIcons(); } catch(e) { console.error('Lucide final init error:', e); }
