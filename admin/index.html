@@ -6058,6 +6058,46 @@
         nextBtn.addEventListener('click', () => {
             if (currentStep < TOTAL_STEPS) {
                 goToStep(currentStep + 1);
+            } else {
+                // ─── FINISH: Save & redirect to Dashboard ───
+                try {
+                    // Save wizard completion flag
+                    localStorage.setItem('paloma_wizard_completed', 'true');
+                    localStorage.setItem('paloma_wizard_completed_at', new Date().toISOString());
+                    
+                    // Try saving to Firestore if available
+                    if (typeof firebase !== 'undefined' && firebase.firestore) {
+                        var db = firebase.firestore();
+                        var configPath = (typeof TenantManager !== 'undefined' && TenantManager.getPracticeId()) 
+                            ? 'practices/' + TenantManager.getPracticeId() + '/config/wizard'
+                            : 'practice-config/wizard';
+                        db.doc(configPath).set({
+                            completed: true,
+                            completed_at: firebase.firestore.FieldValue.serverTimestamp(),
+                            completed_by: firebase.auth().currentUser ? firebase.auth().currentUser.email : 'unknown'
+                        }, { merge: true }).catch(function(e) { console.log('[Wizard] Save error:', e); });
+                    }
+                } catch(e) { console.log('[Wizard] Finish save error:', e); }
+                
+                // Show success feedback
+                if (typeof showToast === 'function') {
+                    showToast('🎉 PALOMA is configured and ready! Welcome to your dashboard.', 'success');
+                }
+                
+                // Navigate to Dashboard after a brief moment
+                setTimeout(function() {
+                    // Click Dashboard nav item
+                    var dashLink = document.querySelector('[data-view="overview"]');
+                    if (dashLink) {
+                        dashLink.click();
+                    } else {
+                        // Fallback: switch views manually
+                        document.querySelectorAll('.view').forEach(function(v) { v.style.display = 'none'; });
+                        var overview = document.getElementById('view-overview');
+                        if (overview) overview.style.display = 'block';
+                    }
+                    window.scrollTo(0, 0);
+                }, 800);
             }
         });
 
