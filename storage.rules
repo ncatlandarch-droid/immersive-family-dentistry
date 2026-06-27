@@ -31,8 +31,8 @@ service firebase.storage {
     }
     
     // ═══ Practice Assets (non-PHI) ═══
-    // Avatar images, logos, etc.
-    match /practice/{fileName} {
+    // Avatar images, logos, team photos, etc.
+    match /practice/{allPaths=**} {
       allow read: if true;  // Public assets
       allow write: if request.auth != null
                    && request.resource.size < 5 * 1024 * 1024;

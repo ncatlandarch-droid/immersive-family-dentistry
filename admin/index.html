@@ -6236,20 +6236,97 @@
             reader.readAsDataURL(input.files[0]);
         };
 
-        // ─── Team photo preview ───
+        // ─── Team photo upload & persist ───
         window.previewTeamPhoto = function(input) {
             if (!input.files || !input.files[0]) return;
             var card = input.closest('.wizard-team-avatar');
             var img = card.querySelector('.team-photo');
             var initials = card.querySelector('.team-initials');
+            var file = input.files[0];
+            
+            // Get team member name from the card
+            var teamCard = input.closest('.wizard-team-card');
+            var nameEl = teamCard ? teamCard.querySelector('strong') : null;
+            var memberName = nameEl ? nameEl.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, '-') : 'member-' + Date.now();
+            
+            // Instant preview via FileReader
             var reader = new FileReader();
             reader.onload = function(e) {
                 img.src = e.target.result;
                 img.style.display = 'block';
                 if (initials) initials.style.display = 'none';
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
+            
+            // Upload to Firebase Storage
+            try {
+                var ext = file.name.split('.').pop() || 'png';
+                var storageRef = firebase.storage().ref();
+                var photoRef = storageRef.child('practice/team/' + memberName + '.' + ext);
+                
+                // Show uploading indicator
+                var cameraDiv = card.querySelector('div[style*="bottom:0"]');
+                if (cameraDiv) cameraDiv.textContent = '⏳';
+                
+                photoRef.put(file).then(function() {
+                    return photoRef.getDownloadURL();
+                }).then(function(url) {
+                    // Save URL to Firestore
+                    var db = firebase.firestore();
+                    var configPath = (typeof TenantManager !== 'undefined' && TenantManager.getPracticeId())
+                        ? 'practices/' + TenantManager.getPracticeId() + '/config'
+                        : 'practice-config';
+                    
+                    var updateObj = {};
+                    updateObj[memberName] = url;
+                    db.collection(configPath).doc('team-photos').set(updateObj, { merge: true });
+                    
+                    // Update camera icon to checkmark
+                    if (cameraDiv) cameraDiv.textContent = '✅';
+                    setTimeout(function() { if (cameraDiv) cameraDiv.textContent = '📷'; }, 2000);
+                    
+                    if (typeof showToast === 'function') showToast('Photo saved for ' + (nameEl ? nameEl.textContent : 'team member'), 'success');
+                }).catch(function(err) {
+                    console.error('[Team Photo] Upload error:', err);
+                    if (cameraDiv) cameraDiv.textContent = '❌';
+                    setTimeout(function() { if (cameraDiv) cameraDiv.textContent = '📷'; }, 2000);
+                });
+            } catch(e) {
+                console.error('[Team Photo] Error:', e);
+            }
         };
+        
+        // ─── Load saved team photos on init ───
+        function loadTeamPhotos() {
+            try {
+                var db = firebase.firestore();
+                var configPath = (typeof TenantManager !== 'undefined' && TenantManager.getPracticeId())
+                    ? 'practices/' + TenantManager.getPracticeId() + '/config'
+                    : 'practice-config';
+                
+                db.collection(configPath).doc('team-photos').get().then(function(doc) {
+                    if (!doc.exists) return;
+                    var photos = doc.data();
+                    
+                    // For each team card, check if we have a saved photo
+                    document.querySelectorAll('.wizard-team-card').forEach(function(card) {
+                        var nameEl = card.querySelector('strong');
+                        if (!nameEl) return;
+                        var memberKey = nameEl.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, '-');
+                        
+                        if (photos[memberKey]) {
+                            var img = card.querySelector('.team-photo');
+                            var initials = card.querySelector('.team-initials');
+                            if (img) { img.src = photos[memberKey]; img.style.display = 'block'; }
+                            if (initials) initials.style.display = 'none';
+                        }
+                    });
+                }).catch(function(e) { console.log('[Team Photos] Load error:', e); });
+            } catch(e) { console.log('[Team Photos] Init error:', e); }
+        }
+        
+        // Load team photos after Firebase initializes
+        setTimeout(loadTeamPhotos, 2000);
 
         // ─── Add team member ───
         const addTeamBtn = document.getElementById('wiz-add-team');
