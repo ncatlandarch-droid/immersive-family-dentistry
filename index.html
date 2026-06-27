@@ -1185,9 +1185,21 @@
       setTimeout(function() {
         try {
           if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('practice-config').doc('avatar').get()
+            var db = firebase.firestore();
+            // Try tenant path first, then legacy path
+            db.collection('practices').doc('brenes').collection('config').doc('avatar').get()
               .then(function(doc) {
                 if (doc.exists) {
+                  var settings = doc.data();
+                  localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
+                  applyCustomAvatar(settings);
+                } else {
+                  // Fallback to legacy path
+                  return db.collection('practice-config').doc('avatar').get();
+                }
+              })
+              .then(function(doc) {
+                if (doc && doc.exists) {
                   var settings = doc.data();
                   localStorage.setItem('paloma_avatar_settings', JSON.stringify(settings));
                   applyCustomAvatar(settings);
