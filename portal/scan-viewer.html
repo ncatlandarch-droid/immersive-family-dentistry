@@ -1502,6 +1502,9 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                     <button class="sv-preset-btn" data-overlay="inflammation">
                         <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#fbbf24,#f97316,#dc2626);margin-right:4px;"></span> Gingival
                     </button>
+                    <button class="sv-preset-btn" data-overlay="nerves">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#fde047,#f59e0b);margin-right:4px;"></span> Nerves
+                    </button>
                 </div>
                 <!-- Overlay Legend (shown when overlay active) -->
                 <div id="overlayLegend" class="sv-overlay-legend" style="display:none;">
@@ -1513,7 +1516,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                     </div>
                 </div>
                 <p style="font-size:11px;color:var(--mm-text-muted);margin-top:8px;line-height:1.4;">
-                    🔬 Analyzing real scan colors — plaque (yellow/brown), decay (dark spots), inflammation (deep red). Results are patient-specific.
+                    🔬 Scan color analysis for plaque/decay/gingival. 🧠 Nerve overlay shows anatomical pathways (educational).
                 </p>
             </div>
 
@@ -3604,12 +3607,210 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                     document.getElementById('legendLow').textContent = '💛 Healthy';
                     document.getElementById('legendMid').textContent = '🟠 Mild';
                     document.getElementById('legendHigh').textContent = '🔴 Inflamed';
+                } else if (overlay === 'nerves') {
+                    legendBar.style.background = 'linear-gradient(90deg, #fde047, #f59e0b, #fde047)';
+                    document.getElementById('legendLow').textContent = '🧠 Sensory';
+                    document.getElementById('legendMid').textContent = '⚡ Motor';
+                    document.getElementById('legendHigh').textContent = '🔶 Branch';
                 }
 
-                state.models.forEach(m => applyOverlay(m.mesh, overlay));
+                if (overlay === 'nerves') {
+                    // Nerve overlay uses 3D geometry, not vertex colors
+                    state.models.forEach(m => restoreVertexColors(m.mesh));
+                    renderNerveOverlay();
+                } else {
+                    clearNerveOverlay();
+                    state.models.forEach(m => applyOverlay(m.mesh, overlay));
+                }
             }
         });
     });
+
+    // ─── Nerve Overlay System ───
+    let nerveGroup = null;
+
+    function clearNerveOverlay() {
+        if (nerveGroup) {
+            scene.remove(nerveGroup);
+            nerveGroup.traverse(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+            });
+            nerveGroup = null;
+        }
+    }
+
+    function renderNerveOverlay() {
+        clearNerveOverlay();
+        nerveGroup = new THREE.Group();
+        nerveGroup.name = 'nerveOverlay';
+
+        if (state.models.length === 0) return;
+
+        // Get combined bounding box of all models
+        const combinedBBox = new THREE.Box3();
+        state.models.forEach(m => {
+            m.mesh.geometry.computeBoundingBox();
+            const bbox = m.mesh.geometry.boundingBox.clone();
+            bbox.applyMatrix4(m.mesh.matrixWorld);
+            combinedBBox.union(bbox);
+        });
+
+        const center = new THREE.Vector3();
+        const size = new THREE.Vector3();
+        combinedBBox.getCenter(center);
+        combinedBBox.getSize(size);
+
+        // Scale factors for positioning
+        const sx = size.x * 0.5;
+        const sy = size.y * 0.5;
+        const sz = size.z * 0.5;
+
+        // ── Nerve material (glowing yellow) ──
+        const nerveMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047,
+            transparent: true,
+            opacity: 0.85,
+        });
+        const branchMat = new THREE.MeshBasicMaterial({
+            color: 0xf59e0b,
+            transparent: true,
+            opacity: 0.7,
+        });
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047,
+            transparent: true,
+            opacity: 0.15,
+        });
+
+        function createNerveTube(points, radius, material) {
+            if (points.length < 2) return;
+            const curve = new THREE.CatmullRomCurve3(
+                points.map(p => new THREE.Vector3(
+                    center.x + p[0] * sx,
+                    center.y + p[1] * sy,
+                    center.z + p[2] * sz
+                ))
+            );
+            const tubeGeo = new THREE.TubeGeometry(curve, 32, radius, 8, false);
+            const tube = new THREE.Mesh(tubeGeo, material);
+            nerveGroup.add(tube);
+
+            // Outer glow
+            const glowGeo = new THREE.TubeGeometry(curve, 32, radius * 2.5, 8, false);
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            nerveGroup.add(glow);
+        }
+
+        // ── INFERIOR ALVEOLAR NERVE (mandibular canal) ──
+        // Runs through the lower jaw from ramus to mental foramen
+        createNerveTube([
+            [-0.8, -0.6, -0.7],  // Left ramus entry
+            [-0.6, -0.7, -0.5],
+            [-0.4, -0.75, -0.3],
+            [-0.2, -0.8, -0.1],
+            [0.0, -0.8, 0.0],    // Below lower incisors
+            [0.2, -0.8, -0.1],
+            [0.4, -0.75, -0.3],
+            [0.6, -0.7, -0.5],
+            [0.8, -0.6, -0.7],   // Right ramus entry
+        ], 0.3, nerveMat);
+
+        // ── MENTAL NERVE (exits through mental foramen) ──
+        // Left side
+        createNerveTube([
+            [-0.35, -0.75, -0.2],  // Branch from IAN
+            [-0.35, -0.55, 0.1],   // Exits foramen
+            [-0.3, -0.4, 0.3],     // To chin/lip area
+        ], 0.2, branchMat);
+        // Right side
+        createNerveTube([
+            [0.35, -0.75, -0.2],
+            [0.35, -0.55, 0.1],
+            [0.3, -0.4, 0.3],
+        ], 0.2, branchMat);
+
+        // ── SUPERIOR ALVEOLAR NERVES (branches to upper teeth) ──
+        // Posterior Superior Alveolar - to upper molars
+        createNerveTube([
+            [-0.7, 0.7, -0.6],    // Infraorbital region
+            [-0.6, 0.5, -0.4],
+            [-0.5, 0.4, -0.2],    // Upper molar roots
+        ], 0.2, branchMat);
+        createNerveTube([
+            [0.7, 0.7, -0.6],
+            [0.6, 0.5, -0.4],
+            [0.5, 0.4, -0.2],
+        ], 0.2, branchMat);
+
+        // Anterior Superior Alveolar - to upper front teeth
+        createNerveTube([
+            [-0.3, 0.7, -0.3],
+            [-0.15, 0.5, 0.0],
+            [0.0, 0.45, 0.2],     // Central incisors
+            [0.15, 0.5, 0.0],
+            [0.3, 0.7, -0.3],
+        ], 0.18, branchMat);
+
+        // ── TOOTH PULP NERVES (small branches into each tooth) ──
+        // Create small nerve branches going up/down into tooth areas
+        const toothPositions = [
+            // Upper arch - approximate X positions for 8 teeth per side
+            { x: -0.65, y: 0.3, z: -0.15 },
+            { x: -0.55, y: 0.3, z: -0.05 },
+            { x: -0.45, y: 0.3, z: 0.05 },
+            { x: -0.35, y: 0.3, z: 0.12 },
+            { x: -0.2, y: 0.3, z: 0.18 },
+            { x: -0.08, y: 0.3, z: 0.22 },
+            { x: 0.08, y: 0.3, z: 0.22 },
+            { x: 0.2, y: 0.3, z: 0.18 },
+            { x: 0.35, y: 0.3, z: 0.12 },
+            { x: 0.45, y: 0.3, z: 0.05 },
+            { x: 0.55, y: 0.3, z: -0.05 },
+            { x: 0.65, y: 0.3, z: -0.15 },
+            // Lower arch
+            { x: -0.6, y: -0.3, z: -0.1 },
+            { x: -0.5, y: -0.3, z: 0.0 },
+            { x: -0.4, y: -0.3, z: 0.08 },
+            { x: -0.25, y: -0.3, z: 0.14 },
+            { x: -0.1, y: -0.3, z: 0.18 },
+            { x: 0.1, y: -0.3, z: 0.18 },
+            { x: 0.25, y: -0.3, z: 0.14 },
+            { x: 0.4, y: -0.3, z: 0.08 },
+            { x: 0.5, y: -0.3, z: 0.0 },
+            { x: 0.6, y: -0.3, z: -0.1 },
+        ];
+
+        toothPositions.forEach(tp => {
+            const isUpper = tp.y > 0;
+            createNerveTube([
+                [tp.x, tp.y + (isUpper ? 0.15 : -0.15), tp.z],
+                [tp.x, tp.y, tp.z],
+                [tp.x, tp.y - (isUpper ? 0.1 : -0.1), tp.z + 0.03],
+            ], 0.08, branchMat);
+
+            // Tiny pulp chamber dot
+            const dotGeo = new THREE.SphereGeometry(0.12 * Math.min(sx, sy, sz) * 0.15, 8, 8);
+            const dot = new THREE.Mesh(dotGeo, nerveMat);
+            dot.position.set(
+                center.x + tp.x * sx,
+                center.y + tp.y * sy,
+                center.z + tp.z * sz
+            );
+            nerveGroup.add(dot);
+        });
+
+        scene.add(nerveGroup);
+
+        // Make the scan semi-transparent so nerves show through
+        state.models.forEach(m => {
+            m.mesh.material.transparent = true;
+            m.mesh.material.opacity = 0.35;
+            m.mesh.material.needsUpdate = true;
+        });
+
+        console.log('🧠 Nerve overlay rendered — anatomical pathways displayed');
+    }
 
     // ─── Patient Photo Capture & Upload ───
     const photoInput = document.getElementById('photoFileInput');
