@@ -1406,7 +1406,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 </div>
                 <div class="sv-toggle-row">
                     <label>Auto-Rotate</label>
-                    <button class="sv-toggle on" id="toggleAutoRotate" aria-label="Toggle auto-rotate"></button>
+                    <button class="sv-toggle" id="toggleAutoRotate" aria-label="Toggle auto-rotate"></button>
                 </div>
                 <div class="sv-toggle-row">
                     <label>Grid Floor</label>
@@ -1483,7 +1483,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         annotateMode: false,
         measureFirstPoint: null,
         pendingAnnotationPoint: null,
-        autoRotate: true,
+        autoRotate: false,
         idCounter: 0
     };
 
@@ -1518,7 +1518,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
-        controls.autoRotate = true;
+        controls.autoRotate = false;
         controls.autoRotateSpeed = 0.8;
         controls.minDistance = 10;
         controls.maxDistance = 500;
@@ -1612,7 +1612,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     }
 
     // ─── Create dental material ───
-    function createDentalMaterial(preset) {
+    function createDentalMaterial(preset, hasVertexColors) {
         const presets = {
             tooth: { color: 0xF0E6D8, roughness: 0.35, metalness: 0.0, clearcoat: 0.3, clearcoatRoughness: 0.4, wireframe: false, opacity: 1.0, transparent: false },
             gum:   { color: 0xE8A0A0, roughness: 0.55, metalness: 0.0, clearcoat: 0.15, clearcoatRoughness: 0.6, wireframe: false, opacity: 1.0, transparent: false },
@@ -1620,20 +1620,31 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             xray:  { color: 0x88ccff, roughness: 0.3, metalness: 0.1, clearcoat: 0.0, clearcoatRoughness: 0.5, wireframe: true, opacity: 0.6, transparent: true }
         };
         const p = presets[preset] || presets.tooth;
-        const mat = new THREE.MeshPhysicalMaterial({
-            color: p.color,
+        const matOpts = {
             roughness: p.roughness,
             metalness: p.metalness,
             clearcoat: p.clearcoat,
             clearcoatRoughness: p.clearcoatRoughness,
             envMap: envMap,
-            envMapIntensity: 0.8,
+            envMapIntensity: hasVertexColors ? 0.4 : 0.8,
             wireframe: p.wireframe,
             transparent: p.transparent,
             opacity: p.opacity,
             side: THREE.DoubleSide
-        });
-        return mat;
+        };
+
+        // If scan has real vertex colors (Medit/iTero/3Shape), use them!
+        if (hasVertexColors && preset !== 'xray') {
+            matOpts.vertexColors = true;
+            matOpts.color = 0xffffff; // White base lets vertex colors show true
+            matOpts.roughness = 0.4;
+            matOpts.clearcoat = 0.15;
+            matOpts.clearcoatRoughness = 0.5;
+        } else {
+            matOpts.color = p.color;
+        }
+
+        return new THREE.MeshPhysicalMaterial(matOpts);
     }
 
     // ─── File Loading ───
@@ -1704,11 +1715,18 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     }
 
     function addModelToScene(geometry, file, format, archIndex) {
+        // Detect vertex colors from scanner (Medit, iTero, 3Shape PLY files embed RGB per vertex)
+        const hasVertexColors = geometry.hasAttribute('color');
+        if (hasVertexColors) {
+            console.log('🎨 Vertex colors detected — rendering with real scan colors');
+        }
+
         const presetName = state.models.length === 0 ? 'tooth' : 'gum';
-        const material = createDentalMaterial(presetName);
+        const material = createDentalMaterial(presetName, hasVertexColors);
         const mesh = new THREE.Mesh(geometry, material);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.userData.hasVertexColors = hasVertexColors;
 
         // Center and scale
         geometry.computeBoundingBox();
@@ -1723,11 +1741,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         const scaleFactor = 60 / maxDim;
         mesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        // Position for multi-arch
+        // Position for multi-arch — close together like a real bite
         if (state.models.length === 1) {
-            // Second arch — offset below the first
-            mesh.position.y = -15;
-            state.models[0].mesh.position.y = 15;
+            // Second arch — small gap to show natural bite
+            mesh.position.y = -3;
+            state.models[0].mesh.position.y = 3;
         }
 
         scene.add(mesh);
@@ -2132,21 +2150,26 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             btn.classList.add('active');
 
             const preset = btn.dataset.preset;
-            const mat = createDentalMaterial(preset);
             state.models.forEach(m => {
+                // For 'scan' preset, use vertex colors if available
+                const useVertexColors = (preset === 'scan') && m.mesh.userData.hasVertexColors;
+                const mat = createDentalMaterial(preset === 'scan' ? 'tooth' : preset, useVertexColors);
                 m.mesh.material.dispose();
-                m.mesh.material = mat.clone();
+                m.mesh.material = mat;
             });
 
-            // Update sliders
-            document.getElementById('sliderRoughness').value = mat.roughness * 100;
-            document.getElementById('valRoughness').textContent = mat.roughness.toFixed(2);
-            document.getElementById('sliderMetalness').value = mat.metalness * 100;
-            document.getElementById('valMetalness').textContent = mat.metalness.toFixed(2);
-            document.getElementById('sliderOpacity').value = mat.opacity * 100;
-            document.getElementById('valOpacity').textContent = mat.opacity.toFixed(2);
-            document.getElementById('colorPicker').value = '#' + mat.color.getHexString();
-            document.getElementById('toggleWireframe').classList.toggle('on', mat.wireframe);
+            // Update sliders from first model's material
+            if (state.models.length > 0) {
+                const mat = state.models[0].mesh.material;
+                document.getElementById('sliderRoughness').value = mat.roughness * 100;
+                document.getElementById('valRoughness').textContent = mat.roughness.toFixed(2);
+                document.getElementById('sliderMetalness').value = mat.metalness * 100;
+                document.getElementById('valMetalness').textContent = mat.metalness.toFixed(2);
+                document.getElementById('sliderOpacity').value = mat.opacity * 100;
+                document.getElementById('valOpacity').textContent = mat.opacity.toFixed(2);
+                document.getElementById('colorPicker').value = '#' + mat.color.getHexString();
+                document.getElementById('toggleWireframe').classList.toggle('on', mat.wireframe);
+            }
         });
     });
 
