@@ -1622,6 +1622,9 @@
                 <button class="sidebar-item" data-view="paloma-analytics">
                     <i data-lucide="bird"></i> PALOMA AI
                 </button>
+                <button class="sidebar-item" data-view="treatment-plans">
+                    <i data-lucide="clipboard-plus"></i> Treatment Plans
+                </button>
                 <button class="sidebar-item" id="sidebar-financial" data-view="financial-intelligence">
                     <i data-lucide="wallet"></i> Financial
                 </button>
@@ -1633,6 +1636,9 @@
                 </button>
                 <button class="sidebar-item" id="sidebar-onboarding" data-view="onboarding-wizard">
                     <i data-lucide="wand-2"></i> Practice Setup
+                </button>
+                <button class="sidebar-item" data-view="billing">
+                    <i data-lucide="credit-card"></i> Billing
                 </button>
                 <button class="sidebar-item" data-view="practice-settings">
                     <i data-lucide="settings-2"></i> Settings
@@ -3354,6 +3360,181 @@ We look forward to seeing you!
                 </div>
             </div>
 
+            <!-- ═══ Billing & Subscription View ═══ -->
+            <div id="view-billing" class="view">
+                <div class="view-header">
+                    <h2><i data-lucide="credit-card" style="width:22px;height:22px"></i> Billing & Subscription</h2>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button class="btn-secondary" onclick="loadBillingView()">
+                            <i data-lucide="refresh-cw" style="width:14px;height:14px"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pricing Tiers -->
+                <div id="billing-pricing-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px;align-items:start;"></div>
+
+                <!-- Usage Dashboard -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="activity" style="width:18px;height:18px;color:var(--admin-teal)"></i> Usage This Month
+                    </h3>
+                    <div id="billing-usage-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;"></div>
+                </div>
+
+                <!-- Billing History -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="receipt" style="width:18px;height:18px;color:var(--admin-teal)"></i> Billing History
+                    </h3>
+                    <div class="data-table-container">
+                        <table class="data-table" id="billing-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billing-history-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="wallet" style="width:18px;height:18px;color:var(--admin-teal)"></i> Payment Method
+                    </h3>
+                    <div id="billing-payment-info" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;"></div>
+                </div>
+            </div>
+
+            <!-- ═══ Treatment Plans View ═══ -->
+            <div id="view-treatment-plans" class="view">
+                <div class="view-header">
+                    <h2><i data-lucide="clipboard-plus" style="width:22px;height:22px"></i> AI Treatment Plan Generator</h2>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button class="btn-secondary" onclick="loadTreatmentPlansView()">
+                            <i data-lucide="refresh-cw" style="width:14px;height:14px"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tp-grid">
+                    <!-- LEFT COLUMN — Plan Builder -->
+                    <div class="tp-builder">
+                        <div class="glass-card" style="padding:24px;">
+                            <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="stethoscope" style="width:18px;height:18px;color:var(--admin-teal)"></i> Plan Builder
+                            </h3>
+
+                            <!-- Patient Selector -->
+                            <div class="tp-field">
+                                <label class="tp-label">Patient</label>
+                                <input type="text" id="tp-patient-input" list="tp-patient-list" class="tp-input" placeholder="Search patient name..." autocomplete="off">
+                                <datalist id="tp-patient-list"></datalist>
+                            </div>
+
+                            <!-- Teeth Involved -->
+                            <div class="tp-field">
+                                <label class="tp-label">Teeth Involved <span style="color:var(--admin-muted);font-weight:400;">(click to select)</span></label>
+                                <div class="tp-teeth-chart">
+                                    <div class="tp-arch-label">Upper</div>
+                                    <div class="tp-arch" id="tp-upper-arch"></div>
+                                    <div class="tp-arch-divider"></div>
+                                    <div class="tp-arch" id="tp-lower-arch"></div>
+                                    <div class="tp-arch-label">Lower</div>
+                                </div>
+                                <div class="tp-selected-teeth" id="tp-selected-display">No teeth selected</div>
+                            </div>
+
+                            <!-- Diagnosis -->
+                            <div class="tp-field">
+                                <label class="tp-label">Diagnosis</label>
+                                <select id="tp-diagnosis" class="tp-input">
+                                    <option value="">Select a diagnosis...</option>
+                                    <option value="Dental Caries">Dental Caries</option>
+                                    <option value="Tooth Fracture">Tooth Fracture</option>
+                                    <option value="Periapical Abscess">Periapical Abscess</option>
+                                    <option value="Periodontal Disease">Periodontal Disease</option>
+                                    <option value="Malocclusion">Malocclusion</option>
+                                    <option value="Edentulism (Partial)">Edentulism (Partial)</option>
+                                    <option value="Edentulism (Complete)">Edentulism (Complete)</option>
+                                    <option value="Enamel Erosion">Enamel Erosion</option>
+                                    <option value="Bruxism">Bruxism</option>
+                                    <option value="TMJ Disorder">TMJ Disorder</option>
+                                    <option value="Impacted Tooth">Impacted Tooth</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="tp-field">
+                                <label class="tp-label">Additional Notes</label>
+                                <textarea id="tp-notes" class="tp-input" rows="3" placeholder="Clinical observations, patient concerns, special considerations..."></textarea>
+                            </div>
+
+                            <!-- Generate Button -->
+                            <button class="btn-primary tp-generate-btn" id="tp-generate-btn" onclick="generateTreatmentPlan()">
+                                <i data-lucide="sparkles" style="width:18px;height:18px"></i> Generate Treatment Plan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN — Generated Plan -->
+                    <div class="tp-output">
+                        <div class="glass-card" style="padding:24px;min-height:500px;">
+                            <div class="tp-output-header">
+                                <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                    <i data-lucide="file-text" style="width:18px;height:18px;color:var(--admin-teal)"></i> Generated Plan
+                                </h3>
+                                <div class="tp-tabs" id="tp-tabs" style="display:none;">
+                                    <button class="tp-tab active" data-tab="patient" onclick="switchPlanTab('patient')">Patient-Friendly</button>
+                                    <button class="tp-tab" data-tab="clinical" onclick="switchPlanTab('clinical')">Clinical</button>
+                                </div>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div id="tp-loading" style="display:none;">
+                                <div class="tp-loading-container">
+                                    <div class="tp-loading-spinner"></div>
+                                    <p class="tp-loading-text">Analyzing case and generating treatment plan...</p>
+                                    <div class="tp-loading-bar"><div class="tp-loading-bar-fill" id="tp-progress-bar"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div id="tp-empty-state" class="tp-empty-state">
+                                <i data-lucide="clipboard-plus" style="width:48px;height:48px;color:var(--admin-muted);opacity:0.4;"></i>
+                                <p style="color:var(--admin-muted);font-size:14px;margin-top:12px;">Select a patient, teeth, and diagnosis, then click <strong>Generate</strong> to create an AI-powered treatment plan.</p>
+                            </div>
+
+                            <!-- Plan Content -->
+                            <div id="tp-plan-content" style="display:none;">
+                                <div id="tp-plan-patient" class="tp-plan-body"></div>
+                                <div id="tp-plan-clinical" class="tp-plan-body" style="display:none;"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div id="tp-actions" class="tp-actions" style="display:none;">
+                                <button class="btn-secondary" onclick="copyPlanToClipboard()">
+                                    <i data-lucide="copy" style="width:14px;height:14px"></i> Copy to Clipboard
+                                </button>
+                                <button class="btn-secondary" onclick="exportPlanPDF()">
+                                    <i data-lucide="file-down" style="width:14px;height:14px"></i> Export PDF
+                                </button>
+                                <button class="btn-primary" onclick="savePlanToPatient()">
+                                    <i data-lucide="save" style="width:14px;height:14px"></i> Save to Patient Record
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -3786,6 +3967,8 @@ We look forward to seeing you!
                 if (view === 'patients') loadPatients();
                 if (view === 'insurance-verify') loadInsuranceHistory();
                 if (view === 'reminders') loadRemindersView();
+                if (view === 'treatment-plans') loadTreatmentPlansView();
+                if (view === 'billing') loadBillingView();
 
                 // Refresh Lucide icons for dynamic content
                 try { lucide.createIcons(); } catch(e) {}
@@ -7848,6 +8031,1791 @@ We look forward to seeing you!
 
     console.log('[Reminders] Appointment Reminders module loaded');
     </script>
+    <!-- ═══ Billing & Subscription Module ═══ -->
+    <style>
+    /* ─── Billing Pricing Cards ─── */
+    .billing-pricing-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 18px;
+        overflow: hidden;
+        transition: var(--admin-transition);
+        position: relative;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+    }
+    .billing-pricing-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    .billing-pricing-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .billing-pricing-card.recommended {
+        transform: translateY(-6px);
+        box-shadow: 0 0 30px rgba(20,184,166,0.2), 0 16px 48px rgba(0,0,0,0.4);
+        z-index: 2;
+    }
+    .billing-pricing-card.recommended::before {
+        background: linear-gradient(135deg, var(--admin-teal), rgba(20,184,166,0.3), var(--admin-teal));
+        padding: 2px;
+    }
+    .billing-pricing-card.recommended:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 0 40px rgba(20,184,166,0.3), 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .billing-card-header {
+        padding: 28px 24px 20px;
+        text-align: center;
+        position: relative;
+    }
+    .billing-card-header.starter {
+        background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.08));
+    }
+    .billing-card-header.professional {
+        background: linear-gradient(135deg, rgba(20,184,166,0.15), rgba(14,165,233,0.1));
+    }
+    .billing-card-header.enterprise {
+        background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(239,68,68,0.08));
+    }
+    .billing-card-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 12px;
+    }
+    .billing-card-badge.popular {
+        background: var(--admin-teal-glow);
+        color: var(--admin-teal);
+        border: 1px solid rgba(20,184,166,0.3);
+    }
+    .billing-card-badge.current {
+        background: var(--admin-blue-glow);
+        color: var(--admin-blue);
+        border: 1px solid rgba(59,130,246,0.3);
+    }
+    .billing-card-badge.best-value {
+        background: var(--admin-gold-glow);
+        color: var(--admin-gold);
+        border: 1px solid rgba(245,158,11,0.3);
+    }
+    .billing-card-tier {
+        font-family: 'Outfit', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--admin-text);
+        margin-bottom: 4px;
+    }
+    .billing-card-price {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        color: var(--admin-text);
+        line-height: 1.1;
+    }
+    .billing-card-price span {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--admin-muted);
+    }
+    .billing-card-body {
+        padding: 20px 24px 28px;
+    }
+    .billing-card-features {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+    .billing-card-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--admin-text-secondary);
+        line-height: 1.4;
+    }
+    .billing-card-features li::before {
+        content: '✓';
+        color: var(--admin-teal);
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+    .billing-card-btn {
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        transition: var(--admin-transition);
+        border: none;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+    }
+    .billing-card-btn.primary {
+        background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark));
+        color: #fff;
+    }
+    .billing-card-btn.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px var(--admin-teal-glow);
+    }
+    .billing-card-btn.secondary {
+        background: rgba(255,255,255,0.05);
+        color: var(--admin-text-secondary);
+        border: 1px solid var(--admin-border);
+    }
+    .billing-card-btn.secondary:hover {
+        border-color: var(--admin-teal);
+        color: var(--admin-teal);
+    }
+    .billing-card-btn.current-plan {
+        background: var(--admin-blue-glow);
+        color: var(--admin-blue);
+        cursor: default;
+        border: 1px solid rgba(59,130,246,0.3);
+    }
+
+    /* ─── Usage Progress Bars ─── */
+    .billing-usage-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: var(--admin-radius);
+        padding: 18px;
+        transition: var(--admin-transition);
+    }
+    .billing-usage-card:hover {
+        border-color: rgba(255,255,255,0.1);
+        transform: translateY(-2px);
+    }
+    .billing-usage-icon { font-size: 24px; margin-bottom: 8px; }
+    .billing-usage-label {
+        font-size: 11px;
+        color: var(--admin-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .billing-usage-value {
+        font-family: 'Outfit', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--admin-text);
+        margin-bottom: 4px;
+    }
+    .billing-usage-sub {
+        font-size: 12px;
+        color: var(--admin-muted);
+        margin-bottom: 10px;
+    }
+    .billing-progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .billing-progress-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--admin-teal), #2dd4bf);
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .billing-progress-fill.warning {
+        background: linear-gradient(90deg, var(--admin-amber), #f97316);
+    }
+    .billing-progress-fill.danger {
+        background: linear-gradient(90deg, var(--admin-red), #f87171);
+    }
+
+    /* ─── Payment Card Display ─── */
+    .billing-saved-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        min-width: 280px;
+    }
+    .billing-card-icon {
+        font-size: 28px;
+    }
+    .billing-card-number {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 14px;
+        color: var(--admin-text);
+        letter-spacing: 1px;
+    }
+    .billing-card-exp {
+        font-size: 12px;
+        color: var(--admin-muted);
+    }
+
+    /* ─── Plan Confirm Modal ─── */
+    .billing-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        z-index: 99998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease-out;
+    }
+    .billing-modal {
+        background: var(--admin-surface-solid);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 440px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        animation: slideUp 0.3s ease-out;
+        text-align: center;
+    }
+    .billing-modal h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--admin-text);
+        margin-bottom: 8px;
+    }
+    .billing-modal p {
+        font-size: 14px;
+        color: var(--admin-muted);
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+    .billing-modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    /* ─── Responsive Billing ─── */
+    @media (max-width: 1024px) {
+        #billing-pricing-grid { grid-template-columns: 1fr !important; max-width: 480px; margin: 0 auto 28px; }
+        #billing-usage-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .billing-pricing-card.recommended { transform: none; }
+        .billing-pricing-card.recommended:hover { transform: translateY(-4px); }
+    }
+    @media (max-width: 600px) {
+        #billing-usage-grid { grid-template-columns: 1fr !important; }
+    }
+    </style>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    //  Billing & Subscription Module
+    //  PALOMA Dental Intelligence Platform
+    // ═══════════════════════════════════════════════════════════
+
+    // TODO: Replace with Stripe.js checkout session
+    // <script src="https://js.stripe.com/v3/"></script>
+    // const stripe = Stripe('pk_live_XXXXXXX');
+
+    const BILLING_PLANS = {
+        starter: {
+            name: 'Starter',
+            price: 199,
+            headerClass: 'starter',
+            badge: null,
+            features: [
+                'Up to 500 PALOMA chats/month',
+                'Basic practice dashboard',
+                'Email appointment reminders',
+                '1 staff login',
+                'Email support'
+            ]
+        },
+        professional: {
+            name: 'Professional',
+            price: 399,
+            headerClass: 'professional',
+            badge: { label: 'Most Popular', class: 'popular' },
+            recommended: true,
+            features: [
+                'Up to 2,000 PALOMA chats/month',
+                'Full intelligence dashboard & KPI scorecards',
+                'Insurance verification',
+                'AI treatment plan generator',
+                '3D MouthMap patient portal',
+                'Unlimited staff logins',
+                'Priority support'
+            ]
+        },
+        enterprise: {
+            name: 'Enterprise',
+            price: 799,
+            headerClass: 'enterprise',
+            badge: { label: 'Best Value', class: 'best-value' },
+            features: [
+                'Unlimited PALOMA chats',
+                'Everything in Professional',
+                'Multi-location support',
+                'Custom AI training on your practice data',
+                'Dedicated account manager',
+                'API access',
+                'White-label option'
+            ]
+        }
+    };
+
+    let billingCurrentPlan = 'starter'; // Default, overridden by Firestore
+
+    async function loadBillingView() {
+        console.log('[Billing] Loading billing view...');
+        // Try to load from Firestore
+        try {
+            const db = firebase.firestore();
+            const doc = await db.collection('practice-config').doc('billing').get();
+            if (doc.exists) {
+                const data = doc.data();
+                billingCurrentPlan = data.currentPlan || 'starter';
+            }
+        } catch (e) {
+            console.warn('[Billing] Could not load billing config:', e.message);
+        }
+
+        renderPricingCards();
+        renderUsageDashboard();
+        loadBillingHistory();
+        renderPaymentMethod();
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    function renderPricingCards() {
+        const grid = document.getElementById('billing-pricing-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        Object.entries(BILLING_PLANS).forEach(([key, plan]) => {
+            const isCurrent = billingCurrentPlan === key;
+            const isRecommended = plan.recommended || false;
+
+            let badgeHTML = '';
+            if (isCurrent) {
+                badgeHTML = '<div class="billing-card-badge current">✓ Current Plan</div>';
+            } else if (plan.badge) {
+                badgeHTML = `<div class="billing-card-badge ${plan.badge.class}">⭐ ${plan.badge.label}</div>`;
+            }
+
+            let btnHTML = '';
+            if (isCurrent) {
+                btnHTML = '<button class="billing-card-btn current-plan" disabled>Current Plan</button>';
+            } else if (BILLING_PLANS[billingCurrentPlan] && plan.price > BILLING_PLANS[billingCurrentPlan].price) {
+                btnHTML = `<button class="billing-card-btn primary" onclick="selectPlan('${key}')"><i data-lucide="arrow-up-circle" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:4px"></i> Upgrade</button>`;
+            } else {
+                btnHTML = `<button class="billing-card-btn secondary" onclick="selectPlan('${key}')">Select Plan</button>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = `billing-pricing-card${isRecommended ? ' recommended' : ''}`;
+            card.innerHTML = `
+                <div class="billing-card-header ${plan.headerClass}">
+                    ${badgeHTML}
+                    <div class="billing-card-tier">${plan.name}</div>
+                    <div class="billing-card-price">$${plan.price}<span>/mo</span></div>
+                </div>
+                <div class="billing-card-body">
+                    <ul class="billing-card-features">
+                        ${plan.features.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                    ${btnHTML}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderUsageDashboard() {
+        const grid = document.getElementById('billing-usage-grid');
+        if (!grid) return;
+
+        // Mock usage data
+        const currentLimit = BILLING_PLANS[billingCurrentPlan]?.features[0] || '';
+        const chatLimit = billingCurrentPlan === 'enterprise' ? Infinity : (billingCurrentPlan === 'professional' ? 2000 : 500);
+        const apiLimit = billingCurrentPlan === 'enterprise' ? Infinity : (billingCurrentPlan === 'professional' ? 5000 : 1000);
+
+        const usage = [
+            { icon: '💬', label: 'Chat Volume', value: 127, max: chatLimit, sub: `${127} / ${chatLimit === Infinity ? '∞' : chatLimit.toLocaleString()} chats this month`, hasBar: true },
+            { icon: '👥', label: 'Active Patients', value: 48, max: null, sub: 'Active this month', hasBar: false },
+            { icon: '📊', label: 'API Calls', value: 234, max: apiLimit, sub: `${234} / ${apiLimit === Infinity ? '∞' : apiLimit.toLocaleString()}`, hasBar: true },
+            { icon: '📧', label: 'Reminders Sent', value: 89, max: null, sub: '89 this month', hasBar: false }
+        ];
+
+        grid.innerHTML = usage.map(u => {
+            let barHTML = '';
+            if (u.hasBar && u.max && u.max !== Infinity) {
+                const pct = Math.min((u.value / u.max) * 100, 100);
+                const fillClass = pct > 90 ? 'danger' : pct > 70 ? 'warning' : '';
+                barHTML = `
+                    <div class="billing-progress-bar">
+                        <div class="billing-progress-fill ${fillClass}" style="width:${pct}%"></div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="billing-usage-card">
+                    <div class="billing-usage-icon">${u.icon}</div>
+                    <div class="billing-usage-label">${u.label}</div>
+                    <div class="billing-usage-value">${u.value.toLocaleString()}</div>
+                    <div class="billing-usage-sub">${u.sub}</div>
+                    ${barHTML}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function loadBillingHistory() {
+        const tbody = document.getElementById('billing-history-body');
+        if (!tbody) return;
+
+        // Mock billing history
+        const now = new Date();
+        const history = [
+            { date: new Date(now.getFullYear(), now.getMonth(), 1), desc: `PALOMA ${BILLING_PLANS[billingCurrentPlan]?.name || 'Starter'} — Monthly`, amount: BILLING_PLANS[billingCurrentPlan]?.price || 199, status: 'Paid' },
+            { date: new Date(now.getFullYear(), now.getMonth() - 1, 1), desc: `PALOMA ${BILLING_PLANS[billingCurrentPlan]?.name || 'Starter'} — Monthly`, amount: BILLING_PLANS[billingCurrentPlan]?.price || 199, status: 'Paid' },
+            { date: new Date(now.getFullYear(), now.getMonth() - 2, 1), desc: `PALOMA ${BILLING_PLANS[billingCurrentPlan]?.name || 'Starter'} — Monthly`, amount: BILLING_PLANS[billingCurrentPlan]?.price || 199, status: 'Paid' }
+        ];
+
+        tbody.innerHTML = history.map((h, i) => `
+            <tr>
+                <td>${h.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                <td>${h.desc}</td>
+                <td style="font-weight:600;color:var(--admin-text);">$${h.amount.toFixed(2)}</td>
+                <td><span class="badge badge-green"><span class="badge-dot"></span> ${h.status}</span></td>
+                <td><a href="#" class="table-link" onclick="event.preventDefault();showToast('Invoice download coming soon','info')"><i data-lucide="download" style="width:14px;height:14px;vertical-align:middle"></i> PDF</a></td>
+            </tr>
+        `).join('');
+    }
+
+    function renderPaymentMethod() {
+        const container = document.getElementById('billing-payment-info');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="billing-saved-card">
+                <div class="billing-card-icon">💳</div>
+                <div>
+                    <div class="billing-card-number">•••• •••• •••• 4242</div>
+                    <div class="billing-card-exp">Visa · Expires 12/2027</div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <button class="btn-secondary" onclick="showToast('Stripe payment update coming soon','info')">
+                    <i data-lucide="pencil" style="width:14px;height:14px"></i> Update Payment Method
+                </button>
+                <span style="font-size:12px;color:var(--admin-muted);">Billing email: admin@lakejeanettedentistry.com</span>
+            </div>
+        `;
+    }
+
+    function selectPlan(tier) {
+        const plan = BILLING_PLANS[tier];
+        if (!plan || tier === billingCurrentPlan) return;
+
+        const isUpgrade = plan.price > (BILLING_PLANS[billingCurrentPlan]?.price || 0);
+        const action = isUpgrade ? 'Upgrade' : 'Switch';
+
+        // Show confirmation modal
+        const overlay = document.createElement('div');
+        overlay.className = 'billing-modal-overlay';
+        overlay.innerHTML = `
+            <div class="billing-modal">
+                <h3>${action} to ${plan.name}?</h3>
+                <p>Your plan will change to <strong>${plan.name}</strong> at <strong>$${plan.price}/mo</strong>. 
+                ${isUpgrade ? 'You will be charged the prorated difference immediately.' : 'The change takes effect at the start of your next billing cycle.'}</p>
+                <div class="billing-modal-actions">
+                    <button class="btn-secondary" onclick="this.closest('.billing-modal-overlay').remove()">Cancel</button>
+                    <button class="btn-primary" onclick="confirmPlanChange('${tier}')">
+                        <i data-lucide="check" style="width:16px;height:16px"></i> Confirm ${action}
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.remove();
+        });
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    async function confirmPlanChange(tier) {
+        // TODO: Replace with Stripe.js checkout session
+        // const session = await fetch('/.netlify/functions/create-checkout-session', {
+        //     method: 'POST',
+        //     body: JSON.stringify({ plan: tier }),
+        //     headers: { 'Content-Type': 'application/json' }
+        // });
+        // const { sessionId } = await session.json();
+        // await stripe.redirectToCheckout({ sessionId });
+
+        // For now, save to Firestore and update UI
+        try {
+            const db = firebase.firestore();
+            await db.collection('practice-config').doc('billing').set({
+                currentPlan: tier,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: firebase.auth().currentUser?.email || 'unknown'
+            }, { merge: true });
+
+            billingCurrentPlan = tier;
+            document.querySelector('.billing-modal-overlay')?.remove();
+            showToast(`Plan changed to ${BILLING_PLANS[tier].name}!`, 'success');
+            loadBillingView();
+        } catch (e) {
+            console.error('[Billing] Plan change failed:', e);
+            showToast('Failed to update plan: ' + e.message, 'error');
+        }
+    }
+
+    console.log('[Billing] Billing & Subscription module loaded');
+    </script>
+
+    <!-- ═══ AI Treatment Plan Generator Module ═══ -->
+    <style>
+    /* ─── Treatment Plans Layout ─── */
+    .tp-grid {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 24px;
+        align-items: start;
+    }
+    @media (max-width: 1024px) {
+        .tp-grid { grid-template-columns: 1fr; }
+    }
+    .tp-field {
+        margin-bottom: 18px;
+    }
+    .tp-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--admin-text-secondary);
+        margin-bottom: 6px;
+    }
+    .tp-input {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: var(--admin-radius-sm);
+        border: 1px solid var(--admin-border);
+        background: rgba(255,255,255,0.04);
+        color: var(--admin-text);
+        font-size: 13px;
+        font-family: 'Inter', sans-serif;
+        transition: var(--admin-transition);
+    }
+    .tp-input:focus {
+        outline: none;
+        border-color: var(--admin-teal);
+        box-shadow: 0 0 0 3px var(--admin-teal-glow);
+    }
+    select.tp-input {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+        cursor: pointer;
+    }
+    select.tp-input option {
+        background: var(--admin-bg-secondary);
+        color: var(--admin-text);
+    }
+    textarea.tp-input {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    /* ─── Tooth Chart ─── */
+    .tp-teeth-chart {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius);
+        padding: 16px;
+        text-align: center;
+    }
+    .tp-arch-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--admin-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 4px 0;
+    }
+    .tp-arch {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+        margin: 6px 0;
+    }
+    .tp-arch-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--admin-border), transparent);
+        margin: 8px 20px;
+    }
+    .tp-tooth {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid var(--admin-border);
+        background: rgba(255,255,255,0.04);
+        color: var(--admin-muted);
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    .tp-tooth:hover {
+        transform: scale(1.1);
+        border-color: var(--admin-teal);
+        color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+    }
+    .tp-tooth.selected {
+        background: var(--admin-teal);
+        color: white;
+        border-color: var(--admin-teal);
+        box-shadow: 0 2px 8px var(--admin-teal-glow);
+    }
+    .tp-selected-teeth {
+        font-size: 12px;
+        color: var(--admin-muted);
+        margin-top: 8px;
+        min-height: 18px;
+    }
+
+    /* ─── Generate Button ─── */
+    .tp-generate-btn {
+        width: 100%;
+        padding: 14px 24px !important;
+        font-size: 15px !important;
+        justify-content: center;
+        margin-top: 6px;
+    }
+
+    /* ─── Output Panel ─── */
+    .tp-output-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .tp-tabs {
+        display: flex;
+        gap: 4px;
+        background: rgba(255,255,255,0.04);
+        border-radius: var(--admin-radius-sm);
+        padding: 3px;
+    }
+    .tp-tab {
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--admin-muted);
+        transition: var(--admin-transition);
+    }
+    .tp-tab:hover {
+        color: var(--admin-text);
+    }
+    .tp-tab.active {
+        background: var(--admin-teal);
+        color: white;
+    }
+
+    /* ─── Empty State ─── */
+    .tp-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    /* ─── Loading ─── */
+    .tp-loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 20px;
+    }
+    .tp-loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--admin-border);
+        border-top-color: var(--admin-teal);
+        border-radius: 50%;
+        animation: tp-spin 0.8s linear infinite;
+    }
+    @keyframes tp-spin {
+        to { transform: rotate(360deg); }
+    }
+    .tp-loading-text {
+        color: var(--admin-muted);
+        font-size: 14px;
+        margin-top: 16px;
+        animation: tp-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes tp-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    .tp-loading-bar {
+        width: 200px;
+        height: 4px;
+        background: var(--admin-border);
+        border-radius: 2px;
+        margin-top: 16px;
+        overflow: hidden;
+    }
+    .tp-loading-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--admin-teal), var(--admin-teal-dark));
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+
+    /* ─── Plan Body ─── */
+    .tp-plan-body {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--admin-text-secondary);
+    }
+    .tp-plan-body h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--admin-text);
+        margin: 20px 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .tp-plan-body h4:first-child {
+        margin-top: 0;
+    }
+    .tp-plan-body ol, .tp-plan-body ul {
+        padding-left: 20px;
+        margin: 8px 0;
+    }
+    .tp-plan-body li {
+        margin-bottom: 4px;
+    }
+    .tp-plan-body .tp-highlight {
+        background: var(--admin-teal-glow);
+        border-left: 3px solid var(--admin-teal);
+        padding: 10px 14px;
+        border-radius: 0 var(--admin-radius-sm) var(--admin-radius-sm) 0;
+        margin: 10px 0;
+        font-size: 13px;
+    }
+    .tp-plan-body .tp-cost-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: var(--admin-green-glow);
+        color: var(--admin-green);
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    /* ─── Action Buttons ─── */
+    .tp-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--admin-border);
+        flex-wrap: wrap;
+    }
+    </style>
+
+    <script>
+    /* ═══════════════════════════════════════════════════════════
+       AI Treatment Plan Generator — Admin Module
+       Patient Builder, Tooth Grid, AI Generation, Save/Export
+       ═══════════════════════════════════════════════════════════ */
+
+    // ─── State ───
+    let tpSelectedTeeth = new Set();
+    let tpCurrentPlan = null; // { patient, clinical }
+    let tpCurrentTab = 'patient';
+
+    // ─── Treatment Templates (Fallback) ───
+    const TREATMENT_TEMPLATES = {
+        'Dental Caries': {
+            patientFriendly: {
+                summary: 'You have a cavity (tooth decay) that needs to be treated. The decayed portion of the tooth will be removed and replaced with a tooth-colored filling to restore its shape and function.',
+                procedures: [
+                    'Dental examination and X-rays to assess the extent of decay',
+                    'Local anesthesia (numbing) to keep you comfortable',
+                    'Removal of the decayed portion of the tooth',
+                    'Placement of a composite (tooth-colored) filling',
+                    'Bite check and polishing for a natural feel'
+                ],
+                timeline: '1 visit, approximately 45–60 minutes',
+                costRange: '$150 – $350 per tooth',
+                aftercare: [
+                    'Avoid eating on the treated side for 2 hours after the procedure',
+                    'Mild sensitivity to hot and cold is normal for 1–2 weeks',
+                    'Maintain regular brushing and flossing',
+                    'Avoid very hard or sticky foods on the filling for 24 hours',
+                    'Call us if you experience persistent pain or the filling feels too high when biting'
+                ]
+            },
+            clinical: {
+                summary: 'Carious lesion identified requiring operative intervention. Lesion classification and extent to be confirmed radiographically.',
+                procedures: [
+                    'Comprehensive oral evaluation (D0150)',
+                    'Periapical radiograph (D0220)',
+                    'Local infiltration anesthesia (lidocaine 2% with 1:100,000 epinephrine)',
+                    'Caries excavation with #330 carbide bur, high-speed handpiece',
+                    'Selective caries removal to firm dentin; caries indicator dye verification',
+                    'Direct composite restoration (D2391–D2394), incremental layering technique',
+                    'Occlusal adjustment and finishing with Sof-Lex discs'
+                ],
+                timeline: '1 appointment, 45–60 min chair time',
+                costRange: '$150 – $350 per restoration (D2391–D2394)',
+                aftercare: [
+                    'Post-operative sensitivity may occur for 1–2 weeks; recommend desensitizing toothpaste',
+                    'Monitor occlusion at follow-up; adjust if premature contacts noted',
+                    'Re-evaluate restoration integrity at 6-month recall',
+                    'Advise patient on cariogenic diet reduction and fluoride use',
+                    'Rx: Ibuprofen 400mg PRN for post-op discomfort'
+                ]
+            }
+        },
+        'Tooth Fracture': {
+            patientFriendly: {
+                summary: 'Your tooth has a fracture (crack or break) that needs to be repaired. Depending on the severity, treatment may range from bonding to a dental crown to protect the tooth.',
+                procedures: [
+                    'Thorough examination and X-rays to evaluate the fracture',
+                    'Discussion of treatment options based on fracture severity',
+                    'Numbing the area for your comfort',
+                    'Smoothing or bonding for minor chips, or crown preparation for larger fractures',
+                    'Placement of a custom dental crown (may require a temporary crown for 2–3 weeks)',
+                    'Follow-up to check bite and fit'
+                ],
+                timeline: '1–2 visits over 2–3 weeks (if crown is needed)',
+                costRange: '$300 – $1,500 per tooth (bonding $300–$600; crown $800–$1,500)',
+                aftercare: [
+                    'Avoid chewing hard foods on the treated tooth until the permanent crown is placed',
+                    'If a temporary crown is placed, avoid sticky foods that could pull it off',
+                    'Some sensitivity is normal after crown preparation',
+                    'Maintain excellent oral hygiene around the treated area',
+                    'Contact us immediately if the temporary crown comes loose'
+                ]
+            },
+            clinical: {
+                summary: 'Tooth fracture requiring evaluation via Ellis classification or AAE crack tooth categories. Extent of fracture to pulp, PDL involvement to be determined radiographically and clinically.',
+                procedures: [
+                    'Comprehensive oral evaluation (D0150) with transillumination',
+                    'Periapical radiograph (D0220) and/or CBCT (D0367) if fracture line not visible',
+                    'Vitality testing: cold test (Endo-Ice), EPT',
+                    'Ellis Class I/II: Direct composite bonding (D2330–D2335)',
+                    'Ellis Class III or cracked tooth: Full-coverage crown (D2740 ceramic or D2750 PFM)',
+                    'Crown preparation with chamfer or shoulder margin; impression with PVS or digital scan',
+                    'Temporary crown fabrication (D2799) with provisional cement',
+                    'Crown delivery: try-in, marginal evaluation, occlusal adjustment, final cementation'
+                ],
+                timeline: '2 appointments over 2–3 weeks for indirect restoration; 1 appointment for direct bonding',
+                costRange: '$300 – $1,500 (D2330–D2335 bonding; D2740/D2750 crown)',
+                aftercare: [
+                    'Post-operative vitality monitoring recommended for 3–6 months',
+                    'If pulpal symptoms develop, endodontic consultation indicated',
+                    'Temporary crown: caution with sticky/hard foods; re-cement if dislodged',
+                    'Evaluate occlusion at delivery and 2-week post-op',
+                    'Night guard (D9944) recommended if bruxism suspected as contributing factor'
+                ]
+            }
+        },
+        'Periapical Abscess': {
+            patientFriendly: {
+                summary: 'You have an infection at the root of your tooth (abscess). This needs to be treated promptly with antibiotics and either a root canal to save the tooth or an extraction if the tooth cannot be saved.',
+                procedures: [
+                    'Emergency examination and X-rays to locate the infection',
+                    'Prescribe antibiotics and pain medication for immediate relief',
+                    'Drainage of the abscess if needed to relieve pressure',
+                    'Root canal treatment to remove the infected nerve and clean the inside of the tooth',
+                    'Placement of a dental crown to protect the treated tooth',
+                    'Follow-up to ensure healing and infection clearance'
+                ],
+                timeline: '2–3 visits over 3–4 weeks',
+                costRange: '$800 – $2,500 (root canal $800–$1,200; crown $800–$1,500)',
+                aftercare: [
+                    'Take all prescribed antibiotics exactly as directed — complete the full course',
+                    'Over-the-counter pain relievers can help manage discomfort',
+                    'Avoid chewing on the affected side until treatment is complete',
+                    'Warm salt water rinses (½ tsp salt in 8 oz water) can help with healing',
+                    'Call immediately if swelling worsens, fever develops, or difficulty swallowing/breathing occurs'
+                ]
+            },
+            clinical: {
+                summary: 'Periapical abscess/acute apical periodontitis with radiographic periapical radiolucency. Pulpal necrosis confirmed or suspected. Urgent management required.',
+                procedures: [
+                    'Emergency evaluation (D0140) with periapical radiograph (D0220)',
+                    'Pulp vitality testing: negative to cold and EPT expected',
+                    'Incision and drainage (D7510) if fluctuant swelling present',
+                    'Rx: Amoxicillin 500mg TID × 7 days (or Clindamycin 300mg QID if PCN allergy)',
+                    'Rx: Ibuprofen 600mg QID PRN pain',
+                    'Root canal therapy (D3310 anterior, D3320 premolar, D3330 molar)',
+                    'Working length determination via electronic apex locator + radiograph',
+                    'Biomechanical preparation, NaOCl irrigation, Ca(OH)₂ inter-appointment dressing',
+                    'Obturation with gutta-percha and sealer; post-space if indicated',
+                    'Full-coverage crown (D2740/D2750) following endodontic completion'
+                ],
+                timeline: '2–3 appointments over 3–4 weeks; emergency visit within 24 hours',
+                costRange: '$800 – $2,500 (D3310–D3330 RCT + D2740/D2750 crown)',
+                aftercare: [
+                    'Monitor for systemic signs: fever, lymphadenopathy, cellulitis — refer to ER if airway compromise',
+                    'Antibiotic compliance critical; culture and sensitivity if refractory',
+                    'Post-endodontic flare: may occur in 24–48 hrs; short course corticosteroid if severe',
+                    'Radiographic follow-up at 6 months and 1 year to evaluate periapical healing',
+                    'If non-healing, consider apicoectomy (D3410–D3426) or extraction'
+                ]
+            }
+        },
+        'Periodontal Disease': {
+            patientFriendly: {
+                summary: 'You have gum disease, which means the gums and bone supporting your teeth are being affected by bacteria. Treatment involves deep cleaning below the gum line and ongoing maintenance to keep your gums healthy.',
+                procedures: [
+                    'Full periodontal examination with probing depth measurements',
+                    'Full-mouth X-rays to assess bone levels',
+                    'Scaling and root planing (deep cleaning) — usually done in 2 visits, one side at a time',
+                    'Numbing medication for comfort during deep cleaning',
+                    'Possible antimicrobial rinse or locally placed antibiotic',
+                    'Re-evaluation 4–6 weeks after treatment to measure improvement',
+                    'Ongoing periodontal maintenance cleanings every 3–4 months'
+                ],
+                timeline: '2–4 visits over 6–8 weeks, then ongoing maintenance every 3–4 months',
+                costRange: '$800 – $2,000 for initial treatment; $200 – $350 per maintenance visit',
+                aftercare: [
+                    'Brush gently twice daily with a soft-bristle toothbrush',
+                    'Floss daily — your hygienist will show you the best technique',
+                    'Use prescribed antimicrobial mouth rinse if provided',
+                    'Avoid smoking — it significantly slows gum healing',
+                    'Keep all follow-up appointments; periodontal disease requires ongoing management',
+                    'Some bleeding and sensitivity are normal for a few days after deep cleaning'
+                ]
+            },
+            clinical: {
+                summary: 'Generalized/localized chronic periodontitis with clinical attachment loss and radiographic bone loss. AAP Stage and Grade to be determined based on probing depths and radiographic findings.',
+                procedures: [
+                    'Comprehensive periodontal evaluation (D0180) with full probing chart',
+                    'Full-mouth radiographic survey (D0210) or vertical bitewings',
+                    'AAP staging and grading classification',
+                    'Scaling and root planing per quadrant (D4341) with local anesthesia',
+                    'Subgingival irrigation with chlorhexidine 0.12%',
+                    'Arestin (minocycline microspheres, D4381) placement in sites ≥5mm',
+                    'Re-evaluation at 4–6 weeks (D0171); repeat probing and charting',
+                    'Periodontal maintenance (D4910) every 3–4 months',
+                    'Referral to periodontist if sites >6mm non-responsive to initial therapy'
+                ],
+                timeline: '2–4 appointments over 6–8 weeks for active therapy; D4910 q3–4 months',
+                costRange: '$800 – $2,000 initial (D4341 ×4 quads + D4381); $200 – $350 per D4910',
+                aftercare: [
+                    'Post-SRP sensitivity expected 1–2 weeks; desensitizing toothpaste recommended',
+                    'Prescribe chlorhexidine 0.12% rinse BID × 2 weeks post-SRP',
+                    'Tobacco cessation counseling critical for treatment success',
+                    'Monitor HbA1c in diabetic patients — glycemic control affects periodontal outcomes',
+                    'Re-evaluate non-responsive sites for surgical intervention: osseous surgery (D4260/D4261)'
+                ]
+            }
+        },
+        'Malocclusion': {
+            patientFriendly: {
+                summary: 'Your bite is not properly aligned (malocclusion), which can cause difficulty chewing, jaw pain, or uneven tooth wear. Orthodontic treatment can correct the alignment of your teeth and jaws.',
+                procedures: [
+                    'Comprehensive orthodontic evaluation with photos and models',
+                    'Panoramic X-ray and cephalometric analysis to plan treatment',
+                    'Discussion of treatment options: traditional braces vs. clear aligners',
+                    'Fitting of orthodontic appliances or delivery of aligner trays',
+                    'Regular adjustment visits every 4–8 weeks',
+                    'Retainer delivery after active treatment is complete'
+                ],
+                timeline: '12–24 months of active treatment, followed by retainer wear',
+                costRange: '$3,000 – $8,000 (varies by complexity and appliance type)',
+                aftercare: [
+                    'Wear aligners 20–22 hours per day as directed',
+                    'Brush and floss after every meal — braces trap food easily',
+                    'Avoid hard, sticky, or chewy foods with traditional braces',
+                    'Wear your retainer as instructed to prevent teeth from shifting back',
+                    'Keep all scheduled adjustment appointments for the best results',
+                    'Some discomfort for 2–3 days after adjustments is normal'
+                ]
+            },
+            clinical: {
+                summary: 'Malocclusion requiring orthodontic evaluation. Angle classification and skeletal relationship to be determined via cephalometric analysis and clinical examination.',
+                procedures: [
+                    'Comprehensive orthodontic evaluation (D8660)',
+                    'Panoramic radiograph (D0330) and lateral cephalometric radiograph (D0340)',
+                    'Cephalometric tracing and analysis (ANB angle, SN-MP, etc.)',
+                    'Dental models/digital scan for space analysis and Bolton discrepancy',
+                    'Treatment planning: fixed appliances (D8080/D8090) or clear aligner therapy (D8040)',
+                    'Bonding of brackets or delivery of aligners; initial archwire placement',
+                    'Sequential archwire progression and/or aligner changes q2 weeks',
+                    'Detailing and finishing; interproximal reduction (IPR) as needed',
+                    'Debonding (D8070) and retainer delivery (D8680 fixed or D8692 removable)'
+                ],
+                timeline: '12–24 months active treatment; phase-based if growth modification needed',
+                costRange: '$3,000 – $8,000 (D8080/D8090 comprehensive; D8040 limited)',
+                aftercare: [
+                    'Retention protocol: fixed lingual retainer + removable Essix retainer',
+                    'Retainer wear: full-time 6 months, then nighttime indefinitely',
+                    'Monitor third molar development; extraction (D7230) if impaction risk',
+                    'Post-ortho dental restorations if spacing or shape correction needed',
+                    'TMJ monitoring if pre-existing dysfunction'
+                ]
+            }
+        },
+        'Edentulism (Partial)': {
+            patientFriendly: {
+                summary: 'You are missing one or more teeth, which can affect chewing, speech, and the alignment of remaining teeth. We can replace missing teeth with a bridge, partial denture, or dental implants.',
+                procedures: [
+                    'Comprehensive examination and X-rays to evaluate remaining teeth and bone',
+                    'Discussion of replacement options: implant, bridge, or partial denture',
+                    'Preparatory work: any needed extractions or gum treatment',
+                    'For implants: surgical placement of titanium post, healing period, then crown',
+                    'For bridge: preparation of adjacent teeth, impressions, and cementation',
+                    'For partial denture: impressions, try-in, and delivery',
+                    'Follow-up adjustments to ensure proper fit and comfort'
+                ],
+                timeline: '2–6 months depending on treatment choice (implants require longer healing)',
+                costRange: '$1,500 – $5,000 per tooth (implant $3,000–$5,000; bridge $1,500–$3,000; partial $1,000–$2,500)',
+                aftercare: [
+                    'Implants: avoid hard foods for the first few weeks; keep the area very clean',
+                    'Bridge: floss under the bridge daily using a floss threader or water flosser',
+                    'Partial denture: remove and clean daily; soak overnight',
+                    'Keep all follow-up appointments to monitor healing and fit',
+                    'Report any looseness, pain, or changes in bite immediately'
+                ]
+            },
+            clinical: {
+                summary: 'Partial edentulism requiring prosthetic rehabilitation. Kennedy classification and treatment planning to consider implant-supported, fixed, or removable options based on ridge anatomy, occlusion, and patient factors.',
+                procedures: [
+                    'Comprehensive oral evaluation (D0150) with full radiographic survey (D0210)',
+                    'CBCT scan (D0367) for implant site evaluation if applicable',
+                    'Diagnostic casts and wax-up for prosthetic planning',
+                    'Option A — Implant: Implant placement (D6010), abutment (D6056), crown (D6065)',
+                    'Option B — Fixed bridge: Abutment preparations, PFM or ceramic FPD (D6740–D6752)',
+                    'Option C — Removable partial denture: framework design (D5213/D5214)',
+                    'Interim prosthesis (D5820/D5821) if immediate aesthetics required',
+                    'Implant-stage II surgery and impression (D6011) if two-stage protocol',
+                    'Delivery, occlusal adjustment, and patient education'
+                ],
+                timeline: '2–6 months; implants: 3–6 months osseointegration; FPD: 2–3 weeks lab',
+                costRange: '$1,500 – $5,000 per unit (D6010+D6056+D6065 implant; D6740–D6752 bridge; D5213/D5214 RPD)',
+                aftercare: [
+                    'Implant maintenance: periapical radiograph at 1 year, then biannual',
+                    'FPD: superfloss or floss threader for pontic hygiene',
+                    'RPD: daily cleaning with denture brush; annual reline evaluation (D5730/D5731)',
+                    'Monitor abutment teeth for secondary caries and periodontal status',
+                    'Night guard consideration if opposing dentition shows wear facets'
+                ]
+            }
+        },
+        'Edentulism (Complete)': {
+            patientFriendly: {
+                summary: 'You are missing all or most of your teeth and need a full replacement to restore your ability to eat, speak, and smile confidently. Options include conventional dentures or implant-supported dentures for a more secure fit.',
+                procedures: [
+                    'Complete examination of your mouth, gums, and jawbone',
+                    'X-rays or CT scan to evaluate bone density for implant options',
+                    'Discussion of options: conventional dentures vs. implant-supported dentures',
+                    'Impressions and bite registration for custom denture fabrication',
+                    'Try-in appointment to check fit, appearance, and bite',
+                    'Delivery of final dentures with adjustments',
+                    'For implants: placement of 4–6 implants to anchor the denture'
+                ],
+                timeline: '4–8 weeks for conventional dentures; 4–6 months for implant-supported',
+                costRange: '$2,000 – $30,000 (conventional dentures $2,000–$5,000; implant-supported $15,000–$30,000 per arch)',
+                aftercare: [
+                    'Remove and clean dentures daily with a denture brush and cleaner',
+                    'Soak dentures overnight in a denture solution',
+                    'Clean your gums and any remaining natural structures daily',
+                    'Schedule regular check-ups for denture relining and fit evaluation',
+                    'It takes time to adjust to dentures — start with soft foods and practice speaking'
+                ]
+            },
+            clinical: {
+                summary: 'Complete edentulism requiring full-arch prosthetic rehabilitation. Assessment of residual ridge morphology, inter-ridge space, and patient candidacy for conventional vs. implant-retained/supported prosthesis.',
+                procedures: [
+                    'Comprehensive evaluation (D0150) with panoramic radiograph (D0330)',
+                    'CBCT scan (D0367) for implant candidacy assessment',
+                    'Preliminary and final impressions (border-molded custom tray technique)',
+                    'Facebow transfer, jaw relation records, Gothic arch tracing',
+                    'Wax try-in for tooth arrangement and aesthetics verification',
+                    'Option A — Complete denture (D5110/D5120): conventional processing',
+                    'Option B — Implant overdenture: 2–4 implants (D6010) with Locator attachments',
+                    'Option C — All-on-4/6: 4–6 implants with fixed hybrid prosthesis (D6114/D6115)',
+                    'Delivery, occlusal adjustment (bilateral balanced occlusion), patient education'
+                ],
+                timeline: '4–8 weeks conventional; 4–6 months implant-supported (osseointegration)',
+                costRange: '$2,000 – $30,000 per arch (D5110/D5120 conventional; D6010×4 + hybrid for All-on-4)',
+                aftercare: [
+                    'Conventional: 24-hr post-insertion recall; adjust as needed (D5410/D5411)',
+                    'Annual reline assessment (D5730/D5731); remake every 5–7 years',
+                    'Implant overdenture: attachment maintenance, nylon cap replacement q6–12 months',
+                    'All-on-4 hybrid: annual removal for cleaning; peri-implant evaluation',
+                    'Nutritional counseling if extensive adaptation period'
+                ]
+            }
+        },
+        'Enamel Erosion': {
+            patientFriendly: {
+                summary: 'The outer protective layer of your teeth (enamel) has been wearing away, which can cause sensitivity and make teeth more vulnerable to cavities. Treatment focuses on protecting remaining enamel and restoring damaged areas.',
+                procedures: [
+                    'Comprehensive examination to assess extent of enamel loss',
+                    'Discussion of contributing factors (acid reflux, diet, grinding)',
+                    'Fluoride varnish treatment to strengthen remaining enamel',
+                    'Bonding or veneers for teeth with significant enamel loss',
+                    'Custom fluoride tray for at-home use',
+                    'Dietary counseling to reduce acidic food and drink exposure'
+                ],
+                timeline: '1–3 visits; ongoing preventive care',
+                costRange: '$200 – $2,000 (fluoride treatment $50–$100; bonding $200–$600; veneers $800–$2,000 per tooth)',
+                aftercare: [
+                    'Use a soft-bristle toothbrush and non-abrasive fluoride toothpaste',
+                    'Wait 30 minutes after eating acidic foods before brushing',
+                    'Drink acidic beverages through a straw to minimize contact with teeth',
+                    'Use the prescribed fluoride tray as directed',
+                    'Consider reducing citrus, soda, wine, and other acidic foods',
+                    'Address any acid reflux issues with your physician'
+                ]
+            },
+            clinical: {
+                summary: 'Enamel erosion/tooth wear identified. Etiology assessment needed: erosion (intrinsic vs. extrinsic acid), attrition, abrasion, or abfraction. Smith and Knight Tooth Wear Index for classification.',
+                procedures: [
+                    'Comprehensive evaluation (D0150) with intraoral photographs',
+                    'Study models or digital scan for baseline documentation',
+                    'Dietary and medical history review for acid exposure (GERD, bulimia, acidic diet)',
+                    'Fluoride varnish application (D1206)',
+                    'Custom fluoride tray fabrication for home use',
+                    'Direct composite restoration (D2330–D2335) for localized defects',
+                    'Porcelain veneer (D2962) or full-coverage crown (D2740) for severe cases',
+                    'Referral to gastroenterologist if GERD suspected'
+                ],
+                timeline: '1–3 visits for restorative; ongoing preventive protocol',
+                costRange: '$200 – $2,000 per tooth (D1206 fluoride; D2330 bonding; D2962 veneer; D2740 crown)',
+                aftercare: [
+                    'Prescribe high-fluoride toothpaste (5000ppm sodium fluoride)',
+                    'Advise against brushing immediately post-acid exposure (wait 30 min)',
+                    'pH neutralization with baking soda rinse after acid episodes',
+                    'Night guard (D9944) if attrition/bruxism component identified',
+                    'Serial monitoring with study models or photographs at 6-month intervals'
+                ]
+            }
+        },
+        'Bruxism': {
+            patientFriendly: {
+                summary: 'You are grinding or clenching your teeth, often during sleep. This can cause tooth wear, jaw pain, and headaches. A custom night guard can protect your teeth, and we\'ll address any damage that has already occurred.',
+                procedures: [
+                    'Examination of teeth for wear patterns and jaw muscle tenderness',
+                    'X-rays to check for any damage to teeth or jaw joint',
+                    'Impressions for a custom-fitted night guard (occlusal splint)',
+                    'Delivery and adjustment of the night guard',
+                    'Repair of any chipped or worn teeth with bonding or crowns if needed',
+                    'Stress management and relaxation technique recommendations'
+                ],
+                timeline: '1–2 visits for night guard; additional visits if teeth need repair',
+                costRange: '$400 – $800 for night guard; additional restorations vary',
+                aftercare: [
+                    'Wear your night guard every night while sleeping',
+                    'Clean the night guard with a toothbrush and cool water each morning',
+                    'Store in the provided case when not wearing it',
+                    'Bring your night guard to dental visits for evaluation',
+                    'Practice jaw relaxation: lips together, teeth apart during the day',
+                    'Consider stress reduction techniques — stress often increases grinding'
+                ]
+            },
+            clinical: {
+                summary: 'Bruxism (sleep and/or awake) with associated tooth wear and/or myofascial pain. Differential diagnosis to rule out sleep-disordered breathing. Assessment of wear patterns and TMJ status required.',
+                procedures: [
+                    'Comprehensive evaluation (D0150) with wear pattern analysis',
+                    'TMJ evaluation: range of motion, joint sounds, muscle palpation',
+                    'Panoramic radiograph (D0330) for condylar morphology assessment',
+                    'Occlusal analysis: premature contacts, lateral interferences',
+                    'Maxillary occlusal guard fabrication (D9944)',
+                    'Direct composite restoration of worn surfaces (D2330–D2335) as needed',
+                    'Crown lengthening considerations if vertical dimension loss significant',
+                    'Referral for sleep study if nocturnal bruxism with sleep apnea symptoms'
+                ],
+                timeline: '1–2 visits for splint therapy; phased restorative if wear is extensive',
+                costRange: '$400 – $800 for D9944 occlusal guard; restorative costs additional',
+                aftercare: [
+                    'Nightly occlusal guard wear; evaluate guard at 2-week and 3-month follow-up',
+                    'Pharmacologic: consider low-dose muscle relaxant (cyclobenzaprine 5mg HS) short-term',
+                    'Referral to orofacial pain specialist if refractory',
+                    'Behavioral therapy: biofeedback, cognitive behavioral therapy for awake bruxism',
+                    'Monitor for progressive wear; consider full-mouth rehabilitation if VDO loss >2mm'
+                ]
+            }
+        },
+        'TMJ Disorder': {
+            patientFriendly: {
+                summary: 'You have a problem with your jaw joint (TMJ), which may cause pain, clicking, or difficulty opening your mouth. Treatment focuses on relieving pain, reducing inflammation, and improving jaw function.',
+                procedures: [
+                    'Thorough examination of jaw joints, muscles, and bite',
+                    'X-rays or CT scan of the jaw joints',
+                    'Custom splint or bite guard to reduce joint stress',
+                    'Physical therapy exercises for jaw muscles',
+                    'Pain management with anti-inflammatory medications',
+                    'Possible bite adjustment if needed',
+                    'Referral to TMJ specialist for complex cases'
+                ],
+                timeline: '4–12 weeks of conservative treatment; ongoing management if chronic',
+                costRange: '$500 – $2,000 (splint $400–$800; imaging $200–$500; physical therapy varies)',
+                aftercare: [
+                    'Eat soft foods and avoid wide opening (like big sandwiches or yawning)',
+                    'Apply moist heat or ice packs to the jaw area for 15 minutes at a time',
+                    'Practice jaw relaxation exercises as shown by your dentist',
+                    'Avoid gum chewing and nail biting',
+                    'Take anti-inflammatory medication as directed',
+                    'Reduce stress with relaxation techniques — tension worsens TMJ symptoms'
+                ]
+            },
+            clinical: {
+                summary: 'Temporomandibular disorder (TMD) — differential diagnosis per DC/TMD (Diagnostic Criteria for Temporomandibular Disorders). Classification: myalgia, arthralgia, disc displacement, and/or degenerative joint disease.',
+                procedures: [
+                    'DC/TMD Axis I and Axis II evaluation',
+                    'TMJ imaging: panoramic (D0330), CBCT (D0367) if bony pathology suspected',
+                    'MRI referral if internal derangement (disc displacement) suspected',
+                    'Stabilization splint fabrication (D9944) — full-arch maxillary',
+                    'Pharmacotherapy: NSAIDs (naproxen 500mg BID), muscle relaxant (cyclobenzaprine 10mg HS)',
+                    'Physical therapy referral: manual therapy, ultrasound, jaw exercises',
+                    'Trigger point injection (D9930) if myofascial trigger points identified',
+                    'Behavioral counseling: habit awareness, stress management',
+                    'Re-evaluation at 4-week and 12-week intervals'
+                ],
+                timeline: '4–12 weeks conservative therapy; referral to orofacial pain specialist if non-responsive',
+                costRange: '$500 – $2,000 (D9944 splint; D0367 CBCT; D9930 injection; PT varies)',
+                aftercare: [
+                    'Splint wear protocol: nights initially, titrate based on symptom improvement',
+                    'Home exercise program: gentle ROM exercises, lateral excursion stretches',
+                    'Self-care: soft diet, moist heat 20 min QID, avoid parafunctional habits',
+                    'If Wilkes Stage III+ internal derangement: consider arthrocentesis (D7870) or arthroscopy referral',
+                    'Long-term monitoring for degenerative changes; annual imaging if DJD'
+                ]
+            }
+        },
+        'Impacted Tooth': {
+            patientFriendly: {
+                summary: 'You have a tooth that hasn\'t come in properly and is stuck in the jawbone or gum tissue (impacted). This commonly happens with wisdom teeth. The impacted tooth needs to be surgically removed to prevent pain, infection, or damage to nearby teeth.',
+                procedures: [
+                    'Panoramic X-ray or CT scan to see the exact position of the impacted tooth',
+                    'Discussion of anesthesia options (local, sedation, or general)',
+                    'Surgical extraction of the impacted tooth',
+                    'Stitches to close the site and promote healing',
+                    'Prescription for pain medication and antibiotics if needed',
+                    'Follow-up visit to check healing and remove stitches'
+                ],
+                timeline: '1 surgical visit; 1–2 week recovery period',
+                costRange: '$350 – $900 per tooth (varies by impaction complexity)',
+                aftercare: [
+                    'Bite on gauze for 30–45 minutes after surgery to control bleeding',
+                    'Apply ice packs to your cheek: 20 minutes on, 20 minutes off for the first 48 hours',
+                    'Eat soft foods for 3–5 days (yogurt, mashed potatoes, smoothies)',
+                    'Do NOT use straws, spit, or smoke — this can cause a painful dry socket',
+                    'Gently rinse with warm salt water starting the day after surgery',
+                    'Take pain medication before the numbness wears off'
+                ]
+            },
+            clinical: {
+                summary: 'Impacted tooth identified radiographically. Classification per Winter (angulation) and Pell & Gregory (depth/ramus relation). Proximity to IAN canal, sinus, and adjacent tooth roots to be evaluated.',
+                procedures: [
+                    'Panoramic radiograph (D0330) or CBCT (D0367) for 3D positional assessment',
+                    'Evaluation of IAN canal proximity (coronectomy consideration if intimate)',
+                    'Pre-operative assessment: medical history, anticoagulant use, allergy review',
+                    'Soft tissue impaction removal (D7220)',
+                    'Partial bony impaction removal (D7230)',
+                    'Complete bony impaction removal (D7240) with bone removal and tooth sectioning',
+                    'Primary closure with resorbable sutures (3-0 or 4-0 chromic gut)',
+                    'Rx: Amoxicillin 500mg TID × 5 days (if infection risk); Ibuprofen 600mg QID + Acetaminophen 500mg PRN',
+                    'Post-op radiograph to confirm complete removal'
+                ],
+                timeline: '1 surgical appointment; suture removal at 7–10 days if non-resorbable',
+                costRange: '$350 – $900 per tooth (D7220 soft tissue; D7230 partial bony; D7240 complete bony)',
+                aftercare: [
+                    'Post-op hemostasis: pressure with gauze 30–45 min; tranexamic acid rinse if anticoagulated',
+                    'Alveolar osteitis (dry socket) prevention: avoid negative pressure, smoking cessation',
+                    'If dry socket develops: irrigate and place medicated dressing (D7250)',
+                    'Monitor for IAN paresthesia: lip/chin numbness — document and monitor spontaneous recovery',
+                    'Follow-up at 1 week and 4 weeks; radiograph at 4 weeks if pathology suspected'
+                ]
+            }
+        },
+        'Other': {
+            patientFriendly: {
+                summary: 'Based on our examination findings, we\'ve identified a dental condition that requires a personalized treatment approach. We\'ll explain your specific situation and outline the best path forward.',
+                procedures: [
+                    'Comprehensive dental examination and necessary X-rays',
+                    'Detailed discussion of findings and diagnosis',
+                    'Presentation of treatment options with pros and cons',
+                    'Treatment tailored to your specific condition',
+                    'Follow-up visits to monitor progress and healing'
+                ],
+                timeline: 'To be determined based on specific treatment needs',
+                costRange: 'Varies based on treatment plan — we\'ll provide a detailed estimate',
+                aftercare: [
+                    'Follow all post-treatment instructions provided by your dentist',
+                    'Maintain excellent oral hygiene with brushing and flossing',
+                    'Keep all scheduled follow-up appointments',
+                    'Report any unusual symptoms promptly',
+                    'Continue with regular preventive dental visits'
+                ]
+            },
+            clinical: {
+                summary: 'Condition requiring individualized treatment planning based on clinical and radiographic findings. Further diagnostic workup may be indicated.',
+                procedures: [
+                    'Comprehensive oral evaluation (D0150)',
+                    'Appropriate radiographic survey (D0210/D0220/D0330)',
+                    'Additional diagnostic tests as indicated (biopsy D7285, culture, vitality testing)',
+                    'Treatment planning conference and case presentation',
+                    'Individualized treatment sequence based on diagnosis',
+                    'Specialist referral if beyond scope of general practice'
+                ],
+                timeline: 'Variable — dependent on diagnosis and treatment complexity',
+                costRange: 'To be determined following comprehensive treatment planning',
+                aftercare: [
+                    'Post-treatment protocol specific to procedures performed',
+                    'Regular recall schedule: D0120 periodic evaluation',
+                    'Radiographic monitoring per ADA guidelines',
+                    'Patient compliance with home care instructions critical',
+                    'Interdisciplinary coordination if multiple specialties involved'
+                ]
+            }
+        }
+    };
+
+    // ─── Initialize Tooth Grid ───
+    function initToothGrid() {
+        const upperArch = document.getElementById('tp-upper-arch');
+        const lowerArch = document.getElementById('tp-lower-arch');
+        if (!upperArch || !lowerArch) return;
+        upperArch.innerHTML = '';
+        lowerArch.innerHTML = '';
+        // Upper teeth: 1-16
+        for (let i = 1; i <= 16; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'tp-tooth';
+            btn.textContent = i;
+            btn.dataset.tooth = i;
+            btn.onclick = () => toggleTooth(i);
+            upperArch.appendChild(btn);
+        }
+        // Lower teeth: 32 down to 17 (mirrors upper arch)
+        for (let i = 32; i >= 17; i--) {
+            const btn = document.createElement('button');
+            btn.className = 'tp-tooth';
+            btn.textContent = i;
+            btn.dataset.tooth = i;
+            btn.onclick = () => toggleTooth(i);
+            lowerArch.appendChild(btn);
+        }
+    }
+
+    // ─── Toggle Tooth Selection ───
+    function toggleTooth(num) {
+        if (tpSelectedTeeth.has(num)) {
+            tpSelectedTeeth.delete(num);
+        } else {
+            tpSelectedTeeth.add(num);
+        }
+        // Update UI
+        document.querySelectorAll('.tp-tooth').forEach(btn => {
+            const t = parseInt(btn.dataset.tooth);
+            btn.classList.toggle('selected', tpSelectedTeeth.has(t));
+        });
+        // Update display
+        const display = document.getElementById('tp-selected-display');
+        if (tpSelectedTeeth.size === 0) {
+            display.textContent = 'No teeth selected';
+            display.style.color = 'var(--admin-muted)';
+        } else {
+            const sorted = Array.from(tpSelectedTeeth).sort((a, b) => a - b);
+            display.innerHTML = `<span style="color:var(--admin-teal);font-weight:600;">${sorted.length} teeth selected:</span> #${sorted.join(', #')}`;
+        }
+    }
+
+    // ─── Load Treatment Plans View ───
+    async function loadTreatmentPlansView() {
+        console.log('[TreatmentPlans] Loading treatment plans view...');
+        // Reset state
+        tpSelectedTeeth.clear();
+        tpCurrentPlan = null;
+        tpCurrentTab = 'patient';
+
+        // Reset form
+        const patientInput = document.getElementById('tp-patient-input');
+        if (patientInput) patientInput.value = '';
+        const diagSelect = document.getElementById('tp-diagnosis');
+        if (diagSelect) diagSelect.value = '';
+        const notesArea = document.getElementById('tp-notes');
+        if (notesArea) notesArea.value = '';
+
+        // Reset output
+        const emptyState = document.getElementById('tp-empty-state');
+        const planContent = document.getElementById('tp-plan-content');
+        const tabs = document.getElementById('tp-tabs');
+        const actions = document.getElementById('tp-actions');
+        const loading = document.getElementById('tp-loading');
+        if (emptyState) emptyState.style.display = '';
+        if (planContent) planContent.style.display = 'none';
+        if (tabs) tabs.style.display = 'none';
+        if (actions) actions.style.display = 'none';
+        if (loading) loading.style.display = 'none';
+
+        // Init tooth grid
+        initToothGrid();
+
+        // Load patient list
+        await populateTreatmentPlanPatients();
+
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    // ─── Populate Patient List ───
+    async function populateTreatmentPlanPatients() {
+        const datalist = document.getElementById('tp-patient-list');
+        if (!datalist) return;
+        datalist.innerHTML = '';
+        try {
+            const db = firebase.firestore();
+            // Try patients collection first
+            let snap = await db.collection('patients').orderBy('lastName').limit(100).get();
+            if (!snap.empty) {
+                snap.docs.forEach(doc => {
+                    const d = doc.data();
+                    const name = [d.firstName, d.lastName].filter(Boolean).join(' ');
+                    if (name) {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.dataset.id = doc.id;
+                        datalist.appendChild(opt);
+                    }
+                });
+            } else {
+                // Fallback: pull from appointments
+                snap = await db.collection('appointments').orderBy('created_at', 'desc').limit(50).get();
+                const names = new Set();
+                snap.docs.forEach(doc => {
+                    const d = doc.data();
+                    const name = d.patient_name || d.patientName || '';
+                    if (name && !names.has(name)) {
+                        names.add(name);
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        datalist.appendChild(opt);
+                    }
+                });
+            }
+        } catch(e) {
+            console.warn('[TreatmentPlans] Could not load patients:', e.message);
+        }
+    }
+
+    // ─── Generate Treatment Plan ───
+    async function generateTreatmentPlan() {
+        const patient = document.getElementById('tp-patient-input')?.value?.trim();
+        const diagnosis = document.getElementById('tp-diagnosis')?.value;
+        const notes = document.getElementById('tp-notes')?.value?.trim();
+        const teeth = Array.from(tpSelectedTeeth).sort((a, b) => a - b);
+
+        // Validate
+        if (!patient) { showToast('Please select a patient', 'error'); return; }
+        if (teeth.length === 0) { showToast('Please select at least one tooth', 'error'); return; }
+        if (!diagnosis) { showToast('Please select a diagnosis', 'error'); return; }
+
+        // Show loading
+        const btn = document.getElementById('tp-generate-btn');
+        const loading = document.getElementById('tp-loading');
+        const emptyState = document.getElementById('tp-empty-state');
+        const planContent = document.getElementById('tp-plan-content');
+        const tabs = document.getElementById('tp-tabs');
+        const actions = document.getElementById('tp-actions');
+        const progressBar = document.getElementById('tp-progress-bar');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" style="width:18px;height:18px;animation:tp-spin 0.8s linear infinite"></i> Generating...';
+        emptyState.style.display = 'none';
+        planContent.style.display = 'none';
+        tabs.style.display = 'none';
+        actions.style.display = 'none';
+        loading.style.display = '';
+
+        // Animate progress bar
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress = Math.min(progress + Math.random() * 15, 90);
+            progressBar.style.width = progress + '%';
+        }, 400);
+
+        const teethStr = teeth.map(t => `#${t}`).join(', ');
+
+        try {
+            // Try AI generation
+            const prompt = `You are a dental treatment plan generator. Generate a comprehensive treatment plan for the following case:
+
+Patient: ${patient}
+Teeth Involved: ${teethStr}
+Diagnosis: ${diagnosis}
+Additional Notes: ${notes || 'None'}
+
+Generate TWO versions of the treatment plan in JSON format:
+{
+  "patientFriendly": {
+    "summary": "Simple explanation for the patient",
+    "procedures": ["step 1", "step 2", ...],
+    "timeline": "expected timeline",
+    "costRange": "estimated cost range in USD",
+    "aftercare": ["instruction 1", "instruction 2", ...]
+  },
+  "clinical": {
+    "summary": "Clinical summary with proper terminology",
+    "procedures": ["procedure with CDT code", ...],
+    "timeline": "clinical timeline",
+    "costRange": "cost range with CDT codes",
+    "aftercare": ["clinical post-op instruction", ...]
+  }
+}
+
+The patient-friendly version should use simple, reassuring language.
+The clinical version should include CDT codes, proper dental terminology, and pharmaceutical details.
+Include realistic cost ranges for the US market.
+Return ONLY valid JSON, no markdown or explanation.`;
+
+            const res = await fetch('/.netlify/functions/paloma-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: prompt,
+                    history: [],
+                    lang: 'en',
+                    mode: 'admin'
+                })
+            });
+
+            if (!res.ok) throw new Error('API returned ' + res.status);
+
+            const data = await res.json();
+            const reply = data.reply || '';
+
+            // Try to parse JSON from the response
+            let plan = null;
+            try {
+                // Extract JSON from potential markdown code blocks
+                const jsonMatch = reply.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, reply];
+                const jsonStr = jsonMatch[1].trim();
+                plan = JSON.parse(jsonStr);
+            } catch(parseErr) {
+                console.warn('[TreatmentPlans] Could not parse AI response, falling back to template');
+                throw new Error('parse_failed');
+            }
+
+            if (plan && plan.patientFriendly && plan.clinical) {
+                tpCurrentPlan = plan;
+            } else {
+                throw new Error('incomplete_plan');
+            }
+
+        } catch(e) {
+            console.log('[TreatmentPlans] Using template fallback:', e.message);
+            // Use template fallback
+            const template = TREATMENT_TEMPLATES[diagnosis] || TREATMENT_TEMPLATES['Other'];
+            tpCurrentPlan = {
+                patientFriendly: { ...template.patientFriendly },
+                clinical: { ...template.clinical }
+            };
+            // Customize with patient info
+            tpCurrentPlan.patientFriendly.summary = tpCurrentPlan.patientFriendly.summary.replace(
+                /identified on\.\.\./,
+                `identified on teeth ${teethStr}.`
+            );
+            tpCurrentPlan.clinical.summary = tpCurrentPlan.clinical.summary.replace(
+                /identified/,
+                `identified on teeth ${teethStr}`
+            );
+        }
+
+        // Complete progress bar
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+
+        setTimeout(() => {
+            loading.style.display = 'none';
+            renderPlan(patient, diagnosis, teeth);
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="sparkles" style="width:18px;height:18px"></i> Generate Treatment Plan';
+            try { lucide.createIcons(); } catch(e) {}
+        }, 500);
+    }
+
+    // ─── Render Plan ───
+    function renderPlan(patient, diagnosis, teeth) {
+        if (!tpCurrentPlan) return;
+        const teethStr = teeth.map(t => `#${t}`).join(', ');
+        const planDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Render patient-friendly version
+        document.getElementById('tp-plan-patient').innerHTML = renderPlanVersion(
+            tpCurrentPlan.patientFriendly, patient, diagnosis, teethStr, planDate, 'patient'
+        );
+
+        // Render clinical version
+        document.getElementById('tp-plan-clinical').innerHTML = renderPlanVersion(
+            tpCurrentPlan.clinical, patient, diagnosis, teethStr, planDate, 'clinical'
+        );
+
+        // Show content
+        document.getElementById('tp-plan-content').style.display = '';
+        document.getElementById('tp-tabs').style.display = '';
+        document.getElementById('tp-actions').style.display = '';
+
+        // Reset to patient tab
+        switchPlanTab('patient');
+    }
+
+    function renderPlanVersion(version, patient, diagnosis, teeth, date, type) {
+        const icon = type === 'patient' ? '💬' : '🏥';
+        const title = type === 'patient' ? 'Patient-Friendly Treatment Plan' : 'Clinical Treatment Plan';
+
+        return `
+            <div class="tp-highlight">
+                <strong>${icon} ${title}</strong><br>
+                <span style="font-size:12px;color:var(--admin-muted);">
+                    Patient: <strong>${patient}</strong> &nbsp;|&nbsp; Date: ${date} &nbsp;|&nbsp; Teeth: ${teeth}
+                </span>
+            </div>
+
+            <h4><i data-lucide="search" style="width:16px;height:16px;color:var(--admin-teal)"></i> Diagnosis Summary</h4>
+            <p>${version.summary || ''}</p>
+
+            <h4><i data-lucide="list-ordered" style="width:16px;height:16px;color:var(--admin-teal)"></i> Recommended Procedures</h4>
+            <ol>
+                ${(version.procedures || []).map(p => `<li>${p}</li>`).join('\n                ')}
+            </ol>
+
+            <h4><i data-lucide="clock" style="width:16px;height:16px;color:var(--admin-teal)"></i> Estimated Timeline</h4>
+            <p>${version.timeline || 'To be determined'}</p>
+
+            <h4><i data-lucide="dollar-sign" style="width:16px;height:16px;color:var(--admin-green)"></i> Cost Estimate</h4>
+            <p><span class="tp-cost-badge">${version.costRange || 'To be discussed'}</span></p>
+
+            <h4><i data-lucide="heart-pulse" style="width:16px;height:16px;color:var(--admin-teal)"></i> Post-Treatment Care</h4>
+            <ul>
+                ${(version.aftercare || []).map(a => `<li>${a}</li>`).join('\n                ')}
+            </ul>
+        `;
+    }
+
+    // ─── Switch Tab ───
+    function switchPlanTab(tab) {
+        tpCurrentTab = tab;
+        document.querySelectorAll('.tp-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === tab);
+        });
+        const patientDiv = document.getElementById('tp-plan-patient');
+        const clinicalDiv = document.getElementById('tp-plan-clinical');
+        if (patientDiv) patientDiv.style.display = tab === 'patient' ? '' : 'none';
+        if (clinicalDiv) clinicalDiv.style.display = tab === 'clinical' ? '' : 'none';
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    // ─── Copy to Clipboard ───
+    async function copyPlanToClipboard() {
+        const activeDiv = tpCurrentTab === 'patient'
+            ? document.getElementById('tp-plan-patient')
+            : document.getElementById('tp-plan-clinical');
+        if (!activeDiv) return;
+
+        const text = activeDiv.innerText;
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('Treatment plan copied to clipboard!', 'success');
+        } catch(e) {
+            // Fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Treatment plan copied to clipboard!', 'success');
+        }
+    }
+
+    // ─── Export PDF (Placeholder) ───
+    function exportPlanPDF() {
+        showToast('PDF export coming soon — use Copy to Clipboard for now.', 'info');
+    }
+
+    // ─── Save to Patient Record ───
+    async function savePlanToPatient() {
+        if (!tpCurrentPlan) { showToast('No plan to save', 'error'); return; }
+
+        const patient = document.getElementById('tp-patient-input')?.value?.trim();
+        const diagnosis = document.getElementById('tp-diagnosis')?.value;
+        const notes = document.getElementById('tp-notes')?.value?.trim();
+        const teeth = Array.from(tpSelectedTeeth).sort((a, b) => a - b);
+
+        try {
+            const db = firebase.firestore();
+            await db.collection('treatment-plans').add({
+                patientName: patient,
+                diagnosis: diagnosis,
+                teethInvolved: teeth,
+                additionalNotes: notes || '',
+                planPatientFriendly: tpCurrentPlan.patientFriendly,
+                planClinical: tpCurrentPlan.clinical,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: firebase.auth().currentUser?.email || 'admin',
+                status: 'draft'
+            });
+            showToast('Treatment plan saved to patient record!', 'success');
+        } catch(e) {
+            console.error('[TreatmentPlans] Save error:', e);
+            showToast('Failed to save: ' + e.message, 'error');
+        }
+    }
+
+    console.log('[TreatmentPlans] AI Treatment Plan Generator module loaded');
+    </script>
+
     <!-- Tenant Manager (Multi-Practice Support) -->
     <script src="js/tenant-manager.js"></script>
     <!-- HIPAA Safeguards -->
