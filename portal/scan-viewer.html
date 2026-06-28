@@ -3792,21 +3792,27 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         const sy = size.y * 0.5;
         const sz = size.z * 0.5;
 
-        // ── Nerve material (glowing yellow) ──
+        // ── Nerve material (glowing yellow, renders on top) ──
         const nerveMat = new THREE.MeshBasicMaterial({
             color: 0xfde047,
             transparent: true,
-            opacity: 0.85,
+            opacity: 0.9,
+            depthTest: false,
+            side: THREE.DoubleSide,
         });
         const branchMat = new THREE.MeshBasicMaterial({
             color: 0xf59e0b,
             transparent: true,
-            opacity: 0.7,
+            opacity: 0.8,
+            depthTest: false,
+            side: THREE.DoubleSide,
         });
         const glowMat = new THREE.MeshBasicMaterial({
             color: 0xfde047,
             transparent: true,
-            opacity: 0.15,
+            opacity: 0.12,
+            depthTest: false,
+            side: THREE.DoubleSide,
         });
 
         function createNerveTube(points, radius, material) {
@@ -3818,12 +3824,12 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                     center.z + p[2] * sz
                 ))
             );
-            const tubeGeo = new THREE.TubeGeometry(curve, 32, radius, 8, false);
+            const tubeGeo = new THREE.TubeGeometry(curve, 48, radius, 12, false);
             const tube = new THREE.Mesh(tubeGeo, material);
             nerveGroup.add(tube);
 
             // Outer glow
-            const glowGeo = new THREE.TubeGeometry(curve, 32, radius * 2.5, 8, false);
+            const glowGeo = new THREE.TubeGeometry(curve, 48, radius * 2.5, 12, false);
             const glow = new THREE.Mesh(glowGeo, glowMat);
             nerveGroup.add(glow);
         }
@@ -3840,7 +3846,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             [0.4, -0.75, -0.3],
             [0.6, -0.7, -0.5],
             [0.8, -0.6, -0.7],   // Right ramus entry
-        ], 0.3, nerveMat);
+        ], 0.8, nerveMat);
 
         // ── MENTAL NERVE (exits through mental foramen) ──
         // Left side
@@ -3848,13 +3854,13 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             [-0.35, -0.75, -0.2],  // Branch from IAN
             [-0.35, -0.55, 0.1],   // Exits foramen
             [-0.3, -0.4, 0.3],     // To chin/lip area
-        ], 0.2, branchMat);
+        ], 0.5, branchMat);
         // Right side
         createNerveTube([
             [0.35, -0.75, -0.2],
             [0.35, -0.55, 0.1],
             [0.3, -0.4, 0.3],
-        ], 0.2, branchMat);
+        ], 0.5, branchMat);
 
         // ── SUPERIOR ALVEOLAR NERVES (branches to upper teeth) ──
         // Posterior Superior Alveolar - to upper molars
@@ -3862,12 +3868,12 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             [-0.7, 0.7, -0.6],    // Infraorbital region
             [-0.6, 0.5, -0.4],
             [-0.5, 0.4, -0.2],    // Upper molar roots
-        ], 0.2, branchMat);
+        ], 0.5, branchMat);
         createNerveTube([
             [0.7, 0.7, -0.6],
             [0.6, 0.5, -0.4],
             [0.5, 0.4, -0.2],
-        ], 0.2, branchMat);
+        ], 0.5, branchMat);
 
         // Anterior Superior Alveolar - to upper front teeth
         createNerveTube([
@@ -3876,7 +3882,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             [0.0, 0.45, 0.2],     // Central incisors
             [0.15, 0.5, 0.0],
             [0.3, 0.7, -0.3],
-        ], 0.18, branchMat);
+        ], 0.45, branchMat);
 
         // ── TOOTH PULP NERVES (small branches into each tooth) ──
         // Create small nerve branches going up/down into tooth areas
@@ -3913,10 +3919,10 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 [tp.x, tp.y + (isUpper ? 0.15 : -0.15), tp.z],
                 [tp.x, tp.y, tp.z],
                 [tp.x, tp.y - (isUpper ? 0.1 : -0.1), tp.z + 0.03],
-            ], 0.08, branchMat);
+            ], 0.25, branchMat);
 
             // Tiny pulp chamber dot
-            const dotGeo = new THREE.SphereGeometry(0.12 * Math.min(sx, sy, sz) * 0.15, 8, 8);
+            const dotGeo = new THREE.SphereGeometry(0.5, 8, 8);
             const dot = new THREE.Mesh(dotGeo, nerveMat);
             dot.position.set(
                 center.x + tp.x * sx,
