@@ -1934,6 +1934,43 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     0%, 100% { box-shadow: 0 0 8px rgba(45,212,191,0.4); }
     50% { box-shadow: 0 0 20px rgba(45,212,191,0.8); }
 }
+/* Chart tooth pulse when linked from 3D */
+.dental-chart__tooth.pulse {
+    animation: chartPulse 0.6s ease-out;
+}
+@keyframes chartPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(45,212,191,0); }
+    30% { transform: scale(1.25); box-shadow: 0 0 16px rgba(45,212,191,0.7); }
+    100% { transform: scale(1.1); box-shadow: 0 0 10px rgba(45,212,191,0.4); }
+}
+/* Floating 3D label on viewport */
+.tooth-label-3d {
+    position: absolute;
+    z-index: 100;
+    padding: 4px 10px;
+    background: rgba(15, 20, 30, 0.9);
+    border: 1px solid rgba(45, 212, 191, 0.5);
+    border-radius: 6px;
+    color: #2dd4bf;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -120%);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 8px rgba(45,212,191,0.2);
+}
+.tooth-label-3d::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgba(45, 212, 191, 0.5);
+}
 </style>
 
 <script>
@@ -2552,9 +2589,45 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         showToothPopup(toothNum, e.clientX, e.clientY, hit.point);
 
         // Sync: highlight on dental chart too
-        document.querySelectorAll('.dental-chart__tooth').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.dental-chart__tooth').forEach(t => {
+            t.classList.remove('active');
+            t.classList.remove('pulse');
+        });
         const chartTooth = document.querySelector(`.dental-chart__tooth[data-tooth="${toothNum}"]`);
-        if (chartTooth) chartTooth.classList.add('active');
+        if (chartTooth) {
+            chartTooth.classList.add('active');
+            chartTooth.classList.add('pulse');
+            // Auto-open chart if collapsed so user sees the connection
+            if (!chartOpen) {
+                document.getElementById('dentalChartToggle').click();
+            }
+            // Scroll chart tooth into view
+            chartTooth.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        // Smooth camera nudge toward the selected tooth
+        nudgeCameraToward(hit.point);
+    }
+
+    // Smoothly move camera toward a point (subtle zoom)
+    function nudgeCameraToward(targetPoint) {
+        const start = camera.position.clone();
+        const direction = new THREE.Vector3().subVectors(targetPoint, start).normalize();
+        const nudgeDist = start.distanceTo(targetPoint) * 0.15; // move 15% closer
+        const end = start.clone().add(direction.multiplyScalar(nudgeDist));
+
+        let t = 0;
+        function animateNudge() {
+            t += 0.04;
+            if (t >= 1) {
+                camera.position.copy(end);
+                return;
+            }
+            const ease = t * (2 - t); // ease-out
+            camera.position.lerpVectors(start, end, ease);
+            requestAnimationFrame(animateNudge);
+        }
+        animateNudge();
     }
 
     function showToothPopup(num, screenX, screenY, worldPoint) {
@@ -2584,17 +2657,44 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         popup.style.top = top + 'px';
         popup.style.display = 'block';
 
-        // Add 3D highlight glow at the hit point
+        // Add 3D highlight glow at the hit point (inner + outer ring)
         if (toothHighlight) scene.remove(toothHighlight);
-        const glowGeo = new THREE.SphereGeometry(1.5, 16, 16);
+        if (state._outerGlow) scene.remove(state._outerGlow);
+
+        const glowGeo = new THREE.SphereGeometry(1.2, 16, 16);
         const glowMat = new THREE.MeshBasicMaterial({
             color: 0x2dd4bf,
             transparent: true,
-            opacity: 0.5
+            opacity: 0.6
         });
         toothHighlight = new THREE.Mesh(glowGeo, glowMat);
         toothHighlight.position.copy(worldPoint);
         scene.add(toothHighlight);
+
+        // Outer pulsing ring
+        const outerGeo = new THREE.RingGeometry(2.0, 2.8, 32);
+        const outerMat = new THREE.MeshBasicMaterial({
+            color: 0x2dd4bf,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        });
+        state._outerGlow = new THREE.Mesh(outerGeo, outerMat);
+        state._outerGlow.position.copy(worldPoint);
+        state._outerGlow.lookAt(camera.position);
+        scene.add(state._outerGlow);
+
+        // Floating tooth label (HTML overlay tracks 3D position)
+        let labelEl = document.getElementById('toothLabel3D');
+        if (!labelEl) {
+            labelEl = document.createElement('div');
+            labelEl.id = 'toothLabel3D';
+            labelEl.className = 'tooth-label-3d';
+            document.getElementById('sv-viewport').appendChild(labelEl);
+        }
+        labelEl.textContent = '#' + num + ' ' + tooth.name;
+        labelEl.style.display = 'block';
+        state._labelWorldPos = worldPoint.clone();
 
         // Re-init lucide icons in popup
         lucide.createIcons();
@@ -2606,7 +2706,19 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             scene.remove(toothHighlight);
             toothHighlight = null;
         }
+        if (state._outerGlow) {
+            scene.remove(state._outerGlow);
+            state._outerGlow = null;
+        }
+        // Hide floating label
+        const labelEl = document.getElementById('toothLabel3D');
+        if (labelEl) labelEl.style.display = 'none';
         selectedToothNum = null;
+        // Clear chart highlight
+        document.querySelectorAll('.dental-chart__tooth').forEach(t => {
+            t.classList.remove('active');
+            t.classList.remove('pulse');
+        });
     }
 
     // Close popup
