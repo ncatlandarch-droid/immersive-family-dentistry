@@ -2,96 +2,212 @@
   "patient": "logan-marrero",
   "scanner": "Medit i700",
   "scan_date": "2026-06-28",
+  "version": 2,
+  "method": "multi-scale-curvature-watershed",
   "teeth": {
     "1": {
       "file": "tooth_01.ply",
       "name": "Upper Right Third Molar",
-      "vertices": 357,
-      "faces": 649
+      "vertices": 199,
+      "faces": 337
+    },
+    "2": {
+      "file": "tooth_02.ply",
+      "name": "Upper Right Second Molar",
+      "vertices": 1368,
+      "faces": 2389
+    },
+    "3": {
+      "file": "tooth_03.ply",
+      "name": "Upper Right First Molar",
+      "vertices": 649,
+      "faces": 1115
     },
     "4": {
       "file": "tooth_04.ply",
       "name": "Upper Right Second Premolar",
-      "vertices": 59,
-      "faces": 87
+      "vertices": 2608,
+      "faces": 4723
+    },
+    "5": {
+      "file": "tooth_05.ply",
+      "name": "Upper Right First Premolar",
+      "vertices": 570,
+      "faces": 965
+    },
+    "6": {
+      "file": "tooth_06.ply",
+      "name": "Upper Right Canine",
+      "vertices": 8935,
+      "faces": 16608
+    },
+    "7": {
+      "file": "tooth_07.ply",
+      "name": "Upper Right Lateral Incisor",
+      "vertices": 1372,
+      "faces": 2537
     },
     "8": {
       "file": "tooth_08.ply",
       "name": "Upper Right Central Incisor",
-      "vertices": 54,
-      "faces": 81
+      "vertices": 390,
+      "faces": 682
+    },
+    "9": {
+      "file": "tooth_09.ply",
+      "name": "Upper Left Central Incisor",
+      "vertices": 552,
+      "faces": 990
+    },
+    "10": {
+      "file": "tooth_10.ply",
+      "name": "Upper Left Lateral Incisor",
+      "vertices": 384,
+      "faces": 634
+    },
+    "11": {
+      "file": "tooth_11.ply",
+      "name": "Upper Left Canine",
+      "vertices": 700,
+      "faces": 1226
     },
     "12": {
       "file": "tooth_12.ply",
       "name": "Upper Left First Premolar",
-      "vertices": 147,
-      "faces": 255
+      "vertices": 936,
+      "faces": 1712
+    },
+    "13": {
+      "file": "tooth_13.ply",
+      "name": "Upper Left Second Premolar",
+      "vertices": 1094,
+      "faces": 1949
+    },
+    "14": {
+      "file": "tooth_14.ply",
+      "name": "Upper Left First Molar",
+      "vertices": 928,
+      "faces": 1595
+    },
+    "15": {
+      "file": "tooth_15.ply",
+      "name": "Upper Left Second Molar",
+      "vertices": 208,
+      "faces": 357
     },
     "16": {
       "file": "tooth_16.ply",
       "name": "Upper Left Third Molar",
-      "vertices": 34117,
-      "faces": 61993
+      "vertices": 1074,
+      "faces": 1918
     },
     "17": {
       "file": "tooth_17.ply",
       "name": "Lower Left Third Molar",
-      "vertices": 51,
-      "faces": 74
+      "vertices": 153,
+      "faces": 232
+    },
+    "18": {
+      "file": "tooth_18.ply",
+      "name": "Lower Left Second Molar",
+      "vertices": 1903,
+      "faces": 3551
     },
     "19": {
       "file": "tooth_19.ply",
       "name": "Lower Left First Molar",
-      "vertices": 72,
-      "faces": 105
+      "vertices": 874,
+      "faces": 1567
+    },
+    "20": {
+      "file": "tooth_20.ply",
+      "name": "Lower Left Second Premolar",
+      "vertices": 382,
+      "faces": 641
     },
     "21": {
       "file": "tooth_21.ply",
       "name": "Lower Left First Premolar",
-      "vertices": 119,
-      "faces": 183
+      "vertices": 1519,
+      "faces": 2740
+    },
+    "22": {
+      "file": "tooth_22.ply",
+      "name": "Lower Left Canine",
+      "vertices": 220,
+      "faces": 342
     },
     "23": {
       "file": "tooth_23.ply",
       "name": "Lower Left Lateral Incisor",
-      "vertices": 107,
-      "faces": 162
+      "vertices": 423,
+      "faces": 749
+    },
+    "24": {
+      "file": "tooth_24.ply",
+      "name": "Lower Left Central Incisor",
+      "vertices": 458,
+      "faces": 788
     },
     "25": {
       "file": "tooth_25.ply",
       "name": "Lower Right Central Incisor",
-      "vertices": 92,
-      "faces": 150
+      "vertices": 1522,
+      "faces": 2819
+    },
+    "26": {
+      "file": "tooth_26.ply",
+      "name": "Lower Right Lateral Incisor",
+      "vertices": 654,
+      "faces": 1142
     },
     "27": {
       "file": "tooth_27.ply",
       "name": "Lower Right Canine",
-      "vertices": 74,
-      "faces": 116
+      "vertices": 261,
+      "faces": 442
+    },
+    "28": {
+      "file": "tooth_28.ply",
+      "name": "Lower Right First Premolar",
+      "vertices": 876,
+      "faces": 1397
     },
     "29": {
       "file": "tooth_29.ply",
       "name": "Lower Right Second Premolar",
-      "vertices": 51,
-      "faces": 79
+      "vertices": 511,
+      "faces": 902
+    },
+    "30": {
+      "file": "tooth_30.ply",
+      "name": "Lower Right First Molar",
+      "vertices": 1134,
+      "faces": 2053
+    },
+    "31": {
+      "file": "tooth_31.ply",
+      "name": "Lower Right Second Molar",
+      "vertices": 272,
+      "faces": 442
     },
     "32": {
       "file": "tooth_32.ply",
       "name": "Lower Right Third Molar",
-      "vertices": 58,
-      "faces": 87
+      "vertices": 237,
+      "faces": 335
     }
   },
   "gums": {
     "upper": {
       "file": "gum_upper.ply",
-      "vertices": 113354,
-      "faces": 218841
+      "vertices": 46704,
+      "faces": 80293
     },
     "lower": {
       "file": "gum_lower.ply",
-      "vertices": 95585,
-      "faces": 188710
+      "vertices": 29852,
+      "faces": 49945
     }
   }
 }

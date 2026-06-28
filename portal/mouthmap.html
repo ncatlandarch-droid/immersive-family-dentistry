@@ -837,6 +837,45 @@ body::before {
                 <i data-lucide="rotate-ccw"></i><span>Reset</span>
             </button>
         </div>
+
+        <!-- Collapsible 2D Tooth Chart -->
+        <div id="tooth-chart-panel" style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:20;transition:all 0.3s ease;">
+            <button id="tooth-chart-toggle" onclick="toggleToothChart()" style="
+                display:flex;align-items:center;gap:6px;padding:8px 16px;
+                background:rgba(15,20,35,0.9);border:1px solid rgba(45,212,191,0.3);
+                border-radius:12px 12px 0 0;color:#2dd4bf;font-size:12px;font-weight:600;
+                cursor:pointer;margin:0 auto;backdrop-filter:blur(12px);
+                box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+                <span style="font-size:16px;">🦷</span> Tooth Chart
+                <i data-lucide="chevron-up" id="chart-chevron" style="width:14px;height:14px;transition:transform 0.3s;"></i>
+            </button>
+            <div id="tooth-chart-body" style="
+                display:none;background:rgba(15,20,35,0.95);border:1px solid rgba(45,212,191,0.2);
+                border-radius:16px;padding:16px 20px;backdrop-filter:blur(16px);
+                box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:480px;">
+                <!-- Upper Arch -->
+                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:4px;">
+                    <span style="font-size:9px;color:#64748b;width:100%;text-align:center;">UPPER ARCH</span>
+                </div>
+                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:8px;" id="upper-arch-chart">
+                </div>
+                <div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0;"></div>
+                <!-- Lower Arch -->
+                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:4px;">
+                    <span style="font-size:9px;color:#64748b;width:100%;text-align:center;">LOWER ARCH</span>
+                </div>
+                <div style="display:flex;justify-content:center;gap:2px;" id="lower-arch-chart">
+                </div>
+                <!-- Legend -->
+                <div style="display:flex;justify-content:center;gap:12px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#F5F5F0;display:inline-block;"></span>Healthy</span>
+                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>Attention</span>
+                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#3B82F6;display:inline-block;"></span>Treated</span>
+                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
+                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#333;display:inline-block;"></span>Missing</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- RIGHT: Info Panel -->
@@ -2097,6 +2136,72 @@ function updateSummaryStats() {
             <div class="mm-stat-card__label">Planned</div>
         </div>
     `;
+    
+    // Also rebuild the 2D tooth chart
+    buildToothChart();
+}
+
+/* ═══ Collapsible 2D Tooth Chart ═══ */
+let toothChartOpen = false;
+
+function toggleToothChart() {
+    toothChartOpen = !toothChartOpen;
+    const body = document.getElementById('tooth-chart-body');
+    const chevron = document.getElementById('chart-chevron');
+    if (body) body.style.display = toothChartOpen ? 'block' : 'none';
+    if (chevron) chevron.style.transform = toothChartOpen ? 'rotate(180deg)' : '';
+}
+
+const STATUS_HEX = {
+    healthy: '#F5F5F0', needs_attention: '#F59E0B', treated: '#3B82F6',
+    planned: '#2dd4bf', missing: '#333333'
+};
+
+function buildToothChart() {
+    const upperEl = document.getElementById('upper-arch-chart');
+    const lowerEl = document.getElementById('lower-arch-chart');
+    if (!upperEl || !lowerEl) return;
+    
+    // Upper arch: teeth 1-16 (displayed right to left: 1..8 then 9..16)
+    let upperHTML = '';
+    for (let i = 1; i <= 16; i++) {
+        const tooth = DEMO_PATIENT.teeth[i] || { status: 'healthy' };
+        const color = STATUS_HEX[tooth.status] || '#F5F5F0';
+        const isSelected = selectedTooth === i;
+        const border = isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.15)';
+        const shadow = isSelected ? '0 0 8px rgba(45,212,191,0.6)' : 'none';
+        upperHTML += `<div onclick="selectToothByNumber(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
+            width:26px;height:30px;border-radius:4px 4px 6px 6px;
+            background:${color};border:${border};cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            font-size:8px;font-weight:700;color:${tooth.status==='healthy'?'#555':'#fff'};
+            transition:all 0.2s;box-shadow:${shadow};
+            ${i === 8 ? 'margin-right:6px;' : ''}
+        " onmouseover="this.style.transform='scale(1.2)';this.style.zIndex=5" 
+           onmouseout="this.style.transform='';this.style.zIndex=''">${i}</div>`;
+    }
+    upperEl.innerHTML = upperHTML;
+    
+    // Lower arch: teeth 32-17 (displayed right to left: 32..25 then 24..17)
+    let lowerHTML = '';
+    for (let i = 32; i >= 17; i--) {
+        const tooth = DEMO_PATIENT.teeth[i] || { status: 'healthy' };
+        const color = STATUS_HEX[tooth.status] || '#F5F5F0';
+        const isSelected = selectedTooth === i;
+        const border = isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.15)';
+        const shadow = isSelected ? '0 0 8px rgba(45,212,191,0.6)' : 'none';
+        const num = i; // map: 32→1st position ... 17→16th position
+        lowerHTML += `<div onclick="selectToothByNumber(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
+            width:26px;height:30px;border-radius:6px 6px 4px 4px;
+            background:${color};border:${border};cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            font-size:8px;font-weight:700;color:${tooth.status==='healthy'?'#555':'#fff'};
+            transition:all 0.2s;box-shadow:${shadow};
+            ${i === 25 ? 'margin-right:6px;' : ''}
+        " onmouseover="this.style.transform='scale(1.2)';this.style.zIndex=5" 
+           onmouseout="this.style.transform='';this.style.zIndex=''">${i}</div>`;
+    }
+    lowerEl.innerHTML = lowerHTML;
 }
 
 
