@@ -65,41 +65,13 @@
             <main class="portal-main">
                 <!-- View: 3D Scan -->
                 <div id="view-scan" class="portal-view active">
-                    <!-- MouthMap Hero Card — links to full experience -->
-                    <div class="mouth-viewer-container" id="mouthmap-container" style="position:relative; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #0B0F19 0%, #111827 50%, #0f172a 100%); cursor:pointer;" onclick="window.location.href='/portal/mouthmap'">
-                        <div style="text-align:center; padding:32px;">
-                            <div style="font-size:64px; margin-bottom:16px;">🦷</div>
-                            <h2 style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:700; color:#F1F5F9; margin:0 0 8px;">Your Interactive MouthMap</h2>
-                            <p style="font-family:'Inter',sans-serif; font-size:14px; color:#94A3B8; margin:0 0 20px; max-width:360px;">Explore your dental health in 3D — click teeth, toggle anatomy layers, and learn about your mouth.</p>
-                            <button style="font-family:'Inter',sans-serif; font-size:14px; font-weight:600; padding:12px 28px; background:linear-gradient(135deg,#2dd4bf,#14b8a6); color:#0B0F19; border:none; border-radius:24px; cursor:pointer; box-shadow:0 4px 20px rgba(45,212,191,0.3); transition:all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 28px rgba(45,212,191,0.4)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(45,212,191,0.3)'">
-                                🔬 Open My MouthMap →
-                            </button>
-                            <div style="margin-top:16px; display:flex; gap:16px; justify-content:center;">
-                                <span style="font-size:11px; color:#64748B;">🧠 Nerves</span>
-                                <span style="font-size:11px; color:#64748B;">💪 Muscles</span>
-                                <span style="font-size:11px; color:#64748B;">🫦 Gums</span>
-                                <span style="font-size:11px; color:#64748B;">🦴 Bone</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Interactive Dental Chart (Odontogram) -->
-                    <div class="odontogram-section">
-                        <h3 style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:#1E293B;margin:16px 0 8px;">Click a tooth for AI findings</h3>
-                        <div class="odontogram" id="odontogram">
-                            <div class="odontogram-row" id="upper-arch">
-                                <span class="arch-label">Upper</span>
-                            </div>
-                            <div class="odontogram-row" id="lower-arch">
-                                <span class="arch-label">Lower</span>
-                            </div>
-                        </div>
-                        <div class="odontogram-legend">
-                            <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Healthy</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> Restored</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Monitor</span>
-                            <span class="legend-item"><span class="legend-dot" style="background:#94a3b8;"></span> Extracted</span>
-                        </div>
+                    <!-- MouthMap embedded directly — no landing needed -->
+                    <div class="mouth-viewer-container" id="mouthmap-container" style="position:relative; overflow:hidden; border-radius:12px;">
+                        <iframe id="mouthmap-frame" 
+                            src="/portal/mouthmap?role=patient&embed=true" 
+                            style="width:100%;height:100%;border:none;border-radius:12px;"
+                            allow="fullscreen"
+                            title="MouthMap 3D"></iframe>
                     </div>
 
                     <!-- Tooth Info Panel -->
