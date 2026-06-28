@@ -1312,6 +1312,10 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             <button class="sv-toolbar-btn" id="btnUploadMore" title="Load another file">
                 <i data-lucide="plus"></i><span>Add File</span>
             </button>
+            <div class="sv-toolbar-sep"></div>
+            <button class="sv-toolbar-btn" id="btnVoltron" title="Voltron Mode — Isolate individual teeth" style="color:#fde047;">
+                <i data-lucide="puzzle"></i><span>Voltron</span>
+            </button>
         </div>
 
         <!-- Note Input Overlay -->
@@ -3943,6 +3947,295 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         console.log('🧠 Nerve overlay rendered — anatomical pathways displayed');
     }
+
+    // ─── VOLTRON MODE — Geometric Tooth Segmentation ───
+    let voltronActive = false;
+    let voltronSegments = []; // { mesh, toothNum, originalMat }
+    let voltronExploded = false;
+
+    // Tooth colors for visual distinction
+    const TOOTH_COLORS = [
+        0xe8d5c4, 0xd4c4b0, 0xf0e8d6, 0xe0d0c0,
+        0xd8c8b8, 0xecdcc8, 0xdcceb8, 0xe4d4c4,
+        0xd0c0b0, 0xe8dcc8, 0xf0e4d0, 0xd8ccbc,
+        0xe0d4c0, 0xdccab4, 0xe8d8c4, 0xd4c0ac,
+    ];
+
+    document.getElementById('btnVoltron').addEventListener('click', () => {
+        if (voltronActive) {
+            exitVoltron();
+        } else {
+            enterVoltron();
+        }
+    });
+
+    function enterVoltron() {
+        if (state.models.length === 0) return;
+        voltronActive = true;
+        document.getElementById('btnVoltron').classList.add('active');
+        document.getElementById('btnVoltron').style.background = 'rgba(253,224,71,0.15)';
+
+        state.models.forEach((model, archIdx) => {
+            segmentMesh(model, archIdx);
+        });
+
+        console.log(`⚡ VOLTRON MODE — ${voltronSegments.length} tooth segments created`);
+    }
+
+    function exitVoltron() {
+        voltronActive = false;
+        voltronExploded = false;
+        document.getElementById('btnVoltron').classList.remove('active');
+        document.getElementById('btnVoltron').style.background = '';
+
+        // Remove segmented meshes
+        voltronSegments.forEach(seg => {
+            scene.remove(seg.mesh);
+            seg.mesh.geometry.dispose();
+            seg.mesh.material.dispose();
+        });
+        voltronSegments = [];
+
+        // Restore original meshes
+        state.models.forEach(m => {
+            m.mesh.visible = true;
+        });
+
+        console.log('⚡ Exited Voltron mode');
+    }
+
+    function segmentMesh(model, archIdx) {
+        const mesh = model.mesh;
+        const geo = mesh.geometry;
+        const posAttr = geo.getAttribute('position');
+        const colorAttr = geo.getAttribute('color');
+        const normalAttr = geo.getAttribute('normal');
+        if (!posAttr) return;
+
+        // Hide original mesh
+        mesh.visible = false;
+
+        // Get bounding box in local space
+        geo.computeBoundingBox();
+        const bbox = geo.boundingBox;
+        const center = new THREE.Vector3();
+        const size = new THREE.Vector3();
+        bbox.getCenter(center);
+        bbox.getSize(size);
+
+        const isUpper = archIdx === 0;
+        const numTeeth = 16;
+
+        // Step 1: Classify each face (triangle) by angular position on the arch
+        const faceCount = posAttr.count / 3; // non-indexed: every 3 vertices = 1 face
+        const faceLabels = new Int32Array(faceCount); // -1 = gum, 0-15 = tooth
+
+        for (let f = 0; f < faceCount; f++) {
+            const i0 = f * 3, i1 = f * 3 + 1, i2 = f * 3 + 2;
+
+            // Face centroid
+            const cx = (posAttr.getX(i0) + posAttr.getX(i1) + posAttr.getX(i2)) / 3;
+            const cy = (posAttr.getY(i0) + posAttr.getY(i1) + posAttr.getY(i2)) / 3;
+            const cz = (posAttr.getZ(i0) + posAttr.getZ(i1) + posAttr.getZ(i2)) / 3;
+
+            // Face normal (average vertex normals)
+            let nx = 0, ny = 0, nz = 0;
+            if (normalAttr) {
+                nx = (normalAttr.getX(i0) + normalAttr.getX(i1) + normalAttr.getX(i2)) / 3;
+                ny = (normalAttr.getY(i0) + normalAttr.getY(i1) + normalAttr.getY(i2)) / 3;
+                nz = (normalAttr.getZ(i0) + normalAttr.getZ(i1) + normalAttr.getZ(i2)) / 3;
+            }
+
+            // Normalized position relative to center
+            const relX = (cx - center.x) / (size.x * 0.5);
+            const relY = (cy - center.y) / (size.y * 0.5);
+            const relZ = (cz - center.z) / (size.z * 0.5);
+
+            // Gum detection: faces pointing mostly up/down (Y-normal dominant)
+            // and faces at extreme Y positions (base of scan)
+            const normalUp = Math.abs(ny);
+            const isGumByNormal = normalUp > 0.7;
+            const isGumByPosition = isUpper ? relY > 0.6 : relY < -0.6;
+
+            if (isGumByNormal && isGumByPosition) {
+                faceLabels[f] = -1; // gum
+                continue;
+            }
+
+            // Angular position along the arch (atan2 of X,Z from center)
+            const angle = Math.atan2(relX, relZ + 0.3); // offset Z to better match arch
+            // Map angle (-π to π) to tooth index (0-15)
+            const normalized = (angle + Math.PI) / (2 * Math.PI);
+            const toothIdx = Math.floor(normalized * numTeeth);
+            faceLabels[f] = Math.max(0, Math.min(numTeeth - 1, toothIdx));
+        }
+
+        // Step 2: Create separate meshes for each segment
+        for (let t = -1; t < numTeeth; t++) {
+            // Collect faces for this segment
+            const vertices = [];
+            const colors = [];
+            const normals = [];
+
+            for (let f = 0; f < faceCount; f++) {
+                if (faceLabels[f] !== t) continue;
+
+                for (let v = 0; v < 3; v++) {
+                    const idx = f * 3 + v;
+                    vertices.push(posAttr.getX(idx), posAttr.getY(idx), posAttr.getZ(idx));
+                    if (colorAttr) {
+                        colors.push(colorAttr.getX(idx), colorAttr.getY(idx), colorAttr.getZ(idx));
+                    }
+                    if (normalAttr) {
+                        normals.push(normalAttr.getX(idx), normalAttr.getY(idx), normalAttr.getZ(idx));
+                    }
+                }
+            }
+
+            if (vertices.length === 0) continue;
+
+            // Build geometry
+            const segGeo = new THREE.BufferGeometry();
+            segGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            if (colors.length > 0) {
+                segGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            }
+            if (normals.length > 0) {
+                segGeo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            } else {
+                segGeo.computeVertexNormals();
+            }
+
+            // Material: vertex colors for real scan, tinted for gum
+            const segMat = new THREE.MeshPhysicalMaterial({
+                vertexColors: colors.length > 0 ? 2 : 0,
+                color: t === -1 ? 0xD4848A : (colors.length > 0 ? 0xffffff : TOOTH_COLORS[t % TOOTH_COLORS.length]),
+                roughness: 0.55,
+                metalness: 0.0,
+                clearcoat: 0.05,
+                clearcoatRoughness: 0.4,
+                envMap: envMap,
+                envMapIntensity: 0.05,
+                side: THREE.DoubleSide,
+            });
+
+            const segMesh = new THREE.Mesh(segGeo, segMat);
+            segMesh.scale.copy(mesh.scale);
+            segMesh.position.copy(mesh.position);
+            segMesh.rotation.copy(mesh.rotation);
+            segMesh.castShadow = true;
+            segMesh.receiveShadow = true;
+
+            // Compute centroid for explode
+            segGeo.computeBoundingBox();
+            const segCenter = new THREE.Vector3();
+            segGeo.boundingBox.getCenter(segCenter);
+
+            segMesh.userData = {
+                isVoltron: true,
+                toothNum: t === -1 ? null : (isUpper ? t + 1 : t + 17),
+                isGum: t === -1,
+                segCenter: segCenter.clone(),
+                originalPosition: mesh.position.clone(),
+            };
+
+            scene.add(segMesh);
+
+            voltronSegments.push({
+                mesh: segMesh,
+                toothNum: segMesh.userData.toothNum,
+                isGum: t === -1,
+                originalMat: segMat.clone(),
+            });
+        }
+    }
+
+    // Voltron: click individual tooth to highlight
+    renderer.domElement.addEventListener('click', (e) => {
+        if (!voltronActive) return;
+
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const segMeshes = voltronSegments.map(s => s.mesh);
+        const intersects = raycaster.intersectObjects(segMeshes, false);
+
+        // Reset all segments
+        voltronSegments.forEach(seg => {
+            seg.mesh.material.emissive = new THREE.Color(0x000000);
+            seg.mesh.material.emissiveIntensity = 0;
+        });
+
+        if (intersects.length > 0) {
+            const hitMesh = intersects[0].object;
+            const ud = hitMesh.userData;
+
+            if (!ud.isGum && ud.toothNum) {
+                // Highlight this tooth
+                hitMesh.material.emissive = new THREE.Color(0x2dd4bf);
+                hitMesh.material.emissiveIntensity = 0.4;
+
+                // Sync chart
+                document.querySelectorAll('.dental-chart__tooth').forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.remove('pulse');
+                });
+                const chartEl = document.querySelector(`.dental-chart__tooth[data-tooth="${ud.toothNum}"]`);
+                if (chartEl) {
+                    chartEl.classList.add('active');
+                    chartEl.classList.add('pulse');
+                    if (!chartOpen) document.getElementById('dentalChartToggle').click();
+                }
+
+                // Show label
+                let labelEl = document.getElementById('toothLabel3D');
+                if (!labelEl) {
+                    labelEl = document.createElement('div');
+                    labelEl.id = 'toothLabel3D';
+                    labelEl.className = 'tooth-label-3d';
+                    document.getElementById('viewerContainer').appendChild(labelEl);
+                }
+                const tooth = TOOTH_DB[ud.toothNum];
+                if (tooth) {
+                    labelEl.textContent = '#' + ud.toothNum + ' ' + tooth.name;
+                    labelEl.style.display = 'block';
+                    state._labelWorldPos = intersects[0].point.clone();
+                }
+
+                console.log(`⚡ Selected tooth #${ud.toothNum} (${voltronSegments.find(s => s.mesh === hitMesh)?.mesh.geometry.getAttribute('position').count / 3} faces)`);
+            }
+        }
+    });
+
+    // Keyboard shortcut: 'E' to toggle explode in Voltron mode
+    document.addEventListener('keydown', (e) => {
+        if (!voltronActive) return;
+        if (e.key === 'e' || e.key === 'E') {
+            voltronExploded = !voltronExploded;
+            const explodeFactor = voltronExploded ? 1.8 : 0;
+
+            voltronSegments.forEach(seg => {
+                const ud = seg.mesh.userData;
+                if (ud.isGum) {
+                    seg.mesh.visible = !voltronExploded; // hide gum in exploded
+                    return;
+                }
+
+                // Explode: move each tooth outward from scan center
+                const dir = ud.segCenter.clone().normalize();
+                const offset = dir.multiplyScalar(explodeFactor * 5);
+
+                seg.mesh.position.copy(ud.originalPosition);
+                if (voltronExploded) {
+                    seg.mesh.position.add(offset);
+                }
+            });
+
+            console.log(`💥 Explode ${voltronExploded ? 'ON' : 'OFF'}`);
+        }
+    });
 
     // ─── Patient Photo Capture & Upload ───
     const photoInput = document.getElementById('photoFileInput');
