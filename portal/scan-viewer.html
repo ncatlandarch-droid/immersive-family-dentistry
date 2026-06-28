@@ -1419,8 +1419,8 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 </div>
                 <div class="sv-slider-row">
                     <span class="sv-slider-label">Metalness</span>
-                    <input type="range" class="sv-slider" id="sliderMetalness" min="0" max="100" value="82">
-                    <span class="sv-slider-val" id="valMetalness">0.82</span>
+                    <input type="range" class="sv-slider" id="sliderMetalness" min="0" max="100" value="0">
+                    <span class="sv-slider-val" id="valMetalness">0.00</span>
                 </div>
                 <div class="sv-slider-row">
                     <span class="sv-slider-label">Opacity</span>
@@ -2114,13 +2114,12 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         // ─── Environment Map (hemisphere gradient for reflections) ───
         envMap = createGradientEnvMap();
 
-        // ─── Lights ───
-        // Hemisphere
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xb0a090, 0.6);
+        // Hemisphere (sky=white, ground=warm) — main color-faithful illumination
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xd4c4b0, 0.85);
         scene.add(hemiLight);
 
-        // Key light (warm white from top-right)
-        const keyLight = new THREE.DirectionalLight(0xfff5e8, 0.8);
+        // Key light (neutral white from top-right — not warm, to avoid tinting scan colors)
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.65);
         keyLight.position.set(50, 80, 40);
         keyLight.castShadow = true;
         keyLight.shadow.mapSize.set(2048, 2048);
@@ -2133,18 +2132,23 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         keyLight.shadow.bias = -0.001;
         scene.add(keyLight);
 
-        // Fill light (cool white from left)
-        const fillLight = new THREE.DirectionalLight(0xe8f0ff, 0.4);
+        // Fill light (neutral from left)
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
         fillLight.position.set(-60, 40, -30);
         scene.add(fillLight);
 
-        // Rim/edge light (teal accent from behind)
-        const rimLight = new THREE.PointLight(0x2dd4bf, 0.35, 200);
+        // Front fill light (so face of scan isn't in shadow)
+        const frontLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        frontLight.position.set(0, 20, 80);
+        scene.add(frontLight);
+
+        // Rim/edge light (subtle teal accent from behind — brand touch only)
+        const rimLight = new THREE.PointLight(0x2dd4bf, 0.15, 200);
         rimLight.position.set(0, -30, -80);
         scene.add(rimLight);
 
-        // Ambient fill
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        // Ambient fill — strong to ensure vertex colors show evenly
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
 
         // ─── Grid & Axes (hidden by default) ───
@@ -2224,11 +2228,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         if (hasVertexColors && preset !== 'xray') {
             matOpts.vertexColors = 2; // THREE.VertexColors = 2 in r128
             matOpts.color = new THREE.Color(0xffffff);
-            matOpts.roughness = 0.35;     // Smooth like real enamel
-            matOpts.metalness = 0.82;     // High metalness makes vertex colors pop
-            matOpts.clearcoat = 0.0;      // No clearcoat white wash
-            matOpts.clearcoatRoughness = 0;
-            matOpts.envMapIntensity = 0.15;
+            matOpts.roughness = 0.55;     // Natural matte look like real tissue
+            matOpts.metalness = 0.0;      // NO metalness — faithful vertex colors
+            matOpts.clearcoat = 0.05;     // Subtle wet sheen only
+            matOpts.clearcoatRoughness = 0.4;
+            matOpts.envMapIntensity = 0.05; // Minimal reflection — don't tint colors
         } else {
             matOpts.color = p.color;
         }
