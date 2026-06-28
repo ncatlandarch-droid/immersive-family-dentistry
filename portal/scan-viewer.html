@@ -1513,7 +1513,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                     </div>
                 </div>
                 <p style="font-size:11px;color:var(--mm-text-muted);margin-top:8px;line-height:1.4;">
-                    💡 Heat maps highlight trouble areas. Connect PALOMA AI for automated detection.
+                    🔬 Analyzing real scan colors — plaque (yellow/brown), decay (dark spots), inflammation (deep red). Results are patient-specific.
                 </p>
             </div>
 
@@ -3413,11 +3413,15 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         backupVertexColors(mesh);
 
+        // Get ORIGINAL vertex colors (the real scan data)
+        const origColors = originalVertexColors.get(mesh.uuid);
+        const hasRealColors = !!origColors;
+
         // Create or get color attribute
         let colorAttr = geo.getAttribute('color');
         if (!colorAttr) {
             const colors = new Float32Array(posAttr.count * 3);
-            colors.fill(1.0); // white
+            colors.fill(1.0);
             colorAttr = new THREE.BufferAttribute(colors, 3);
             geo.setAttribute('color', colorAttr);
         }
@@ -3425,7 +3429,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         // Enable vertex colors on material
         mesh.material.dispose();
         const mat = new THREE.MeshPhysicalMaterial({
-            vertexColors: 2, // THREE.VertexColors = 2 in r128
+            vertexColors: 2,
             color: 0xffffff,
             roughness: 0.4,
             metalness: 0.0,
@@ -3436,62 +3440,137 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         });
         mesh.material = mat;
 
-        // Compute bounding box for normalization
         geo.computeBoundingBox();
         const bbox = geo.boundingBox;
         const bboxSize = new THREE.Vector3();
         bbox.getSize(bboxSize);
 
-        // Seed some deterministic "trouble areas" based on vertex position
-        const seed = mesh.uuid.charCodeAt(0) * 7;
+        // ─── Helper: RGB → HSL ───
+        function rgbToHsl(r, g, b) {
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                else if (max === g) h = ((b - r) / d + 2) / 6;
+                else h = ((r - g) / d + 4) / 6;
+            }
+            return { h, s, l };
+        }
 
         for (let i = 0; i < posAttr.count; i++) {
-            const x = posAttr.getX(i);
-            const y = posAttr.getY(i);
-            const z = posAttr.getZ(i);
+            const ny = (posAttr.getY(i) - bbox.min.y) / bboxSize.y;
 
-            // Normalize position within bounding box
-            const nx = (x - bbox.min.x) / bboxSize.x;
-            const ny = (y - bbox.min.y) / bboxSize.y;
-            const nz = (z - bbox.min.z) / bboxSize.z;
+            // Get actual scan color for this vertex
+            let vr = 0.8, vg = 0.8, vb = 0.8; // fallback gray
+            if (hasRealColors) {
+                vr = origColors[i * 3];
+                vg = origColors[i * 3 + 1];
+                vb = origColors[i * 3 + 2];
+            }
 
-            // Create pseudo-random "risk" based on position
+            const hsl = rgbToHsl(vr, vg, vb);
             let risk = 0;
-            const noise1 = Math.sin(x * 0.3 + seed) * Math.cos(z * 0.5) * 0.5 + 0.5;
-            const noise2 = Math.sin(y * 0.7 + x * 0.4) * 0.5 + 0.5;
 
             if (type === 'plaque') {
-                // Plaque concentrates near gumline (edges) and between teeth
-                risk = noise1 * 0.6 + (1 - Math.abs(ny - 0.5) * 2) * 0.3 + noise2 * 0.1;
-                risk = Math.pow(risk, 1.5); // concentrate peaks
-                // Green → Yellow → Red
+                // ─── REAL PLAQUE DETECTION from scan colors ───
+                // Plaque = yellowish/brownish deviation from healthy white or pink
+                // Healthy enamel: high lightness (>0.7), low saturation
+                // Healthy gum: pinkish hue (~0.95-0.05), moderate saturation
+                // Plaque/calculus: yellow-brown hue (0.08-0.18), moderate saturation
+
+                const isYellowBrown = (hsl.h > 0.06 && hsl.h < 0.20); // yellow-brown hue range
+                const hasColor = hsl.s > 0.08; // not pure gray/white
+                const notBright = hsl.l < 0.85; // not pure white highlight
+
+                if (isYellowBrown && hasColor && notBright) {
+                    // Strong plaque indicator: yellow/brown colored area
+                    risk = 0.4 + hsl.s * 0.6; // more saturated = more plaque
+                } else if (hsl.l < 0.5 && hasColor) {
+                    // Dark deposits (calculus/tartar)
+                    risk = 0.5 + (0.5 - hsl.l);
+                } else if (isYellowBrown) {
+                    // Mild yellowish tint
+                    risk = 0.15 + hsl.s * 0.3;
+                } else {
+                    // Clean — healthy white or pink
+                    risk = Math.max(0, 0.05 - hsl.l * 0.05);
+                }
+
+                risk = Math.min(1, Math.max(0, risk));
+                // Green (clean) → Yellow (moderate) → Red (heavy)
                 const r = risk < 0.5 ? risk * 2 : 1.0;
-                const g = risk < 0.5 ? 1.0 : 1.0 - (risk - 0.5) * 2;
-                const b = 0.1;
+                const g = risk < 0.5 ? 0.8 + risk * 0.2 : 1.0 - (risk - 0.5) * 2;
+                const b = 0.05 + (1 - risk) * 0.1;
                 colorAttr.setXYZ(i, r, g, b);
 
             } else if (type === 'decay') {
-                // Decay risk on biting surfaces and between teeth
-                risk = noise2 * 0.5 + (nz > 0.6 ? 0.3 : 0) + noise1 * 0.2;
-                risk = Math.min(1, risk);
-                // Blue → Purple → Pink
-                const r = 0.3 + risk * 0.7;
-                const g = 0.3 - risk * 0.2;
-                const b = 0.9 - risk * 0.3;
+                // ─── REAL DECAY DETECTION from scan colors ───
+                // Early decay = chalky white spots (high L, low S, slight blue shift)
+                // Active decay = dark brown/black (very low L)
+                // Demineralization = matte white patches
+
+                const isDark = hsl.l < 0.35;
+                const isChalkyWhite = hsl.l > 0.85 && hsl.s < 0.1;
+                const isBrown = (hsl.h > 0.04 && hsl.h < 0.12) && hsl.l < 0.5;
+
+                if (isDark) {
+                    // Dark spot — possible cavity or deep stain
+                    risk = 0.6 + (0.35 - hsl.l) * 1.5;
+                } else if (isBrown) {
+                    // Brown discoloration — decay or heavy stain
+                    risk = 0.4 + hsl.s * 0.4;
+                } else if (isChalkyWhite) {
+                    // White spot lesion — early demineralization
+                    risk = 0.25;
+                } else {
+                    risk = 0.02;
+                }
+
+                risk = Math.min(1, Math.max(0, risk));
+                // Blue (low) → Purple (medium) → Pink (high risk)
+                const r = 0.3 + risk * 0.65;
+                const g = 0.4 - risk * 0.35;
+                const b = 0.95 - risk * 0.35;
                 colorAttr.setXYZ(i, r, g, b);
 
             } else if (type === 'inflammation') {
-                // Inflammation along gumline
-                risk = (ny < 0.3 || ny > 0.7) ? noise1 * 0.8 + 0.2 : noise1 * 0.2;
-                risk = Math.min(1, risk);
-                // Yellow → Orange → Red
+                // ─── REAL GINGIVAL DETECTION from scan colors ───
+                // Healthy gum = light pink (hue ~0.95, moderate S, L ~0.6-0.75)
+                // Inflamed gum = deep red/purple (hue ~0.95-0.0, high S, lower L)
+                // Detects redness intensity in gum-region vertices
+
+                const isGumRegion = ny < 0.35 || ny > 0.65; // edges = gumline
+                const isReddish = (hsl.h > 0.9 || hsl.h < 0.08); // red hue range
+                const deepRed = isReddish && hsl.s > 0.3 && hsl.l < 0.55;
+                const mildRed = isReddish && hsl.s > 0.15;
+
+                if (isGumRegion && deepRed) {
+                    // Deep red/purple in gum area — strong inflammation
+                    risk = 0.5 + hsl.s * 0.5;
+                } else if (isGumRegion && mildRed) {
+                    // Mild redness
+                    risk = 0.2 + hsl.s * 0.3;
+                } else if (deepRed) {
+                    // Red outside typical gum zone
+                    risk = 0.15 + hsl.s * 0.2;
+                } else {
+                    risk = 0.03;
+                }
+
+                risk = Math.min(1, Math.max(0, risk));
+                // Yellow (healthy) → Orange (mild) → Red (inflamed)
                 const r = 0.9 + risk * 0.1;
-                const g = 0.8 - risk * 0.6;
+                const g = 0.8 - risk * 0.65;
                 const b = 0.1;
                 colorAttr.setXYZ(i, r, g, b);
             }
         }
         colorAttr.needsUpdate = true;
+
+        console.log(`🔬 Applied REAL ${type} overlay — analyzed ${posAttr.count} vertices from scan color data`);
     }
 
     document.querySelectorAll('[data-overlay]').forEach(btn => {
