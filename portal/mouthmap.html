@@ -193,9 +193,10 @@ body::before {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 1fr 320px;
     gap: 0;
     height: calc(100vh - 73px);
+    min-width: 0;
 }
 
 /* ═══ 3D Viewer Panel ═══ */
@@ -203,6 +204,7 @@ body::before {
     position: relative;
     overflow: hidden;
     background: linear-gradient(180deg, #0d1117 0%, #0B0F19 100%);
+    min-width: 0;
 }
 
 .mm-viewer canvas {
@@ -1390,17 +1392,17 @@ function adjustJawOpen(value) {
     
     if (angle > 0) {
         // Pivot technique: translate to pivot, rotate, translate back
-        // This makes the mandible swing open around the condyle
+        // Negative X rotation = mandible swings DOWN (natural jaw open)
         lowerGroup.position.set(
             -pivot.x,
             -pivot.y,
             -pivot.z
         );
-        lowerGroup.rotation.x = angle;
+        lowerGroup.rotation.x = -angle;
         
         // Re-offset by rotated pivot
         var rotatedPivot = pivot.clone();
-        rotatedPivot.applyAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+        rotatedPivot.applyAxisAngle(new THREE.Vector3(1, 0, 0), -angle);
         lowerGroup.position.add(rotatedPivot);
     }
 }
