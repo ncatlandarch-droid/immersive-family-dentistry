@@ -112,7 +112,7 @@ function initPortal() {
 
 // ─── 3D MouthMap Viewer ───
 function init3DMouthMap() {
-    const container = document.querySelector('.mouth-viewer-container');
+    const container = document.getElementById('mouthmap-container');
     if (!container) return;
 
     // Set background dark for 3D viewer
