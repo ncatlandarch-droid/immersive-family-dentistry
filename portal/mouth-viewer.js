@@ -290,4 +290,209 @@ export class MouthViewer {
         this.camera.position.set(0, 0, 120);
         this.controls.reset();
     }
+
+    // ─── Toggle Layer ───
+    toggleLayer(layerName, visible) {
+        switch (layerName) {
+            case 'teeth':
+                if (this.model) this.model.visible = visible;
+                break;
+            case 'nerves':
+                if (visible && !this.nerveGroup) this.renderNerves();
+                if (this.nerveGroup) this.nerveGroup.visible = visible;
+                break;
+            case 'muscles':
+                if (visible && !this.muscleGroup) this.renderMuscles();
+                if (this.muscleGroup) this.muscleGroup.visible = visible;
+                break;
+            case 'gums':
+                if (visible && !this.gumGroup) this.renderGumline();
+                if (this.gumGroup) this.gumGroup.visible = visible;
+                break;
+        }
+    }
+
+    // ─── NERVES ───
+    renderNerves() {
+        if (this.nerveGroup) this.scene.remove(this.nerveGroup);
+        this.nerveGroup = new THREE.Group();
+        this.nerveGroup.name = 'nerves';
+
+        const nerveMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047, transparent: true, opacity: 0.85,
+            depthTest: false, side: THREE.DoubleSide,
+        });
+        const branchMat = new THREE.MeshBasicMaterial({
+            color: 0xf59e0b, transparent: true, opacity: 0.7,
+            depthTest: false, side: THREE.DoubleSide,
+        });
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047, transparent: true, opacity: 0.1,
+            depthTest: false, side: THREE.DoubleSide,
+        });
+
+        const R = 35; // archRadius
+        const self = this;
+
+        function tube(points, radius, material) {
+            if (points.length < 2) return;
+            const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p[0], p[1], p[2])));
+            const geo = new THREE.TubeGeometry(curve, 32, radius, 8, false);
+            self.nerveGroup.add(new THREE.Mesh(geo, material));
+            // Glow
+            const glowGeo = new THREE.TubeGeometry(curve, 32, radius * 2.5, 8, false);
+            self.nerveGroup.add(new THREE.Mesh(glowGeo, glowMat));
+        }
+
+        // Inferior Alveolar Nerve (lower jaw, inside mandible)
+        tube([
+            [-R * 0.9, -10, -R * 0.5], [-R * 0.6, -12, -R * 0.3],
+            [-R * 0.3, -13, -R * 0.1], [0, -13, 0],
+            [R * 0.3, -13, -R * 0.1], [R * 0.6, -12, -R * 0.3],
+            [R * 0.9, -10, -R * 0.5],
+        ], 0.5, nerveMat);
+
+        // Mental Nerves (exit points)
+        tube([[-R * 0.35, -12, -R * 0.15], [-R * 0.35, -6, R * 0.1]], 0.35, branchMat);
+        tube([[R * 0.35, -12, -R * 0.15], [R * 0.35, -6, R * 0.1]], 0.35, branchMat);
+
+        // Superior Alveolar (upper)
+        tube([
+            [-R * 0.7, 14, -R * 0.4], [-R * 0.5, 12, -R * 0.2], [-R * 0.3, 11, 0],
+            [0, 10.5, R * 0.1],
+            [R * 0.3, 11, 0], [R * 0.5, 12, -R * 0.2], [R * 0.7, 14, -R * 0.4],
+        ], 0.4, branchMat);
+
+        // Pulp branches (into each tooth)
+        for (let i = 0; i < 16; i++) {
+            const angle = (Math.PI * 0.85) * (i / 15) - (Math.PI * 0.85 / 2);
+            const x = Math.sin(angle) * R;
+            const z = Math.cos(angle) * R - R;
+            // Upper
+            tube([[x, 12, z], [x, 8, z]], 0.15, branchMat);
+            // Lower
+            tube([[x, -12, z], [x, -8, z]], 0.15, branchMat);
+        }
+
+        this.scene.add(this.nerveGroup);
+    }
+
+    // ─── MUSCLES ───
+    renderMuscles() {
+        if (this.muscleGroup) this.scene.remove(this.muscleGroup);
+        this.muscleGroup = new THREE.Group();
+        this.muscleGroup.name = 'muscles';
+
+        const muscleMat = new THREE.MeshPhysicalMaterial({
+            color: 0xdc2626, roughness: 0.6, metalness: 0.0,
+            transparent: true, opacity: 0.45, side: THREE.DoubleSide,
+        });
+        const tendonMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfca5a5, roughness: 0.5, metalness: 0.0,
+            transparent: true, opacity: 0.35, side: THREE.DoubleSide,
+        });
+
+        const R = 35;
+
+        // Masseter (jaw closing — large box on each side)
+        [-1, 1].forEach(side => {
+            const geo = new THREE.BoxGeometry(4, 12, 6);
+            const mesh = new THREE.Mesh(geo, muscleMat);
+            mesh.position.set(side * (R + 4), -2, -R * 0.3);
+            mesh.rotation.z = side * 0.15;
+            mesh.userData.muscleName = 'Masseter';
+            this.muscleGroup.add(mesh);
+        });
+
+        // Temporalis (fan-shaped at temples)
+        [-1, 1].forEach(side => {
+            const geo = new THREE.ConeGeometry(8, 16, 6);
+            const mesh = new THREE.Mesh(geo, muscleMat);
+            mesh.position.set(side * (R + 6), 14, -R * 0.4);
+            mesh.rotation.z = side * -0.3;
+            mesh.userData.muscleName = 'Temporalis';
+            this.muscleGroup.add(mesh);
+        });
+
+        // Lateral Pterygoid (deep, connects to TMJ)
+        [-1, 1].forEach(side => {
+            const pts = [
+                new THREE.Vector3(side * R * 0.4, 2, -R * 0.5),
+                new THREE.Vector3(side * R * 0.7, 4, -R * 0.6),
+            ];
+            const curve = new THREE.CatmullRomCurve3(pts);
+            const geo = new THREE.TubeGeometry(curve, 16, 1.5, 6, false);
+            const mesh = new THREE.Mesh(geo, tendonMat);
+            mesh.userData.muscleName = 'Lateral Pterygoid';
+            this.muscleGroup.add(mesh);
+        });
+
+        // Digastric (below mandible — opens jaw)
+        const digPts = [
+            new THREE.Vector3(-R * 0.3, -16, -R * 0.1),
+            new THREE.Vector3(0, -18, R * 0.05),
+            new THREE.Vector3(R * 0.3, -16, -R * 0.1),
+        ];
+        const digCurve = new THREE.CatmullRomCurve3(digPts);
+        const digGeo = new THREE.TubeGeometry(digCurve, 24, 1.0, 6, false);
+        const digMesh = new THREE.Mesh(digGeo, tendonMat);
+        digMesh.userData.muscleName = 'Digastric';
+        this.muscleGroup.add(digMesh);
+
+        // Mylohyoid (floor of mouth — hammock)
+        const myloGeo = new THREE.PlaneGeometry(R * 1.2, 8, 8, 4);
+        const myloMesh = new THREE.Mesh(myloGeo, tendonMat);
+        myloMesh.position.set(0, -14, R * 0.05);
+        myloMesh.rotation.x = -Math.PI * 0.5;
+        myloMesh.userData.muscleName = 'Mylohyoid';
+        this.muscleGroup.add(myloMesh);
+
+        this.scene.add(this.muscleGroup);
+    }
+
+    // ─── GUMLINE ───
+    renderGumline() {
+        if (this.gumGroup) this.scene.remove(this.gumGroup);
+        this.gumGroup = new THREE.Group();
+        this.gumGroup.name = 'gums';
+
+        const gumMat = new THREE.MeshPhysicalMaterial({
+            color: 0xD4848A, roughness: 0.55, metalness: 0.05,
+            transparent: true, opacity: 0.6, side: THREE.DoubleSide,
+        });
+
+        const R = 35;
+
+        // Create gum arches (upper and lower) as tube geometry following the arch
+        [1, -1].forEach(archSign => {
+            const points = [];
+            for (let i = 0; i <= 32; i++) {
+                const t = i / 32;
+                const angle = (Math.PI * 0.9) * t - (Math.PI * 0.9 / 2);
+                const x = Math.sin(angle) * (R + 1);
+                const y = archSign * 8;
+                const z = Math.cos(angle) * (R + 1) - (R + 1);
+                points.push(new THREE.Vector3(x, y, z));
+            }
+            const curve = new THREE.CatmullRomCurve3(points);
+            const gumGeo = new THREE.TubeGeometry(curve, 64, 2.5, 8, false);
+            this.gumGroup.add(new THREE.Mesh(gumGeo, gumMat));
+
+            // Inner gum ridge (where teeth meet gum)
+            const innerPoints = [];
+            for (let i = 0; i <= 32; i++) {
+                const t = i / 32;
+                const angle = (Math.PI * 0.85) * t - (Math.PI * 0.85 / 2);
+                const x = Math.sin(angle) * (R - 1);
+                const y = archSign * 6;
+                const z = Math.cos(angle) * (R - 1) - (R - 1);
+                innerPoints.push(new THREE.Vector3(x, y, z));
+            }
+            const innerCurve = new THREE.CatmullRomCurve3(innerPoints);
+            const innerGeo = new THREE.TubeGeometry(innerCurve, 64, 1.8, 8, false);
+            this.gumGroup.add(new THREE.Mesh(innerGeo, gumMat));
+        });
+
+        this.scene.add(this.gumGroup);
+    }
 }

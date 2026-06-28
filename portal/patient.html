@@ -70,16 +70,22 @@
                 <!-- View: 3D Scan -->
                 <div id="view-scan" class="portal-view active">
                     <div class="mouth-viewer-container" style="position:relative;">
-                        <iframe 
-                          title="Interactive 3D Dental Model — MouthMap" 
-                          frameborder="0" 
-                          allowfullscreen 
-                          mozallowfullscreen="true" 
-                          webkitallowfullscreen="true" 
-                          allow="autoplay; fullscreen; xr-spatial-tracking" 
-                          style="width:100%; height:100%; min-height:400px; border-radius:12px;"
-                          src="https://sketchfab.com/models/522eda0ec0e3413a914b1b298a791320/embed?autostart=1&transparent=1&ui_theme=dark&dnt=1">
-                        </iframe>
+                        <canvas id="mouthmap-canvas" style="width:100%; height:100%; min-height:400px; border-radius:12px; display:block;"></canvas>
+                        <!-- Anatomy Layer Toggles -->
+                        <div id="anatomy-toggles" style="position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:10;">
+                            <button class="anatomy-toggle active" data-layer="teeth" title="Teeth">🦷 Teeth</button>
+                            <button class="anatomy-toggle" data-layer="gums" title="Gums">🫦 Gums</button>
+                            <button class="anatomy-toggle" data-layer="nerves" title="Nerves">🧠 Nerves</button>
+                            <button class="anatomy-toggle" data-layer="muscles" title="Muscles">💪 Muscles</button>
+                        </div>
+                        <!-- View Controls -->
+                        <div id="view-controls" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;">
+                            <button class="view-btn active" data-view="front">👁 Front</button>
+                            <button class="view-btn" data-view="top">⬆ Top</button>
+                            <button class="view-btn" data-view="upper">∧ Upper</button>
+                            <button class="view-btn" data-view="lower">∨ Lower</button>
+                            <button class="view-btn" data-view="reset">↺ Reset</button>
+                        </div>
                     </div>
 
                     <!-- Interactive Dental Chart (Odontogram) -->
