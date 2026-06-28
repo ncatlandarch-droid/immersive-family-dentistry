@@ -1,0 +1,97 @@
+{
+  "patient": "logan-marrero",
+  "scanner": "Medit i700",
+  "scan_date": "2026-06-28",
+  "teeth": {
+    "1": {
+      "file": "tooth_01.ply",
+      "name": "Upper Right Third Molar",
+      "vertices": 357,
+      "faces": 649
+    },
+    "4": {
+      "file": "tooth_04.ply",
+      "name": "Upper Right Second Premolar",
+      "vertices": 59,
+      "faces": 87
+    },
+    "8": {
+      "file": "tooth_08.ply",
+      "name": "Upper Right Central Incisor",
+      "vertices": 54,
+      "faces": 81
+    },
+    "12": {
+      "file": "tooth_12.ply",
+      "name": "Upper Left First Premolar",
+      "vertices": 147,
+      "faces": 255
+    },
+    "16": {
+      "file": "tooth_16.ply",
+      "name": "Upper Left Third Molar",
+      "vertices": 34117,
+      "faces": 61993
+    },
+    "17": {
+      "file": "tooth_17.ply",
+      "name": "Lower Left Third Molar",
+      "vertices": 51,
+      "faces": 74
+    },
+    "19": {
+      "file": "tooth_19.ply",
+      "name": "Lower Left First Molar",
+      "vertices": 72,
+      "faces": 105
+    },
+    "21": {
+      "file": "tooth_21.ply",
+      "name": "Lower Left First Premolar",
+      "vertices": 119,
+      "faces": 183
+    },
+    "23": {
+      "file": "tooth_23.ply",
+      "name": "Lower Left Lateral Incisor",
+      "vertices": 107,
+      "faces": 162
+    },
+    "25": {
+      "file": "tooth_25.ply",
+      "name": "Lower Right Central Incisor",
+      "vertices": 92,
+      "faces": 150
+    },
+    "27": {
+      "file": "tooth_27.ply",
+      "name": "Lower Right Canine",
+      "vertices": 74,
+      "faces": 116
+    },
+    "29": {
+      "file": "tooth_29.ply",
+      "name": "Lower Right Second Premolar",
+      "vertices": 51,
+      "faces": 79
+    },
+    "32": {
+      "file": "tooth_32.ply",
+      "name": "Lower Right Third Molar",
+      "vertices": 58,
+      "faces": 87
+    }
+  },
+  "gums": {
+    "upper": {
+      "file": "gum_upper.ply",
+      "vertices": 113354,
+      "faces": 218841
+    },
+    "lower": {
+      "file": "gum_lower.ply",
+      "vertices": 95585,
+      "faces": 188710
+    }
+  }
+}

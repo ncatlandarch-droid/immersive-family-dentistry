@@ -1025,6 +1025,14 @@ const STATUS_EMISSIVE = {
     missing:         0x000000
 };
 
+const STATUS_EMISSIVE_INTENSITY = {
+    healthy:         0,
+    needs_attention: 0.4,
+    treated:         0.3,
+    planned:         0.35,
+    missing:         0
+};
+
 let scene, camera, renderer, controls;
 let toothMeshes = [];
 let selectedTooth = null;
@@ -1166,8 +1174,143 @@ function init() {
 
 /* ═══ Build Dental Arch ═══ */
 function buildDentalArch() {
-    // Real scan IS the model — no procedural teeth needed
-    loadRealScans();
+    // Try loading segmented teeth first (Voltron mode)
+    // Falls back to full arch scan if segmented files aren't available
+    loadSegmentedTeeth().catch(() => {
+        console.log('[MouthMap] No segmented teeth — loading full arch scans');
+        loadRealScans();
+    });
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   VOLTRON LOADER — Individual Segmented Teeth
+   Each tooth is its own mesh = clickable, highlightable, colorable
+   ═══════════════════════════════════════════════════════════ */
+
+async function loadSegmentedTeeth() {
+    const resp = await fetch('/portal/demo-scans/teeth/manifest.json');
+    if (!resp.ok) throw new Error('No manifest');
+    const manifest = await resp.json();
+    
+    if (!manifest.teeth || Object.keys(manifest.teeth).length < 5) {
+        throw new Error('Too few teeth in manifest');
+    }
+    
+    const loader = new THREE.PLYLoader();
+    const teethGroup = new THREE.Group();
+    teethGroup.name = 'segmentedTeeth';
+    const gumsGroup = new THREE.Group();
+    gumsGroup.name = 'gums';
+    
+    let loaded = 0;
+    const toothEntries = Object.entries(manifest.teeth);
+    const gumEntries = Object.entries(manifest.gums || {});
+    const total = toothEntries.length + gumEntries.length;
+    
+    // Load each tooth as its own mesh
+    for (const [toothNum, info] of toothEntries) {
+        try {
+            const geo = await loadPLY(loader, `/portal/demo-scans/teeth/${info.file}`);
+            geo.computeVertexNormals();
+            
+            const num = parseInt(toothNum);
+            const status = DEMO_PATIENT.teeth[num]?.status || 'healthy';
+            
+            const mat = new THREE.MeshPhysicalMaterial({
+                color: STATUS_COLORS[status] || 0xF5F5F0,
+                roughness: 0.30,
+                metalness: 0.02,
+                clearcoat: 0.6,
+                clearcoatRoughness: 0.1,
+                emissive: STATUS_EMISSIVE[status] || 0x000000,
+                emissiveIntensity: STATUS_EMISSIVE_INTENSITY[status] || 0,
+                side: THREE.DoubleSide
+            });
+            
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.name = `tooth_${toothNum}`;
+            mesh.userData.toothNumber = num;
+            mesh.userData.toothData = DEMO_PATIENT.teeth[num];
+            mesh.userData.originalColor = mat.color.getHex();
+            mesh.userData.originalEmissive = mat.emissive.getHex();
+            mesh.userData.originalEmissiveIntensity = mat.emissiveIntensity;
+            mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
+            mesh.castShadow = true;
+            
+            teethGroup.add(mesh);
+            toothMeshes.push(mesh);
+            loaded++;
+            updateLoadingProgress(loaded, total);
+        } catch (e) {
+            console.warn(`⚠ Failed to load tooth ${toothNum}:`, e);
+        }
+    }
+    
+    // Load gum meshes
+    for (const [archType, info] of gumEntries) {
+        try {
+            const geo = await loadPLY(loader, `/portal/demo-scans/teeth/${info.file}`);
+            geo.computeVertexNormals();
+            
+            const mat = new THREE.MeshPhysicalMaterial({
+                color: 0xE8A0A0,  // pinkish gum color
+                roughness: 0.55,
+                metalness: 0.0,
+                clearcoat: 0.2,
+                transparent: true,
+                opacity: 0.7,
+                side: THREE.DoubleSide
+            });
+            
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.name = `gum_${archType}`;
+            mesh.userData.archType = archType;
+            mesh.userData.baseY = 0;
+            gumsGroup.add(mesh);
+            scanMeshes.push(mesh);
+            loaded++;
+            updateLoadingProgress(loaded, total);
+        } catch (e) {
+            console.warn(`⚠ Failed to load gum ${archType}:`, e);
+        }
+    }
+    
+    scene.add(teethGroup);
+    scene.add(gumsGroup);
+    
+    // Store baseY for jaw open control
+    toothMeshes.forEach(m => { m.userData.baseY = m.position.y; });
+    
+    // Fit camera
+    const allGroup = new THREE.Group();
+    allGroup.add(teethGroup.clone());
+    allGroup.add(gumsGroup.clone());
+    scanBounds = new THREE.Box3().setFromObject(teethGroup);
+    if (gumsGroup.children.length > 0) {
+        scanBounds.expandByObject(gumsGroup);
+    }
+    const center = scanBounds.getCenter(new THREE.Vector3());
+    const size = scanBounds.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    
+    camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
+    controls.target.copy(center);
+    controls.update();
+    
+    scanLoaded = true;
+    
+    const loadingEl = document.getElementById('loading-overlay');
+    if (loadingEl) loadingEl.style.display = 'none';
+    
+    updateSummaryStats();
+    console.log(`🦷 Voltron mode: ${toothMeshes.length} teeth loaded as individual meshes`);
+}
+
+function loadPLY(loader, url) {
+    return new Promise((resolve, reject) => {
+        loader.load(url, resolve, undefined, reject);
+    });
 }
 
 
@@ -1302,13 +1445,25 @@ function adjustJawOpen(value) {
     const label = document.getElementById('jaw-open-label');
     if (label) label.textContent = pct + '%';
     
-    // Separate upper and lower jaws
     const separation = pct * 0.3; // max 30 units of separation
+    
+    // Move segmented teeth
+    toothMeshes.forEach(m => {
+        const base = m.userData.baseY || 0;
+        if (m.userData.archType === 'upper') {
+            m.position.y = base + separation;
+        } else if (m.userData.archType === 'lower') {
+            m.position.y = base - separation;
+        }
+    });
+    
+    // Move full scan meshes and gums
     scanMeshes.forEach(m => {
-        if (m.name === 'maxilla') {
-            m.position.y = (m.userData.baseY || 0) + separation;
-        } else if (m.name === 'mandible') {
-            m.position.y = (m.userData.baseY || 0) - separation;
+        const base = m.userData.baseY || 0;
+        if (m.name === 'maxilla' || m.userData.archType === 'upper') {
+            m.position.y = base + separation;
+        } else if (m.name === 'mandible' || m.userData.archType === 'lower') {
+            m.position.y = base - separation;
         }
     });
 }
@@ -1702,7 +1857,19 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
     
-    // Raycast against real scan meshes first
+    // 1st priority: Segmented tooth meshes (direct tooth number)
+    if (toothMeshes.length > 0) {
+        const toothHits = raycaster.intersectObjects(toothMeshes);
+        if (toothHits.length > 0) {
+            const mesh = toothHits[0].object;
+            if (mesh.userData.toothNumber) {
+                selectToothByNumber(mesh.userData.toothNumber, toothHits[0].point);
+                return;
+            }
+        }
+    }
+    
+    // 2nd priority: Full scan meshes (position-based mapping)
     if (scanLoaded && scanMeshes.length > 0) {
         const scanHits = raycaster.intersectObjects(scanMeshes);
         if (scanHits.length > 0) {
@@ -1712,15 +1879,6 @@ function onMouseClick(event) {
                 selectToothByNumber(toothNum, hitPoint);
                 return;
             }
-        }
-    }
-    
-    // Fallback: raycast against procedural tooth meshes
-    const intersects = raycaster.intersectObjects(toothMeshes);
-    if (intersects.length > 0) {
-        const mesh = intersects[0].object;
-        if (mesh.userData.toothNumber) {
-            selectToothByNumber(mesh.userData.toothNumber);
         }
     }
 }
@@ -1735,25 +1893,26 @@ function onTouchStart(event) {
 
         raycaster.setFromCamera(mouse, camera);
         
-        if (scanLoaded && scanMeshes.length > 0) {
-            const scanHits = raycaster.intersectObjects(scanMeshes);
-            if (scanHits.length > 0) {
-                const hitPoint = scanHits[0].point;
-                const toothNum = mapPositionToTooth(hitPoint);
-                if (toothNum && DEMO_PATIENT.teeth[toothNum]) {
-                    event.preventDefault();
-                    selectToothByNumber(toothNum, hitPoint);
-                    return;
-                }
+        // 1st: segmented teeth (direct ID)
+        if (toothMeshes.length > 0) {
+            const toothHits = raycaster.intersectObjects(toothMeshes);
+            if (toothHits.length > 0 && toothHits[0].object.userData.toothNumber) {
+                event.preventDefault();
+                selectToothByNumber(toothHits[0].object.userData.toothNumber, toothHits[0].point);
+                return;
             }
         }
         
-        const intersects = raycaster.intersectObjects(toothMeshes);
-        if (intersects.length > 0) {
-            const mesh = intersects[0].object;
-            if (mesh.userData.toothNumber) {
-                event.preventDefault();
-                selectToothByNumber(mesh.userData.toothNumber);
+        // 2nd: full scan (position guess)
+        if (scanLoaded && scanMeshes.length > 0) {
+            const scanHits = raycaster.intersectObjects(scanMeshes);
+            if (scanHits.length > 0) {
+                const toothNum = mapPositionToTooth(scanHits[0].point);
+                if (toothNum && DEMO_PATIENT.teeth[toothNum]) {
+                    event.preventDefault();
+                    selectToothByNumber(toothNum, scanHits[0].point);
+                    return;
+                }
             }
         }
     }
