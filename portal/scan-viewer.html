@@ -1195,10 +1195,10 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     </div>
     <div class="mm-header__center">
         <div class="mm-patient-badge">
-            <div class="mm-patient-avatar">SM</div>
+            <div class="mm-patient-avatar">LB</div>
             <div class="mm-patient-info">
-                <strong>Sarah Mitchell</strong>
-                <span>Last visit: May 15, 2026</span>
+                <strong>Logan Burton</strong>
+                <span>Medit i700 Intraoral Scan • June 28, 2026</span>
             </div>
         </div>
     </div>
@@ -2257,6 +2257,78 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         });
     });
 
+    // ─── Load from URL (for demo scans) ───
+    async function loadFileFromURL(url, filename, archIndex) {
+        const ext = filename.split('.').pop().toLowerCase();
+        showLoading(true);
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const buffer = await response.arrayBuffer();
+
+            let geometry;
+            if (ext === 'stl') {
+                geometry = new THREE.STLLoader().parse(buffer);
+            } else if (ext === 'ply') {
+                geometry = new THREE.PLYLoader().parse(buffer);
+            } else if (ext === 'obj') {
+                const text = new TextDecoder().decode(buffer);
+                const group = new THREE.OBJLoader().parse(text);
+                const mergedGeo = new THREE.BufferGeometry();
+                const positions = [];
+                group.traverse(child => {
+                    if (child.isMesh && child.geometry) {
+                        const pos = child.geometry.getAttribute('position');
+                        if (pos) for (let i = 0; i < pos.count; i++) positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+                    }
+                });
+                mergedGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                const indices = [];
+                for (let i = 0; i < positions.length / 3; i++) indices.push(i);
+                mergedGeo.setIndex(indices);
+                geometry = mergedGeo;
+            }
+
+            if (!geometry) throw new Error('Parse failed');
+            geometry.computeVertexNormals();
+            geometry.computeBoundingBox();
+
+            // Fake file object for addModelToScene
+            const fakeFile = { name: filename, size: buffer.byteLength };
+            addModelToScene(geometry, fakeFile, ext, archIndex);
+
+        } catch (err) {
+            console.warn('Auto-load skipped:', filename, err.message);
+            showLoading(false);
+        }
+    }
+
+    // ─── Auto-load demo scans if available ───
+    async function autoLoadDemoScans() {
+        const demoFiles = [
+            { url: '/portal/demo-scans/Maxilla_Base.ply', name: 'Maxilla_Base.ply', arch: 0 },
+            { url: '/portal/demo-scans/Mandible_Base.ply', name: 'Mandible_Base.ply', arch: 1 }
+        ];
+
+        // Check if first file exists
+        try {
+            const check = await fetch(demoFiles[0].url, { method: 'HEAD' });
+            if (!check.ok) return; // No demo scans available
+
+            // Hide drop zone, show loading
+            const dropZone = document.getElementById('sv-drop-zone');
+            if (dropZone) dropZone.style.display = 'none';
+
+            // Load upper arch first, then lower
+            await loadFileFromURL(demoFiles[0].url, demoFiles[0].name, demoFiles[0].arch);
+            await loadFileFromURL(demoFiles[1].url, demoFiles[1].name, demoFiles[1].arch);
+
+        } catch (e) {
+            console.log('No demo scans found, showing upload UI');
+        }
+    }
+
     // ─── Init ───
     initThree();
 
@@ -2265,6 +2337,9 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
     // Initialize Lucide icons
     lucide.createIcons();
+
+    // Auto-load demo scans
+    autoLoadDemoScans();
 
 })();
 </script>
