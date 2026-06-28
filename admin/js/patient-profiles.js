@@ -27,19 +27,19 @@ const PatientProfiles = (function() {
     } catch (e) { /* ignore */ }
   }
 
-  // Auto-seed Logan Burton as demo patient if not in Firestore
+  // Auto-seed Logan Marrero as demo patient — always force-updates
   async function seedDemoPatient() {
     try {
       const db = firebase.firestore();
-      const docRef = db.collection('patients').doc('logan-burton');
-      const doc = await docRef.get();
-      if (!doc.exists) {
-        await docRef.set({
+      const docRef = db.collection('patients').doc('logan-marrero');
+      // Also clean up old 'logan-burton' doc if it exists
+      try { await db.collection('patients').doc('logan-burton').delete(); } catch(e) {}
+      await docRef.set({
           first_name: 'Logan',
-          last_name: 'Burton',
-          display_name: 'Logan Burton',
+          last_name: 'Marrero',
+          display_name: 'Logan Marrero',
           phone: '336-555-0147',
-          email: 'logan.burton@email.com',
+          email: 'logan.marrero@email.com',
           address: '4821 Lake Jeanette Rd, Greensboro, NC 27455',
           date_of_birth: '1992-03-15',
           insurance_provider: 'Delta Dental PPO',
@@ -54,6 +54,7 @@ const PatientProfiles = (function() {
           conversation_count: 2,
           last_visit: '2026-06-28',
           next_appointment: '2026-07-10',
+          is_demo: true,
           scan_files: {
             maxilla: '/portal/demo-scans/Maxilla_Base.ply',
             mandible: '/portal/demo-scans/Mandible_Base.ply',
@@ -62,9 +63,8 @@ const PatientProfiles = (function() {
           },
           created_at: firebase.firestore.FieldValue.serverTimestamp(),
           updated_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        console.log('[Patients] 🦷 Demo patient Logan Burton seeded');
-      }
+        }, { merge: true });
+        console.log('[Patients] 🦷 Demo patient Logan Marrero seeded');
     } catch (e) {
       console.warn('[Patients] Could not seed demo patient:', e.message);
     }
@@ -225,7 +225,7 @@ const PatientProfiles = (function() {
 
       detailPanel.innerHTML = `
         <div class="patient-detail-header">
-          <div style="width:100px;height:100px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:3px solid rgba(45,212,191,0.3);box-shadow:0 4px 16px rgba(45,212,191,0.15);"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
+          <div style="width:140px;height:140px;min-width:140px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:3px solid rgba(45,212,191,0.3);box-shadow:0 8px 24px rgba(45,212,191,0.15);"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
           <div class="patient-detail-info">
             <h2>${name}</h2>
             <div class="patient-detail-badges">
@@ -250,6 +250,10 @@ const PatientProfiles = (function() {
               <option value="inactive" ${patient.status === 'inactive' ? 'selected' : ''}>Inactive</option>
               <option value="archived" ${patient.status === 'archived' ? 'selected' : ''}>Archived</option>
             </select>
+            <button class="btn btn-sm" onclick="PatientProfiles.deletePatient('${patientId}', '${name.replace(/'/g, "\\'")}')"
+              style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);margin-left:4px;">
+              <i data-lucide="trash-2" style="width:14px;height:14px"></i> Delete
+            </button>
           </div>
         </div>
 
@@ -841,6 +845,25 @@ const PatientProfiles = (function() {
   }
 
   // Public API
+  async function deletePatient(patientId, name) {
+    if (!confirm(`Delete patient "${name}"? This cannot be undone.`)) return;
+    try {
+      const db = firebase.firestore();
+      await db.collection('patients').doc(patientId).delete();
+      patients = patients.filter(p => p.patient_id !== patientId);
+      selectedPatientId = null;
+      renderPatientList();
+      const detailPanel = document.getElementById('patient-detail-panel');
+      if (detailPanel) {
+        detailPanel.innerHTML = '<div class="empty-state" style="padding:60px 20px;text-align:center;"><p style="color:#94a3b8;">Patient deleted</p></div>';
+      }
+      showToast(`Patient "${name}" deleted`, 'success');
+    } catch (err) {
+      console.error('Error deleting patient:', err);
+      showToast('Error deleting patient', 'error');
+    }
+  }
+
   return {
     init,
     loadPatients,
@@ -855,7 +878,8 @@ const PatientProfiles = (function() {
     switchTab,
     switchDocTab,
     uploadClinicalFiles,
-    loadClinicalFiles
+    loadClinicalFiles,
+    deletePatient
   };
 })();
 
