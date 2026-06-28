@@ -1,0 +1,292 @@
+{
+  "teeth": [
+    {
+      "toothNumber": 1,
+      "name": "Upper Right Third Molar",
+      "status": "extracted",
+      "color": "gray",
+      "findings": ["Extracted — wisdom tooth (2019)"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Removed due to impaction. Site fully healed."
+    },
+    {
+      "toothNumber": 2,
+      "name": "Upper Right Second Molar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 3,
+      "name": "Upper Right First Molar",
+      "status": "restored",
+      "color": "blue",
+      "findings": ["Composite filling (MOD) placed 2024", "AI: Margins intact, no recurrent decay"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Good adaptation. No sensitivity."
+    },
+    {
+      "toothNumber": 4,
+      "name": "Upper Right Second Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 5,
+      "name": "Upper Right First Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 6,
+      "name": "Upper Right Canine",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 7,
+      "name": "Upper Right Lateral Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 8,
+      "name": "Upper Right Central Incisor",
+      "status": "monitor",
+      "color": "yellow",
+      "findings": ["Enamel erosion — lingual surface", "AI: Pattern consistent with acid reflux (GERD)", "Confidence: 88%"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Needs attention. Recommend fluoride varnish and GI referral for reflux management."
+    },
+    {
+      "toothNumber": 9,
+      "name": "Upper Left Central Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 10,
+      "name": "Upper Left Lateral Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 11,
+      "name": "Upper Left Canine",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 12,
+      "name": "Upper Left First Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 13,
+      "name": "Upper Left Second Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 14,
+      "name": "Upper Left First Molar",
+      "status": "planned",
+      "color": "teal",
+      "findings": ["Large amalgam with marginal ridge fracture", "AI: Fracture propagation risk — high", "Crown recommended — scheduled Jul 2026"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Existing amalgam failing. PFZ crown planned for 2026-07-10 to prevent catastrophic failure."
+    },
+    {
+      "toothNumber": 15,
+      "name": "Upper Left Second Molar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 16,
+      "name": "Upper Left Third Molar",
+      "status": "extracted",
+      "color": "gray",
+      "findings": ["Extracted — wisdom tooth (2019)"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Removed due to impaction. Site fully healed."
+    },
+    {
+      "toothNumber": 17,
+      "name": "Lower Left Third Molar",
+      "status": "extracted",
+      "color": "gray",
+      "findings": ["Extracted — wisdom tooth (2019)"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Removed due to partial eruption. Site fully healed."
+    },
+    {
+      "toothNumber": 18,
+      "name": "Lower Left Second Molar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 19,
+      "name": "Lower Left First Molar",
+      "status": "restored",
+      "color": "blue",
+      "findings": ["Root canal therapy completed 2024-09-22", "Zirconia crown placed 2024-09-22", "AI: Periapical healing confirmed, no pathology"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Excellent prognosis. Crown margins sealed. No symptoms."
+    },
+    {
+      "toothNumber": 20,
+      "name": "Lower Left Second Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 21,
+      "name": "Lower Left First Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 22,
+      "name": "Lower Left Canine",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 23,
+      "name": "Lower Left Lateral Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 24,
+      "name": "Lower Left Central Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 25,
+      "name": "Lower Right Central Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 26,
+      "name": "Lower Right Lateral Incisor",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 27,
+      "name": "Lower Right Canine",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 28,
+      "name": "Lower Right First Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 29,
+      "name": "Lower Right Second Premolar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 30,
+      "name": "Lower Right First Molar",
+      "status": "monitor",
+      "color": "yellow",
+      "findings": ["Recurrent decay at existing filling margin", "AI: Demineralization zone detected — distal", "Confidence: 91%"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Needs attention. Schedule caries excavation + restoration within 4-6 weeks. May need ceramic onlay if extensive."
+    },
+    {
+      "toothNumber": 31,
+      "name": "Lower Right Second Molar",
+      "status": "healthy",
+      "color": "green",
+      "findings": ["No findings"],
+      "lastAssessed": "2026-06-28",
+      "notes": ""
+    },
+    {
+      "toothNumber": 32,
+      "name": "Lower Right Third Molar",
+      "status": "extracted",
+      "color": "gray",
+      "findings": ["Extracted — wisdom tooth (2019)"],
+      "lastAssessed": "2026-06-28",
+      "notes": "Removed due to impaction. Site fully healed."
+    }
+  ]
+}

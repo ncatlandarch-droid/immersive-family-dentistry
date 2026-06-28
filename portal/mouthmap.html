@@ -761,9 +761,9 @@ body::before {
     </div>
     <div class="mm-header__center">
         <div class="mm-patient-badge">
-            <div class="mm-patient-avatar">LB</div>
+            <div class="mm-patient-avatar" style="overflow:hidden;"><img src="/images/patients/logan-burton.png" alt="Logan Marrero" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
             <div class="mm-patient-info">
-                <strong>Logan Burton</strong>
+                <strong>Logan Marrero</strong>
                 <span>Last visit: June 28, 2026</span>
             </div>
         </div>
@@ -949,12 +949,12 @@ function getQuadrant(n) {
 }
 
 const DEMO_PATIENT = {
-    name: 'Logan Burton',
+    name: 'Logan Marrero',
     lastVisit: 'June 28, 2026',
     teeth: {}
 };
 
-// Initialize all 32 teeth as healthy
+// Initialize all 32 teeth as healthy defaults
 for (let i = 1; i <= 32; i++) {
     DEMO_PATIENT.teeth[i] = {
         number: i,
@@ -968,92 +968,38 @@ for (let i = 1; i <= 32; i++) {
     };
 }
 
-// Tooth #3 — Treated (composite filling)
-DEMO_PATIENT.teeth[3] = {
-    number: 3,
-    name: TOOTH_NAMES[3],
-    quadrant: getQuadrant(3),
-    status: 'treated',
-    condition: 'Occlusal cavity was identified and treated with a composite resin filling. The restoration is intact with good margins and no signs of recurrent decay.',
-    history: [
-        { date: 'Mar 12, 2025', procedure: 'Composite filling (MOD)', provider: 'Dr. Brenes' },
-        { date: 'Jan 8, 2025', procedure: 'Cavity detected on bitewing X-ray', provider: 'Dr. Brenes' }
-    ],
-    planned: [],
-    notes: 'Composite filling holding well. Monitor at next recall for any marginal breakdown. Patient reports no sensitivity.'
-};
-
-// Tooth #8 — Needs Attention (enamel erosion)
-DEMO_PATIENT.teeth[8] = {
-    number: 8,
-    name: TOOTH_NAMES[8],
-    quadrant: getQuadrant(8),
-    status: 'needs_attention',
-    condition: 'Moderate enamel erosion observed on the labial surface. Likely related to acid reflux or dietary acids. Early intervention recommended to prevent further progression.',
-    history: [
-        { date: 'May 15, 2026', procedure: 'Enamel erosion noted on clinical exam', provider: 'Dr. Brenes' },
-        { date: 'Nov 20, 2025', procedure: 'Mild wear pattern observed', provider: 'Dr. Brenes' }
-    ],
-    planned: [
-        { procedure: 'Fluoride varnish application', timeline: 'Next visit', est_cost: '$45' },
-        { procedure: 'Dietary counseling for acid reduction', timeline: 'Next visit', est_cost: '—' }
-    ],
-    notes: 'Discuss acid reflux management with patient. Consider prescription-strength fluoride toothpaste. Re-evaluate in 6 months for possible bonding.'
-};
-
-// Tooth #14 — Planned (crown)
-DEMO_PATIENT.teeth[14] = {
-    number: 14,
-    name: TOOTH_NAMES[14],
-    quadrant: getQuadrant(14),
-    status: 'planned',
-    condition: 'Large existing amalgam restoration with marginal ridge fracture. Tooth structure compromised — full coverage crown recommended to prevent catastrophic fracture.',
-    history: [
-        { date: 'May 15, 2026', procedure: 'Treatment plan presented for crown', provider: 'Dr. Brenes' },
-        { date: 'Aug 3, 2022', procedure: 'Amalgam filling placed (MOD)', provider: 'Dr. Previous' },
-        { date: 'Feb 14, 2018', procedure: 'Initial cavity treatment', provider: 'Dr. Previous' }
-    ],
-    planned: [
-        { procedure: 'Porcelain-fused-to-zirconia crown (PFZ)', timeline: 'Scheduled Jul 10, 2026', est_cost: '$1,250' },
-        { procedure: 'Build-up / core if needed', timeline: 'Same appointment', est_cost: '$285' }
-    ],
-    notes: 'Crown preparation scheduled. Patient opted for tooth-colored PFZ crown. Insurance pre-authorization submitted and approved. Marginal ridge crack is progressing — do not delay.'
-};
-
-// Tooth #19 — Treated (root canal + crown)
-DEMO_PATIENT.teeth[19] = {
-    number: 19,
-    name: TOOTH_NAMES[19],
-    quadrant: getQuadrant(19),
-    status: 'treated',
-    condition: 'Previously symptomatic tooth treated with root canal therapy and restored with a full-coverage zirconia crown. Currently asymptomatic with no periapical pathology on radiograph.',
-    history: [
-        { date: 'Sep 22, 2024', procedure: 'Zirconia crown seated (permanent)', provider: 'Dr. Brenes' },
-        { date: 'Sep 5, 2024', procedure: 'Crown prep + temporary crown', provider: 'Dr. Brenes' },
-        { date: 'Aug 15, 2024', procedure: 'Root canal therapy completed', provider: 'Dr. Patel (Endodontist)' },
-        { date: 'Aug 2, 2024', procedure: 'Emergency visit — acute pulpitis', provider: 'Dr. Brenes' }
-    ],
-    planned: [],
-    notes: 'Excellent prognosis. Crown margins sealed, no sensitivity. Annual periapical X-ray recommended to monitor healing. Patient very happy with result.'
-};
-
-// Tooth #30 — Needs Attention (recurrent decay)
-DEMO_PATIENT.teeth[30] = {
-    number: 30,
-    name: TOOTH_NAMES[30],
-    quadrant: getQuadrant(30),
-    status: 'needs_attention',
-    condition: 'Recurrent decay detected at the distal margin of an existing composite filling. The restoration will need to be replaced with a larger restoration or an onlay.',
-    history: [
-        { date: 'May 15, 2026', procedure: 'Recurrent decay identified on bitewing', provider: 'Dr. Brenes' },
-        { date: 'Jun 18, 2023', procedure: 'Composite filling placed (DO)', provider: 'Dr. Brenes' }
-    ],
-    planned: [
-        { procedure: 'Remove existing restoration + caries excavation', timeline: 'Scheduling', est_cost: '$320' },
-        { procedure: 'Possible ceramic onlay if decay is extensive', timeline: 'TBD after excavation', est_cost: '$950–$1,200' }
-    ],
-    notes: 'Schedule within 4-6 weeks. Extent of decay will determine if a direct composite or indirect onlay is needed. Discuss options with patient at next appointment.'
-};
+// Load dental chart from JSON and merge into DEMO_PATIENT
+(async function loadDentalChart() {
+    try {
+        const resp = await fetch('/data/patients/logan-marrero/dental-chart.json');
+        if (!resp.ok) return;
+        const chart = await resp.json();
+        if (chart.teeth && Array.isArray(chart.teeth)) {
+            chart.teeth.forEach(t => {
+                if (!t.toothNumber || t.toothNumber < 1 || t.toothNumber > 32) return;
+                const num = t.toothNumber;
+                // Map dental-chart status to MouthMap status
+                let status = 'healthy';
+                if (t.status === 'extracted') status = 'missing';
+                else if (t.status === 'restored' || t.status === 'treated') status = 'treated';
+                else if (t.status === 'decay' || t.status === 'needs_attention') status = 'needs_attention';
+                else if (t.status === 'planned' || t.status === 'watch') status = 'planned';
+                
+                // Only override if not already set with richer data, or if chart has findings
+                if (t.findings && t.findings.length && t.findings[0] !== 'No findings') {
+                    DEMO_PATIENT.teeth[num].status = status;
+                    DEMO_PATIENT.teeth[num].condition = t.findings.join('. ');
+                }
+                if (t.notes) DEMO_PATIENT.teeth[num].notes = t.notes;
+                if (t.status === 'extracted') DEMO_PATIENT.teeth[num].status = 'missing';
+            });
+            console.log(`[MouthMap] 📋 Dental chart loaded: ${chart.teeth.length} teeth`);
+            updateSummaryStats();
+        }
+    } catch (e) {
+        console.warn('[MouthMap] Could not load dental chart:', e.message);
+    }
+})();
 
 
 /* ═══════════════════════════════════════════════════════════

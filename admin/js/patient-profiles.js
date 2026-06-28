@@ -241,9 +241,6 @@ const PatientProfiles = (function() {
             <a href="/portal/mouthmap?role=staff&patient=${patientId}" target="_blank" class="btn btn-sm" style="background:linear-gradient(135deg,#2dd4bf,#0d9488);color:#fff;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
               🦷 Open MouthMap
             </a>
-            ${patient.scan_files ? `<a href="/portal/scan-viewer.html?patient=${patientId}" target="_blank" class="btn btn-sm" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
-              🔬 View 3D Scan
-            </a>` : ''}
             <button class="btn btn-sm" onclick="PatientProfiles.editPatient('${patientId}')">
               <i data-lucide="edit" style="width:14px;height:14px"></i> Edit
             </button>
