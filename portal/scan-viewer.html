@@ -1287,6 +1287,13 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         </div>
 
         <!-- Viewer Toolbar -->
+        <!-- Floating Mouth Slider (on 3D canvas) -->
+        <div class="sv-float-jaw" id="floatJawSlider">
+            <div class="sv-float-jaw__label">🦷</div>
+            <input type="range" class="sv-float-jaw__range" id="floatMouthRange" min="0" max="100" value="35" orient="vertical">
+            <div class="sv-float-jaw__val" id="floatMouthVal">Bite</div>
+        </div>
+
         <div class="sv-viewer-toolbar" id="viewerToolbar">
             <button class="sv-toolbar-btn" id="btnMeasure" title="Measure distance">
                 <i data-lucide="ruler"></i><span>Measure</span>
@@ -1623,12 +1630,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 /* Dental Chart Panel */
 .dental-chart-panel {
     position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 50px;
+    left: 10px;
     z-index: 5000;
-    width: 680px;
-    max-width: 90vw;
+    width: 620px;
+    max-width: 45vw;
     font-family: 'Inter', sans-serif;
 }
 .dental-chart__toggle {
@@ -1828,6 +1834,63 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 </div>
 
 <style>
+/* Floating Jaw Slider (on 3D canvas) */
+.sv-float-jaw {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    background: rgba(15, 20, 30, 0.85);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+.sv-float-jaw__label {
+    font-size: 16px;
+    line-height: 1;
+}
+.sv-float-jaw__range {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 28px;
+    height: 100px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+}
+.sv-float-jaw__range::-webkit-slider-runnable-track {
+    width: 4px;
+    height: 100%;
+    background: rgba(45, 212, 191, 0.2);
+    border-radius: 2px;
+}
+.sv-float-jaw__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #2dd4bf;
+    border: 2px solid rgba(255,255,255,0.3);
+    margin-left: -6px;
+    cursor: grab;
+    box-shadow: 0 0 8px rgba(45,212,191,0.5);
+}
+.sv-float-jaw__val {
+    font-size: 9px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
 /* Overlay Legend */
 .sv-overlay-legend {
     margin-top: 10px;
@@ -3292,6 +3355,30 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     document.getElementById('btnMouthClosed').addEventListener('click', () => setMouthOpen(0));
     document.getElementById('btnMouthMid').addEventListener('click', () => setMouthOpen(50));
     document.getElementById('btnMouthWide').addEventListener('click', () => setMouthOpen(100));
+
+    // Floating jaw slider on 3D canvas — syncs with sidebar slider
+    const floatJaw = document.getElementById('floatMouthRange');
+    const floatJawVal = document.getElementById('floatMouthVal');
+    if (floatJaw) {
+        floatJaw.addEventListener('input', function() {
+            const val = parseInt(this.value);
+            setMouthOpen(val);
+            // Sync sidebar slider
+            mouthSlider.value = val;
+        });
+    }
+    // Patch setMouthOpen to also sync floating slider
+    const origSetMouthOpen = setMouthOpen;
+    setMouthOpen = function(val) {
+        origSetMouthOpen(val);
+        if (floatJaw) floatJaw.value = val;
+        if (floatJawVal) {
+            if (val <= 5) floatJawVal.textContent = 'Closed';
+            else if (val <= 30) floatJawVal.textContent = 'Bite';
+            else if (val <= 60) floatJawVal.textContent = 'Open';
+            else floatJawVal.textContent = 'Wide';
+        }
+    };
 
     // ─── Clinical Overlays (Heat Map on vertex colors) ───
     let originalVertexColors = new Map(); // store originals for restore
