@@ -19,6 +19,7 @@
     <!-- Three.js r128 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
@@ -1216,33 +1217,166 @@ function init() {
 
 /* ═══ Build Dental Arch ═══ */
 function buildDentalArch() {
-    // Parametric U-shape arch using cosine curve
-    // Upper arch: teeth 1 (right 3rd molar) → 16 (left 3rd molar)
-    // Array index 0..15 maps right→front→left
-
-    const archGroup = new THREE.Group();
-
-    buildArch(archGroup, 'upper'); // teeth 1-16
-    buildArch(archGroup, 'lower'); // teeth 17-32
-
-    // Subtle floor/gum plane for grounding
-    const planeGeo = new THREE.PlaneGeometry(80, 60);
-    const planeMat = new THREE.MeshStandardMaterial({
-        color: 0x0B0F19,
-        transparent: true,
-        opacity: 0.0
-    });
-    const plane = new THREE.Mesh(planeGeo, planeMat);
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -18;
-    plane.receiveShadow = true;
-    archGroup.add(plane);
-
-    scene.add(archGroup);
+    // Real scan IS the model — no procedural teeth needed
+    loadRealScans();
 }
 
 
-function buildArch(parent, arch) {
+/* ═══════════════════════════════════════════════════════════
+   REAL SCAN LOADER — PLY Files as Primary Model
+   The scan is BOTH the visual AND the click target.
+   Position-based mapping determines which tooth was clicked.
+   ═══════════════════════════════════════════════════════════ */
+
+let scanMeshes = [];
+let scanLoaded = false;
+let scanBounds = null;
+
+function loadRealScans() {
+    const loader = new THREE.PLYLoader();
+    const scanGroup = new THREE.Group();
+    scanGroup.name = 'realScans';
+    let loaded = 0;
+    const total = 2;
+    
+    // Premium dental material — mimics real enamel/gum appearance
+    function makeScanMaterial(hasColors) {
+        return new THREE.MeshPhysicalMaterial({
+            color: 0xf0e6d8,
+            roughness: 0.32,
+            metalness: 0.01,
+            clearcoat: 0.5,
+            clearcoatRoughness: 0.15,
+            envMapIntensity: 0.6,
+            vertexColors: hasColors,
+            side: THREE.DoubleSide
+        });
+    }
+    
+    function onScanLoaded() {
+        loaded++;
+        updateLoadingProgress(loaded, total);
+        
+        if (loaded >= total) {
+            scanLoaded = true;
+            
+            // Calculate bounds for position-based tooth mapping
+            scanBounds = new THREE.Box3().setFromObject(scanGroup);
+            const center = scanBounds.getCenter(new THREE.Vector3());
+            const size = scanBounds.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // Position camera for a nice dental view
+            camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
+            controls.target.copy(center);
+            controls.update();
+            
+            // Hide loading overlay
+            const loadingEl = document.getElementById('loading-overlay');
+            if (loadingEl) loadingEl.style.display = 'none';
+            
+            // Update stats
+            updateSummaryStats();
+            
+            console.log(`🦷 Dental scans loaded — ${scanMeshes.reduce((a, m) => a + m.geometry.attributes.position.count, 0)} total vertices`);
+            console.log(`📐 Bounds: ${size.x.toFixed(1)} x ${size.y.toFixed(1)} x ${size.z.toFixed(1)} mm`);
+        }
+    }
+    
+    // Load Maxilla (upper jaw)
+    loader.load('/portal/demo-scans/Maxilla_Base.ply', 
+        (geometry) => {
+            geometry.computeVertexNormals();
+            const hasColors = geometry.hasAttribute('color');
+            const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
+            mesh.name = 'maxilla';
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scanGroup.add(mesh);
+            scanMeshes.push(mesh);
+            console.log(`✅ Maxilla: ${geometry.attributes.position.count.toLocaleString()} vertices`);
+            onScanLoaded();
+        },
+        (xhr) => {
+            if (xhr.total) updateLoadingProgress(xhr.loaded / xhr.total * 0.5, 1);
+        },
+        (err) => { console.warn('⚠ Maxilla failed:', err); onScanLoaded(); }
+    );
+    
+    // Load Mandible (lower jaw)
+    loader.load('/portal/demo-scans/Mandible_Base.ply',
+        (geometry) => {
+            geometry.computeVertexNormals();
+            const hasColors = geometry.hasAttribute('color');
+            const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
+            mesh.name = 'mandible';
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scanGroup.add(mesh);
+            scanMeshes.push(mesh);
+            console.log(`✅ Mandible: ${geometry.attributes.position.count.toLocaleString()} vertices`);
+            onScanLoaded();
+        },
+        (xhr) => {},
+        (err) => { console.warn('⚠ Mandible failed:', err); onScanLoaded(); }
+    );
+    
+    scene.add(scanGroup);
+}
+
+function updateLoadingProgress(loaded, total) {
+    const loadingEl = document.getElementById('loading-overlay');
+    if (loadingEl) {
+        const p = loadingEl.querySelector('p');
+        if (p) p.textContent = `Loading dental scans… ${Math.round(loaded/total*100)}%`;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   POSITION-BASED TOOTH MAPPING
+   Maps a 3D click position on the real scan → tooth number.
+   Uses dental arch geometry — no mesh segmentation needed.
+   ═══════════════════════════════════════════════════════════ */
+
+function mapPositionToTooth(point) {
+    if (!scanBounds) return null;
+    
+    const center = scanBounds.getCenter(new THREE.Vector3());
+    const size = scanBounds.getSize(new THREE.Vector3());
+    
+    // Determine if upper or lower based on Y position
+    const isUpper = point.y > center.y;
+    
+    // Normalize X position to -1..+1 across the arch width
+    const normalizedX = (point.x - center.x) / (size.x * 0.5);
+    const absX = Math.abs(normalizedX);
+    const isRight = normalizedX < 0;
+    
+    // Determine tooth position (1-8 from back to front)
+    let toothPos;
+    if (absX > 0.85) toothPos = 1;       // 3rd molar (wisdom)
+    else if (absX > 0.72) toothPos = 2;  // 2nd molar
+    else if (absX > 0.58) toothPos = 3;  // 1st molar
+    else if (absX > 0.45) toothPos = 4;  // 2nd premolar
+    else if (absX > 0.32) toothPos = 5;  // 1st premolar
+    else if (absX > 0.20) toothPos = 6;  // canine
+    else if (absX > 0.08) toothPos = 7;  // lateral incisor
+    else toothPos = 8;                    // central incisor
+    
+    // Convert to Universal Numbering System
+    let toothNum;
+    if (isUpper) {
+        toothNum = isRight ? toothPos : (17 - toothPos);
+    } else {
+        toothNum = isRight ? (33 - toothPos) : (16 + toothPos);
+    }
+    
+    return toothNum;
+}
+
+
+function buildClickZones(parent, arch) {
     const isUpper = arch === 'upper';
     const yOffset = isUpper ? 5 : -5;
     const yFlip = isUpper ? 1 : -1;
@@ -1343,71 +1477,194 @@ function getToothType(num) {
 
 
 function createToothGeometry(type) {
-    let geo;
-    const segments = 4;
-
     switch (type) {
-        case 'molar':
-            geo = createRoundedBox(4.2, 6.0, 4.8, 0.6, segments);
-            break;
-        case 'premolar':
-            geo = createRoundedBox(3.4, 6.5, 3.6, 0.5, segments);
-            break;
-        case 'canine':
-            geo = createCanineGeometry();
-            break;
-        case 'incisor':
-            geo = createRoundedBox(2.8, 7.2, 2.2, 0.5, segments);
-            break;
+        case 'molar':      return buildMolarGeometry();
+        case 'premolar':   return buildPremolarGeometry();
+        case 'canine':     return buildCanineGeometry();
+        case 'incisor':    return buildIncisorGeometry();
+        default:           return buildIncisorGeometry();
     }
-
-    return geo;
 }
 
 
-function createRoundedBox(width, height, depth, radius, segments) {
-    // Create a rounded box using beveled box approach
-    const shape = new THREE.Shape();
-    const w = width / 2 - radius;
-    const h = height / 2 - radius;
+/* ═══════════════════════════════════════════════════════════
+   VOLTRON TOOTH COMPONENTS — Anatomically Accurate
+   Each tooth type has:
+   - Crown: visible part above gumline
+   - CEJ (cementoenamel junction): neck/waist
+   - Root(s): below gumline
+   ═══════════════════════════════════════════════════════════ */
 
-    shape.moveTo(-w, -h - radius);
-    shape.lineTo(w, -h - radius);
-    shape.quadraticCurveTo(w + radius, -h - radius, w + radius, -h);
-    shape.lineTo(w + radius, h);
-    shape.quadraticCurveTo(w + radius, h + radius, w, h + radius);
-    shape.lineTo(-w, h + radius);
-    shape.quadraticCurveTo(-w - radius, h + radius, -w - radius, h);
-    shape.lineTo(-w - radius, -h);
-    shape.quadraticCurveTo(-w - radius, -h - radius, -w, -h - radius);
+function buildMolarGeometry() {
+    // Molar: Wide, bulky crown with 4 cusps + bifurcated roots
+    // Profile: wide top with cusps → neck → 2 root prongs
 
-    const extrudeSettings = {
-        depth: depth,
+    const crown = new THREE.Shape();
+
+    // Crown — bulky rectangle with rounded corners and cusp bumps
+    const cw = 2.3, ch = 2.5; // crown half-width, half-depth
+    const r = 0.5; // corner radius
+
+    // Outer crown profile (top view → extruded)
+    crown.moveTo(-cw + r, -ch);
+    crown.lineTo(cw - r, -ch);
+    crown.quadraticCurveTo(cw, -ch, cw, -ch + r);
+    crown.lineTo(cw, ch - r);
+    crown.quadraticCurveTo(cw, ch, cw - r, ch);
+    crown.lineTo(-cw + r, ch);
+    crown.quadraticCurveTo(-cw, ch, -cw, ch - r);
+    crown.lineTo(-cw, -ch + r);
+    crown.quadraticCurveTo(-cw, -ch, -cw + r, -ch);
+
+    const crownGeo = new THREE.ExtrudeGeometry(crown, {
+        depth: 3.2,       // crown height
         bevelEnabled: true,
-        bevelThickness: radius * 0.5,
-        bevelSize: radius * 0.3,
-        bevelSegments: segments,
-        curveSegments: segments
-    };
+        bevelThickness: 0.6,
+        bevelSize: 0.4,
+        bevelSegments: 4,
+        curveSegments: 6
+    });
 
-    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    // Add cusp bumps on the occlusal surface
+    const cusps = [];
+    const cuspPositions = [
+        [-1.0, -1.0], [1.0, -1.0],  // buccal cusps
+        [-1.0, 1.0],  [1.0, 1.0]    // lingual cusps
+    ];
+    cuspPositions.forEach(([cx, cz]) => {
+        const cuspGeo = new THREE.SphereGeometry(0.8, 6, 4, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        cuspGeo.translate(cx, 3.8, cz + 2.5);
+        cusps.push(cuspGeo);
+    });
+
+    // Central fissure depression
+    const fissureGeo = new THREE.CylinderGeometry(0.25, 0.25, 4.2, 6);
+    fissureGeo.rotateZ(Math.PI / 2);
+    fissureGeo.translate(0, 3.4, 2.5);
+
+    // Root: tapered cylinder split into 2 prongs
+    const rootProfile = [];
+    rootProfile.push(new THREE.Vector2(0, 0));
+    rootProfile.push(new THREE.Vector2(1.5, 0));
+    rootProfile.push(new THREE.Vector2(1.6, -0.3));
+    rootProfile.push(new THREE.Vector2(1.3, -2.0));
+    rootProfile.push(new THREE.Vector2(0.8, -3.5));
+    rootProfile.push(new THREE.Vector2(0.25, -4.8));
+    rootProfile.push(new THREE.Vector2(0, -5.0));
+
+    const rootGeo = new THREE.LatheGeometry(rootProfile, 8);
+
+    // Merge all into one
+    crownGeo.center();
+    cusps.forEach(c => crownGeo.merge(c));
+    rootGeo.translate(0, -3.5, 0);
+    crownGeo.merge(rootGeo);
+
+    crownGeo.center();
+    return crownGeo;
+}
+
+
+function buildPremolarGeometry() {
+    // Premolar: 2 cusps (buccal + lingual), narrower than molar
+    const pts = [];
+    // Root → neck → crown → cusps profile (revolution shape)
+    pts.push(new THREE.Vector2(0, -4.5));     // root tip
+    pts.push(new THREE.Vector2(0.35, -3.8));
+    pts.push(new THREE.Vector2(0.7, -2.5));
+    pts.push(new THREE.Vector2(1.0, -1.2));   // root body
+    pts.push(new THREE.Vector2(1.2, -0.3));   // neck (CEJ) narrowing
+    pts.push(new THREE.Vector2(1.05, 0));     // CEJ waist
+    pts.push(new THREE.Vector2(1.4, 0.5));    // crown bulge
+    pts.push(new THREE.Vector2(1.7, 1.5));    // crown widest
+    pts.push(new THREE.Vector2(1.65, 2.5));   // crown upper
+    pts.push(new THREE.Vector2(1.4, 3.2));    // shoulder
+    pts.push(new THREE.Vector2(1.1, 3.8));    // cusp slope
+    pts.push(new THREE.Vector2(0.5, 4.3));    // cusp tip area
+    pts.push(new THREE.Vector2(0, 4.5));      // cusp peak
+
+    const geo = new THREE.LatheGeometry(pts, 10);
+
+    // Flatten slightly (premolars are oval, not round)
+    const verts = geo.attributes.position;
+    for (let i = 0; i < verts.count; i++) {
+        const z = verts.getZ(i);
+        verts.setZ(i, z * 0.72); // compress buccal-lingual
+    }
+    verts.needsUpdate = true;
+    geo.computeVertexNormals();
+
     geo.center();
     return geo;
 }
 
 
-function createCanineGeometry() {
-    // Canine: tapered, slightly pointed top
+function buildCanineGeometry() {
+    // Canine: sharp pointed cusp, long single root, diamond cross-section
     const pts = [];
-    pts.push(new THREE.Vector2(0, 0));
-    pts.push(new THREE.Vector2(1.6, 0));
-    pts.push(new THREE.Vector2(1.8, 1));
-    pts.push(new THREE.Vector2(1.7, 3));
-    pts.push(new THREE.Vector2(1.3, 5.5));
-    pts.push(new THREE.Vector2(0.6, 7));
-    pts.push(new THREE.Vector2(0, 7.5));
+    pts.push(new THREE.Vector2(0, -5.5));     // root tip (longer root)
+    pts.push(new THREE.Vector2(0.25, -5.0));
+    pts.push(new THREE.Vector2(0.55, -3.5));
+    pts.push(new THREE.Vector2(0.8, -2.0));
+    pts.push(new THREE.Vector2(1.0, -0.8));   // root body
+    pts.push(new THREE.Vector2(1.15, -0.2));  // approaching CEJ
+    pts.push(new THREE.Vector2(1.0, 0.1));    // CEJ waist (narrow)
+    pts.push(new THREE.Vector2(1.25, 0.8));   // crown emergence
+    pts.push(new THREE.Vector2(1.5, 1.8));    // crown max width
+    pts.push(new THREE.Vector2(1.45, 2.8));   // crown body
+    pts.push(new THREE.Vector2(1.2, 3.8));    // tapering to cusp
+    pts.push(new THREE.Vector2(0.8, 4.8));    // cusp slope
+    pts.push(new THREE.Vector2(0.35, 5.6));   // near tip
+    pts.push(new THREE.Vector2(0, 6.0));      // sharp cusp tip
 
-    const geo = new THREE.LatheGeometry(pts, 8);
+    const geo = new THREE.LatheGeometry(pts, 10);
+
+    // Flatten to diamond/oval cross-section
+    const verts = geo.attributes.position;
+    for (let i = 0; i < verts.count; i++) {
+        const z = verts.getZ(i);
+        verts.setZ(i, z * 0.55); // more flattened than premolar
+    }
+    verts.needsUpdate = true;
+    geo.computeVertexNormals();
+
+    geo.center();
+    return geo;
+}
+
+
+function buildIncisorGeometry() {
+    // Incisor: thin chisel-shaped crown, single root
+    // Laterally wide, anteroposteriorly thin (like a spatula)
+    const pts = [];
+    pts.push(new THREE.Vector2(0, -4.2));     // root tip
+    pts.push(new THREE.Vector2(0.3, -3.5));
+    pts.push(new THREE.Vector2(0.55, -2.2));
+    pts.push(new THREE.Vector2(0.75, -1.0));  // root body
+    pts.push(new THREE.Vector2(0.9, -0.2));   // near CEJ
+    pts.push(new THREE.Vector2(0.8, 0.1));    // CEJ waist
+    pts.push(new THREE.Vector2(1.1, 0.8));    // crown emergence
+    pts.push(new THREE.Vector2(1.35, 1.8));   // crown widest
+    pts.push(new THREE.Vector2(1.4, 2.8));    // crown body
+    pts.push(new THREE.Vector2(1.35, 3.8));   // approaching edge
+    pts.push(new THREE.Vector2(1.25, 4.5));   // near incisal edge
+    pts.push(new THREE.Vector2(1.1, 4.9));    // edge
+    pts.push(new THREE.Vector2(0, 5.0));      // incisal edge center
+
+    const geo = new THREE.LatheGeometry(pts, 10);
+
+    // Strongly flatten (incisors are thin blades)
+    const verts = geo.attributes.position;
+    for (let i = 0; i < verts.count; i++) {
+        const z = verts.getZ(i);
+        const y = verts.getY(i);
+        // More flattened at the crown, less at root
+        const flatFactor = y > 0 ? 0.32 : 0.5;
+        verts.setZ(i, z * flatFactor);
+    }
+    verts.needsUpdate = true;
+    geo.computeVertexNormals();
+
     geo.center();
     return geo;
 }
@@ -1463,12 +1720,26 @@ function onMouseClick(event) {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
+    
+    // Raycast against real scan meshes first
+    if (scanLoaded && scanMeshes.length > 0) {
+        const scanHits = raycaster.intersectObjects(scanMeshes);
+        if (scanHits.length > 0) {
+            const hitPoint = scanHits[0].point;
+            const toothNum = mapPositionToTooth(hitPoint);
+            if (toothNum && DEMO_PATIENT.teeth[toothNum]) {
+                selectToothByNumber(toothNum, hitPoint);
+                return;
+            }
+        }
+    }
+    
+    // Fallback: raycast against procedural tooth meshes
     const intersects = raycaster.intersectObjects(toothMeshes);
-
     if (intersects.length > 0) {
         const mesh = intersects[0].object;
         if (mesh.userData.toothNumber) {
-            selectTooth(mesh);
+            selectToothByNumber(mesh.userData.toothNumber);
         }
     }
 }
@@ -1482,40 +1753,83 @@ function onTouchStart(event) {
         mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
+        
+        if (scanLoaded && scanMeshes.length > 0) {
+            const scanHits = raycaster.intersectObjects(scanMeshes);
+            if (scanHits.length > 0) {
+                const hitPoint = scanHits[0].point;
+                const toothNum = mapPositionToTooth(hitPoint);
+                if (toothNum && DEMO_PATIENT.teeth[toothNum]) {
+                    event.preventDefault();
+                    selectToothByNumber(toothNum, hitPoint);
+                    return;
+                }
+            }
+        }
+        
         const intersects = raycaster.intersectObjects(toothMeshes);
-
         if (intersects.length > 0) {
             const mesh = intersects[0].object;
             if (mesh.userData.toothNumber) {
                 event.preventDefault();
-                selectTooth(mesh);
+                selectToothByNumber(mesh.userData.toothNumber);
             }
         }
     }
 }
 
 
-function selectTooth(mesh) {
-    // Reset previous selection
+/* ═══ Highlight ring for selected tooth area on scan ═══ */
+let selectionRing = null;
+
+function selectToothByNumber(toothNum, hitPoint) {
+    const toothData = DEMO_PATIENT.teeth[toothNum];
+    if (!toothData) return;
+    
+    // Remove previous selection ring
+    if (selectionRing) {
+        scene.remove(selectionRing);
+        selectionRing = null;
+    }
+    
+    // Reset previous procedural tooth selection
     if (selectedTooth) {
         const ud = selectedTooth.userData;
         selectedTooth.material.emissive.setHex(ud.originalEmissive);
         selectedTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
         selectedTooth.scale.set(1, 1, 1);
     }
-
-    selectedTooth = mesh;
-
-    // Highlight selected tooth
-    mesh.material.emissive.setHex(0x2dd4bf);
-    mesh.material.emissiveIntensity = 0.5;
-    mesh.scale.set(1.1, 1.1, 1.1);
+    
+    // If we have a hit point on the real scan, show a glowing ring
+    if (hitPoint && scanLoaded) {
+        const ringGeo = new THREE.RingGeometry(2.5, 3.2, 24);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: 0x2dd4bf,
+            transparent: true,
+            opacity: 0.7,
+            side: THREE.DoubleSide,
+            depthTest: false
+        });
+        selectionRing = new THREE.Mesh(ringGeo, ringMat);
+        selectionRing.position.copy(hitPoint);
+        // Orient ring to face camera
+        selectionRing.lookAt(camera.position);
+        scene.add(selectionRing);
+    }
+    
+    // Also highlight procedural tooth mesh if it exists
+    const procMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
+    if (procMesh) {
+        selectedTooth = procMesh;
+        procMesh.material.emissive.setHex(0x2dd4bf);
+        procMesh.material.emissiveIntensity = 0.5;
+    }
 
     // Stop auto-rotate
     autoRotate = false;
 
     // Update info panel
-    updateInfoPanel(mesh.userData.toothData);
+    updateInfoPanel(toothData);
 }
 
 
