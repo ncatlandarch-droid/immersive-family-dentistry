@@ -11,9 +11,20 @@ const PatientProfiles = (function() {
 
   async function init() {
     await seedDemoPatient();
+    await cleanupTestPatients();
     await loadPatients();
     renderPatientList();
     bindEvents();
+  }
+
+  // Remove test patients like Jamie Good
+  async function cleanupTestPatients() {
+    try {
+      const db = firebase.firestore();
+      const snapshot = await db.collection('patients').where('display_name', '==', 'Jamie Good').get();
+      snapshot.forEach(doc => doc.ref.delete());
+      if (!snapshot.empty) console.log('[Patients] 🧹 Cleaned up test patients');
+    } catch (e) { /* ignore */ }
   }
 
   // Auto-seed Logan Burton as demo patient if not in Firestore
@@ -37,7 +48,7 @@ const PatientProfiles = (function() {
           preferred_language: 'en',
           status: 'active',
           source: 'scan-upload',
-          photo_url: '',
+          photo_url: '/images/patients/logan-burton.png',
           outstanding_balance: 630,
           total_lifetime_value: 3145,
           conversation_count: 2,
@@ -163,20 +174,20 @@ const PatientProfiles = (function() {
       return `
         <div class="patient-card ${isSelected ? 'selected' : ''}" 
              data-patient-id="${patient.patient_id}"
-             onclick="PatientProfiles.selectPatient('${patient.patient_id}')">
-          <div style="width:56px;height:56px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
-          <div class="patient-info">
-            <div class="patient-name">${patient.display_name || `${patient.first_name} ${patient.last_name}`} ${langBadge}</div>
-            <div class="patient-meta">
-              ${patient.phone ? `<span><i data-lucide="phone" style="width:12px;height:12px"></i> ${patient.phone}</span>` : ''}
-              ${patient.email ? `<span><i data-lucide="mail" style="width:12px;height:12px"></i> ${patient.email}</span>` : ''}
-            </div>
-            <div class="patient-meta">
-              <span><i data-lucide="calendar" style="width:12px;height:12px"></i> ${lastVisit}</span>
-              ${patient.insurance_provider ? `<span><i data-lucide="shield" style="width:12px;height:12px"></i> ${patient.insurance_provider}</span>` : ''}
+             onclick="PatientProfiles.selectPatient('${patient.patient_id}')"
+             style="display:flex;align-items:center;gap:16px;padding:14px 16px;cursor:pointer;border-radius:12px;transition:all 0.2s;">
+          <div style="width:80px;height:80px;min-width:80px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff;overflow:hidden;border:3px solid rgba(45,212,191,0.25);box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+            <img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};">
+            <span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:15px;color:#f1f5f9;margin-bottom:4px;">${patient.display_name || `${patient.first_name} ${patient.last_name}`} ${langBadge} ${statusBadge}</div>
+            <div style="font-size:12px;color:#94a3b8;line-height:1.6;">
+              ${patient.phone ? `<div>📞 ${patient.phone}</div>` : ''}
+              ${patient.email ? `<div>✉️ ${patient.email}</div>` : ''}
+              <div>📅 ${lastVisit}${patient.insurance_provider ? ` · 🛡️ ${patient.insurance_provider}` : ''}</div>
             </div>
           </div>
-          <div class="patient-status">${statusBadge}</div>
         </div>`;
     }).join('');
 
