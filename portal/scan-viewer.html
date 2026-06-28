@@ -1512,6 +1512,368 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     </div><!-- /sv-panel -->
 </div><!-- /sv-layout -->
 
+<!-- Dental Chart Overlay (bottom of viewer) -->
+<div id="dentalChartPanel" class="dental-chart-panel">
+    <div class="dental-chart__toggle" id="dentalChartToggle">
+        <i data-lucide="layout-grid"></i>
+        <span>Dental Chart</span>
+        <i data-lucide="chevron-up" id="dentalChartChevron"></i>
+    </div>
+    <div class="dental-chart__body" id="dentalChartBody">
+        <div class="dental-chart__label">UPPER (Maxillary)</div>
+        <div class="dental-chart__arch dental-chart__upper">
+            <div class="dental-chart__tooth" data-tooth="1"><span class="dc-num">1</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="2"><span class="dc-num">2</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="3"><span class="dc-num">3</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="4"><span class="dc-num">4</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="5"><span class="dc-num">5</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="6"><span class="dc-num">6</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="7"><span class="dc-num">7</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="8"><span class="dc-num">8</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__midline"></div>
+            <div class="dental-chart__tooth" data-tooth="9"><span class="dc-num">9</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="10"><span class="dc-num">10</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="11"><span class="dc-num">11</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="12"><span class="dc-num">12</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="13"><span class="dc-num">13</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="14"><span class="dc-num">14</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="15"><span class="dc-num">15</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="16"><span class="dc-num">16</span><span class="dc-icon">🦷</span></div>
+        </div>
+        <div class="dental-chart__divider">
+            <span>R</span>
+            <div class="dental-chart__divider-line"></div>
+            <span class="dental-chart__divider-center">ADA Universal Numbering</span>
+            <div class="dental-chart__divider-line"></div>
+            <span>L</span>
+        </div>
+        <div class="dental-chart__arch dental-chart__lower">
+            <div class="dental-chart__tooth" data-tooth="32"><span class="dc-num">32</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="31"><span class="dc-num">31</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="30"><span class="dc-num">30</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="29"><span class="dc-num">29</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="28"><span class="dc-num">28</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="27"><span class="dc-num">27</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="26"><span class="dc-num">26</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="25"><span class="dc-num">25</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__midline"></div>
+            <div class="dental-chart__tooth" data-tooth="24"><span class="dc-num">24</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="23"><span class="dc-num">23</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="22"><span class="dc-num">22</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="21"><span class="dc-num">21</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="20"><span class="dc-num">20</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="19"><span class="dc-num">19</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="18"><span class="dc-num">18</span><span class="dc-icon">🦷</span></div>
+            <div class="dental-chart__tooth" data-tooth="17"><span class="dc-num">17</span><span class="dc-icon">🦷</span></div>
+        </div>
+        <div class="dental-chart__label" style="margin-top:4px;">LOWER (Mandibular)</div>
+        <div class="dental-chart__legend">
+            <span class="dc-legend-item"><span class="dc-dot" style="background:#22c55e;"></span> Healthy</span>
+            <span class="dc-legend-item"><span class="dc-dot" style="background:#eab308;"></span> Watch</span>
+            <span class="dc-legend-item"><span class="dc-dot" style="background:#ef4444;"></span> Decay</span>
+            <span class="dc-legend-item"><span class="dc-dot" style="background:#3b82f6;"></span> Treated</span>
+            <span class="dc-legend-item"><span class="dc-dot" style="background:#8b5cf6;"></span> Flagged</span>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Dental Chart Panel */
+.dental-chart-panel {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5000;
+    width: 680px;
+    max-width: 90vw;
+    font-family: 'Inter', sans-serif;
+}
+.dental-chart__toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(15, 20, 30, 0.95);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: fit-content;
+    margin: 0 auto;
+    transition: all 0.2s;
+}
+.dental-chart__toggle:hover { color: #2dd4bf; border-color: rgba(45,212,191,0.5); }
+.dental-chart__toggle i { width: 14px; height: 14px; }
+.dental-chart__toggle .chevron-flipped { transform: rotate(180deg); }
+.dental-chart__body {
+    background: rgba(15, 20, 30, 0.97);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    padding: 12px 16px 8px;
+    backdrop-filter: blur(16px);
+    animation: chartSlideUp 0.25s ease-out;
+}
+@keyframes chartSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.dental-chart__body.collapsed { display: none; }
+.dental-chart__label {
+    text-align: center;
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.dental-chart__arch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+.dental-chart__midline {
+    width: 2px;
+    height: 36px;
+    background: rgba(45, 212, 191, 0.3);
+    margin: 0 4px;
+    border-radius: 1px;
+}
+.dental-chart__tooth {
+    width: 34px;
+    height: 36px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+}
+.dental-chart__tooth:hover {
+    background: rgba(45, 212, 191, 0.15);
+    border-color: rgba(45, 212, 191, 0.5);
+    transform: scale(1.1);
+    z-index: 2;
+}
+.dental-chart__tooth.active {
+    background: rgba(45, 212, 191, 0.25);
+    border-color: #2dd4bf;
+    box-shadow: 0 0 10px rgba(45,212,191,0.4);
+}
+.dental-chart__tooth.condition-healthy { border-bottom: 2px solid #22c55e; }
+.dental-chart__tooth.condition-watch { border-bottom: 2px solid #eab308; background: rgba(234,179,8,0.06); }
+.dental-chart__tooth.condition-decay { border-bottom: 2px solid #ef4444; background: rgba(239,68,68,0.06); }
+.dental-chart__tooth.condition-filling,
+.dental-chart__tooth.condition-crown,
+.dental-chart__tooth.condition-implant,
+.dental-chart__tooth.condition-rct { border-bottom: 2px solid #3b82f6; background: rgba(59,130,246,0.06); }
+.dental-chart__tooth.condition-missing { opacity: 0.3; border-style: dashed; }
+.dental-chart__tooth.flagged { box-shadow: 0 0 6px rgba(239,68,68,0.5); border-color: #ef4444; }
+.dc-num {
+    font-size: 9px;
+    font-weight: 700;
+    color: #94a3b8;
+    line-height: 1;
+}
+.dc-icon {
+    font-size: 13px;
+    line-height: 1;
+    margin-top: 1px;
+}
+.dental-chart__divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0;
+    padding: 0 8px;
+}
+.dental-chart__divider span {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+}
+.dental-chart__divider-center {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.dental-chart__divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+.dental-chart__legend {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.dc-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #64748b;
+}
+.dc-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+</style>
+
+<!-- Tooth Info Popup (appears on double-click) -->
+<div id="toothPopup" class="tooth-popup" style="display:none;">
+    <div class="tooth-popup__header">
+        <div class="tooth-popup__number" id="toothNum">#14</div>
+        <div class="tooth-popup__title">
+            <strong id="toothName">First Premolar</strong>
+            <span id="toothQuadrant">Upper Left</span>
+        </div>
+        <button class="tooth-popup__close" id="toothPopupClose">×</button>
+    </div>
+    <div class="tooth-popup__body">
+        <div class="tooth-popup__field">
+            <label>Condition</label>
+            <select id="toothCondition">
+                <option value="healthy">✅ Healthy</option>
+                <option value="watch">⚠️ Watch</option>
+                <option value="decay">🦷 Decay</option>
+                <option value="filling">🔧 Filling</option>
+                <option value="crown">👑 Crown</option>
+                <option value="implant">🔩 Implant</option>
+                <option value="missing">❌ Missing</option>
+                <option value="rct">🏥 Root Canal</option>
+            </select>
+        </div>
+        <div class="tooth-popup__field">
+            <label>Clinical Notes</label>
+            <textarea id="toothNotes" rows="2" placeholder="Add notes for this tooth..."></textarea>
+        </div>
+        <div class="tooth-popup__field">
+            <label>Treatment Plan</label>
+            <textarea id="toothTreatment" rows="2" placeholder="Recommended treatment..."></textarea>
+        </div>
+        <div class="tooth-popup__field" style="display:flex;gap:8px;">
+            <button class="sv-action-btn" id="toothSaveBtn" style="flex:1;">
+                <i data-lucide="save"></i> Save
+            </button>
+            <button class="sv-action-btn" id="toothFlagBtn" style="flex:1;background:rgba(239,68,68,0.15);color:#f87171;">
+                <i data-lucide="flag"></i> Flag
+            </button>
+        </div>
+    </div>
+    <div class="tooth-popup__footer">
+        <span id="toothLastExam">No prior exam on record</span>
+    </div>
+</div>
+
+<style>
+/* Tooth Popup */
+.tooth-popup {
+    position: fixed;
+    z-index: 10000;
+    width: 300px;
+    background: rgba(15, 20, 30, 0.97);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(45,212,191,0.15);
+    backdrop-filter: blur(16px);
+    font-family: 'Inter', sans-serif;
+    animation: toothPopIn 0.2s ease-out;
+    overflow: hidden;
+}
+@keyframes toothPopIn {
+    from { opacity: 0; transform: scale(0.9) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.tooth-popup__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(45, 212, 191, 0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tooth-popup__number {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+    color: #0f1520;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+}
+.tooth-popup__title strong { display: block; color: #f0f4f8; font-size: 13px; }
+.tooth-popup__title span { color: #94a3b8; font-size: 11px; }
+.tooth-popup__close {
+    margin-left: auto;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.tooth-popup__close:hover { background: rgba(239,68,68,0.3); color: #f87171; }
+.tooth-popup__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.tooth-popup__field label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.tooth-popup__field select,
+.tooth-popup__field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #f0f4f8;
+    font-size: 12px;
+    padding: 6px 8px;
+    font-family: inherit;
+    resize: none;
+}
+.tooth-popup__field select:focus,
+.tooth-popup__field textarea:focus { outline: none; border-color: rgba(45,212,191,0.5); }
+.tooth-popup__footer {
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.tooth-popup__footer span { font-size: 11px; color: #64748b; }
+/* Tooth highlight ring on the 3D model */
+.sv-tooth-marker {
+    pointer-events: none;
+    position: absolute;
+    width: 24px; height: 24px;
+    border: 2px solid #2dd4bf;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(45,212,191,0.5);
+    transform: translate(-50%, -50%);
+    animation: toothRing 1.5s ease-in-out infinite;
+}
+@keyframes toothRing {
+    0%, 100% { box-shadow: 0 0 8px rgba(45,212,191,0.4); }
+    50% { box-shadow: 0 0 20px rgba(45,212,191,0.8); }
+}
+</style>
+
 <script>
 /* ═══════════════════════════════════════════════════════════
    3D Scan Viewer — PALOMA
@@ -1697,10 +2059,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         if (hasVertexColors && preset !== 'xray') {
             matOpts.vertexColors = 2; // THREE.VertexColors = 2 in r128
             matOpts.color = new THREE.Color(0xffffff);
-            matOpts.roughness = 0.6;      // Matte surface lets vertex colors dominate
-            matOpts.metalness = 0.0;
-            matOpts.clearcoat = 0.0;       // No clearcoat — kills the white wash
+            matOpts.roughness = 0.35;     // Smooth like real enamel
+            matOpts.metalness = 0.82;     // High metalness makes vertex colors pop
+            matOpts.clearcoat = 0.0;      // No clearcoat white wash
             matOpts.clearcoatRoughness = 0;
+            matOpts.envMapIntensity = 0.15;
         } else {
             matOpts.color = p.color;
         }
@@ -2018,6 +2381,322 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             handleAnnotateClick(point, e);
         }
     }
+
+    // ─── Tooth Mapping Database (ADA Universal Numbering 1-32) ───
+    const TOOTH_DB = {
+        // Upper Right (Q1): 1-8, right to left from patient's perspective
+        1:  { name: 'Third Molar (Wisdom)', quadrant: 'Upper Right', type: 'molar' },
+        2:  { name: 'Second Molar', quadrant: 'Upper Right', type: 'molar' },
+        3:  { name: 'First Molar', quadrant: 'Upper Right', type: 'molar' },
+        4:  { name: 'Second Premolar', quadrant: 'Upper Right', type: 'premolar' },
+        5:  { name: 'First Premolar', quadrant: 'Upper Right', type: 'premolar' },
+        6:  { name: 'Canine (Cuspid)', quadrant: 'Upper Right', type: 'canine' },
+        7:  { name: 'Lateral Incisor', quadrant: 'Upper Right', type: 'incisor' },
+        8:  { name: 'Central Incisor', quadrant: 'Upper Right', type: 'incisor' },
+        // Upper Left (Q2): 9-16
+        9:  { name: 'Central Incisor', quadrant: 'Upper Left', type: 'incisor' },
+        10: { name: 'Lateral Incisor', quadrant: 'Upper Left', type: 'incisor' },
+        11: { name: 'Canine (Cuspid)', quadrant: 'Upper Left', type: 'canine' },
+        12: { name: 'First Premolar', quadrant: 'Upper Left', type: 'premolar' },
+        13: { name: 'Second Premolar', quadrant: 'Upper Left', type: 'premolar' },
+        14: { name: 'First Molar', quadrant: 'Upper Left', type: 'molar' },
+        15: { name: 'Second Molar', quadrant: 'Upper Left', type: 'molar' },
+        16: { name: 'Third Molar (Wisdom)', quadrant: 'Upper Left', type: 'molar' },
+        // Lower Left (Q3): 17-24
+        17: { name: 'Third Molar (Wisdom)', quadrant: 'Lower Left', type: 'molar' },
+        18: { name: 'Second Molar', quadrant: 'Lower Left', type: 'molar' },
+        19: { name: 'First Molar', quadrant: 'Lower Left', type: 'molar' },
+        20: { name: 'Second Premolar', quadrant: 'Lower Left', type: 'premolar' },
+        21: { name: 'First Premolar', quadrant: 'Lower Left', type: 'premolar' },
+        22: { name: 'Canine (Cuspid)', quadrant: 'Lower Left', type: 'canine' },
+        23: { name: 'Lateral Incisor', quadrant: 'Lower Left', type: 'incisor' },
+        24: { name: 'Central Incisor', quadrant: 'Lower Left', type: 'incisor' },
+        // Lower Right (Q4): 25-32
+        25: { name: 'Central Incisor', quadrant: 'Lower Right', type: 'incisor' },
+        26: { name: 'Lateral Incisor', quadrant: 'Lower Right', type: 'incisor' },
+        27: { name: 'Canine (Cuspid)', quadrant: 'Lower Right', type: 'canine' },
+        28: { name: 'First Premolar', quadrant: 'Lower Right', type: 'premolar' },
+        29: { name: 'Second Premolar', quadrant: 'Lower Right', type: 'premolar' },
+        30: { name: 'First Molar', quadrant: 'Lower Right', type: 'molar' },
+        31: { name: 'Second Molar', quadrant: 'Lower Right', type: 'molar' },
+        32: { name: 'Third Molar (Wisdom)', quadrant: 'Lower Right', type: 'molar' }
+    };
+
+    // Per-tooth clinical data storage
+    const toothData = {};
+    let selectedToothNum = null;
+    let toothHighlight = null;
+
+    // Map a 3D hit point to nearest ADA tooth number
+    function mapPointToTooth(point, meshIndex) {
+        const isUpper = meshIndex === 0; // first loaded = maxilla
+        const mesh = state.models[meshIndex]?.mesh;
+        if (!mesh) return null;
+
+        // Get point in local mesh coordinates
+        const localPt = point.clone();
+        mesh.worldToLocal(localPt);
+
+        // Get mesh bounding box for normalization
+        mesh.geometry.computeBoundingBox();
+        const bbox = mesh.geometry.boundingBox;
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
+
+        // Normalize X position (-1 to 1, left to right from front view)
+        const nx = ((localPt.x - bbox.min.x) / size.x) * 2 - 1;
+
+        // Map X position to tooth index within the arch (0-15)
+        // Center = incisors, edges = molars
+        const toothIndex = Math.round((nx + 1) / 2 * 15);
+        const clampedIndex = Math.max(0, Math.min(15, toothIndex));
+
+        if (isUpper) {
+            // Upper arch: teeth 1-16
+            // X goes from right molars (1) through front (8-9) to left molars (16)
+            return clampedIndex + 1;
+        } else {
+            // Lower arch: teeth 17-32
+            // Mirrored: left molars (17) through front (24-25) to right molars (32)
+            return 17 + clampedIndex;
+        }
+    }
+
+    // Double-click handler for tooth selection
+    function onCanvasDblClick(e) {
+        if (state.models.length === 0) return;
+
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const meshes = state.models.filter(m => m.visible).map(m => m.mesh);
+        const intersects = raycaster.intersectObjects(meshes, false);
+
+        if (intersects.length === 0) {
+            hideToothPopup();
+            return;
+        }
+
+        const hit = intersects[0];
+        const hitMesh = hit.object;
+        const meshIndex = state.models.findIndex(m => m.mesh === hitMesh);
+        const toothNum = mapPointToTooth(hit.point, meshIndex);
+
+        if (!toothNum || !TOOTH_DB[toothNum]) return;
+
+        selectedToothNum = toothNum;
+        showToothPopup(toothNum, e.clientX, e.clientY, hit.point);
+    }
+
+    function showToothPopup(num, screenX, screenY, worldPoint) {
+        const tooth = TOOTH_DB[num];
+        const popup = document.getElementById('toothPopup');
+
+        // Fill in tooth info
+        document.getElementById('toothNum').textContent = '#' + num;
+        document.getElementById('toothName').textContent = tooth.name;
+        document.getElementById('toothQuadrant').textContent = tooth.quadrant;
+
+        // Load saved data for this tooth
+        const data = toothData[num] || {};
+        document.getElementById('toothCondition').value = data.condition || 'healthy';
+        document.getElementById('toothNotes').value = data.notes || '';
+        document.getElementById('toothTreatment').value = data.treatment || '';
+        document.getElementById('toothLastExam').textContent = data.lastExam || 'No prior exam on record';
+
+        // Position popup near click (but keep on screen)
+        let left = screenX + 20;
+        let top = screenY - 100;
+        if (left + 320 > window.innerWidth) left = screenX - 330;
+        if (top < 10) top = 10;
+        if (top + 400 > window.innerHeight) top = window.innerHeight - 410;
+
+        popup.style.left = left + 'px';
+        popup.style.top = top + 'px';
+        popup.style.display = 'block';
+
+        // Add 3D highlight glow at the hit point
+        if (toothHighlight) scene.remove(toothHighlight);
+        const glowGeo = new THREE.SphereGeometry(1.5, 16, 16);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0x2dd4bf,
+            transparent: true,
+            opacity: 0.5
+        });
+        toothHighlight = new THREE.Mesh(glowGeo, glowMat);
+        toothHighlight.position.copy(worldPoint);
+        scene.add(toothHighlight);
+
+        // Re-init lucide icons in popup
+        lucide.createIcons();
+    }
+
+    function hideToothPopup() {
+        document.getElementById('toothPopup').style.display = 'none';
+        if (toothHighlight) {
+            scene.remove(toothHighlight);
+            toothHighlight = null;
+        }
+        selectedToothNum = null;
+    }
+
+    // Close popup
+    document.getElementById('toothPopupClose').addEventListener('click', hideToothPopup);
+
+    // Save tooth data
+    document.getElementById('toothSaveBtn').addEventListener('click', () => {
+        if (!selectedToothNum) return;
+        toothData[selectedToothNum] = {
+            condition: document.getElementById('toothCondition').value,
+            notes: document.getElementById('toothNotes').value,
+            treatment: document.getElementById('toothTreatment').value,
+            lastExam: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            flagged: toothData[selectedToothNum]?.flagged || false
+        };
+        document.getElementById('toothLastExam').textContent = 'Saved: ' + toothData[selectedToothNum].lastExam;
+
+        // Flash save confirmation
+        const btn = document.getElementById('toothSaveBtn');
+        btn.style.background = 'rgba(34,197,94,0.3)';
+        btn.innerHTML = '<i data-lucide="check"></i> Saved!';
+        lucide.createIcons();
+        setTimeout(() => {
+            btn.style.background = '';
+            btn.innerHTML = '<i data-lucide="save"></i> Save';
+            lucide.createIcons();
+        }, 1500);
+    });
+
+    // Flag tooth
+    document.getElementById('toothFlagBtn').addEventListener('click', () => {
+        if (!selectedToothNum) return;
+        if (!toothData[selectedToothNum]) toothData[selectedToothNum] = {};
+        toothData[selectedToothNum].flagged = !toothData[selectedToothNum].flagged;
+
+        const btn = document.getElementById('toothFlagBtn');
+        if (toothData[selectedToothNum].flagged) {
+            btn.style.background = 'rgba(239,68,68,0.4)';
+            btn.innerHTML = '<i data-lucide="flag"></i> Flagged!';
+            // Change highlight to red
+            if (toothHighlight) toothHighlight.material.color.set(0xef4444);
+        } else {
+            btn.style.background = 'rgba(239,68,68,0.15)';
+            btn.innerHTML = '<i data-lucide="flag"></i> Flag';
+            if (toothHighlight) toothHighlight.material.color.set(0x2dd4bf);
+        }
+        lucide.createIcons();
+    });
+
+    // Attach double-click handler
+    renderer.domElement.addEventListener('dblclick', onCanvasDblClick);
+
+    // ─── Dental Chart Integration ───
+    let chartOpen = true;
+    const chartBody = document.getElementById('dentalChartBody');
+    const chartChevron = document.getElementById('dentalChartChevron');
+
+    document.getElementById('dentalChartToggle').addEventListener('click', () => {
+        chartOpen = !chartOpen;
+        if (chartOpen) {
+            chartBody.classList.remove('collapsed');
+            chartChevron.style.transform = '';
+        } else {
+            chartBody.classList.add('collapsed');
+            chartChevron.style.transform = 'rotate(180deg)';
+        }
+    });
+
+    // Click tooth on chart → select it on 3D model
+    document.querySelectorAll('.dental-chart__tooth').forEach(el => {
+        el.addEventListener('click', () => {
+            const num = parseInt(el.dataset.tooth);
+            if (!num || !TOOTH_DB[num]) return;
+
+            // Highlight on chart
+            document.querySelectorAll('.dental-chart__tooth').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+
+            // Determine which mesh and approximate world position
+            selectedToothNum = num;
+            const isUpper = num <= 16;
+            const meshIdx = isUpper ? 0 : 1;
+            const model = state.models[meshIdx];
+
+            if (model) {
+                // Compute approximate tooth position on 3D mesh
+                const mesh = model.mesh;
+                mesh.geometry.computeBoundingBox();
+                const bbox = mesh.geometry.boundingBox;
+                const size = new THREE.Vector3();
+                bbox.getSize(size);
+
+                // Map tooth number to X position
+                let toothIdx;
+                if (isUpper) {
+                    toothIdx = num - 1; // 0-15
+                } else {
+                    toothIdx = num - 17; // 0-15
+                }
+                const nx = (toothIdx / 15) * 2 - 1; // -1 to 1
+                const localX = bbox.min.x + ((nx + 1) / 2) * size.x;
+                const localY = (bbox.min.y + bbox.max.y) / 2;
+                const localZ = (bbox.min.z + bbox.max.z) / 2;
+
+                const worldPt = new THREE.Vector3(localX, localY, localZ);
+                mesh.localToWorld(worldPt);
+
+                // Place highlight glow
+                if (toothHighlight) scene.remove(toothHighlight);
+                const glowGeo = new THREE.SphereGeometry(1.5, 16, 16);
+                const glowMat = new THREE.MeshBasicMaterial({
+                    color: 0x2dd4bf,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                toothHighlight = new THREE.Mesh(glowGeo, glowMat);
+                toothHighlight.position.copy(worldPt);
+                scene.add(toothHighlight);
+
+                // Show popup centered on screen
+                showToothPopup(num, window.innerWidth / 2 - 150, window.innerHeight / 2 - 200, worldPt);
+            } else {
+                // No 3D scan loaded — show popup anyway
+                showToothPopup(num, window.innerWidth / 2 - 150, window.innerHeight / 2 - 200, new THREE.Vector3());
+            }
+        });
+    });
+
+    // Update dental chart visuals when tooth data changes
+    function updateDentalChart() {
+        document.querySelectorAll('.dental-chart__tooth').forEach(el => {
+            const num = parseInt(el.dataset.tooth);
+            const data = toothData[num];
+
+            // Remove old condition classes
+            el.className = el.className.replace(/condition-\S+/g, '').replace(/flagged/g, '').trim();
+            el.className = 'dental-chart__tooth ' + el.className.trim();
+
+            if (data) {
+                if (data.condition && data.condition !== 'healthy') {
+                    el.classList.add('condition-' + data.condition);
+                }
+                if (data.flagged) {
+                    el.classList.add('flagged');
+                }
+            }
+        });
+    }
+
+    // Monkey-patch save button to also update chart
+    const origSaveHandler = document.getElementById('toothSaveBtn');
+    origSaveHandler.addEventListener('click', () => {
+        setTimeout(updateDentalChart, 100);
+    });
+    document.getElementById('toothFlagBtn').addEventListener('click', () => {
+        setTimeout(updateDentalChart, 100);
+    });
 
     // ─── Measurement ───
     function handleMeasureClick(point) {
