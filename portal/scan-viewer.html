@@ -3267,15 +3267,15 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             mandible.position.sub(tmjPivot);
 
             // Create rotation matrix around X axis (jaw hinge axis)
-            const rotMatrix = new THREE.Matrix4().makeRotationX(-angle);
+            const rotMatrix = new THREE.Matrix4().makeRotationX(angle);
             mandible.position.applyMatrix4(rotMatrix);
             mandible.position.add(tmjPivot);
 
-            mandible.rotateX(-angle);
+            mandible.rotateX(angle);
 
             // Slight forward protrusion (mandible slides forward when opening)
             const protrusion = (val / 100) * 3;
-            mandible.position.z += protrusion;
+            mandible.position.z -= protrusion;
         }
 
         // Update label
