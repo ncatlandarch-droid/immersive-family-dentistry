@@ -1238,14 +1238,8 @@ async function loadHybridScans() {
     // Realistic enamel material
     function makeScanMaterial(hasColors) {
         if (hasColors) {
-            // Vertex colors from Medit scanner — use white base so natural
-            // tooth/gum colors show through untinted (matches Medit Web Viewer)
-            return new THREE.MeshPhysicalMaterial({
-                color: 0xffffff,          // neutral — lets vertex colors dominate
-                roughness: 0.45,          // slightly matte, like real enamel
-                metalness: 0.0,
-                clearcoat: 0.15,          // subtle shine, not glassy
-                clearcoatRoughness: 0.3,
+            // UNLIT: show vertex colors exactly as Medit scanner captured them
+            return new THREE.MeshBasicMaterial({
                 vertexColors: true,
                 side: THREE.DoubleSide
             });
