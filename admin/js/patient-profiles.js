@@ -10,9 +10,53 @@ const PatientProfiles = (function() {
   let currentDetailPatientId = null;
 
   async function init() {
+    await seedDemoPatient();
     await loadPatients();
     renderPatientList();
     bindEvents();
+  }
+
+  // Auto-seed Logan Burton as demo patient if not in Firestore
+  async function seedDemoPatient() {
+    try {
+      const db = firebase.firestore();
+      const docRef = db.collection('patients').doc('logan-burton');
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        await docRef.set({
+          first_name: 'Logan',
+          last_name: 'Burton',
+          display_name: 'Logan Burton',
+          phone: '336-555-0147',
+          email: 'logan.burton@email.com',
+          address: '4821 Lake Jeanette Rd, Greensboro, NC 27455',
+          date_of_birth: '1992-03-15',
+          insurance_provider: 'Delta Dental PPO',
+          insurance_id: 'DDL-9284710',
+          primary_concern: 'Crown needed on #14, monitor decay on #30',
+          preferred_language: 'en',
+          status: 'active',
+          source: 'scan-upload',
+          photo_url: '',
+          outstanding_balance: 630,
+          total_lifetime_value: 3145,
+          conversation_count: 2,
+          last_visit: '2026-06-28',
+          next_appointment: '2026-07-10',
+          scan_files: {
+            maxilla: '/portal/demo-scans/Maxilla_Base.ply',
+            mandible: '/portal/demo-scans/Mandible_Base.ply',
+            scanner: 'Medit i700',
+            scan_date: '2026-06-28'
+          },
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log('[Patients] 🦷 Demo patient Logan Burton seeded');
+      }
+    } catch (e) {
+      console.warn('[Patients] Could not seed demo patient:', e.message);
+    }
   }
 
   function bindEvents() {
@@ -183,6 +227,9 @@ const PatientProfiles = (function() {
             <a href="/portal/mouthmap?role=staff&patient=${patientId}" target="_blank" class="btn btn-sm" style="background:linear-gradient(135deg,#2dd4bf,#0d9488);color:#fff;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
               🦷 Open MouthMap
             </a>
+            ${patient.scan_files ? `<a href="/portal/scan-viewer.html?patient=${patientId}" target="_blank" class="btn btn-sm" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+              🔬 View 3D Scan
+            </a>` : ''}
             <button class="btn btn-sm" onclick="PatientProfiles.editPatient('${patientId}')">
               <i data-lucide="edit" style="width:14px;height:14px"></i> Edit
             </button>
@@ -224,6 +271,14 @@ const PatientProfiles = (function() {
               <div class="detail-row"><label>Last Visit</label><span>${patient.last_visit ? formatDate(patient.last_visit) : 'No visits'}</span></div>
               <div class="detail-row"><label>Next Appointment</label><span>${patient.next_appointment ? formatDate(patient.next_appointment) : 'None scheduled'}</span></div>
               <div class="detail-row"><label>PALOMA Chats</label><span>${patient.conversation_count || 0}</span></div>
+              ${patient.scan_files ? `
+              <div class="detail-row" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+                <label>3D Scans</label>
+                <span style="color:#2dd4bf;">✅ ${patient.scan_files.scanner || 'Intraoral'} — ${patient.scan_files.scan_date || 'On file'}</span>
+              </div>
+              <div class="detail-row"><label>Maxilla</label><span style="font-size:11px;color:#94a3b8;">Maxilla_Base.ply</span></div>
+              <div class="detail-row"><label>Mandible</label><span style="font-size:11px;color:#94a3b8;">Mandible_Base.ply</span></div>
+              ` : '<div class="detail-row"><label>3D Scans</label><span style="color:#94a3b8;">None uploaded</span></div>'}
             </div>
           </div>
           ${patient.paloma_notes ? `
