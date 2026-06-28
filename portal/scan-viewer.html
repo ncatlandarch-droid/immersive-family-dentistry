@@ -1426,6 +1426,63 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 </div>
             </div>
 
+            <!-- Mouth Open/Close -->
+            <div class="sv-section">
+                <div class="sv-section__title"><i data-lucide="move-vertical"></i> Mouth Position</div>
+                <div class="sv-slider-row">
+                    <label>Bite / Open</label>
+                    <div class="sv-slider-wrap">
+                        <input type="range" class="sv-slider" id="sliderMouthOpen" min="0" max="100" value="10">
+                        <span class="sv-slider-val" id="valMouthOpen">Bite</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:6px;">
+                    <button class="sv-view-btn" id="btnMouthClosed" style="flex:1;font-size:11px;">Closed Bite</button>
+                    <button class="sv-view-btn" id="btnMouthMid" style="flex:1;font-size:11px;">Half Open</button>
+                    <button class="sv-view-btn" id="btnMouthWide" style="flex:1;font-size:11px;">Wide Open</button>
+                </div>
+            </div>
+
+            <!-- Clinical Overlays -->
+            <div class="sv-section">
+                <div class="sv-section__title"><i data-lucide="scan"></i> Clinical Overlays</div>
+                <div class="sv-preset-grid" style="grid-template-columns:1fr 1fr;">
+                    <button class="sv-preset-btn active" data-overlay="none">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#666;margin-right:4px;"></span> None
+                    </button>
+                    <button class="sv-preset-btn" data-overlay="plaque">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#22c55e,#eab308,#ef4444);margin-right:4px;"></span> Plaque
+                    </button>
+                    <button class="sv-preset-btn" data-overlay="decay">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#60a5fa,#a855f7,#ec4899);margin-right:4px;"></span> Decay Risk
+                    </button>
+                    <button class="sv-preset-btn" data-overlay="inflammation">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#fbbf24,#f97316,#dc2626);margin-right:4px;"></span> Gingival
+                    </button>
+                </div>
+                <p style="font-size:11px;color:var(--mm-text-muted);margin-top:8px;line-height:1.4;">
+                    💡 Heat maps highlight trouble areas. Connect PALOMA AI for automated detection.
+                </p>
+            </div>
+
+            <!-- Patient Photo Capture -->
+            <div class="sv-section">
+                <div class="sv-section__title"><i data-lucide="camera"></i> Patient Photos</div>
+                <p style="font-size:12px;color:var(--mm-text-muted);margin-bottom:8px;line-height:1.4;">
+                    Take or upload photos of your mouth for your care team.
+                </p>
+                <div style="display:flex;gap:6px;">
+                    <button class="sv-action-btn" id="btnCapturePhoto" style="flex:1;">
+                        <i data-lucide="camera"></i> Take Photo
+                    </button>
+                    <button class="sv-action-btn" id="btnUploadPhoto" style="flex:1;">
+                        <i data-lucide="upload"></i> Upload
+                    </button>
+                </div>
+                <input type="file" id="photoFileInput" accept="image/*" capture="environment" style="display:none;">
+                <div id="photoGallery" class="sv-photo-gallery" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+            </div>
+
             <!-- D. Measurements -->
             <div class="sv-section">
                 <div class="sv-section__title"><i data-lucide="ruler"></i> Measurements</div>
@@ -2279,6 +2336,217 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             else renderer.setClearColor(0x0f1520, 1);
         });
     });
+
+    // ─── Mouth Open/Close Slider ───
+    const mouthSlider = document.getElementById('sliderMouthOpen');
+    const mouthLabel = document.getElementById('valMouthOpen');
+
+    function setMouthOpen(val) {
+        mouthSlider.value = val;
+        const maxGap = 40; // max separation in scene units
+        const gap = (val / 100) * maxGap;
+        if (state.models.length >= 2) {
+            state.models[0].mesh.position.y = gap / 2;   // upper arch moves up
+            state.models[1].mesh.position.y = -gap / 2;  // lower arch moves down
+        }
+        if (val <= 5) mouthLabel.textContent = 'Closed';
+        else if (val <= 30) mouthLabel.textContent = 'Bite';
+        else if (val <= 60) mouthLabel.textContent = 'Open';
+        else mouthLabel.textContent = 'Wide';
+    }
+
+    mouthSlider.addEventListener('input', function() {
+        setMouthOpen(parseInt(this.value));
+    });
+
+    document.getElementById('btnMouthClosed').addEventListener('click', () => setMouthOpen(0));
+    document.getElementById('btnMouthMid').addEventListener('click', () => setMouthOpen(50));
+    document.getElementById('btnMouthWide').addEventListener('click', () => setMouthOpen(100));
+
+    // ─── Clinical Overlays (Heat Map on vertex colors) ───
+    let originalVertexColors = new Map(); // store originals for restore
+
+    function backupVertexColors(mesh) {
+        const geo = mesh.geometry;
+        if (geo.hasAttribute('color') && !originalVertexColors.has(mesh.uuid)) {
+            const colorAttr = geo.getAttribute('color');
+            originalVertexColors.set(mesh.uuid, colorAttr.array.slice());
+        }
+    }
+
+    function restoreVertexColors(mesh) {
+        const geo = mesh.geometry;
+        const backup = originalVertexColors.get(mesh.uuid);
+        if (backup && geo.hasAttribute('color')) {
+            const colorAttr = geo.getAttribute('color');
+            colorAttr.array.set(backup);
+            colorAttr.needsUpdate = true;
+        }
+        // Restore scan colors material
+        if (mesh.userData.hasVertexColors) {
+            mesh.material.dispose();
+            mesh.material = createDentalMaterial('tooth', true);
+        }
+    }
+
+    function applyOverlay(mesh, type) {
+        const geo = mesh.geometry;
+        const posAttr = geo.getAttribute('position');
+        if (!posAttr) return;
+
+        backupVertexColors(mesh);
+
+        // Create or get color attribute
+        let colorAttr = geo.getAttribute('color');
+        if (!colorAttr) {
+            const colors = new Float32Array(posAttr.count * 3);
+            colors.fill(1.0); // white
+            colorAttr = new THREE.BufferAttribute(colors, 3);
+            geo.setAttribute('color', colorAttr);
+        }
+
+        // Enable vertex colors on material
+        mesh.material.dispose();
+        const mat = new THREE.MeshPhysicalMaterial({
+            vertexColors: true,
+            color: 0xffffff,
+            roughness: 0.4,
+            metalness: 0.0,
+            clearcoat: 0.1,
+            envMap: envMap,
+            envMapIntensity: 0.3,
+            side: THREE.DoubleSide
+        });
+        mesh.material = mat;
+
+        // Compute bounding box for normalization
+        geo.computeBoundingBox();
+        const bbox = geo.boundingBox;
+        const bboxSize = new THREE.Vector3();
+        bbox.getSize(bboxSize);
+
+        // Seed some deterministic "trouble areas" based on vertex position
+        const seed = mesh.uuid.charCodeAt(0) * 7;
+
+        for (let i = 0; i < posAttr.count; i++) {
+            const x = posAttr.getX(i);
+            const y = posAttr.getY(i);
+            const z = posAttr.getZ(i);
+
+            // Normalize position within bounding box
+            const nx = (x - bbox.min.x) / bboxSize.x;
+            const ny = (y - bbox.min.y) / bboxSize.y;
+            const nz = (z - bbox.min.z) / bboxSize.z;
+
+            // Create pseudo-random "risk" based on position
+            let risk = 0;
+            const noise1 = Math.sin(x * 0.3 + seed) * Math.cos(z * 0.5) * 0.5 + 0.5;
+            const noise2 = Math.sin(y * 0.7 + x * 0.4) * 0.5 + 0.5;
+
+            if (type === 'plaque') {
+                // Plaque concentrates near gumline (edges) and between teeth
+                risk = noise1 * 0.6 + (1 - Math.abs(ny - 0.5) * 2) * 0.3 + noise2 * 0.1;
+                risk = Math.pow(risk, 1.5); // concentrate peaks
+                // Green → Yellow → Red
+                const r = risk < 0.5 ? risk * 2 : 1.0;
+                const g = risk < 0.5 ? 1.0 : 1.0 - (risk - 0.5) * 2;
+                const b = 0.1;
+                colorAttr.setXYZ(i, r, g, b);
+
+            } else if (type === 'decay') {
+                // Decay risk on biting surfaces and between teeth
+                risk = noise2 * 0.5 + (nz > 0.6 ? 0.3 : 0) + noise1 * 0.2;
+                risk = Math.min(1, risk);
+                // Blue → Purple → Pink
+                const r = 0.3 + risk * 0.7;
+                const g = 0.3 - risk * 0.2;
+                const b = 0.9 - risk * 0.3;
+                colorAttr.setXYZ(i, r, g, b);
+
+            } else if (type === 'inflammation') {
+                // Inflammation along gumline
+                risk = (ny < 0.3 || ny > 0.7) ? noise1 * 0.8 + 0.2 : noise1 * 0.2;
+                risk = Math.min(1, risk);
+                // Yellow → Orange → Red
+                const r = 0.9 + risk * 0.1;
+                const g = 0.8 - risk * 0.6;
+                const b = 0.1;
+                colorAttr.setXYZ(i, r, g, b);
+            }
+        }
+        colorAttr.needsUpdate = true;
+    }
+
+    document.querySelectorAll('[data-overlay]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-overlay]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const overlay = btn.dataset.overlay;
+            state.models.forEach(m => {
+                if (overlay === 'none') {
+                    restoreVertexColors(m.mesh);
+                } else {
+                    applyOverlay(m.mesh, overlay);
+                }
+            });
+        });
+    });
+
+    // ─── Patient Photo Capture & Upload ───
+    const photoInput = document.getElementById('photoFileInput');
+    const photoGallery = document.getElementById('photoGallery');
+    let patientPhotos = [];
+
+    document.getElementById('btnCapturePhoto').addEventListener('click', () => {
+        photoInput.setAttribute('capture', 'environment');
+        photoInput.click();
+    });
+
+    document.getElementById('btnUploadPhoto').addEventListener('click', () => {
+        photoInput.removeAttribute('capture');
+        photoInput.click();
+    });
+
+    photoInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        files.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const photo = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    dataUrl: ev.target.result,
+                    timestamp: new Date().toLocaleString(),
+                    size: file.size
+                };
+                patientPhotos.push(photo);
+                renderPhotoGallery();
+            };
+            reader.readAsDataURL(file);
+        });
+        this.value = ''; // reset for re-use
+    });
+
+    function renderPhotoGallery() {
+        if (patientPhotos.length === 0) {
+            photoGallery.innerHTML = '<p style="font-size:11px;color:var(--mm-text-muted);width:100%;">No photos yet</p>';
+            return;
+        }
+        photoGallery.innerHTML = patientPhotos.map((p, i) => `
+            <div style="position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;border:1px solid var(--mm-border);cursor:pointer;" title="${p.name}\n${p.timestamp}">
+                <img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover;">
+                <button onclick="event.stopPropagation();window._removePhoto(${i})" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.9);border:none;color:white;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+            </div>
+        `).join('');
+    }
+
+    window._removePhoto = function(index) {
+        patientPhotos.splice(index, 1);
+        renderPhotoGallery();
+    };
 
     // ─── Load from URL (for demo scans) ───
     async function loadFileFromURL(url, filename, archIndex) {
