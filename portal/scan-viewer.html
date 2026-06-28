@@ -3953,6 +3953,43 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     let voltronSegments = []; // { mesh, toothNum, originalMat }
     let voltronExploded = false;
 
+    // AI Gumline Detection: uses vertex color analysis to find true gum/tooth boundary
+    function classifyVertexAsGum(r, g, b) {
+        // Convert RGB (0-1) to HSL
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const l = (max + min) / 2;
+        let h = 0, s = 0;
+
+        if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+            else if (max === g) h = ((b - r) / d + 2) / 6;
+            else h = ((r - g) / d + 4) / 6;
+        }
+
+        // Gum tissue characteristics:
+        // - Pink/red/salmon hue (h ≈ 0.0-0.08 or 0.9-1.0)
+        // - Moderate saturation (s > 0.15)
+        // - Medium lightness (l between 0.3-0.7)
+        const isGumHue = (h < 0.1 || h > 0.88) && s > 0.12;
+        const isGumLight = l > 0.25 && l < 0.75;
+
+        // Tooth characteristics:
+        // - Low saturation (white/ivory)
+        // - High lightness
+        const isToothColor = s < 0.15 && l > 0.55;
+
+        // Dark areas (shadow/sulcus) = likely gum
+        const isDark = l < 0.25;
+
+        if (isToothColor) return 0; // tooth
+        if (isGumHue && isGumLight) return 1; // definite gum
+        if (isDark) return 0.7; // probably gum (shadow)
+        return 0.3; // uncertain, lean tooth
+    }
+
     // Tooth colors for visual distinction
     const TOOTH_COLORS = [
         0xe8d5c4, 0xd4c4b0, 0xf0e8d6, 0xe0d0c0,
@@ -4051,13 +4088,26 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             const relY = (cy - center.y) / (size.y * 0.5);
             const relZ = (cz - center.z) / (size.z * 0.5);
 
-            // Gum detection: faces pointing mostly up/down (Y-normal dominant)
-            // and faces at extreme Y positions (base of scan)
+            // Gum detection: combine geometric + color-based AI analysis
             const normalUp = Math.abs(ny);
             const isGumByNormal = normalUp > 0.7;
             const isGumByPosition = isUpper ? relY > 0.6 : relY < -0.6;
 
-            if (isGumByNormal && isGumByPosition) {
+            // AI Color-based gum detection (if vertex colors available)
+            let colorGumScore = 0.3; // default: lean tooth
+            if (colorAttr) {
+                // Sample vertex colors for this face
+                const r = (colorAttr.getX(i0) + colorAttr.getX(i1) + colorAttr.getX(i2)) / 3;
+                const g = (colorAttr.getY(i0) + colorAttr.getY(i1) + colorAttr.getY(i2)) / 3;
+                const b = (colorAttr.getZ(i0) + colorAttr.getZ(i1) + colorAttr.getZ(i2)) / 3;
+                colorGumScore = classifyVertexAsGum(r, g, b);
+            }
+
+            // Weighted voting: geometry (40%) + color (60%)
+            const geoGumScore = (isGumByNormal ? 0.5 : 0) + (isGumByPosition ? 0.5 : 0);
+            const finalGumScore = geoGumScore * 0.4 + colorGumScore * 0.6;
+
+            if (finalGumScore > 0.55) {
                 faceLabels[f] = -1; // gum
                 continue;
             }
