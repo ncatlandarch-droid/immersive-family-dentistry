@@ -1094,7 +1094,8 @@ function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.NoToneMapping;
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    // PLY vertex colors are already sRGB — LinearEncoding prevents double-gamma wash-out
+    renderer.outputEncoding = THREE.LinearEncoding;
     container.appendChild(renderer.domElement);
 
     // ─── Background: dark gradient ───
