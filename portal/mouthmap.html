@@ -1080,7 +1080,7 @@ const STATUS_EMISSIVE_INTENSITY = {
 
 let scene, camera, renderer, controls;
 let toothMeshes = [];
-let selectedTooth = null;
+let selectedTooth = null;  // stores tooth NUMBER (int), not mesh
 let hoveredTooth = null;
 let raycaster, mouse;
 let autoRotate = true;
@@ -1331,21 +1331,27 @@ async function loadHybridScans() {
         
         scanLoaded = true;
         
+        // Compute combined bounds from BOTH groups
         scanBounds = new THREE.Box3();
-        scanMeshes.forEach(function(m) { scanBounds.expandByObject(m); });
+        upperGroup.traverse(function(c) { if (c.isMesh && c.material.visible !== false) scanBounds.expandByObject(c); });
+        lowerGroup.traverse(function(c) { if (c.isMesh && c.material.visible !== false) scanBounds.expandByObject(c); });
         
         var center = scanBounds.getCenter(new THREE.Vector3());
         var size = scanBounds.getSize(new THREE.Vector3());
         var maxDim = Math.max(size.x, size.y, size.z);
         
-        // Center at origin
+        // Center BOTH groups by the same offset (preserves relative alignment)
         upperGroup.position.sub(center);
         lowerGroup.position.sub(center);
         
-        // Store base position and TMJ pivot
-        upperGroup.userData.basePos = upperGroup.position.clone();
-        lowerGroup.userData.basePos = lowerGroup.position.clone();
-        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, size.y * 0.1, -(size.z * 0.42));
+        // Store base Y for jaw separation
+        upperGroup.userData.baseY = upperGroup.position.y;
+        lowerGroup.userData.baseY = lowerGroup.position.y;
+        
+        // Recalculate bounds after centering
+        scanBounds = new THREE.Box3();
+        upperGroup.traverse(function(c) { if (c.isMesh) scanBounds.expandByObject(c); });
+        lowerGroup.traverse(function(c) { if (c.isMesh) scanBounds.expandByObject(c); });
         
         camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
         controls.target.set(0, 0, 0);
@@ -1372,33 +1378,21 @@ function updateLoadingProgress(loaded, total) {
     }
 }
 
-/* ═══ TMJ Hinge Jaw Open ═══ */
+/* ═══ Jaw Open (Simple Y Separation) ═══ */
 function adjustJawOpen(value) {
     var pct = parseInt(value);
     var label = document.getElementById('jaw-open-label');
     if (label) label.textContent = pct + '%';
     
-    if (!lowerGroup) return;
+    // Simple Y separation: upper moves up, lower moves down
+    // Max separation = 15 units (natural mouth opening range)
+    var sep = (pct / 100) * 15;
     
-    // Natural jaw: mandible rotates around TMJ condyle (hinge at back)
-    var maxAngle = 25 * (Math.PI / 180); // 25 degrees max opening
-    var angle = (pct / 100) * maxAngle;
-    var pivot = lowerGroup.userData.tmjPivot;
-    
-    // Reset to base position first
-    var basePos = lowerGroup.userData.basePos;
-    if (basePos) {
-        lowerGroup.position.copy(basePos);
+    if (upperGroup && upperGroup.userData.baseY !== undefined) {
+        upperGroup.position.y = upperGroup.userData.baseY + sep * 0.3;
     }
-    lowerGroup.rotation.set(0, 0, 0);
-    lowerGroup.updateMatrix();
-    
-    if (pivot && angle > 0) {
-        // Translate so pivot is at origin, rotate X, translate back
-        lowerGroup.position.sub(pivot);
-        lowerGroup.rotation.x = angle;
-        lowerGroup.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), angle);
-        lowerGroup.position.add(pivot);
+    if (lowerGroup && lowerGroup.userData.baseY !== undefined) {
+        lowerGroup.position.y = lowerGroup.userData.baseY - sep * 0.7;
     }
 }
 
@@ -1866,13 +1860,8 @@ function selectToothByNumber(toothNum, hitPoint) {
         selectionRing = null;
     }
     
-    // Reset previous procedural tooth selection
-    if (selectedTooth) {
-        const ud = selectedTooth.userData;
-        selectedTooth.material.emissive.setHex(ud.originalEmissive);
-        selectedTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
-        selectedTooth.scale.set(1, 1, 1);
-    }
+    // Store as NUMBER for chart sync
+    selectedTooth = toothNum;
     
     // If we have a hit point on the real scan, show a glowing ring
     if (hitPoint && scanLoaded) {
@@ -1886,17 +1875,8 @@ function selectToothByNumber(toothNum, hitPoint) {
         });
         selectionRing = new THREE.Mesh(ringGeo, ringMat);
         selectionRing.position.copy(hitPoint);
-        // Orient ring to face camera
         selectionRing.lookAt(camera.position);
         scene.add(selectionRing);
-    }
-    
-    // Also highlight procedural tooth mesh if it exists
-    const procMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
-    if (procMesh) {
-        selectedTooth = procMesh;
-        procMesh.material.emissive.setHex(0x2dd4bf);
-        procMesh.material.emissiveIntensity = 0.5;
     }
 
     // Stop auto-rotate
@@ -1904,6 +1884,9 @@ function selectToothByNumber(toothNum, hitPoint) {
 
     // Update info panel
     updateInfoPanel(toothData);
+    
+    // Sync tooth chart highlighting
+    buildToothChart();
 }
 
 
@@ -2136,8 +2119,8 @@ function showAnatomyOverlay(layer) {
         });
     }
     
-    // Add to the appropriate group
-    if (upperGroup) upperGroup.add(group);
+    // Add to scene (not jaw groups, so anatomy stays fixed when jaw opens)
+    scene.add(group);
     anatomyMeshes[layer] = group;
 }
 
