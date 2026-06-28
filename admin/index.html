@@ -461,6 +461,31 @@
     .badge-red .badge-dot { background: var(--admin-red); }
     .badge-blue .badge-dot { background: var(--admin-blue); }
 
+    /* ─── Toggle Switch ─── */
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(100,116,139,0.3); border-radius: 24px;
+        transition: var(--admin-transition);
+    }
+    .toggle-slider::before {
+        content: ''; position: absolute; height: 18px; width: 18px;
+        left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
+        transition: var(--admin-transition);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: linear-gradient(135deg, var(--admin-teal), var(--admin-teal-dark)); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+    .toggle-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 0; border-bottom: 1px solid var(--admin-border);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-row-info { display: flex; flex-direction: column; gap: 2px; }
+    .toggle-row-label { font-size: 14px; font-weight: 500; color: var(--admin-text); }
+    .toggle-row-desc { font-size: 12px; color: var(--admin-muted); }
+
     .table-link { font-size: 13px; font-weight: 500; }
     .info-note {
         padding: 18px; background: var(--admin-surface-alt); border-radius: var(--admin-radius);
@@ -1584,6 +1609,9 @@
                 </button>
                 <button class="sidebar-item" data-view="insurance-verify">
                     <i data-lucide="shield-check"></i> Insurance
+                </button>
+                <button class="sidebar-item" data-view="reminders">
+                    <i data-lucide="bell-ring"></i> Reminders
                 </button>
                 <div class="sidebar-divider"></div>
                 <!-- Intelligence -->
@@ -3151,6 +3179,181 @@
                 </div>
             </div>
 
+            <!-- ═══ View: Appointment Reminders ═══ -->
+            <div id="view-reminders" class="view">
+                <div class="view-header">
+                    <h2><i data-lucide="bell-ring" style="width:22px;height:22px"></i> Appointment Reminders</h2>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button class="btn-secondary" onclick="loadRemindersView()">
+                            <i data-lucide="refresh-cw" style="width:14px;height:14px"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Settings Panel -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="settings" style="width:18px;height:18px;color:var(--admin-teal)"></i> Reminder Settings
+                    </h3>
+                    <div id="rem-settings-container">
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">📧 48-Hour Appointment Reminder</span>
+                                <span class="toggle-row-desc">Email patients 48 hours before their appointment</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-48h" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">📧 24-Hour Appointment Reminder</span>
+                                <span class="toggle-row-desc">Email patients 24 hours before their appointment</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-24h" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">📧 2-Hour Appointment Reminder</span>
+                                <span class="toggle-row-desc">Final reminder 2 hours before appointment time</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-2h" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">🔔 New Patient Lead Notification</span>
+                                <span class="toggle-row-desc">Notify staff when a new patient lead comes in via website</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-lead" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">🌙 After-Hours Chat Summary</span>
+                                <span class="toggle-row-desc">Daily digest of after-hours PALOMA chat conversations</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-afterhours" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-row-info">
+                                <span class="toggle-row-label">❌ Missed Appointment Follow-Up</span>
+                                <span class="toggle-row-desc">Auto-send follow-up email when a patient misses their appointment</span>
+                            </div>
+                            <label class="toggle-switch"><input type="checkbox" id="rem-toggle-missed" checked><span class="toggle-slider"></span></label>
+                        </div>
+                    </div>
+                    <div style="margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="saveReminderSettings()" style="padding:10px 24px;">
+                            <i data-lucide="save" style="width:14px;height:14px"></i> Save Settings
+                        </button>
+                        <span id="rem-settings-status" style="font-size:12px;color:var(--admin-muted);"></span>
+                    </div>
+                </div>
+
+                <!-- Email Template Preview -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="mail" style="width:18px;height:18px;color:var(--admin-teal)"></i> Default Email Template Preview
+                    </h3>
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--admin-border);border-radius:10px;padding:20px;font-size:13px;line-height:1.8;color:var(--admin-text-secondary);">
+                        <p style="margin:0 0 6px;"><strong style="color:var(--admin-text);">From:</strong> Lake Jeanette Family &amp; Implant Dentistry &lt;noreply@ljfamilydentist.com&gt;</p>
+                        <p style="margin:0 0 6px;"><strong style="color:var(--admin-text);">Subject:</strong> 🦷 Appointment Reminder — [Date] at [Time]</p>
+                        <hr style="border:none;border-top:1px solid var(--admin-border);margin:12px 0;">
+                        <p style="margin:0 0 8px;">Hi <span style="color:var(--admin-teal);">[Patient Name]</span>,</p>
+                        <p style="margin:0 0 8px;">This is a friendly reminder that you have an upcoming appointment at <strong>Lake Jeanette Family &amp; Implant Dentistry</strong>.</p>
+                        <div style="background:rgba(20,184,166,0.08);border-left:3px solid var(--admin-teal);padding:10px 14px;border-radius:6px;margin:12px 0;">
+                            📅 <strong>[Appointment Date]</strong> at <strong>[Time]</strong><br>
+                            📍 3810 North Elm St, Suite 201, Greensboro, NC 27455<br>
+                            📞 (336) 545-4281
+                        </div>
+                        <p style="margin:8px 0;">Need to reschedule? Call us at <strong>(336) 545-4281</strong>.</p>
+                        <p style="margin:8px 0;color:var(--admin-muted);font-size:11px;">🕊️ Sent by PALOMA — Your AI Dental Assistant</p>
+                    </div>
+                </div>
+
+                <!-- Upcoming Reminders Queue -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="clock" style="width:18px;height:18px;color:var(--admin-teal)"></i> Upcoming Reminders Queue
+                    </h3>
+                    <div class="data-table-container" style="border:none;box-shadow:none;background:transparent;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Appointment Date/Time</th>
+                                    <th>Reminder Type</th>
+                                    <th>Status</th>
+                                    <th>Send Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rem-queue-tbody">
+                                <tr><td colspan="5" style="text-align:center;color:var(--admin-muted);padding:32px;">Loading queue...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reminder History -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="history" style="width:18px;height:18px;color:var(--admin-teal)"></i> Reminder History
+                    </h3>
+                    <div class="data-table-container" style="border:none;box-shadow:none;background:transparent;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Type</th>
+                                    <th>Email</th>
+                                    <th>Sent At</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rem-history-tbody">
+                                <tr><td colspan="5" style="text-align:center;color:var(--admin-muted);padding:32px;">No reminder history yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Compose Manual Reminder -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="send" style="width:18px;height:18px;color:var(--admin-teal)"></i> Compose Manual Reminder
+                    </h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Patient</label>
+                            <input type="text" id="rem-manual-patient" placeholder="Search patient name..." class="view-search" style="width:100%;" list="rem-patient-list" autocomplete="off" />
+                            <datalist id="rem-patient-list"></datalist>
+                        </div>
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Patient Email</label>
+                            <input type="email" id="rem-manual-email" placeholder="patient@email.com" class="view-search" style="width:100%;" />
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Subject Line</label>
+                        <input type="text" id="rem-manual-subject" value="🦷 Appointment Reminder — Lake Jeanette Dentistry" class="view-search" style="width:100%;" />
+                    </div>
+                    <div style="margin-top:16px;">
+                        <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Message</label>
+                        <textarea id="rem-manual-body" rows="6" class="view-search" style="width:100%;resize:vertical;line-height:1.6;" placeholder="Type your message...">Hi [Patient Name],
+
+This is a friendly reminder about your upcoming appointment at Lake Jeanette Family &amp; Implant Dentistry.
+
+Please call us at (336) 545-4281 if you need to reschedule.
+
+We look forward to seeing you!
+— The Lake Jeanette Team</textarea>
+                    </div>
+                    <div style="margin-top:18px;display:flex;align-items:center;gap:12px;">
+                        <button class="btn-primary" id="rem-send-btn" onclick="sendManualReminder()" style="padding:12px 28px;font-size:14px;">
+                            <i data-lucide="send" style="width:16px;height:16px"></i> Send Reminder
+                        </button>
+                        <span id="rem-send-status" style="font-size:13px;color:var(--admin-muted);"></span>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -3582,6 +3785,7 @@
                 if (view === 'schedule') loadScheduleData();
                 if (view === 'patients') loadPatients();
                 if (view === 'insurance-verify') loadInsuranceHistory();
+                if (view === 'reminders') loadRemindersView();
 
                 // Refresh Lucide icons for dynamic content
                 try { lucide.createIcons(); } catch(e) {}
@@ -7345,6 +7549,304 @@
     })();
 
     console.log('[Insurance] Insurance Verification module loaded');
+    </script>
+
+    <!-- ═══ Appointment Reminders Module ═══ -->
+    <script>
+    /* ═══════════════════════════════════════════════════════════
+       Appointment Reminders — Admin Module
+       Settings, Queue, History, Manual Compose
+       ═══════════════════════════════════════════════════════════ */
+
+    // ─── Load Reminders View (master loader) ───
+    async function loadRemindersView() {
+        console.log('[Reminders] Loading reminders view...');
+        await loadReminderSettings();
+        loadReminderQueue();
+        loadReminderHistory();
+        populateReminderPatientList();
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    // ─── Populate patient datalist for manual compose ───
+    async function populateReminderPatientList() {
+        const datalist = document.getElementById('rem-patient-list');
+        if (!datalist) return;
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('appointments').orderBy('created_at', 'desc').limit(50).get();
+            const names = new Set();
+            snap.docs.forEach(doc => {
+                const d = doc.data();
+                if (d.patient_name) names.add(d.patient_name);
+            });
+            datalist.innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+        } catch(e) {
+            console.log('[Reminders] Patient list populate error:', e.message);
+        }
+    }
+
+    // ─── Load Reminder Settings from Firestore ───
+    async function loadReminderSettings() {
+        try {
+            const db = firebase.firestore();
+            const doc = await db.collection('practice-config').doc('reminders').get();
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('rem-toggle-48h').checked = data.reminder48h !== false;
+                document.getElementById('rem-toggle-24h').checked = data.reminder24h !== false;
+                document.getElementById('rem-toggle-2h').checked = data.reminder2h !== false;
+                document.getElementById('rem-toggle-lead').checked = data.newPatientLead !== false;
+                document.getElementById('rem-toggle-afterhours').checked = data.afterHoursDigest !== false;
+                document.getElementById('rem-toggle-missed').checked = data.missedFollowUp !== false;
+                console.log('[Reminders] Settings loaded from Firestore');
+            } else {
+                console.log('[Reminders] No saved settings, using defaults (all on)');
+            }
+        } catch(e) {
+            console.log('[Reminders] Settings load error:', e.message);
+        }
+    }
+
+    // ─── Save Reminder Settings to Firestore ───
+    async function saveReminderSettings() {
+        const statusEl = document.getElementById('rem-settings-status');
+        statusEl.textContent = 'Saving...';
+        statusEl.style.color = 'var(--admin-muted)';
+        try {
+            const db = firebase.firestore();
+            const settings = {
+                reminder48h: document.getElementById('rem-toggle-48h').checked,
+                reminder24h: document.getElementById('rem-toggle-24h').checked,
+                reminder2h: document.getElementById('rem-toggle-2h').checked,
+                newPatientLead: document.getElementById('rem-toggle-lead').checked,
+                afterHoursDigest: document.getElementById('rem-toggle-afterhours').checked,
+                missedFollowUp: document.getElementById('rem-toggle-missed').checked,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: currentUserEmail || 'admin'
+            };
+            await db.collection('practice-config').doc('reminders').set(settings, { merge: true });
+            statusEl.textContent = '✅ Settings saved!';
+            statusEl.style.color = 'var(--admin-green)';
+            showToast('Reminder settings saved successfully', 'success');
+            setTimeout(() => { statusEl.textContent = ''; }, 3000);
+        } catch(e) {
+            statusEl.textContent = '❌ Save failed';
+            statusEl.style.color = 'var(--admin-red)';
+            showToast('Failed to save settings: ' + e.message, 'error');
+        }
+    }
+
+    // ─── Generate Mock Reminder Queue ───
+    function generateMockQueue() {
+        const now = new Date();
+        const patients = [
+            { name: 'Maria Garcia', time: '9:00 AM', type: '48-Hour', status: 'sent' },
+            { name: 'James Wilson', time: '10:30 AM', type: '24-Hour', status: 'sent' },
+            { name: 'Sarah Chen', time: '2:00 PM', type: '2-Hour', status: 'scheduled' },
+            { name: 'Robert Johnson', time: '11:00 AM', type: '48-Hour', status: 'scheduled' },
+            { name: 'Ana Rodriguez', time: '3:30 PM', type: '24-Hour', status: 'scheduled' },
+            { name: 'Michael Brown', time: '8:30 AM', type: '2-Hour', status: 'failed' },
+            { name: 'Jennifer Lee', time: '1:00 PM', type: '48-Hour', status: 'sent' },
+            { name: 'David Martinez', time: '4:00 PM', type: '24-Hour', status: 'scheduled' },
+        ];
+
+        return patients.map((p, i) => {
+            const apptDate = new Date(now);
+            apptDate.setDate(apptDate.getDate() + Math.floor(i / 2) + 1);
+            const sendDate = new Date(apptDate);
+            if (p.type === '48-Hour') sendDate.setHours(sendDate.getHours() - 48);
+            else if (p.type === '24-Hour') sendDate.setHours(sendDate.getHours() - 24);
+            else sendDate.setHours(sendDate.getHours() - 2);
+
+            return {
+                name: p.name,
+                apptDate: apptDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                apptTime: p.time,
+                type: p.type,
+                status: p.status,
+                sendTime: sendDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            };
+        });
+    }
+
+    // ─── Load Reminder Queue (mock data) ───
+    function loadReminderQueue() {
+        const tbody = document.getElementById('rem-queue-tbody');
+        if (!tbody) return;
+
+        const queue = generateMockQueue();
+
+        tbody.innerHTML = queue.map(item => {
+            let statusBadge = '';
+            if (item.status === 'sent') {
+                statusBadge = '<span class="badge badge-green"><span class="badge-dot"></span>Sent</span>';
+            } else if (item.status === 'scheduled') {
+                statusBadge = '<span class="badge badge-amber"><span class="badge-dot"></span>Scheduled</span>';
+            } else {
+                statusBadge = '<span class="badge badge-red"><span class="badge-dot"></span>Failed</span>';
+            }
+
+            let typeBadge = '';
+            if (item.type === '48-Hour') typeBadge = '<span class="badge badge-blue">📧 48-Hour</span>';
+            else if (item.type === '24-Hour') typeBadge = '<span class="badge badge-purple">📧 24-Hour</span>';
+            else typeBadge = '<span class="badge badge-muted">📧 2-Hour</span>';
+
+            return `<tr>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.apptDate} at ${item.apptTime}</td>
+                <td>${typeBadge}</td>
+                <td>${statusBadge}</td>
+                <td style="font-size:12px;color:var(--admin-muted);">${item.sendTime}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ─── Load Reminder History from Firestore ───
+    async function loadReminderHistory() {
+        const tbody = document.getElementById('rem-history-tbody');
+        if (!tbody) return;
+
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('reminder-history')
+                .orderBy('sentAt', 'desc')
+                .limit(20)
+                .get();
+
+            if (snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--admin-muted);padding:32px;">No reminders sent yet. Send your first reminder above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = snap.docs.map(doc => {
+                const d = doc.data();
+                const sentDate = d.sentAt ? d.sentAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+                let statusBadge = '';
+                if (d.status === 'sent') {
+                    statusBadge = '<span class="badge badge-green"><span class="badge-dot"></span>Sent</span>';
+                } else if (d.status === 'failed') {
+                    statusBadge = '<span class="badge badge-red"><span class="badge-dot"></span>Failed</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-amber"><span class="badge-dot"></span>' + (d.status || 'Unknown') + '</span>';
+                }
+
+                let typeBadge = '';
+                const t = d.reminderType || d.type || 'manual';
+                if (t.includes('48')) typeBadge = '<span class="badge badge-blue">48-Hour</span>';
+                else if (t.includes('24')) typeBadge = '<span class="badge badge-purple">24-Hour</span>';
+                else if (t.includes('2h') || t.includes('2-')) typeBadge = '<span class="badge badge-muted">2-Hour</span>';
+                else typeBadge = '<span class="badge badge-muted">' + t + '</span>';
+
+                return `<tr>
+                    <td><strong>${d.patientName || '—'}</strong></td>
+                    <td>${typeBadge}</td>
+                    <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.patientEmail || '—'}</td>
+                    <td style="font-size:12px;">${sentDate}</td>
+                    <td>${statusBadge}</td>
+                </tr>`;
+            }).join('');
+        } catch(e) {
+            console.log('[Reminders] History load error:', e.message);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--admin-muted);padding:32px;">Unable to load reminder history.</td></tr>';
+        }
+    }
+
+    // ─── Send Manual Reminder ───
+    async function sendManualReminder() {
+        const patientName = document.getElementById('rem-manual-patient').value.trim();
+        const patientEmail = document.getElementById('rem-manual-email').value.trim();
+        const subject = document.getElementById('rem-manual-subject').value.trim();
+        const body = document.getElementById('rem-manual-body').value.trim();
+        const statusEl = document.getElementById('rem-send-status');
+        const sendBtn = document.getElementById('rem-send-btn');
+
+        // Validate
+        if (!patientName) { showToast('Please enter a patient name', 'error'); return; }
+        if (!patientEmail || !patientEmail.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
+        if (!subject) { showToast('Please enter a subject line', 'error'); return; }
+        if (!body) { showToast('Please enter a message', 'error'); return; }
+
+        sendBtn.disabled = true;
+        statusEl.textContent = 'Sending...';
+        statusEl.style.color = 'var(--admin-muted)';
+
+        try {
+            // Call the Netlify function
+            const response = await fetch('/.netlify/functions/send-reminder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patientName,
+                    patientEmail,
+                    subject,
+                    messageBody: body,
+                    reminderType: 'manual',
+                    practiceName: 'Lake Jeanette Family & Implant Dentistry',
+                    practicePhone: '(336) 545-4281'
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Log to Firestore
+                const db = firebase.firestore();
+                await db.collection('reminder-history').add({
+                    patientName,
+                    patientEmail,
+                    subject,
+                    reminderType: 'manual',
+                    status: 'sent',
+                    messageId: result.messageId || '',
+                    sentAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    sentBy: currentUserEmail || 'admin'
+                });
+
+                statusEl.textContent = '✅ Reminder sent!';
+                statusEl.style.color = 'var(--admin-green)';
+                showToast(`Reminder sent to ${patientName} (${patientEmail})`, 'success');
+
+                // Clear form
+                document.getElementById('rem-manual-patient').value = '';
+                document.getElementById('rem-manual-email').value = '';
+
+                // Refresh history
+                setTimeout(() => loadReminderHistory(), 1000);
+            } else {
+                throw new Error(result.error || 'Send failed');
+            }
+        } catch(e) {
+            console.error('[Reminders] Send error:', e);
+
+            // Log failure to Firestore too
+            try {
+                const db = firebase.firestore();
+                await db.collection('reminder-history').add({
+                    patientName,
+                    patientEmail,
+                    subject,
+                    reminderType: 'manual',
+                    status: 'failed',
+                    error: e.message,
+                    sentAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    sentBy: currentUserEmail || 'admin'
+                });
+            } catch(logErr) {
+                console.log('[Reminders] Could not log failure:', logErr.message);
+            }
+
+            statusEl.textContent = '❌ Send failed — ' + e.message;
+            statusEl.style.color = 'var(--admin-red)';
+            showToast('Failed to send reminder: ' + e.message, 'error');
+        } finally {
+            sendBtn.disabled = false;
+            setTimeout(() => { statusEl.textContent = ''; }, 5000);
+        }
+    }
+
+    console.log('[Reminders] Appointment Reminders module loaded');
     </script>
     <!-- Tenant Manager (Multi-Practice Support) -->
     <script src="js/tenant-manager.js"></script>
