@@ -2756,7 +2756,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             labelEl = document.createElement('div');
             labelEl.id = 'toothLabel3D';
             labelEl.className = 'tooth-label-3d';
-            document.getElementById('sv-viewport').appendChild(labelEl);
+            document.getElementById('viewerContainer').appendChild(labelEl);
         }
         labelEl.textContent = '#' + num + ' ' + tooth.name;
         labelEl.style.display = 'block';
@@ -3587,7 +3587,14 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
             if (overlay === 'none') {
                 legend.style.display = 'none';
-                state.models.forEach(m => restoreVertexColors(m.mesh));
+                clearNerveOverlay();
+                state.models.forEach(m => {
+                    restoreVertexColors(m.mesh);
+                    // Restore full opacity (nerve overlay sets it to 0.35)
+                    m.mesh.material.transparent = false;
+                    m.mesh.material.opacity = 1.0;
+                    m.mesh.material.needsUpdate = true;
+                });
             } else {
                 // Show legend with appropriate colors and labels
                 legend.style.display = 'block';
