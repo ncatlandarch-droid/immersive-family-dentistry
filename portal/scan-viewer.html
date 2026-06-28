@@ -2651,8 +2651,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         lucide.createIcons();
     });
 
-    // Attach double-click handler
-    renderer.domElement.addEventListener('dblclick', onCanvasDblClick);
+    // dblclick handler attached after initThree() — see Init section
 
     // ─── Dental Chart Integration ───
     let chartOpen = true;
@@ -3393,8 +3392,9 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     // ─── Init ───
     initThree();
 
-    // Attach click handler to canvas
+    // Attach click handlers to canvas
     renderer.domElement.addEventListener('click', onCanvasClick);
+    renderer.domElement.addEventListener('dblclick', onCanvasDblClick);
 
     // Initialize Lucide icons
     lucide.createIcons();
