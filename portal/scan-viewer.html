@@ -2652,7 +2652,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         if (!toothNum || !TOOTH_DB[toothNum]) return;
 
         selectedToothNum = toothNum;
-        showToothPopup(toothNum, e.clientX, e.clientY, hit.point);
+        showToothPopup(toothNum, e.clientX, e.clientY, hit.point, hitMesh);
 
         // Sync: highlight on dental chart too
         document.querySelectorAll('.dental-chart__tooth').forEach(t => {
@@ -2696,7 +2696,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         animateNudge();
     }
 
-    function showToothPopup(num, screenX, screenY, worldPoint) {
+    function showToothPopup(num, screenX, screenY, worldPoint, hitMesh) {
         const tooth = TOOTH_DB[num];
         const popup = document.getElementById('toothPopup');
 
@@ -2723,32 +2723,71 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         popup.style.top = top + 'px';
         popup.style.display = 'block';
 
-        // Add 3D highlight glow at the hit point (inner + outer ring)
+        // Highlight the TOOTH SURFACE by vertex-painting nearby vertices teal
         if (toothHighlight) scene.remove(toothHighlight);
         if (state._outerGlow) scene.remove(state._outerGlow);
 
-        const glowGeo = new THREE.SphereGeometry(1.2, 16, 16);
-        const glowMat = new THREE.MeshBasicMaterial({
+        // Store which mesh we're highlighting for cleanup
+        state._highlightedMesh = hitMesh;
+
+        // Backup vertex colors if not already done
+        const geo = hitMesh.geometry;
+        const posAttr = geo.getAttribute('position');
+        let colorAttr = geo.getAttribute('color');
+
+        if (!state._toothColorBackup && colorAttr) {
+            state._toothColorBackup = colorAttr.array.slice();
+        }
+
+        // Get local coordinates of hit point
+        const localHit = worldPoint.clone();
+        hitMesh.worldToLocal(localHit);
+
+        // Paint vertices near the hit point with teal highlight
+        const highlightRadius = 5.0; // radius around hit in mesh units
+        const tealR = 0.18, tealG = 0.83, tealB = 0.75; // #2dd4bf
+
+        if (colorAttr && posAttr) {
+            for (let i = 0; i < posAttr.count; i++) {
+                const vx = posAttr.getX(i);
+                const vy = posAttr.getY(i);
+                const vz = posAttr.getZ(i);
+
+                const dist = Math.sqrt(
+                    (vx - localHit.x) ** 2 +
+                    (vy - localHit.y) ** 2 +
+                    (vz - localHit.z) ** 2
+                );
+
+                if (dist < highlightRadius) {
+                    // Blend: closer = more teal, edges feather out
+                    const blend = 1 - (dist / highlightRadius);
+                    const strength = blend * blend * 0.7; // ease-in, max 70% teal
+
+                    const origR = state._toothColorBackup ? state._toothColorBackup[i * 3] : 0.8;
+                    const origG = state._toothColorBackup ? state._toothColorBackup[i * 3 + 1] : 0.8;
+                    const origB = state._toothColorBackup ? state._toothColorBackup[i * 3 + 2] : 0.8;
+
+                    colorAttr.setXYZ(i,
+                        origR + (tealR - origR) * strength,
+                        origG + (tealG - origG) * strength,
+                        origB + (tealB - origB) * strength
+                    );
+                }
+            }
+            colorAttr.needsUpdate = true;
+        }
+
+        // Small indicator dot at exact click point (minimal, not a big sphere)
+        const dotGeo = new THREE.SphereGeometry(0.4, 8, 8);
+        const dotMat = new THREE.MeshBasicMaterial({
             color: 0x2dd4bf,
             transparent: true,
-            opacity: 0.6
+            opacity: 0.9
         });
-        toothHighlight = new THREE.Mesh(glowGeo, glowMat);
+        toothHighlight = new THREE.Mesh(dotGeo, dotMat);
         toothHighlight.position.copy(worldPoint);
         scene.add(toothHighlight);
-
-        // Outer pulsing ring
-        const outerGeo = new THREE.RingGeometry(2.0, 2.8, 32);
-        const outerMat = new THREE.MeshBasicMaterial({
-            color: 0x2dd4bf,
-            transparent: true,
-            opacity: 0.3,
-            side: THREE.DoubleSide
-        });
-        state._outerGlow = new THREE.Mesh(outerGeo, outerMat);
-        state._outerGlow.position.copy(worldPoint);
-        state._outerGlow.lookAt(camera.position);
-        scene.add(state._outerGlow);
 
         // Floating tooth label (HTML overlay tracks 3D position)
         let labelEl = document.getElementById('toothLabel3D');
@@ -2768,6 +2807,8 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
     function hideToothPopup() {
         document.getElementById('toothPopup').style.display = 'none';
+
+        // Remove dot indicator
         if (toothHighlight) {
             scene.remove(toothHighlight);
             toothHighlight = null;
@@ -2776,6 +2817,18 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             scene.remove(state._outerGlow);
             state._outerGlow = null;
         }
+
+        // Restore vertex colors on highlighted mesh
+        if (state._highlightedMesh && state._toothColorBackup) {
+            const colorAttr = state._highlightedMesh.geometry.getAttribute('color');
+            if (colorAttr) {
+                colorAttr.array.set(state._toothColorBackup);
+                colorAttr.needsUpdate = true;
+            }
+            state._highlightedMesh = null;
+            state._toothColorBackup = null;
+        }
+
         // Hide floating label
         const labelEl = document.getElementById('toothLabel3D');
         if (labelEl) labelEl.style.display = 'none';
