@@ -1292,6 +1292,12 @@ async function loadHybridScans() {
             geometry.computeVertexNormals();
             var hasColors = geometry.hasAttribute('color');
             console.log('[Maxilla] hasColors:', hasColors, 'attributes:', Object.keys(geometry.attributes));
+            // If PLY has vertex colors, ensure they are in sRGB space for correct rendering
+            if (hasColors) {
+                var colorAttr = geometry.getAttribute('color');
+                console.log('[Maxilla] Color attribute:', colorAttr.count, 'vertices, first RGB:', 
+                    colorAttr.getX(0).toFixed(3), colorAttr.getY(0).toFixed(3), colorAttr.getZ(0).toFixed(3));
+            }
             var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'maxilla';
             mesh.userData.archType = 'upper';
@@ -1820,8 +1826,10 @@ function onMouseMove(event) {
     // Reset previous hover
     if (hoveredTooth && hoveredTooth !== selectedTooth) {
         const ud = hoveredTooth.userData;
-        hoveredTooth.material.emissive.setHex(ud.originalEmissive);
-        hoveredTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
+        if (hoveredTooth.material && hoveredTooth.material.emissive) {
+            hoveredTooth.material.emissive.setHex(ud.originalEmissive || 0x000000);
+            hoveredTooth.material.emissiveIntensity = ud.originalEmissiveIntensity || 0;
+        }
         hoveredTooth.scale.set(1, 1, 1);
     }
 
@@ -1832,7 +1840,11 @@ function onMouseMove(event) {
             renderer.domElement.style.cursor = 'pointer';
 
             // Hover glow
-            if (mesh !== selectedTooth) {
+            if (mesh !== selectedTooth && mesh.material && mesh.material.emissive) {
+                if (!mesh.userData.originalEmissive) {
+                    mesh.userData.originalEmissive = mesh.material.emissive.getHex();
+                    mesh.userData.originalEmissiveIntensity = mesh.material.emissiveIntensity;
+                }
                 mesh.material.emissive.setHex(0x2dd4bf);
                 mesh.material.emissiveIntensity = 0.35;
                 mesh.scale.set(1.06, 1.06, 1.06);
