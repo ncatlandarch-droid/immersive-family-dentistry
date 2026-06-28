@@ -225,7 +225,10 @@ const PatientProfiles = (function() {
 
       detailPanel.innerHTML = `
         <div class="patient-detail-header">
-          <div style="width:140px;height:140px;min-width:140px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:3px solid rgba(45,212,191,0.3);box-shadow:0 8px 24px rgba(45,212,191,0.15);"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
+          <a href="/portal/mouthmap?role=staff&patient=${patientId}" target="_blank" title="Open MouthMap" style="text-decoration:none;cursor:pointer;position:relative;display:block;">
+            <div style="width:200px;height:200px;min-width:200px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:3.5rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:4px solid rgba(45,212,191,0.3);box-shadow:0 8px 32px rgba(45,212,191,0.2);transition:all 0.3s;"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
+            <div style="position:absolute;bottom:6px;right:6px;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2dd4bf,#0d9488);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:2px solid #0b0f19;">🦷</div>
+          </a>
           <div class="patient-detail-info">
             <h2>${name}</h2>
             <div class="patient-detail-badges">
