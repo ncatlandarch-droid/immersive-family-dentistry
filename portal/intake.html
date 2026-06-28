@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Intake Form | Lake Jeanette Family & Implant Dentistry</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <style>
+    /* ═══════════════════════════════════════════════════════════
+       Patient Intake Form — Dark Glassmorphism Theme
+       Lake Jeanette Family & Implant Dentistry
+       ═══════════════════════════════════════════════════════════ */
+
+    :root {
+        --admin-bg: #0B0F19;
+        --admin-bg-secondary: #111827;
+        --admin-surface: rgba(17, 24, 39, 0.7);
+        --admin-surface-solid: #111827;
+        --admin-surface-alt: rgba(30, 41, 59, 0.5);
+        --admin-glass: rgba(255, 255, 255, 0.03);
+        --admin-glass-border: rgba(255, 255, 255, 0.06);
+        --admin-border: rgba(255, 255, 255, 0.08);
+        --admin-text: #F1F5F9;
+        --admin-text-secondary: #CBD5E1;
+        --admin-muted: #64748B;
+        --admin-teal: #2dd4bf;
+        --admin-teal-dark: #14b8a6;
+        --admin-teal-glow: rgba(45, 212, 191, 0.15);
+        --admin-green: #10B981;
+        --admin-red: #EF4444;
+        --admin-radius: 14px;
+        --admin-radius-sm: 8px;
+        --admin-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+        --admin-shadow-lg: 0 12px 40px rgba(0,0,0,0.4);
+        --admin-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--admin-bg);
+        color: var(--admin-text);
+        min-height: 100vh;
+        background-image:
+            radial-gradient(ellipse at 20% 0%, rgba(45,212,191,0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 80% 100%, rgba(59,130,246,0.04) 0%, transparent 60%);
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    /* ═══ Header ═══ */
+    .intake-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--admin-border);
+        background: rgba(11, 15, 25, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .intake-header__left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .intake-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+    .intake-brand h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--admin-text);
+        line-height: 1.2;
+    }
+    .intake-brand span {
+        font-size: 11px;
+        color: var(--admin-muted);
+        font-weight: 400;
+    }
+    .intake-header__right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .lang-toggle {
+        display: flex;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--admin-border);
+    }
+    .lang-btn {
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--admin-muted);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .lang-btn.active {
+        background: var(--admin-teal);
+        color: #000;
+    }
+    .practice-phone {
+        font-size: 12px;
+        color: var(--admin-muted);
+    }
+    .practice-phone a {
+        color: var(--admin-teal);
+        text-decoration: none;
+    }
+
+    /* ═══ Main Container ═══ */
+    .intake-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+    }
+
+    /* ═══ Progress Bar ═══ */
+    .progress-section {
+        margin-bottom: 32px;
+    }
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        position: relative;
+    }
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+    .progress-step__circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        border: 2px solid var(--admin-border);
+        background: var(--admin-bg-secondary);
+        color: var(--admin-muted);
+        transition: all 0.3s;
+    }
+    .progress-step.active .progress-step__circle {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+        color: var(--admin-teal);
+        box-shadow: 0 0 20px rgba(45,212,191,0.2);
+    }
+    .progress-step.completed .progress-step__circle {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal);
+        color: #000;
+    }
+    .progress-step__label {
+        font-size: 10px;
+        color: var(--admin-muted);
+        text-align: center;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    .progress-step.active .progress-step__label,
+    .progress-step.completed .progress-step__label {
+        color: var(--admin-text-secondary);
+    }
+    .progress-bar-track {
+        height: 3px;
+        background: var(--admin-border);
+        border-radius: 2px;
+        position: relative;
+        margin-top: -30px;
+        margin-bottom: 20px;
+        margin-left: 36px;
+        margin-right: 36px;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--admin-teal), var(--admin-teal-dark));
+        border-radius: 2px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+    }
+
+    /* ═══ Glass Card ═══ */
+    .form-card {
+        background: var(--admin-surface);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid var(--admin-glass-border);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: var(--admin-shadow-lg);
+    }
+    .form-card__title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-card__subtitle {
+        font-size: 13px;
+        color: var(--admin-muted);
+        margin-bottom: 28px;
+    }
+
+    /* ═══ Form Fields ═══ */
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field-row.cols-4 { grid-template-columns: 2fr 1fr 1fr 1fr; }
+    .field-full { grid-column: 1 / -1; }
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .field-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--admin-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .field-group label .required {
+        color: var(--admin-red);
+        margin-left: 2px;
+    }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        padding: 10px 14px;
+        color: var(--admin-text);
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+        outline: none;
+        border-color: var(--admin-teal);
+        box-shadow: 0 0 0 3px var(--admin-teal-glow);
+    }
+    .field-group input::placeholder,
+    .field-group textarea::placeholder {
+        color: var(--admin-muted);
+    }
+    .field-group select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+    .field-group select option {
+        background: var(--admin-bg-secondary);
+        color: var(--admin-text);
+    }
+    .field-group textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.6);
+    }
+
+    /* ═══ Checkbox & Radio Groups ═══ */
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+        margin-top: 4px;
+    }
+    .checkbox-item, .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 13px;
+    }
+    .checkbox-item:hover, .radio-item:hover {
+        background: rgba(255,255,255,0.06);
+        border-color: var(--admin-teal);
+    }
+    .checkbox-item input[type="checkbox"],
+    .radio-item input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--admin-teal);
+        flex-shrink: 0;
+    }
+    .checkbox-item.checked {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+    }
+
+    /* ═══ Toggle Switch ═══ */
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .toggle-switch {
+        position: relative;
+        width: 48px;
+        height: 26px;
+        flex-shrink: 0;
+    }
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.1);
+        border-radius: 26px;
+        transition: 0.3s;
+    }
+    .toggle-slider::before {
+        content: '';
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-slider {
+        background: var(--admin-teal);
+    }
+    .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(22px);
+    }
+    .toggle-label {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* ═══ Yes/No Buttons ═══ */
+    .yesno-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+    }
+    .yesno-btn {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        background: rgba(255,255,255,0.03);
+        color: var(--admin-text);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    .yesno-btn:hover { background: rgba(255,255,255,0.06); }
+    .yesno-btn.selected {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+        color: var(--admin-teal);
+    }
+
+    /* ═══ Slider (Anxiety) ═══ */
+    .anxiety-slider-container {
+        margin-top: 8px;
+    }
+    .anxiety-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--admin-muted);
+        margin-bottom: 8px;
+    }
+    .anxiety-slider {
+        width: 100%;
+        -webkit-appearance: none;
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--admin-green), #f59e0b, var(--admin-red));
+        outline: none;
+    }
+    .anxiety-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--admin-teal);
+        cursor: pointer;
+        border: 3px solid var(--admin-bg);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .anxiety-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--admin-teal);
+        cursor: pointer;
+        border: 3px solid var(--admin-bg);
+    }
+    .anxiety-value {
+        text-align: center;
+        font-size: 28px;
+        margin-top: 8px;
+    }
+
+    /* ═══ Insurance Conditional ═══ */
+    .insurance-fields {
+        display: none;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--admin-border);
+        animation: fadeIn 0.3s;
+    }
+    .insurance-fields.visible { display: block; }
+
+    /* ═══ HIPAA Text Box ═══ */
+    .hipaa-text {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        padding: 16px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 12px;
+        line-height: 1.7;
+        color: var(--admin-text-secondary);
+        margin-bottom: 20px;
+    }
+    .consent-checks {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .consent-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        font-size: 13px;
+        line-height: 1.5;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .consent-item:hover {
+        border-color: rgba(45,212,191,0.3);
+    }
+    .consent-item input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--admin-teal);
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    /* ═══ Signature Pad ═══ */
+    .signature-section {
+        margin-top: 24px;
+    }
+    .signature-section h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+    .signature-pad-wrapper {
+        background: rgba(255,255,255,0.95);
+        border-radius: var(--admin-radius-sm);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid var(--admin-border);
+        transition: border-color 0.2s;
+    }
+    .signature-pad-wrapper:hover,
+    .signature-pad-wrapper.signing {
+        border-color: var(--admin-teal);
+    }
+    #signatureCanvas {
+        display: block;
+        width: 100%;
+        height: 160px;
+        cursor: crosshair;
+        touch-action: none;
+    }
+    .signature-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #94a3b8;
+        font-size: 13px;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+    .signature-pad-wrapper.has-signature .signature-placeholder {
+        opacity: 0;
+    }
+    .signature-line {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        right: 20px;
+        border-bottom: 1px dashed #cbd5e1;
+        pointer-events: none;
+    }
+    .signature-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+    }
+    .sig-btn {
+        padding: 8px 20px;
+        border-radius: var(--admin-radius-sm);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .sig-btn.clear {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--admin-border);
+        color: var(--admin-muted);
+    }
+    .sig-btn.clear:hover { color: var(--admin-red); border-color: var(--admin-red); }
+    .sig-btn.accept {
+        background: var(--admin-teal);
+        color: #000;
+        border: none;
+    }
+    .sig-btn.accept:hover { background: var(--admin-teal-dark); }
+    .sig-btn.accept:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .signature-date {
+        font-size: 12px;
+        color: var(--admin-muted);
+        margin-top: 10px;
+    }
+    .sig-accepted {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(16,185,129,0.1);
+        border: 1px solid rgba(16,185,129,0.3);
+        border-radius: var(--admin-radius-sm);
+        color: var(--admin-green);
+        font-size: 13px;
+        font-weight: 500;
+        margin-top: 12px;
+    }
+    .sig-accepted.visible { display: flex; }
+
+    /* ═══ Navigation Buttons ═══ */
+    .form-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--admin-border);
+    }
+    .nav-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: var(--admin-radius);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .nav-btn.prev {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--admin-border);
+        color: var(--admin-text-secondary);
+    }
+    .nav-btn.prev:hover { background: rgba(255,255,255,0.08); }
+    .nav-btn.next, .nav-btn.submit {
+        background: var(--admin-teal);
+        color: #000;
+        border: none;
+    }
+    .nav-btn.next:hover, .nav-btn.submit:hover {
+        background: var(--admin-teal-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(45,212,191,0.3);
+    }
+    .nav-btn.submit {
+        background: linear-gradient(135deg, var(--admin-teal), #0d9488);
+    }
+    .nav-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* ═══ Step Visibility ═══ */
+    .form-step { display: none; }
+    .form-step.active {
+        display: block;
+        animation: fadeIn 0.35s ease;
+    }
+
+    /* ═══ Section Divider ═══ */
+    .section-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 24px 0 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--admin-teal);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .section-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--admin-border);
+    }
+
+    /* ═══ Success Screen ═══ */
+    .success-screen {
+        display: none;
+        text-align: center;
+        padding: 60px 24px;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--admin-teal-glow);
+        border: 2px solid var(--admin-teal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 36px;
+    }
+    .success-screen h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    .success-screen p {
+        color: var(--admin-text-secondary);
+        font-size: 15px;
+        max-width: 480px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+    .success-screen .practice-info {
+        margin-top: 32px;
+        padding: 20px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius);
+        display: inline-block;
+    }
+    .success-screen .practice-info a {
+        color: var(--admin-teal);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    /* ═══ Payment Method ═══ */
+    .payment-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .payment-option {
+        padding: 14px;
+        border: 1px solid var(--admin-border);
+        border-radius: var(--admin-radius-sm);
+        background: rgba(255,255,255,0.03);
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .payment-option:hover { background: rgba(255,255,255,0.06); }
+    .payment-option.selected {
+        border-color: var(--admin-teal);
+        background: var(--admin-teal-glow);
+        color: var(--admin-teal);
+    }
+    .payment-option .pay-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+    /* ═══ Validation ═══ */
+    .field-group.error input,
+    .field-group.error select,
+    .field-group.error textarea {
+        border-color: var(--admin-red);
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+    }
+    .field-group .error-msg {
+        font-size: 11px;
+        color: var(--admin-red);
+        display: none;
+    }
+    .field-group.error .error-msg { display: block; }
+
+    /* ═══ Loading Spinner ═══ */
+    .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(0,0,0,0.2);
+        border-top-color: #000;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ═══ Responsive ═══ */
+    @media (max-width: 640px) {
+        .intake-header {
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 16px;
+        }
+        .intake-header__right {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .form-card { padding: 20px 16px; border-radius: 16px; }
+        .field-row { grid-template-columns: 1fr; }
+        .field-row.cols-3 { grid-template-columns: 1fr; }
+        .field-row.cols-4 { grid-template-columns: 1fr 1fr; }
+        .progress-step__label { font-size: 9px; }
+        .progress-step__circle { width: 30px; height: 30px; font-size: 12px; }
+        .form-card__title { font-size: 18px; }
+        .checkbox-grid { grid-template-columns: 1fr; }
+        .payment-grid { grid-template-columns: 1fr; }
+    }
+    </style>
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<header class="intake-header">
+    <div class="intake-header__left">
+        <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="intake-logo">
+        <div class="intake-brand">
+            <h1 data-i18n="header_title">New Patient Intake Form</h1>
+            <span>Lake Jeanette Family & Implant Dentistry</span>
+        </div>
+    </div>
+    <div class="intake-header__right">
+        <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn" data-lang="es" onclick="setLanguage('es')">ES</button>
+        </div>
+        <div class="practice-phone">
+            📞 <a href="tel:3365454281">(336) 545-4281</a>
+        </div>
+    </div>
+</header>
+
+<!-- ═══ Main Container ═══ -->
+<div class="intake-container">
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+        <div class="progress-steps">
+            <div class="progress-step active" data-step="1">
+                <div class="progress-step__circle">1</div>
+                <div class="progress-step__label" data-i18n="step_personal">Personal</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="progress-step__circle">2</div>
+                <div class="progress-step__label" data-i18n="step_medical">Medical</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="progress-step__circle">3</div>
+                <div class="progress-step__label" data-i18n="step_dental">Dental</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="progress-step__circle">4</div>
+                <div class="progress-step__label" data-i18n="step_insurance">Insurance</div>
+            </div>
+            <div class="progress-step" data-step="5">
+                <div class="progress-step__circle">5</div>
+                <div class="progress-step__label" data-i18n="step_consent">Consent</div>
+            </div>
+        </div>
+        <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         STEP 1: Personal Information
+         ═══════════════════════════════════════════════ -->
+    <div class="form-step active" id="step-1">
+        <div class="form-card">
+            <div class="form-card__title">👤 <span data-i18n="s1_title">Personal Information</span></div>
+            <div class="form-card__subtitle" data-i18n="s1_subtitle">Please provide your basic contact information.</div>
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label data-i18n="lbl_first_name">First Name <span class="required">*</span></label>
+                    <input type="text" id="firstName" required autocomplete="given-name">
+                    <span class="error-msg" data-i18n="err_required">This field is required</span>
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_last_name">Last Name <span class="required">*</span></label>
+                    <input type="text" id="lastName" required autocomplete="family-name">
+                    <span class="error-msg" data-i18n="err_required">This field is required</span>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label data-i18n="lbl_dob">Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="dob" required>
+                    <span class="error-msg" data-i18n="err_required">This field is required</span>
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_preferred_lang">Preferred Language</label>
+                    <select id="preferredLanguage">
+                        <option value="English">English</option>
+                        <option value="Español">Español</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label data-i18n="lbl_phone">Phone <span class="required">*</span></label>
+                    <input type="tel" id="phone" required autocomplete="tel" placeholder="(555) 123-4567">
+                    <span class="error-msg" data-i18n="err_required">This field is required</span>
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_email">Email</label>
+                    <input type="email" id="email" autocomplete="email" placeholder="you@example.com">
+                </div>
+            </div>
+
+            <div class="section-divider" data-i18n="div_address">Address</div>
+
+            <div class="field-row" style="grid-template-columns:1fr">
+                <div class="field-group">
+                    <label data-i18n="lbl_street">Street Address</label>
+                    <input type="text" id="street" autocomplete="street-address">
+                </div>
+            </div>
+            <div class="field-row cols-4">
+                <div class="field-group">
+                    <label data-i18n="lbl_city">City</label>
+                    <input type="text" id="city" autocomplete="address-level2">
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_state">State</label>
+                    <input type="text" id="state" autocomplete="address-level1" maxlength="2" placeholder="NC">
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_zip">Zip</label>
+                    <input type="text" id="zip" autocomplete="postal-code" maxlength="10" placeholder="27455">
+                </div>
+            </div>
+
+            <div class="section-divider" data-i18n="div_emergency">Emergency Contact</div>
+
+            <div class="field-row cols-3">
+                <div class="field-group">
+                    <label data-i18n="lbl_ec_name">Contact Name</label>
+                    <input type="text" id="ecName">
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_ec_phone">Contact Phone</label>
+                    <input type="tel" id="ecPhone">
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_ec_relationship">Relationship</label>
+                    <select id="ecRelationship">
+                        <option value="">Select...</option>
+                        <option value="Spouse" data-i18n-opt="opt_spouse">Spouse</option>
+                        <option value="Parent" data-i18n-opt="opt_parent">Parent</option>
+                        <option value="Child" data-i18n-opt="opt_child">Child</option>
+                        <option value="Sibling" data-i18n-opt="opt_sibling">Sibling</option>
+                        <option value="Friend" data-i18n-opt="opt_friend">Friend</option>
+                        <option value="Other" data-i18n-opt="opt_other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nav -->
+            <div class="form-nav">
+                <div></div>
+                <button class="nav-btn next" onclick="nextStep()">
+                    <span data-i18n="btn_next">Next</span> →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         STEP 2: Medical History
+         ═══════════════════════════════════════════════ -->
+    <div class="form-step" id="step-2">
+        <div class="form-card">
+            <div class="form-card__title">🏥 <span data-i18n="s2_title">Medical History</span></div>
+            <div class="form-card__subtitle" data-i18n="s2_subtitle">Help us understand your overall health to provide safe care.</div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_medications">Current Medications</label>
+                <textarea id="medications" placeholder="List all current medications, vitamins, and supplements..." data-i18n-ph="ph_medications"></textarea>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_allergies">Allergies</label>
+                <div class="checkbox-grid" id="allergyChecks">
+                    <label class="checkbox-item"><input type="checkbox" value="Penicillin"> <span>Penicillin</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Latex"> <span>Latex</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Codeine"> <span data-i18n="allergy_codeine">Codeine</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Local Anesthetics"> <span data-i18n="allergy_anesthetics">Local Anesthetics</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="None" data-none="allergies"> <span data-i18n="opt_none">None</span></label>
+                </div>
+                <textarea id="allergiesOther" placeholder="Other allergies..." data-i18n-ph="ph_other_allergies" style="margin-top:8px"></textarea>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_conditions">Medical Conditions</label>
+                <div class="checkbox-grid" id="conditionChecks">
+                    <label class="checkbox-item"><input type="checkbox" value="Diabetes"> <span>Diabetes</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Heart Disease"> <span data-i18n="cond_heart">Heart Disease</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="High Blood Pressure"> <span data-i18n="cond_hbp">High Blood Pressure</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Asthma"> <span>Asthma</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Bleeding Disorder"> <span data-i18n="cond_bleeding">Bleeding Disorder</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="HIV/Hepatitis"> <span>HIV/Hepatitis</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Cancer"> <span data-i18n="cond_cancer">Cancer</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Pregnant"> <span data-i18n="cond_pregnant">Pregnant</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="None" data-none="conditions"> <span data-i18n="opt_none">None</span></label>
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_surgeries">Previous Surgeries</label>
+                <textarea id="surgeries" placeholder="List any previous surgeries and approximate dates..." data-i18n-ph="ph_surgeries"></textarea>
+            </div>
+
+            <div class="section-divider" data-i18n="div_physician">Your Physician</div>
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label data-i18n="lbl_physician_name">Physician Name</label>
+                    <input type="text" id="physicianName">
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_physician_phone">Physician Phone</label>
+                    <input type="tel" id="physicianPhone">
+                </div>
+            </div>
+
+            <div class="form-nav">
+                <button class="nav-btn prev" onclick="prevStep()">
+                    ← <span data-i18n="btn_back">Back</span>
+                </button>
+                <button class="nav-btn next" onclick="nextStep()">
+                    <span data-i18n="btn_next">Next</span> →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         STEP 3: Dental History
+         ═══════════════════════════════════════════════ -->
+    <div class="form-step" id="step-3">
+        <div class="form-card">
+            <div class="form-card__title">🦷 <span data-i18n="s3_title">Dental History</span></div>
+            <div class="form-card__subtitle" data-i18n="s3_subtitle">Tell us about your dental health and what brings you in.</div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_last_visit">Last Dental Visit</label>
+                <div class="checkbox-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))">
+                    <label class="radio-item"><input type="radio" name="lastVisit" value="<6 months"> <span data-i18n="visit_6m">< 6 months</span></label>
+                    <label class="radio-item"><input type="radio" name="lastVisit" value="6-12 months"> <span data-i18n="visit_12m">6–12 months</span></label>
+                    <label class="radio-item"><input type="radio" name="lastVisit" value="1-2 years"> <span data-i18n="visit_2y">1–2 years</span></label>
+                    <label class="radio-item"><input type="radio" name="lastVisit" value="2+ years"> <span data-i18n="visit_2yplus">2+ years</span></label>
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_primary_concern">Primary Concern / Reason for Visit <span class="required">*</span></label>
+                <textarea id="primaryConcern" placeholder="What brings you in today?" data-i18n-ph="ph_concern" required></textarea>
+                <span class="error-msg" data-i18n="err_required">This field is required</span>
+            </div>
+
+            <div class="field-group" style="margin-bottom:20px">
+                <label data-i18n="lbl_anxiety">Dental Anxiety Level</label>
+                <div class="anxiety-slider-container">
+                    <div class="anxiety-labels">
+                        <span data-i18n="anxiety_none">😊 None</span>
+                        <span data-i18n="anxiety_mild">😐 Mild</span>
+                        <span data-i18n="anxiety_moderate">😟 Moderate</span>
+                        <span data-i18n="anxiety_high">😣 High</span>
+                        <span data-i18n="anxiety_severe">😰 Severe</span>
+                    </div>
+                    <input type="range" class="anxiety-slider" id="anxietyLevel" min="1" max="5" value="1" step="1">
+                    <div class="anxiety-value" id="anxietyEmoji">😊</div>
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px">
+                <label data-i18n="lbl_prev_dental">Previous Dental Work</label>
+                <div class="checkbox-grid" id="dentalWorkChecks">
+                    <label class="checkbox-item"><input type="checkbox" value="Fillings"> <span data-i18n="dental_fillings">Fillings</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Crowns"> <span data-i18n="dental_crowns">Crowns</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Root Canals"> <span data-i18n="dental_rootcanals">Root Canals</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Implants"> <span data-i18n="dental_implants">Implants</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Braces"> <span data-i18n="dental_braces">Braces</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Extractions"> <span data-i18n="dental_extractions">Extractions</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Dentures"> <span data-i18n="dental_dentures">Dentures</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="Whitening"> <span data-i18n="dental_whitening">Whitening</span></label>
+                    <label class="checkbox-item"><input type="checkbox" value="None" data-none="dentalWork"> <span data-i18n="opt_none">None</span></label>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-group">
+                    <label data-i18n="lbl_grinding">Do you grind or clench your teeth?</label>
+                    <div class="yesno-group">
+                        <button type="button" class="yesno-btn" data-field="grinding" data-value="Yes" data-i18n="btn_yes">Yes</button>
+                        <button type="button" class="yesno-btn" data-field="grinding" data-value="No" data-i18n="btn_no">No</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label data-i18n="lbl_gum_bleeding">Gum bleeding when brushing?</label>
+                    <div class="yesno-group">
+                        <button type="button" class="yesno-btn" data-field="gumBleeding" data-value="Yes" data-i18n="btn_yes">Yes</button>
+                        <button type="button" class="yesno-btn" data-field="gumBleeding" data-value="No" data-i18n="btn_no">No</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-nav">
+                <button class="nav-btn prev" onclick="prevStep()">
+                    ← <span data-i18n="btn_back">Back</span>
+                </button>
+                <button class="nav-btn next" onclick="nextStep()">
+                    <span data-i18n="btn_next">Next</span> →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         STEP 4: Insurance Information
+         ═══════════════════════════════════════════════ -->
+    <div class="form-step" id="step-4">
+        <div class="form-card">
+            <div class="form-card__title">🛡️ <span data-i18n="s4_title">Insurance Information</span></div>
+            <div class="form-card__subtitle" data-i18n="s4_subtitle">If you have dental insurance, please provide your plan details.</div>
+
+            <!-- Primary Insurance -->
+            <div class="toggle-row">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="hasInsurance" onchange="toggleInsurance('primary')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label" data-i18n="lbl_has_insurance">I have dental insurance</span>
+            </div>
+
+            <div class="insurance-fields" id="primaryInsurance">
+                <div class="section-divider" data-i18n="div_primary_ins">Primary Insurance</div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label data-i18n="lbl_ins_provider">Insurance Provider</label>
+                        <input type="text" id="insProvider" placeholder="e.g., Delta Dental, Cigna">
+                    </div>
+                    <div class="field-group">
+                        <label data-i18n="lbl_member_id">Member ID</label>
+                        <input type="text" id="insMemberId">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label data-i18n="lbl_group_number">Group Number</label>
+                        <input type="text" id="insGroupNumber">
+                    </div>
+                    <div class="field-group">
+                        <label data-i18n="lbl_subscriber_name">Subscriber Name</label>
+                        <input type="text" id="insSubscriberName">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label data-i18n="lbl_subscriber_dob">Subscriber Date of Birth</label>
+                        <input type="date" id="insSubscriberDob">
+                    </div>
+                    <div class="field-group">
+                        <label data-i18n="lbl_relationship_subscriber">Relationship to Subscriber</label>
+                        <select id="insRelationship">
+                            <option value="Self" data-i18n-opt="rel_self">Self</option>
+                            <option value="Spouse" data-i18n-opt="rel_spouse">Spouse</option>
+                            <option value="Child" data-i18n-opt="rel_child">Child</option>
+                            <option value="Other" data-i18n-opt="rel_other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Secondary Insurance -->
+                <div class="toggle-row" style="margin-top:20px">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="hasSecondaryInsurance" onchange="toggleInsurance('secondary')">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label" data-i18n="lbl_has_secondary">I have secondary insurance</span>
+                </div>
+
+                <div class="insurance-fields" id="secondaryInsurance">
+                    <div class="section-divider" data-i18n="div_secondary_ins">Secondary Insurance</div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label data-i18n="lbl_ins_provider">Insurance Provider</label>
+                            <input type="text" id="ins2Provider">
+                        </div>
+                        <div class="field-group">
+                            <label data-i18n="lbl_member_id">Member ID</label>
+                            <input type="text" id="ins2MemberId">
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label data-i18n="lbl_group_number">Group Number</label>
+                            <input type="text" id="ins2GroupNumber">
+                        </div>
+                        <div class="field-group">
+                            <label data-i18n="lbl_subscriber_name">Subscriber Name</label>
+                            <input type="text" id="ins2SubscriberName">
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label data-i18n="lbl_subscriber_dob">Subscriber Date of Birth</label>
+                            <input type="date" id="ins2SubscriberDob">
+                        </div>
+                        <div class="field-group">
+                            <label data-i18n="lbl_relationship_subscriber">Relationship to Subscriber</label>
+                            <select id="ins2Relationship">
+                                <option value="Self" data-i18n-opt="rel_self">Self</option>
+                                <option value="Spouse" data-i18n-opt="rel_spouse">Spouse</option>
+                                <option value="Child" data-i18n-opt="rel_child">Child</option>
+                                <option value="Other" data-i18n-opt="rel_other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider" data-i18n="div_payment">Preferred Payment Method</div>
+            <div class="payment-grid" id="paymentGrid">
+                <div class="payment-option" data-value="Insurance" onclick="selectPayment(this)">
+                    <span class="pay-icon">🛡️</span>
+                    <span data-i18n="pay_insurance">Insurance</span>
+                </div>
+                <div class="payment-option" data-value="Cash/Self-pay" onclick="selectPayment(this)">
+                    <span class="pay-icon">💵</span>
+                    <span data-i18n="pay_cash">Cash / Self-pay</span>
+                </div>
+                <div class="payment-option" data-value="CareCredit" onclick="selectPayment(this)">
+                    <span class="pay-icon">💳</span>
+                    <span>CareCredit</span>
+                </div>
+                <div class="payment-option" data-value="Sunbit" onclick="selectPayment(this)">
+                    <span class="pay-icon">☀️</span>
+                    <span>Sunbit</span>
+                </div>
+            </div>
+
+            <div class="form-nav">
+                <button class="nav-btn prev" onclick="prevStep()">
+                    ← <span data-i18n="btn_back">Back</span>
+                </button>
+                <button class="nav-btn next" onclick="nextStep()">
+                    <span data-i18n="btn_next">Next</span> →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         STEP 5: HIPAA Consent & Signature
+         ═══════════════════════════════════════════════ -->
+    <div class="form-step" id="step-5">
+        <div class="form-card">
+            <div class="form-card__title">📝 <span data-i18n="s5_title">Consent & Signature</span></div>
+            <div class="form-card__subtitle" data-i18n="s5_subtitle">Please review and acknowledge the following notices.</div>
+
+            <div class="hipaa-text" id="hipaaText">
+                <strong>NOTICE OF PRIVACY PRACTICES</strong><br><br>
+
+                This notice describes how medical information about you may be used and disclosed and how you can get access to this information. Please review it carefully.<br><br>
+
+                <strong>Our Responsibilities:</strong> We are required by law to maintain the privacy of your protected health information (PHI), give you this notice about our privacy practices, and follow the practices described in this notice. We will let you know promptly if a breach occurs that may have compromised the privacy or security of your information.<br><br>
+
+                <strong>Uses and Disclosures:</strong> We may use and disclose your PHI for the following purposes:<br>
+                • <em>Treatment:</em> We may use your PHI to provide, coordinate, or manage your dental care. For example, we may share your information with other health care providers involved in your treatment.<br>
+                • <em>Payment:</em> We may use and disclose your PHI to bill and collect payment for the dental treatment and services we provide. For example, we may share your information with your dental insurance company to receive payment for services.<br>
+                • <em>Health Care Operations:</em> We may use and disclose your PHI for our health care operations, which include quality assessment, employee review, licensing, and conducting or arranging other business activities.<br><br>
+
+                <strong>Your Rights:</strong> You have the right to:<br>
+                • Request restrictions on certain uses and disclosures of your PHI<br>
+                • Receive confidential communications of your PHI<br>
+                • Inspect and copy your PHI<br>
+                • Amend your PHI<br>
+                • Receive an accounting of disclosures of your PHI<br>
+                • Receive a paper copy of this notice upon request<br>
+                • File a complaint if you believe your privacy rights have been violated<br><br>
+
+                <strong>Contact Information:</strong><br>
+                Lake Jeanette Family & Implant Dentistry<br>
+                Phone: (336) 545-4281<br><br>
+
+                <em>Effective Date: January 1, 2024</em>
+            </div>
+
+            <div class="consent-checks">
+                <label class="consent-item">
+                    <input type="checkbox" id="consentHipaa" required>
+                    <span data-i18n="consent_hipaa">I acknowledge receipt of the HIPAA Notice of Privacy Practices.</span>
+                </label>
+                <label class="consent-item">
+                    <input type="checkbox" id="consentTreatment" required>
+                    <span data-i18n="consent_treatment">I consent to treatment and authorize the release of information to my insurance company.</span>
+                </label>
+                <label class="consent-item">
+                    <input type="checkbox" id="consentFinancial" required>
+                    <span data-i18n="consent_financial">I understand I am financially responsible for charges not covered by insurance.</span>
+                </label>
+            </div>
+
+            <div class="signature-section">
+                <h3 data-i18n="lbl_signature">Digital Signature</h3>
+                <div class="signature-pad-wrapper" id="sigWrapper">
+                    <canvas id="signatureCanvas"></canvas>
+                    <div class="signature-placeholder" data-i18n="sig_placeholder">Sign here with your finger or mouse</div>
+                    <div class="signature-line"></div>
+                </div>
+                <div class="signature-actions" id="sigActions">
+                    <button class="sig-btn clear" onclick="clearSignature()" data-i18n="btn_clear">Clear</button>
+                    <button class="sig-btn accept" id="acceptSigBtn" onclick="acceptSignature()" disabled data-i18n="btn_accept_sig">Accept Signature</button>
+                </div>
+                <div class="sig-accepted" id="sigAccepted">
+                    ✅ <span data-i18n="sig_accepted_msg">Signature accepted</span>
+                </div>
+                <div class="signature-date">
+                    <span data-i18n="lbl_date">Date:</span> <span id="sigDate"></span>
+                </div>
+            </div>
+
+            <div class="form-nav">
+                <button class="nav-btn prev" onclick="prevStep()">
+                    ← <span data-i18n="btn_back">Back</span>
+                </button>
+                <button class="nav-btn submit" id="submitBtn" onclick="submitForm()" disabled>
+                    <span data-i18n="btn_submit">Submit Intake Form</span> 🕊️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Success Screen ═══ -->
+    <div class="success-screen" id="successScreen">
+        <div class="form-card" style="padding:48px 32px">
+            <div class="success-icon">🕊️</div>
+            <h2 data-i18n="success_title">Thank You!</h2>
+            <p data-i18n="success_message">Lake Jeanette Family & Implant Dentistry has received your information. We look forward to seeing you!</p>
+            <div class="practice-info" style="margin-top:32px">
+                <p style="color:var(--admin-muted);font-size:13px;margin-bottom:4px" data-i18n="success_questions">Questions? Call us at</p>
+                <a href="tel:3365454281" style="font-size:18px">(336) 545-4281</a>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /intake-container -->
+
+<!-- ═══ Firebase Config ═══ -->
+<script src="/js/firebase-config.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   Patient Intake Form — Controller
+   ═══════════════════════════════════════════════════════════ */
+
+// ─── State ───
+let currentStep = 1;
+const totalSteps = 5;
+let signatureData = null;
+let signatureAccepted = false;
+let currentLang = 'en';
+const yesNoState = { grinding: null, gumBleeding: null };
+let selectedPayment = null;
+
+// ─── i18n Translations ───
+const i18n = {
+    en: {
+        header_title: 'New Patient Intake Form',
+        step_personal: 'Personal', step_medical: 'Medical', step_dental: 'Dental',
+        step_insurance: 'Insurance', step_consent: 'Consent',
+        s1_title: 'Personal Information', s1_subtitle: 'Please provide your basic contact information.',
+        s2_title: 'Medical History', s2_subtitle: 'Help us understand your overall health to provide safe care.',
+        s3_title: 'Dental History', s3_subtitle: 'Tell us about your dental health and what brings you in.',
+        s4_title: 'Insurance Information', s4_subtitle: 'If you have dental insurance, please provide your plan details.',
+        s5_title: 'Consent & Signature', s5_subtitle: 'Please review and acknowledge the following notices.',
+        lbl_first_name: 'First Name <span class="required">*</span>',
+        lbl_last_name: 'Last Name <span class="required">*</span>',
+        lbl_dob: 'Date of Birth <span class="required">*</span>',
+        lbl_preferred_lang: 'Preferred Language',
+        lbl_phone: 'Phone <span class="required">*</span>',
+        lbl_email: 'Email',
+        lbl_street: 'Street Address', lbl_city: 'City', lbl_state: 'State', lbl_zip: 'Zip',
+        div_address: 'Address', div_emergency: 'Emergency Contact',
+        lbl_ec_name: 'Contact Name', lbl_ec_phone: 'Contact Phone', lbl_ec_relationship: 'Relationship',
+        lbl_medications: 'Current Medications',
+        lbl_allergies: 'Allergies',
+        lbl_conditions: 'Medical Conditions',
+        lbl_surgeries: 'Previous Surgeries',
+        div_physician: 'Your Physician',
+        lbl_physician_name: 'Physician Name', lbl_physician_phone: 'Physician Phone',
+        lbl_last_visit: 'Last Dental Visit',
+        lbl_primary_concern: 'Primary Concern / Reason for Visit <span class="required">*</span>',
+        lbl_anxiety: 'Dental Anxiety Level',
+        lbl_prev_dental: 'Previous Dental Work',
+        lbl_grinding: 'Do you grind or clench your teeth?',
+        lbl_gum_bleeding: 'Gum bleeding when brushing?',
+        lbl_has_insurance: 'I have dental insurance',
+        lbl_has_secondary: 'I have secondary insurance',
+        div_primary_ins: 'Primary Insurance', div_secondary_ins: 'Secondary Insurance',
+        lbl_ins_provider: 'Insurance Provider', lbl_member_id: 'Member ID',
+        lbl_group_number: 'Group Number', lbl_subscriber_name: 'Subscriber Name',
+        lbl_subscriber_dob: 'Subscriber Date of Birth',
+        lbl_relationship_subscriber: 'Relationship to Subscriber',
+        div_payment: 'Preferred Payment Method',
+        pay_insurance: 'Insurance', pay_cash: 'Cash / Self-pay',
+        consent_hipaa: 'I acknowledge receipt of the HIPAA Notice of Privacy Practices.',
+        consent_treatment: 'I consent to treatment and authorize the release of information to my insurance company.',
+        consent_financial: 'I understand I am financially responsible for charges not covered by insurance.',
+        lbl_signature: 'Digital Signature',
+        sig_placeholder: 'Sign here with your finger or mouse',
+        lbl_date: 'Date:',
+        btn_next: 'Next', btn_back: 'Back', btn_clear: 'Clear',
+        btn_accept_sig: 'Accept Signature', btn_submit: 'Submit Intake Form',
+        btn_yes: 'Yes', btn_no: 'No',
+        sig_accepted_msg: 'Signature accepted',
+        err_required: 'This field is required',
+        opt_none: 'None',
+        visit_6m: '< 6 months', visit_12m: '6–12 months', visit_2y: '1–2 years', visit_2yplus: '2+ years',
+        anxiety_none: '😊 None', anxiety_mild: '😐 Mild', anxiety_moderate: '😟 Moderate',
+        anxiety_high: '😣 High', anxiety_severe: '😰 Severe',
+        allergy_codeine: 'Codeine', allergy_anesthetics: 'Local Anesthetics',
+        cond_heart: 'Heart Disease', cond_hbp: 'High Blood Pressure',
+        cond_bleeding: 'Bleeding Disorder', cond_cancer: 'Cancer', cond_pregnant: 'Pregnant',
+        dental_fillings: 'Fillings', dental_crowns: 'Crowns', dental_rootcanals: 'Root Canals',
+        dental_implants: 'Implants', dental_braces: 'Braces', dental_extractions: 'Extractions',
+        dental_dentures: 'Dentures', dental_whitening: 'Whitening',
+        success_title: 'Thank You!',
+        success_message: 'Lake Jeanette Family & Implant Dentistry has received your information. We look forward to seeing you!',
+        success_questions: 'Questions? Call us at',
+        ph_medications: 'List all current medications, vitamins, and supplements...',
+        ph_other_allergies: 'Other allergies...',
+        ph_surgeries: 'List any previous surgeries and approximate dates...',
+        ph_concern: 'What brings you in today?',
+        opt_spouse: 'Spouse', opt_parent: 'Parent', opt_child: 'Child',
+        opt_sibling: 'Sibling', opt_friend: 'Friend', opt_other: 'Other',
+        rel_self: 'Self', rel_spouse: 'Spouse', rel_child: 'Child', rel_other: 'Other',
+    },
+    es: {
+        header_title: 'Formulario de Ingreso para Nuevo Paciente',
+        step_personal: 'Personal', step_medical: 'Médico', step_dental: 'Dental',
+        step_insurance: 'Seguro', step_consent: 'Consentimiento',
+        s1_title: 'Información Personal', s1_subtitle: 'Por favor proporcione su información de contacto básica.',
+        s2_title: 'Historial Médico', s2_subtitle: 'Ayúdenos a entender su salud general para brindarle atención segura.',
+        s3_title: 'Historial Dental', s3_subtitle: 'Cuéntenos sobre su salud dental y el motivo de su visita.',
+        s4_title: 'Información del Seguro', s4_subtitle: 'Si tiene seguro dental, por favor proporcione los detalles de su plan.',
+        s5_title: 'Consentimiento y Firma', s5_subtitle: 'Por favor revise y confirme los siguientes avisos.',
+        lbl_first_name: 'Nombre <span class="required">*</span>',
+        lbl_last_name: 'Apellido <span class="required">*</span>',
+        lbl_dob: 'Fecha de Nacimiento <span class="required">*</span>',
+        lbl_preferred_lang: 'Idioma Preferido',
+        lbl_phone: 'Teléfono <span class="required">*</span>',
+        lbl_email: 'Correo Electrónico',
+        lbl_street: 'Dirección', lbl_city: 'Ciudad', lbl_state: 'Estado', lbl_zip: 'Código Postal',
+        div_address: 'Dirección', div_emergency: 'Contacto de Emergencia',
+        lbl_ec_name: 'Nombre del Contacto', lbl_ec_phone: 'Teléfono del Contacto', lbl_ec_relationship: 'Relación',
+        lbl_medications: 'Medicamentos Actuales',
+        lbl_allergies: 'Alergias',
+        lbl_conditions: 'Condiciones Médicas',
+        lbl_surgeries: 'Cirugías Previas',
+        div_physician: 'Su Médico',
+        lbl_physician_name: 'Nombre del Médico', lbl_physician_phone: 'Teléfono del Médico',
+        lbl_last_visit: 'Última Visita Dental',
+        lbl_primary_concern: 'Razón Principal de su Visita <span class="required">*</span>',
+        lbl_anxiety: 'Nivel de Ansiedad Dental',
+        lbl_prev_dental: 'Trabajo Dental Previo',
+        lbl_grinding: '¿Rechina o aprieta los dientes?',
+        lbl_gum_bleeding: '¿Sangrado de encías al cepillarse?',
+        lbl_has_insurance: 'Tengo seguro dental',
+        lbl_has_secondary: 'Tengo seguro secundario',
+        div_primary_ins: 'Seguro Primario', div_secondary_ins: 'Seguro Secundario',
+        lbl_ins_provider: 'Proveedor de Seguro', lbl_member_id: 'ID de Miembro',
+        lbl_group_number: 'Número de Grupo', lbl_subscriber_name: 'Nombre del Suscriptor',
+        lbl_subscriber_dob: 'Fecha de Nacimiento del Suscriptor',
+        lbl_relationship_subscriber: 'Relación con el Suscriptor',
+        div_payment: 'Método de Pago Preferido',
+        pay_insurance: 'Seguro', pay_cash: 'Efectivo / Pago Propio',
+        consent_hipaa: 'Reconozco haber recibido el Aviso de Prácticas de Privacidad HIPAA.',
+        consent_treatment: 'Consiento al tratamiento y autorizo la divulgación de información a mi compañía de seguros.',
+        consent_financial: 'Entiendo que soy financieramente responsable de los cargos no cubiertos por el seguro.',
+        lbl_signature: 'Firma Digital',
+        sig_placeholder: 'Firme aquí con su dedo o ratón',
+        lbl_date: 'Fecha:',
+        btn_next: 'Siguiente', btn_back: 'Atrás', btn_clear: 'Borrar',
+        btn_accept_sig: 'Aceptar Firma', btn_submit: 'Enviar Formulario',
+        btn_yes: 'Sí', btn_no: 'No',
+        sig_accepted_msg: 'Firma aceptada',
+        err_required: 'Este campo es obligatorio',
+        opt_none: 'Ninguno',
+        visit_6m: '< 6 meses', visit_12m: '6–12 meses', visit_2y: '1–2 años', visit_2yplus: '2+ años',
+        anxiety_none: '😊 Ninguna', anxiety_mild: '😐 Leve', anxiety_moderate: '😟 Moderada',
+        anxiety_high: '😣 Alta', anxiety_severe: '😰 Severa',
+        allergy_codeine: 'Codeína', allergy_anesthetics: 'Anestésicos Locales',
+        cond_heart: 'Enfermedad Cardíaca', cond_hbp: 'Presión Arterial Alta',
+        cond_bleeding: 'Trastorno de Sangrado', cond_cancer: 'Cáncer', cond_pregnant: 'Embarazada',
+        dental_fillings: 'Empastes', dental_crowns: 'Coronas', dental_rootcanals: 'Endodoncias',
+        dental_implants: 'Implantes', dental_braces: 'Frenillos', dental_extractions: 'Extracciones',
+        dental_dentures: 'Dentaduras', dental_whitening: 'Blanqueamiento',
+        success_title: '¡Gracias!',
+        success_message: 'Lake Jeanette Family & Implant Dentistry ha recibido su información. ¡Esperamos verle pronto!',
+        success_questions: '¿Preguntas? Llámenos al',
+        ph_medications: 'Liste todos los medicamentos actuales, vitaminas y suplementos...',
+        ph_other_allergies: 'Otras alergias...',
+        ph_surgeries: 'Liste cualquier cirugía previa y las fechas aproximadas...',
+        ph_concern: '¿Cuál es el motivo de su visita?',
+        opt_spouse: 'Cónyuge', opt_parent: 'Padre/Madre', opt_child: 'Hijo/a',
+        opt_sibling: 'Hermano/a', opt_friend: 'Amigo/a', opt_other: 'Otro',
+        rel_self: 'Yo mismo', rel_spouse: 'Cónyuge', rel_child: 'Hijo/a', rel_other: 'Otro',
+    }
+};
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.documentElement.lang = lang;
+
+    // Update text content
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (i18n[lang][key]) el.innerHTML = i18n[lang][key];
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.dataset.i18nPh;
+        if (i18n[lang][key]) el.placeholder = i18n[lang][key];
+    });
+
+    // Update select options
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+        const key = el.dataset.i18nOpt;
+        if (i18n[lang][key]) el.textContent = i18n[lang][key];
+    });
+}
+
+// ─── Step Navigation ───
+function updateProgress() {
+    const pct = ((currentStep - 1) / (totalSteps - 1)) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+
+    document.querySelectorAll('.progress-step').forEach(s => {
+        const step = parseInt(s.dataset.step);
+        s.classList.remove('active', 'completed');
+        if (step === currentStep) s.classList.add('active');
+        else if (step < currentStep) s.classList.add('completed');
+    });
+}
+
+function showStep(step) {
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`step-${step}`);
+    if (target) target.classList.add('active');
+    currentStep = step;
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep(step) {
+    let valid = true;
+    const stepEl = document.getElementById(`step-${step}`);
+    const required = stepEl.querySelectorAll('[required]');
+
+    required.forEach(field => {
+        const group = field.closest('.field-group');
+        if (field.type === 'checkbox') {
+            // consent checkboxes
+            if (!field.checked) {
+                valid = false;
+                if (group) group.classList.add('error');
+            } else {
+                if (group) group.classList.remove('error');
+            }
+        } else {
+            if (!field.value.trim()) {
+                valid = false;
+                if (group) group.classList.add('error');
+            } else {
+                if (group) group.classList.remove('error');
+            }
+        }
+    });
+
+    return valid;
+}
+
+function nextStep() {
+    if (!validateStep(currentStep)) return;
+    if (currentStep < totalSteps) showStep(currentStep + 1);
+}
+function prevStep() {
+    if (currentStep > 1) showStep(currentStep - 1);
+}
+
+// ─── Yes/No Buttons ───
+document.querySelectorAll('.yesno-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const field = btn.dataset.field;
+        const value = btn.dataset.value;
+        yesNoState[field] = value;
+        btn.parentElement.querySelectorAll('.yesno-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    });
+});
+
+// ─── Payment Selection ───
+function selectPayment(el) {
+    document.querySelectorAll('.payment-option').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPayment = el.dataset.value;
+}
+
+// ─── Insurance Toggle ───
+function toggleInsurance(type) {
+    if (type === 'primary') {
+        const show = document.getElementById('hasInsurance').checked;
+        document.getElementById('primaryInsurance').classList.toggle('visible', show);
+    } else {
+        const show = document.getElementById('hasSecondaryInsurance').checked;
+        document.getElementById('secondaryInsurance').classList.toggle('visible', show);
+    }
+}
+
+// ─── Checkbox "None" logic ───
+document.querySelectorAll('[data-none]').forEach(noneCheckbox => {
+    const group = noneCheckbox.closest('.checkbox-grid');
+    const others = group.querySelectorAll('input[type="checkbox"]:not([data-none])');
+    noneCheckbox.addEventListener('change', () => {
+        if (noneCheckbox.checked) {
+            others.forEach(cb => { cb.checked = false; cb.closest('.checkbox-item').classList.remove('checked'); });
+        }
+    });
+    others.forEach(cb => {
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                noneCheckbox.checked = false;
+                noneCheckbox.closest('.checkbox-item').classList.remove('checked');
+            }
+        });
+    });
+});
+
+// Checkbox visual highlight
+document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+        cb.closest('.checkbox-item').classList.toggle('checked', cb.checked);
+    });
+});
+
+// ─── Anxiety Slider ───
+const anxietySlider = document.getElementById('anxietyLevel');
+const anxietyEmoji = document.getElementById('anxietyEmoji');
+const emojiMap = { 1: '😊', 2: '😐', 3: '😟', 4: '😣', 5: '😰' };
+anxietySlider.addEventListener('input', () => {
+    anxietyEmoji.textContent = emojiMap[anxietySlider.value];
+});
+
+// ─── Signature Pad ───
+const canvas = document.getElementById('signatureCanvas');
+const ctx = canvas.getContext('2d');
+const wrapper = document.getElementById('sigWrapper');
+let drawing = false;
+let hasDrawn = false;
+
+function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = 160;
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+}
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+canvas.addEventListener('mousedown', (e) => { drawing = true; wrapper.classList.add('signing'); const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+canvas.addEventListener('mousemove', (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasDrawn = true; wrapper.classList.add('has-signature'); document.getElementById('acceptSigBtn').disabled = false; });
+canvas.addEventListener('mouseup', () => { drawing = false; wrapper.classList.remove('signing'); });
+canvas.addEventListener('mouseleave', () => { drawing = false; wrapper.classList.remove('signing'); });
+
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); drawing = true; wrapper.classList.add('signing'); const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasDrawn = true; wrapper.classList.add('has-signature'); document.getElementById('acceptSigBtn').disabled = false; });
+canvas.addEventListener('touchend', () => { drawing = false; wrapper.classList.remove('signing'); });
+
+function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn = false;
+    signatureAccepted = false;
+    signatureData = null;
+    wrapper.classList.remove('has-signature');
+    document.getElementById('acceptSigBtn').disabled = true;
+    document.getElementById('sigAccepted').classList.remove('visible');
+    document.getElementById('sigActions').style.display = 'flex';
+    checkSubmitReady();
+}
+
+function acceptSignature() {
+    if (!hasDrawn) return;
+    signatureData = canvas.toDataURL('image/png');
+    signatureAccepted = true;
+    document.getElementById('sigAccepted').classList.add('visible');
+    document.getElementById('sigActions').style.display = 'none';
+    checkSubmitReady();
+}
+
+// Set today's date
+document.getElementById('sigDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// ─── Submit Readiness ───
+function checkSubmitReady() {
+    const consents = document.getElementById('consentHipaa').checked &&
+                     document.getElementById('consentTreatment').checked &&
+                     document.getElementById('consentFinancial').checked;
+    document.getElementById('submitBtn').disabled = !(consents && signatureAccepted);
+}
+document.querySelectorAll('.consent-item input').forEach(cb => cb.addEventListener('change', checkSubmitReady));
+
+// ─── Collect Form Data ───
+function getCheckedValues(gridId) {
+    return [...document.querySelectorAll(`#${gridId} input[type="checkbox"]:checked`)].map(cb => cb.value);
+}
+
+function collectFormData() {
+    const lastVisitEl = document.querySelector('input[name="lastVisit"]:checked');
+    return {
+        // Personal
+        first_name: document.getElementById('firstName').value.trim(),
+        last_name: document.getElementById('lastName').value.trim(),
+        date_of_birth: document.getElementById('dob').value,
+        preferred_language: document.getElementById('preferredLanguage').value,
+        phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        address: {
+            street: document.getElementById('street').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            state: document.getElementById('state').value.trim(),
+            zip: document.getElementById('zip').value.trim()
+        },
+        emergency_contact: {
+            name: document.getElementById('ecName').value.trim(),
+            phone: document.getElementById('ecPhone').value.trim(),
+            relationship: document.getElementById('ecRelationship').value
+        },
+        // Medical
+        medications: document.getElementById('medications').value.trim(),
+        allergies: getCheckedValues('allergyChecks'),
+        allergies_other: document.getElementById('allergiesOther').value.trim(),
+        medical_conditions: getCheckedValues('conditionChecks'),
+        previous_surgeries: document.getElementById('surgeries').value.trim(),
+        physician: {
+            name: document.getElementById('physicianName').value.trim(),
+            phone: document.getElementById('physicianPhone').value.trim()
+        },
+        // Dental
+        last_dental_visit: lastVisitEl ? lastVisitEl.value : '',
+        primary_concern: document.getElementById('primaryConcern').value.trim(),
+        anxiety_level: parseInt(anxietySlider.value),
+        previous_dental_work: getCheckedValues('dentalWorkChecks'),
+        grinding_clenching: yesNoState.grinding,
+        gum_bleeding: yesNoState.gumBleeding,
+        // Insurance
+        has_insurance: document.getElementById('hasInsurance').checked,
+        primary_insurance: document.getElementById('hasInsurance').checked ? {
+            provider: document.getElementById('insProvider').value.trim(),
+            member_id: document.getElementById('insMemberId').value.trim(),
+            group_number: document.getElementById('insGroupNumber').value.trim(),
+            subscriber_name: document.getElementById('insSubscriberName').value.trim(),
+            subscriber_dob: document.getElementById('insSubscriberDob').value,
+            relationship: document.getElementById('insRelationship').value
+        } : null,
+        has_secondary_insurance: document.getElementById('hasSecondaryInsurance').checked,
+        secondary_insurance: document.getElementById('hasSecondaryInsurance').checked ? {
+            provider: document.getElementById('ins2Provider').value.trim(),
+            member_id: document.getElementById('ins2MemberId').value.trim(),
+            group_number: document.getElementById('ins2GroupNumber').value.trim(),
+            subscriber_name: document.getElementById('ins2SubscriberName').value.trim(),
+            subscriber_dob: document.getElementById('ins2SubscriberDob').value,
+            relationship: document.getElementById('ins2Relationship').value
+        } : null,
+        preferred_payment: selectedPayment,
+        // Consent
+        consent_hipaa: document.getElementById('consentHipaa').checked,
+        consent_treatment: document.getElementById('consentTreatment').checked,
+        consent_financial: document.getElementById('consentFinancial').checked,
+        signature: signatureData,
+        signature_date: document.getElementById('sigDate').textContent,
+        // Meta
+        form_language: currentLang,
+        submitted_at: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'pending_review',
+        practice_id: 'brenes'
+    };
+}
+
+// ─── Submit to Firestore ───
+async function submitForm() {
+    if (!validateStep(5)) return;
+    if (!signatureAccepted) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+    try {
+        const data = collectFormData();
+        const { db } = window.initFirebase ? initFirebase() : { db: firebase.firestore() };
+        await db.collection('intake-forms').add(data);
+
+        // Show success
+        document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+        document.querySelector('.progress-section').style.display = 'none';
+        document.getElementById('successScreen').classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Complete progress
+        document.querySelectorAll('.progress-step').forEach(s => s.classList.add('completed'));
+        document.getElementById('progressFill').style.width = '100%';
+
+        console.log('[Intake] ✅ Form submitted to Firestore');
+    } catch (err) {
+        console.error('[Intake] ❌ Submit error:', err);
+        btn.disabled = false;
+        btn.innerHTML = `<span data-i18n="btn_submit">${currentLang === 'es' ? 'Enviar Formulario' : 'Submit Intake Form'}</span> 🕊️`;
+        alert(currentLang === 'es'
+            ? 'Error al enviar el formulario. Por favor intente de nuevo.'
+            : 'Error submitting form. Please try again.');
+    }
+}
+
+// ─── Init ───
+window.addEventListener('DOMContentLoaded', () => {
+    resizeCanvas();
+    updateProgress();
+    try { lucide.createIcons(); } catch(e) {}
+});
+window.addEventListener('resize', () => {
+    if (!signatureAccepted) resizeCanvas();
+});
+</script>
+
+</body>
+</html>

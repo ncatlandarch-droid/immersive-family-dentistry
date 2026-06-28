@@ -1582,6 +1582,9 @@
                 <button class="sidebar-item" data-view="patients">
                     <i data-lucide="users"></i> Patients
                 </button>
+                <button class="sidebar-item" data-view="insurance-verify">
+                    <i data-lucide="shield-check"></i> Insurance
+                </button>
                 <div class="sidebar-divider"></div>
                 <!-- Intelligence -->
                 <span class="sidebar-label">INTELLIGENCE</span>
@@ -3009,6 +3012,145 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ═══ View: Insurance Verification ═══ -->
+            <div id="view-insurance-verify" class="view">
+                <div class="view-header">
+                    <h2><i data-lucide="shield-check" style="width:22px;height:22px"></i> Insurance Verification</h2>
+                </div>
+
+                <!-- Verification Form -->
+                <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="search" style="width:18px;height:18px;color:var(--admin-teal)"></i> Verify Patient Coverage
+                    </h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+                        <!-- Patient Selector -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Patient</label>
+                            <input type="text" id="iv-patient-search" placeholder="Search patient name..." class="view-search" style="width:100%;" list="iv-patient-list" autocomplete="off" />
+                            <datalist id="iv-patient-list"></datalist>
+                        </div>
+                        <!-- Insurance Provider -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Insurance Provider</label>
+                            <select id="iv-provider" class="view-select" style="width:100%;">
+                                <option value="">Select provider...</option>
+                                <option value="Delta Dental">Delta Dental</option>
+                                <option value="Cigna">Cigna</option>
+                                <option value="Aetna">Aetna</option>
+                                <option value="MetLife">MetLife</option>
+                                <option value="UnitedHealthcare">UnitedHealthcare</option>
+                                <option value="Guardian">Guardian</option>
+                                <option value="BlueCross BlueShield">BlueCross BlueShield</option>
+                                <option value="Humana">Humana</option>
+                                <option value="Principal">Principal</option>
+                                <option value="Lincoln Financial">Lincoln Financial</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <!-- Member ID -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Member ID</label>
+                            <input type="text" id="iv-member-id" placeholder="e.g. DDN12345678" class="view-search" style="width:100%;" />
+                        </div>
+                        <!-- Group Number -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Group Number</label>
+                            <input type="text" id="iv-group-num" placeholder="e.g. GRP-5500" class="view-search" style="width:100%;" />
+                        </div>
+                        <!-- Subscriber Name -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Subscriber Name</label>
+                            <input type="text" id="iv-subscriber-name" placeholder="Full name of policyholder" class="view-search" style="width:100%;" />
+                        </div>
+                        <!-- Subscriber DOB -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Subscriber DOB</label>
+                            <input type="date" id="iv-subscriber-dob" class="view-search" style="width:100%;" />
+                        </div>
+                        <!-- Relationship -->
+                        <div>
+                            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--admin-muted);display:block;margin-bottom:6px;">Relationship to Subscriber</label>
+                            <select id="iv-relationship" class="view-select" style="width:100%;">
+                                <option value="Self">Self</option>
+                                <option value="Spouse">Spouse</option>
+                                <option value="Child">Child</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px;display:flex;align-items:center;gap:12px;">
+                        <button class="btn-primary" id="iv-verify-btn" style="padding:12px 28px;font-size:14px;" onclick="runInsuranceVerification()">
+                            <i data-lucide="shield-check" style="width:16px;height:16px"></i> Verify Coverage
+                        </button>
+                        <button class="btn-secondary" onclick="clearInsuranceForm()">
+                            <i data-lucide="x" style="width:14px;height:14px"></i> Clear
+                        </button>
+                        <span id="iv-status-msg" style="font-size:13px;color:var(--admin-muted);"></span>
+                    </div>
+                </div>
+
+                <!-- Results Panel (hidden by default) -->
+                <div id="iv-results-panel" style="display:none;margin-bottom:24px;">
+                    <!-- Status Banner -->
+                    <div id="iv-status-banner" class="glass-card" style="padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;"></div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <!-- Coverage Breakdown -->
+                        <div class="glass-card" style="padding:20px;">
+                            <h3 style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="clipboard-list" style="width:16px;height:16px;color:var(--admin-teal)"></i> Coverage Summary
+                            </h3>
+                            <div class="data-table-container" style="border:none;box-shadow:none;background:transparent;">
+                                <table class="data-table" id="iv-coverage-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Coverage</th>
+                                            <th>Patient Pays</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="iv-coverage-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Plan Details -->
+                        <div class="glass-card" style="padding:20px;">
+                            <h3 style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="file-text" style="width:16px;height:16px;color:var(--admin-teal)"></i> Plan Details
+                            </h3>
+                            <div id="iv-plan-details" style="font-size:13px;line-height:1.9;color:var(--admin-text-secondary);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification History -->
+                <div class="glass-card" style="padding:20px;">
+                    <h3 style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i data-lucide="history" style="width:16px;height:16px;color:var(--admin-teal)"></i> Verification History
+                    </h3>
+                    <div class="data-table-container" style="border:none;box-shadow:none;background:transparent;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Provider</th>
+                                    <th>Member ID</th>
+                                    <th>Date Verified</th>
+                                    <th>Status</th>
+                                    <th>Coverage Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody id="iv-history-tbody">
+                                <tr><td colspan="6" style="text-align:center;color:var(--admin-muted);padding:32px;">No verifications yet. Run your first verification above.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -3439,6 +3581,7 @@
                 if (view === 'practice-settings') loadPracticeSettings();
                 if (view === 'schedule') loadScheduleData();
                 if (view === 'patients') loadPatients();
+                if (view === 'insurance-verify') loadInsuranceHistory();
 
                 // Refresh Lucide icons for dynamic content
                 try { lucide.createIcons(); } catch(e) {}
@@ -6750,6 +6893,458 @@
 
         console.log('[Modules] Chat History, Patient Profiles, KPI Dashboard loaded');
     })();
+    </script>
+    <!-- ═══ Insurance Verification Module ═══ -->
+    <script>
+    /* ═══════════════════════════════════════════════════════════
+       Insurance Verification — Mock Engine + Firestore Persistence
+       Replace mockVerifyInsurance() with a real API call when ready
+       ═══════════════════════════════════════════════════════════ */
+
+    // ─── Provider-Specific Mock Coverage Data ───
+    const INSURANCE_PROVIDER_PROFILES = {
+        'Delta Dental': {
+            status: 'active', planName: 'Delta Dental PPO',
+            annualMax: '$2,000', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Crowns, implants, bridges',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 50, patientPays: 50 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Cigna': {
+            status: 'active', planName: 'Cigna Dental DPPO',
+            annualMax: '$1,500', deductibleInd: '$75', deductibleFam: '$225',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: '6 months', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Implants, crowns over $500',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 0, patientPays: 100 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Aetna': {
+            status: 'active', planName: 'Aetna Dental DMO',
+            annualMax: '$2,500', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '6 months',
+            missingTooth: 'No', preAuthRequired: 'Implants',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 60, patientPays: 40 },
+                { category: 'Implants', coverage: 50, patientPays: 50 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'MetLife': {
+            status: 'active', planName: 'MetLife PDP Plus',
+            annualMax: '$1,500', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Implants, crowns, bridges',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 50, patientPays: 50 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'UnitedHealthcare': {
+            status: 'active', planName: 'UHC Dental Options PPO',
+            annualMax: '$2,000', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Benefit Year (varies)',
+            waitingBasic: 'None', waitingMajor: '12 months',
+            missingTooth: 'No', preAuthRequired: 'Implants, orthodontics',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 70, patientPays: 30 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 0, patientPays: 100 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Guardian': {
+            status: 'active', planName: 'Guardian DentalGuard Preferred',
+            annualMax: '$1,750', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '6 months',
+            missingTooth: 'No', preAuthRequired: 'Crowns, implants',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 40, patientPays: 60 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'BlueCross BlueShield': {
+            status: 'active', planName: 'BCBS Blue Dental Choice',
+            annualMax: '$2,500', deductibleInd: '$25', deductibleFam: '$75',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: 'None',
+            missingTooth: 'No', preAuthRequired: 'Implants over $1,000',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 60, patientPays: 40 },
+                { category: 'Implants', coverage: 50, patientPays: 50 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Humana': {
+            status: 'active', planName: 'Humana Dental Value Plan',
+            annualMax: '$1,000', deductibleInd: '$100', deductibleFam: '$300',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: '6 months', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Crowns, bridges, implants',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 70, patientPays: 30 },
+                { category: 'Major (crowns, bridges)', coverage: 40, patientPays: 60 },
+                { category: 'Implants', coverage: 0, patientPays: 100 },
+                { category: 'Orthodontics', coverage: 0, patientPays: 100 }
+            ]
+        },
+        'Principal': {
+            status: 'active', planName: 'Principal Dental Plan',
+            annualMax: '$1,500', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Implants',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 30, patientPays: 70 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Lincoln Financial': {
+            status: 'active', planName: 'Lincoln DentalConnect',
+            annualMax: '$2,000', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: 'None', waitingMajor: '6 months',
+            missingTooth: 'No', preAuthRequired: 'Crowns, implants, bridges',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 50, patientPays: 50 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        },
+        'Other': {
+            status: 'active', planName: 'Standard Dental Plan',
+            annualMax: '$1,500', deductibleInd: '$50', deductibleFam: '$150',
+            planYear: 'Calendar Year (Jan–Dec)',
+            waitingBasic: '6 months', waitingMajor: '12 months',
+            missingTooth: 'Yes', preAuthRequired: 'Implants, crowns over $500',
+            coverage: [
+                { category: 'Preventive (cleanings, x-rays)', coverage: 100, patientPays: 0 },
+                { category: 'Basic (fillings, extractions)', coverage: 80, patientPays: 20 },
+                { category: 'Major (crowns, bridges)', coverage: 50, patientPays: 50 },
+                { category: 'Implants', coverage: 0, patientPays: 100 },
+                { category: 'Orthodontics', coverage: 50, patientPays: 50 }
+            ]
+        }
+    };
+
+    /**
+     * Mock insurance verification function.
+     * ─────────────────────────────────────────
+     * TODO: Replace this with a real insurance eligibility API
+     * (e.g., Availity, Change Healthcare, DentalXChange).
+     * Signature should remain: async function mockVerifyInsurance(formData) => result
+     */
+    async function mockVerifyInsurance(formData) {
+        // Simulate network delay (0.8–1.5s)
+        await new Promise(r => setTimeout(r, 800 + Math.random() * 700));
+
+        const profile = INSURANCE_PROVIDER_PROFILES[formData.provider] || INSURANCE_PROVIDER_PROFILES['Other'];
+
+        // Calculate mock remaining benefits
+        const maxNum = parseInt(profile.annualMax.replace(/[^0-9]/g, ''));
+        const usedAmount = Math.floor(Math.random() * maxNum * 0.6);
+        const remaining = maxNum - usedAmount;
+
+        // Determine status — 90% active, 5% waiting period, 5% expired
+        const roll = Math.random();
+        let status = 'active';
+        let statusLabel = '✅ Active Coverage';
+        if (roll > 0.95) {
+            status = 'expired';
+            statusLabel = '❌ Coverage Expired';
+        } else if (roll > 0.90) {
+            status = 'waiting';
+            statusLabel = '⚠️ Waiting Period Active';
+        }
+
+        return {
+            status,
+            statusLabel,
+            planName: profile.planName,
+            subscriberName: formData.subscriberName,
+            memberId: formData.memberId,
+            groupNumber: formData.groupNumber,
+            provider: formData.provider,
+            effectiveDate: '01/01/2026',
+            terminationDate: status === 'expired' ? '03/31/2026' : '12/31/2026',
+            coverage: profile.coverage,
+            annualMax: profile.annualMax,
+            deductibleInd: profile.deductibleInd,
+            deductibleFam: profile.deductibleFam,
+            remainingBenefits: '$' + remaining.toLocaleString(),
+            usedBenefits: '$' + usedAmount.toLocaleString(),
+            planYear: profile.planYear,
+            waitingBasic: profile.waitingBasic,
+            waitingMajor: profile.waitingMajor,
+            missingTooth: profile.missingTooth,
+            preAuthRequired: profile.preAuthRequired,
+            verifiedAt: new Date().toISOString()
+        };
+    }
+
+    // ─── Populate Patient Datalist ───
+    async function populateInsurancePatientList() {
+        const datalist = document.getElementById('iv-patient-list');
+        if (!datalist) return;
+        datalist.innerHTML = '';
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('patients').orderBy('name').limit(200).get();
+            snap.forEach(doc => {
+                const d = doc.data();
+                const opt = document.createElement('option');
+                opt.value = d.name || (d.firstName + ' ' + d.lastName) || '';
+                datalist.appendChild(opt);
+            });
+        } catch (e) {
+            console.log('[Insurance] No patients collection or error:', e.message);
+        }
+    }
+
+    // ─── Run Verification ───
+    async function runInsuranceVerification() {
+        const patient = document.getElementById('iv-patient-search').value.trim();
+        const provider = document.getElementById('iv-provider').value;
+        const memberId = document.getElementById('iv-member-id').value.trim();
+        const groupNum = document.getElementById('iv-group-num').value.trim();
+        const subscriberName = document.getElementById('iv-subscriber-name').value.trim();
+        const subscriberDob = document.getElementById('iv-subscriber-dob').value;
+        const relationship = document.getElementById('iv-relationship').value;
+
+        // Validate required fields
+        if (!patient) { showToast('Please enter a patient name', 'error'); return; }
+        if (!provider) { showToast('Please select an insurance provider', 'error'); return; }
+        if (!memberId) { showToast('Please enter a Member ID', 'error'); return; }
+
+        const btn = document.getElementById('iv-verify-btn');
+        const statusMsg = document.getElementById('iv-status-msg');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader" style="width:16px;height:16px;animation:spin 1s linear infinite"></i> Verifying...';
+        statusMsg.textContent = 'Contacting ' + provider + '...';
+        try { lucide.createIcons(); } catch(e) {}
+
+        try {
+            const result = await mockVerifyInsurance({
+                patient, provider, memberId, groupNumber: groupNum,
+                subscriberName, subscriberDob, relationship
+            });
+
+            renderInsuranceResults(result);
+
+            // Save to Firestore
+            try {
+                const db = firebase.firestore();
+                const user = firebase.auth().currentUser;
+                await db.collection('insurance-verifications').add({
+                    patientName: patient,
+                    provider,
+                    memberId,
+                    groupNumber: groupNum,
+                    subscriberName,
+                    subscriberDob,
+                    relationship,
+                    status: result.status,
+                    statusLabel: result.statusLabel,
+                    planName: result.planName,
+                    annualMax: result.annualMax,
+                    remainingBenefits: result.remainingBenefits,
+                    coverageSummary: result.coverage.map(c => c.category.split('(')[0].trim() + ': ' + c.coverage + '%').join(', '),
+                    verified_by: user ? (user.displayName || user.email) : 'Staff',
+                    verified_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast('Verification saved to records', 'success');
+                loadInsuranceHistory();
+            } catch (saveErr) {
+                console.error('[Insurance] Firestore save error:', saveErr);
+                showToast('Verification complete (save to cloud failed)', 'info');
+            }
+
+            statusMsg.textContent = 'Verified ' + new Date().toLocaleTimeString();
+        } catch (err) {
+            showToast('Verification failed: ' + err.message, 'error');
+            statusMsg.textContent = 'Verification failed';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="shield-check" style="width:16px;height:16px"></i> Verify Coverage';
+            try { lucide.createIcons(); } catch(e) {}
+        }
+    }
+
+    // ─── Render Results ───
+    function renderInsuranceResults(result) {
+        const panel = document.getElementById('iv-results-panel');
+        panel.style.display = 'block';
+
+        // Status Banner
+        const banner = document.getElementById('iv-status-banner');
+        let bannerColor = 'var(--admin-green)';
+        let bannerBg = 'rgba(16,185,129,0.1)';
+        let bannerBorder = 'rgba(16,185,129,0.3)';
+        if (result.status === 'waiting') {
+            bannerColor = 'var(--admin-amber)';
+            bannerBg = 'rgba(245,158,11,0.1)';
+            bannerBorder = 'rgba(245,158,11,0.3)';
+        } else if (result.status === 'expired') {
+            bannerColor = 'var(--admin-red)';
+            bannerBg = 'rgba(239,68,68,0.1)';
+            bannerBorder = 'rgba(239,68,68,0.3)';
+        }
+        banner.style.background = bannerBg;
+        banner.style.borderColor = bannerBorder;
+        banner.innerHTML = `
+            <span style="font-size:24px;">${result.status === 'active' ? '✅' : result.status === 'waiting' ? '⚠️' : '❌'}</span>
+            <div>
+                <div style="font-weight:700;font-size:15px;color:${bannerColor};">${result.statusLabel}</div>
+                <div style="font-size:12px;color:var(--admin-muted);margin-top:2px;">
+                    ${result.planName} · Member: ${result.memberId} · Effective: ${result.effectiveDate} – ${result.terminationDate}
+                </div>
+            </div>
+        `;
+
+        // Coverage Table
+        const tbody = document.getElementById('iv-coverage-tbody');
+        tbody.innerHTML = result.coverage.map(c => {
+            const color = c.coverage >= 80 ? 'var(--admin-green)' : c.coverage >= 50 ? 'var(--admin-teal)' : c.coverage > 0 ? 'var(--admin-amber)' : 'var(--admin-red)';
+            const patColor = c.patientPays <= 20 ? 'var(--admin-green)' : c.patientPays <= 50 ? 'var(--admin-amber)' : 'var(--admin-red)';
+            return `<tr>
+                <td><strong>${c.category}</strong></td>
+                <td style="color:${color};font-weight:600;">${c.coverage}%</td>
+                <td style="color:${patColor};font-weight:600;">${c.patientPays}%</td>
+            </tr>`;
+        }).join('');
+
+        // Plan Details
+        const details = document.getElementById('iv-plan-details');
+        const hasWaiting = result.waitingBasic !== 'None' || result.waitingMajor !== 'None';
+        details.innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;">
+                <div>💰 <strong>Annual Maximum:</strong></div><div>${result.annualMax}</div>
+                <div>📋 <strong>Deductible:</strong></div><div>${result.deductibleInd} individual / ${result.deductibleFam} family</div>
+                <div>📊 <strong>Used This Year:</strong></div><div>${result.usedBenefits}</div>
+                <div style="color:var(--admin-teal);">✨ <strong>Remaining Benefits:</strong></div><div style="color:var(--admin-teal);font-weight:700;">${result.remainingBenefits}</div>
+                <div>📅 <strong>Plan Year:</strong></div><div>${result.planYear}</div>
+                <div>⏳ <strong>Waiting (Basic):</strong></div><div${result.waitingBasic !== 'None' ? ' style="color:var(--admin-amber);"' : ''}>${result.waitingBasic}</div>
+                <div>⏳ <strong>Waiting (Major):</strong></div><div${result.waitingMajor !== 'None' ? ' style="color:var(--admin-amber);"' : ''}>${result.waitingMajor}</div>
+                <div>🦷 <strong>Missing Tooth Clause:</strong></div><div>${result.missingTooth}</div>
+                <div>📝 <strong>Pre-Auth Required:</strong></div><div>${result.preAuthRequired}</div>
+            </div>
+        `;
+
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try { lucide.createIcons(); } catch(e) {}
+    }
+
+    // ─── Load Verification History from Firestore ───
+    async function loadInsuranceHistory() {
+        populateInsurancePatientList();
+        const tbody = document.getElementById('iv-history-tbody');
+        if (!tbody) return;
+
+        try {
+            const db = firebase.firestore();
+            const snap = await db.collection('insurance-verifications')
+                .orderBy('verified_at', 'desc')
+                .limit(25)
+                .get();
+
+            if (snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--admin-muted);padding:32px;">No verifications yet. Run your first verification above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = snap.docs.map(doc => {
+                const d = doc.data();
+                const date = d.verified_at ? d.verified_at.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+                let statusBadge = '';
+                if (d.status === 'active') {
+                    statusBadge = '<span style="background:rgba(16,185,129,0.15);color:#10B981;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">✅ Active</span>';
+                } else if (d.status === 'waiting') {
+                    statusBadge = '<span style="background:rgba(245,158,11,0.15);color:#F59E0B;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">⚠️ Waiting</span>';
+                } else {
+                    statusBadge = '<span style="background:rgba(239,68,68,0.15);color:#EF4444;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">❌ Expired</span>';
+                }
+                return `<tr>
+                    <td><strong>${d.patientName || '—'}</strong></td>
+                    <td>${d.provider || '—'}</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${d.memberId || '—'}</td>
+                    <td>${date}</td>
+                    <td>${statusBadge}</td>
+                    <td style="font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.coverageSummary || ''}">${d.coverageSummary || '—'}</td>
+                </tr>`;
+            }).join('');
+        } catch (e) {
+            console.log('[Insurance] History load error:', e.message);
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--admin-muted);padding:32px;">Unable to load history.</td></tr>';
+        }
+    }
+
+    // ─── Clear Form ───
+    function clearInsuranceForm() {
+        document.getElementById('iv-patient-search').value = '';
+        document.getElementById('iv-provider').value = '';
+        document.getElementById('iv-member-id').value = '';
+        document.getElementById('iv-group-num').value = '';
+        document.getElementById('iv-subscriber-name').value = '';
+        document.getElementById('iv-subscriber-dob').value = '';
+        document.getElementById('iv-relationship').value = 'Self';
+        document.getElementById('iv-results-panel').style.display = 'none';
+        document.getElementById('iv-status-msg').textContent = '';
+    }
+
+    // Add spin animation for the loader icon
+    if (!document.getElementById('iv-spin-style')) {
+        const style = document.createElement('style');
+        style.id = 'iv-spin-style';
+        style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+    }
+
+    // Responsive: stack results grid on mobile
+    (function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                #iv-results-panel > div[style*="grid-template-columns: 1fr 1fr"] {
+                    grid-template-columns: 1fr !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    })();
+
+    console.log('[Insurance] Insurance Verification module loaded');
     </script>
     <!-- Tenant Manager (Multi-Practice Support) -->
     <script src="js/tenant-manager.js"></script>
