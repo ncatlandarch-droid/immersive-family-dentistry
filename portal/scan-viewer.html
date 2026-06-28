@@ -2912,15 +2912,19 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         }
     });
 
-    // Click tooth on chart → select it on 3D model
+    // Click tooth on chart → highlight on 3D model + camera nudge
     document.querySelectorAll('.dental-chart__tooth').forEach(el => {
         el.addEventListener('click', () => {
             const num = parseInt(el.dataset.tooth);
             if (!num || !TOOTH_DB[num]) return;
 
             // Highlight on chart
-            document.querySelectorAll('.dental-chart__tooth').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dental-chart__tooth').forEach(t => {
+                t.classList.remove('active');
+                t.classList.remove('pulse');
+            });
             el.classList.add('active');
+            el.classList.add('pulse');
 
             // Determine which mesh and approximate world position
             selectedToothNum = num;
@@ -2929,7 +2933,12 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             const model = state.models[meshIdx];
 
             if (model) {
-                // Compute approximate tooth position on 3D mesh
+                // First, clear any existing highlight
+                hideToothPopup();
+                selectedToothNum = num;
+                el.classList.add('active');
+                el.classList.add('pulse');
+
                 const mesh = model.mesh;
                 mesh.geometry.computeBoundingBox();
                 const bbox = mesh.geometry.boundingBox;
@@ -2946,28 +2955,81 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 const nx = (toothIdx / 15) * 2 - 1; // -1 to 1
                 const localX = bbox.min.x + ((nx + 1) / 2) * size.x;
                 const localY = (bbox.min.y + bbox.max.y) / 2;
-                const localZ = (bbox.min.z + bbox.max.z) / 2;
+                const localZ = bbox.max.z * 0.3; // Front face
 
                 const worldPt = new THREE.Vector3(localX, localY, localZ);
                 mesh.localToWorld(worldPt);
 
-                // Place highlight glow
+                // Vertex-paint the tooth surface on 3D model
+                const localHit = worldPt.clone();
+                mesh.worldToLocal(localHit);
+
+                state._highlightedMesh = mesh;
+                const geo = mesh.geometry;
+                const posAttr = geo.getAttribute('position');
+                let colorAttr = geo.getAttribute('color');
+
+                if (!state._toothColorBackup && colorAttr) {
+                    state._toothColorBackup = colorAttr.array.slice();
+                }
+
+                if (colorAttr && posAttr) {
+                    const highlightRadius = 5.0;
+                    const tealR = 0.18, tealG = 0.83, tealB = 0.75;
+
+                    for (let i = 0; i < posAttr.count; i++) {
+                        const vx = posAttr.getX(i);
+                        const vy = posAttr.getY(i);
+                        const vz = posAttr.getZ(i);
+
+                        const dist = Math.sqrt(
+                            (vx - localHit.x) ** 2 +
+                            (vy - localHit.y) ** 2 +
+                            (vz - localHit.z) ** 2
+                        );
+
+                        if (dist < highlightRadius) {
+                            const blend = 1 - (dist / highlightRadius);
+                            const strength = blend * blend * 0.7;
+
+                            const origR = state._toothColorBackup ? state._toothColorBackup[i * 3] : 0.8;
+                            const origG = state._toothColorBackup ? state._toothColorBackup[i * 3 + 1] : 0.8;
+                            const origB = state._toothColorBackup ? state._toothColorBackup[i * 3 + 2] : 0.8;
+
+                            colorAttr.setXYZ(i,
+                                origR + (tealR - origR) * strength,
+                                origG + (tealG - origG) * strength,
+                                origB + (tealB - origB) * strength
+                            );
+                        }
+                    }
+                    colorAttr.needsUpdate = true;
+                }
+
+                // Small indicator dot
                 if (toothHighlight) scene.remove(toothHighlight);
-                const glowGeo = new THREE.SphereGeometry(1.5, 16, 16);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: 0x2dd4bf,
-                    transparent: true,
-                    opacity: 0.5
+                const dotGeo = new THREE.SphereGeometry(0.4, 8, 8);
+                const dotMat = new THREE.MeshBasicMaterial({
+                    color: 0x2dd4bf, transparent: true, opacity: 0.9
                 });
-                toothHighlight = new THREE.Mesh(glowGeo, glowMat);
+                toothHighlight = new THREE.Mesh(dotGeo, dotMat);
                 toothHighlight.position.copy(worldPt);
                 scene.add(toothHighlight);
 
-                // Show popup centered on screen
-                showToothPopup(num, window.innerWidth / 2 - 150, window.innerHeight / 2 - 200, worldPt);
-            } else {
-                // No 3D scan loaded — show popup anyway
-                showToothPopup(num, window.innerWidth / 2 - 150, window.innerHeight / 2 - 200, new THREE.Vector3());
+                // Floating label
+                let labelEl = document.getElementById('toothLabel3D');
+                if (!labelEl) {
+                    labelEl = document.createElement('div');
+                    labelEl.id = 'toothLabel3D';
+                    labelEl.className = 'tooth-label-3d';
+                    document.getElementById('viewerContainer').appendChild(labelEl);
+                }
+                labelEl.textContent = '#' + num + ' ' + TOOTH_DB[num].name;
+                labelEl.style.display = 'block';
+                state._labelWorldPos = worldPt.clone();
+
+                // Camera nudge toward the tooth
+                nudgeCameraToward(worldPt);
             }
         });
     });
