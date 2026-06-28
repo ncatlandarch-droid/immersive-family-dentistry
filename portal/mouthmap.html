@@ -769,14 +769,9 @@ body::before {
         </div>
     </div>
     <div class="mm-header__right" style="display:flex;align-items:center;gap:8px;">
-        <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:8px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;">
-            <span style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;background:rgba(45,212,191,0.2);color:#2dd4bf;white-space:nowrap;">
-                <i data-lucide="smile"></i> MouthMap
-            </span>
-            <a href="/portal/scan-viewer.html" style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;color:#94a3b8;text-decoration:none;white-space:nowrap;border-left:1px solid rgba(255,255,255,0.08);transition:all 0.2s;" onmouseover="this.style.color='#f0f4f8';this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.color='#94a3b8';this.style.background=''">
-                <i data-lucide="box"></i> 3D Scan
-            </a>
-        </div>
+        <span style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;background:rgba(45,212,191,0.2);color:#2dd4bf;border-radius:8px;border:1px solid rgba(45,212,191,0.3);white-space:nowrap;">
+            <i data-lucide="smile"></i> MouthMap 3D
+        </span>
         <a href="/portal/patient.html" class="mm-back-link">
             <i data-lucide="arrow-left"></i>
             Back to Portal
@@ -818,6 +813,14 @@ body::before {
 
         <!-- View controls -->
         <div class="mm-viewer-controls">
+            <div style="display:flex;align-items:center;gap:8px;padding:0 8px;">
+                <span style="font-size:11px;color:#94a3b8;white-space:nowrap;">🦷 Jaw</span>
+                <input type="range" id="jaw-open-slider" min="0" max="100" value="0" 
+                    style="width:100px;accent-color:#2dd4bf;cursor:pointer;"
+                    oninput="adjustJawOpen(this.value)">
+                <span id="jaw-open-label" style="font-size:11px;color:#64748b;min-width:28px;">0%</span>
+            </div>
+            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
             <button class="mm-view-btn active" data-view="front" title="Front View">
                 <i data-lucide="eye"></i><span>Front</span>
             </button>
@@ -1226,6 +1229,20 @@ function loadRealScans() {
             
             console.log(`🦷 Dental scans loaded — ${scanMeshes.reduce((a, m) => a + m.geometry.attributes.position.count, 0)} total vertices`);
             console.log(`📐 Bounds: ${size.x.toFixed(1)} x ${size.y.toFixed(1)} x ${size.z.toFixed(1)} mm`);
+            
+            // Auto-orient: rotate scan so teeth face the camera
+            // Medit scans typically need rotation to view from front
+            const scanCenter = scanBounds.getCenter(new THREE.Vector3());
+            scanGroup.position.sub(scanCenter); // center at origin
+
+            // Separate upper/lower for jaw control
+            scanMeshes.forEach(m => {
+                if (m.name === 'maxilla') {
+                    m.userData.baseY = m.position.y;
+                } else if (m.name === 'mandible') {
+                    m.userData.baseY = m.position.y;
+                }
+            });
         }
     }
     
@@ -1236,6 +1253,7 @@ function loadRealScans() {
             const hasColors = geometry.hasAttribute('color');
             const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'maxilla';
+            mesh.userData.archType = 'upper';
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             scanGroup.add(mesh);
@@ -1256,6 +1274,7 @@ function loadRealScans() {
             const hasColors = geometry.hasAttribute('color');
             const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'mandible';
+            mesh.userData.archType = 'lower';
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             scanGroup.add(mesh);
@@ -1276,6 +1295,22 @@ function updateLoadingProgress(loaded, total) {
         const p = loadingEl.querySelector('p');
         if (p) p.textContent = `Loading dental scans… ${Math.round(loaded/total*100)}%`;
     }
+}
+
+function adjustJawOpen(value) {
+    const pct = parseInt(value);
+    const label = document.getElementById('jaw-open-label');
+    if (label) label.textContent = pct + '%';
+    
+    // Separate upper and lower jaws
+    const separation = pct * 0.3; // max 30 units of separation
+    scanMeshes.forEach(m => {
+        if (m.name === 'maxilla') {
+            m.position.y = (m.userData.baseY || 0) + separation;
+        } else if (m.name === 'mandible') {
+            m.position.y = (m.userData.baseY || 0) - separation;
+        }
+    });
 }
 
 
