@@ -120,7 +120,7 @@ const PatientProfiles = (function() {
         <div class="patient-card ${isSelected ? 'selected' : ''}" 
              data-patient-id="${patient.patient_id}"
              onclick="PatientProfiles.selectPatient('${patient.patient_id}')">
-          <div style="width:36px;height:36px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;">${patient.photo_url ? `<img src="${patient.photo_url}" alt="" style="width:100%;height:100%;object-fit:cover;">` : initials}</div>
+          <div style="width:56px;height:56px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
           <div class="patient-info">
             <div class="patient-name">${patient.display_name || `${patient.first_name} ${patient.last_name}`} ${langBadge}</div>
             <div class="patient-meta">
@@ -170,7 +170,7 @@ const PatientProfiles = (function() {
 
       detailPanel.innerHTML = `
         <div class="patient-detail-header">
-          <div style="width:64px;height:64px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;">${patient.photo_url ? `<img src="${patient.photo_url}" alt="" style="width:100%;height:100%;object-fit:cover;">` : initials}</div>
+          <div style="width:100px;height:100px;border-radius:50%;background:${patient.photo_url ? 'none' : 'linear-gradient(135deg,#2dd4bf,#0d9488)'};display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:3px solid rgba(45,212,191,0.3);box-shadow:0 4px 16px rgba(45,212,191,0.15);"><img src="${patient.photo_url || ''}" alt="" style="width:100%;height:100%;object-fit:cover;display:${patient.photo_url ? 'block' : 'none'};"><span style="display:${patient.photo_url ? 'none' : 'block'}">${initials}</span></div>
           <div class="patient-detail-info">
             <h2>${name}</h2>
             <div class="patient-detail-badges">
