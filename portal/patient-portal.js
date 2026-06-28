@@ -449,9 +449,9 @@ function initMessages() {
             date: '2026-05-28',
             unread: true,
             messages: [
-                { from: 'Billing Team', time: 'May 28, 8:00 AM', text: 'Hi Chris, your Explanation of Benefits for your May 14 visit has been processed by Delta Dental PPO. Here\'s a summary:\\n\\n• Preventive Cleaning (D1110): $0 patient cost — covered 100%\\n• Periodic Exam (D0120): $0 patient cost — covered 100%\\n• Full Mouth Scan (D0330): $45 patient cost — covered 80%\\n\\nTotal due: $45.00\\nAccount balance: $45.00\\n\\nYou can pay online through the Cost Center tab or call us. Thanks!' },
+                { from: 'Billing Team', time: 'May 28, 8:00 AM', text: 'Hi Chris, your Explanation of Benefits for your May 14 visit has been processed by Delta Dental PPO. Here\'s a summary:\\n\\n• Preventive Cleaning (D1110): $0 patient cost — covered 100%\\n• Periodic Exam (D0120): $0 patient cost — covered 100%\\n• Full Mouth Scan (D0330): $45 patient cost — covered 80%\\n\\nTotal due: $45.00\\nAccount balance: $45.00\\n\\nYou can pay online through the My Costs tab or call us. Thanks!' },
                 { from: 'Chris Harrison', time: 'May 28, 12:15 PM', text: 'Thanks! I\'ll pay through the portal. Can I set up autopay for future visits?' },
-                { from: 'Billing Team', time: 'May 29, 9:30 AM', text: 'Absolutely! We\'re rolling out autopay with our new PALOMA system this fall. For now, you can pay per visit in the Cost Center. We\'ll notify you as soon as autopay is live! 🕊️' },
+                { from: 'Billing Team', time: 'May 29, 9:30 AM', text: 'Absolutely! We\'re rolling out autopay with our new PALOMA system this fall. For now, you can pay per visit in My Costs. We\'ll notify you as soon as autopay is live! 🕊️' },
             ]
         },
         {
@@ -459,7 +459,7 @@ function initMessages() {
             date: '2025-10-15',
             unread: false,
             messages: [
-                { from: 'Lake Jeanette Family Dentistry', time: 'Oct 15, 10:00 AM', text: 'Welcome to My MouthMap, Chris! 👋\\n\\nYour patient portal is now active. Here\'s what you can do:\\n\\n🦷 My Scan — View your 3D digital twin\\n❤️ Health Summary — Track dental health at a glance\\n📅 Timeline — See your full visit history\\n💰 Cost Center — View costs, insurance, and balances\\n📋 Treatment Plan — Review recommended treatments\\n💬 Messages — Secure messaging with our team\\n\\nAnd of course, PALOMA — your AI dental guide — is always here to answer questions about your health.\\n\\nWe\'re so glad you\'re part of the Lake Jeanette family!' },
+                { from: 'Lake Jeanette Family Dentistry', time: 'Oct 15, 10:00 AM', text: 'Welcome to My MouthMap, Chris! 👋\\n\\nYour patient portal is now active. Here\'s what you can do:\\n\\n🦷 My Scan — View your 3D digital twin\\n❤️ Health Summary — Track dental health at a glance\\n📅 Visit History — See your full visit history\\n💰 My Costs — View costs, insurance, and balances\\n📋 My Treatment Options — Review recommended treatments\\n💬 Messages from Our Team — Secure messaging with our team\\n\\nAnd of course, PALOMA — your AI dental guide — is always here to answer questions about your health.\\n\\nWe\'re so glad you\'re part of the Lake Jeanette family!' },
             ]
         }
     ];
@@ -529,8 +529,8 @@ function initCostCenter() {
             </div>
             <div class="health-card">
                 <div class="health-card__icon">🏥</div>
-                <div class="health-card__label">Insurance Covers</div>
-                <div class="health-card__value good">-$${totalInsurance.toLocaleString()}</div>
+                <div class="health-card__label">Insurance Savings</div>
+                <div class="health-card__value good">Insurance saves you: $${totalInsurance.toLocaleString()}</div>
             </div>
             <div class="health-card">
                 <div class="health-card__icon">👤</div>
@@ -542,11 +542,11 @@ function initCostCenter() {
             <div class="cost-card">
                 <div>
                     <div class="cost-card__procedure">${p.procedure}</div>
-                    <div class="cost-card__detail">${p.tooth} • ${p.scheduledDate || 'TBD'}</div>
+                    <div class="cost-card__detail">${p.tooth} • ${p.scheduledDate ? formatDate(p.scheduledDate) : 'To be scheduled'}</div>
                 </div>
                 <div class="cost-card__amounts">
                     <div class="cost-card__total">$${p.estimatedCost.toLocaleString()}</div>
-                    <div class="cost-card__insurance">Insurance: -$${p.insuranceEstimate.toLocaleString()}</div>
+                    <div class="cost-card__insurance">Insurance saves you: $${p.insuranceEstimate.toLocaleString()}</div>
                     <div class="cost-card__patient">You pay: $${p.patientEstimate.toLocaleString()}</div>
                 </div>
             </div>
@@ -573,7 +573,7 @@ function initTreatmentPlan() {
             <div class="plan-card__body">
                 <p><strong>Tooth:</strong> ${p.tooth}</p>
                 <p><strong>Estimated Cost:</strong> $${p.estimatedCost} (You pay ~$${p.patientEstimate} after insurance)</p>
-                <p><strong>Scheduled:</strong> ${p.scheduledDate || 'To be scheduled'}</p>
+                <p><strong>Scheduled:</strong> ${p.scheduledDate ? formatDate(p.scheduledDate) : 'To be scheduled'}</p>
                 ${p.notes ? `<p style="margin-top:8px">${p.notes}</p>` : ''}
             </div>
         </div>
@@ -659,7 +659,7 @@ function initPortalChat() {
 
     const name = patientData?.patient?.firstName || 'there';
     const lastVisit = patientData?.lastVisit ? formatDate(patientData.lastVisit) : 'recently';
-    const greeting = `Hi ${name}! 🕊️ I'm PALOMA, and I know your dental history here at Lake Jeanette.\n\nYour last visit was ${lastVisit}. Looking at your records, your overall dental health is looking **${patientData?.overallHealth?.gumHealth || 'good'}**${dentalChart?.teeth?.some(t => t.color === 'yellow') ? ', with 1 area we\'re monitoring.' : '.'}\n\nWhat would you like to know about your dental health?`;
+    const greeting = `Hi ${name}! 🕊️ I'm PALOMA, and I know your dental history here at Lake Jeanette.\n\nNo question is too small — I'm here 24/7 and I know your records. Your last visit was ${lastVisit}. Looking at your records, your overall dental health is looking **${patientData?.overallHealth?.gumHealth || 'good'}**${dentalChart?.teeth?.some(t => t.color === 'yellow') ? ', with 1 area we\'re monitoring.' : '.'}\n\nWhat would you like to know about your dental health?`;
 
     addChatMessage(messagesEl, greeting, 'bot');
 

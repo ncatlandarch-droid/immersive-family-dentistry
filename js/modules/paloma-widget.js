@@ -27,11 +27,11 @@ const STRINGS = {
     en: {
         name: 'PALOMA',
         subtitle: 'Your AI Dental Health Guide',
-        disclaimer: '🔒 This is an AI assistant, not medical advice. For emergencies, call (336) 545-4281 or 911.',
+        disclaimer: 'Paloma is your AI guide, not a doctor. For emergencies call (336) 545-4281 or 911.',
         placeholder: 'Ask PALOMA anything...',
         greeting: `¡Hola! I'm PALOMA, your dental health guide at Lake Jeanette Dentistry.
 
-I can help with questions about our services, insurance, scheduling, or dental health tips. How can I help you today?`,
+No question is too small — I'm here 24/7 and I know your records. I can help with questions about our services, insurance, scheduling, or dental health tips. How can I help you today?`,
         suggestions: [
             '🦷 What services do you offer?',
             '💰 Do you accept my insurance?',
@@ -46,11 +46,11 @@ I can help with questions about our services, insurance, scheduling, or dental h
     es: {
         name: 'PALOMA',
         subtitle: 'Tu Guía de Salud Dental con IA',
-        disclaimer: '🔒 Este es un asistente de IA, no consejo médico. Para emergencias, llame al (336) 545-4281 o 911.',
+        disclaimer: 'Paloma es tu guía de IA, no un médico. Para emergencias llama al (336) 545-4281 o 911.',
         placeholder: 'Pregúntale a PALOMA...',
         greeting: `¡Hola! Soy PALOMA, tu guía de salud dental en Lake Jeanette Dentistry.
 
-Puedo ayudarte con preguntas sobre nuestros servicios, seguros, citas, o consejos de salud dental. ¿En qué puedo ayudarte hoy?`,
+Ninguna pregunta es demasiado pequeña — estoy aquí 24/7 y conozco tu historial. Puedo ayudarte con preguntas sobre nuestros servicios, seguros, citas, o consejos de salud dental. ¿En qué puedo ayudarte hoy?`,
         suggestions: [
             '🦷 ¿Qué servicios ofrecen?',
             '💰 ¿Aceptan mi seguro dental?',
@@ -191,6 +191,7 @@ class PalomaWidget {
                 ${s.suggestions.map(text => `<button class="paloma-chip">${text}</button>`).join('')}
             </div>
             <div class="paloma-input-area">
+                <button class="paloma-espanol-btn" data-lang="es" title="Cambiar a Español" style="font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid rgba(45,212,191,0.3);background:rgba(45,212,191,0.08);color:#2dd4bf;cursor:pointer;font-weight:600;white-space:nowrap;transition:all 0.2s;">Español</button>
                 <button class="paloma-mic" aria-label="Speak to PALOMA" title="Tap to speak">🎤</button>
                 <input class="paloma-input" id="paloma-chat-input" name="message" type="text" autocomplete="off" placeholder="${s.placeholder}" aria-label="${s.placeholder}" />
                 <button class="paloma-send" aria-label="${s.sendAria}">
@@ -239,6 +240,16 @@ class PalomaWidget {
         this.panel.querySelectorAll('.paloma-header__lang button').forEach(btn => {
             btn.addEventListener('click', () => this.setLanguage(btn.dataset.lang));
         });
+
+        // Español button near input
+        const espBtn = this.panel.querySelector('.paloma-espanol-btn');
+        if (espBtn) {
+            espBtn.addEventListener('click', () => {
+                const newLang = this.lang === 'es' ? 'en' : 'es';
+                espBtn.textContent = newLang === 'es' ? 'English' : 'Español';
+                this.setLanguage(newLang);
+            });
+        }
 
         // Voice toggle
         this.panel.querySelector('.paloma-voice-toggle')?.addEventListener('click', () => {

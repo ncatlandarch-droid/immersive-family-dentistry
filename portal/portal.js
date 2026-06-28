@@ -338,8 +338,8 @@ function initCostCenter() {
             </div>
             <div class="health-card">
                 <div class="health-card__icon">🏥</div>
-                <div class="health-card__label">Insurance Covers</div>
-                <div class="health-card__value good">-$${totalInsurance.toLocaleString()}</div>
+                <div class="health-card__label">Insurance Savings</div>
+                <div class="health-card__value good">Insurance saves you: $${totalInsurance.toLocaleString()}</div>
             </div>
             <div class="health-card">
                 <div class="health-card__icon">👤</div>
@@ -351,11 +351,11 @@ function initCostCenter() {
             <div class="cost-card">
                 <div>
                     <div class="cost-card__procedure">${p.procedure}</div>
-                    <div class="cost-card__detail">${p.tooth} • ${p.scheduledDate || 'TBD'}</div>
+                    <div class="cost-card__detail">${p.tooth} • ${p.scheduledDate ? formatDate(p.scheduledDate) : 'To be scheduled'}</div>
                 </div>
                 <div class="cost-card__amounts">
                     <div class="cost-card__total">$${p.estimatedCost.toLocaleString()}</div>
-                    <div class="cost-card__insurance">Insurance: -$${p.insuranceEstimate.toLocaleString()}</div>
+                    <div class="cost-card__insurance">Insurance saves you: $${p.insuranceEstimate.toLocaleString()}</div>
                     <div class="cost-card__patient">You pay: $${p.patientEstimate.toLocaleString()}</div>
                 </div>
             </div>
