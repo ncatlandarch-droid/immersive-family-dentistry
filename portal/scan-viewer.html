@@ -3201,18 +3201,84 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         });
     });
 
-    // ─── Mouth Open/Close Slider ───
+    // ─── Mouth Open/Close Slider (TMJ Rotation Physics) ───
     const mouthSlider = document.getElementById('sliderMouthOpen');
     const mouthLabel = document.getElementById('valMouthOpen');
 
+    // Store mandible original transform for reset
+    let mandibleOrigPos = null;
+    let mandibleOrigRot = null;
+    let tmjPivot = null;  // pivot point (back of mandible near TMJ)
+
+    function initJawPhysics() {
+        if (state.models.length < 2) return;
+        const mandible = state.models[1].mesh;
+        mandible.geometry.computeBoundingBox();
+        const bbox = mandible.geometry.boundingBox;
+
+        // Store original position
+        mandibleOrigPos = mandible.position.clone();
+        mandibleOrigRot = mandible.rotation.clone();
+
+        // TMJ pivot: posterior (back Z), superior (top Y), centered X
+        // In mouth scan coordinates, Z is typically depth (front-to-back)
+        const center = new THREE.Vector3();
+        bbox.getCenter(center);
+        mandible.localToWorld(center);
+
+        tmjPivot = new THREE.Vector3(
+            center.x,
+            bbox.max.y + mandible.position.y,  // top of mandible
+            bbox.min.z + mandible.position.z    // back of mandible
+        );
+    }
+
     function setMouthOpen(val) {
         mouthSlider.value = val;
-        const maxGap = 40; // max separation in scene units
-        const gap = (val / 100) * maxGap;
-        if (state.models.length >= 2) {
-            state.models[0].mesh.position.y = gap / 2;   // upper arch moves up
-            state.models[1].mesh.position.y = -gap / 2;  // lower arch moves down
+        if (state.models.length < 2) return;
+
+        const mandible = state.models[1].mesh;
+        const maxilla = state.models[0].mesh;
+
+        // Initialize jaw physics on first use
+        if (!mandibleOrigPos) initJawPhysics();
+        if (!mandibleOrigPos) return;
+
+        // Reset to original transform
+        mandible.position.copy(mandibleOrigPos);
+        mandible.rotation.copy(mandibleOrigRot);
+
+        // Upper arch stays FIXED (like real anatomy)
+        maxilla.position.y = 0;
+
+        if (val > 0) {
+            // Real jaw mechanics:
+            // 1. Rotation around TMJ pivot (hinge movement)
+            // 2. Slight forward translation (protrusion)
+            const maxAngle = Math.PI / 5;  // ~36 degrees max open
+            const angle = (val / 100) * maxAngle;
+
+            // Rotate mandible around TMJ pivot point
+            // Translate to pivot, rotate, translate back
+            const pivotLocal = tmjPivot.clone();
+            mandible.worldToLocal(pivotLocal);
+
+            // Apply rotation at pivot
+            mandible.position.sub(tmjPivot);
+
+            // Create rotation matrix around X axis (jaw hinge axis)
+            const rotMatrix = new THREE.Matrix4().makeRotationX(-angle);
+            mandible.position.applyMatrix4(rotMatrix);
+            mandible.position.add(tmjPivot);
+
+            mandible.rotateX(-angle);
+
+            // Slight forward protrusion (mandible slides forward when opening)
+            const protrusion = (val / 100) * 3;
+            mandible.position.z += protrusion;
         }
+
+        // Update label
         if (val <= 5) mouthLabel.textContent = 'Closed';
         else if (val <= 30) mouthLabel.textContent = 'Bite';
         else if (val <= 60) mouthLabel.textContent = 'Open';
