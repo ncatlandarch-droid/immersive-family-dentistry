@@ -1291,6 +1291,7 @@ async function loadHybridScans() {
         function(geometry) {
             geometry.computeVertexNormals();
             var hasColors = geometry.hasAttribute('color');
+            console.log('[Maxilla] hasColors:', hasColors, 'attributes:', Object.keys(geometry.attributes));
             var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'maxilla';
             mesh.userData.archType = 'upper';
