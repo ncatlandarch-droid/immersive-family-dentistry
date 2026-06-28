@@ -29,6 +29,35 @@
    Matches MouthMap exactly
    ═══════════════════════════════════════════════════════════ */
 
+/* View Toggle (MouthMap ↔ 3D Scan) */
+.sv-view-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+}
+.sv-view-toggle__btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.sv-view-toggle__btn i { width: 14px; height: 14px; }
+.sv-view-toggle__btn:hover { color: #f0f4f8; background: rgba(255,255,255,0.06); }
+.sv-view-toggle__active {
+    background: rgba(45, 212, 191, 0.2) !important;
+    color: #2dd4bf !important;
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+
 :root {
     --mm-bg: #0B0F19;
     --mm-bg-secondary: #111827;
@@ -1202,11 +1231,15 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             </div>
         </div>
     </div>
-    <div class="mm-header__right">
-        <a href="/portal/mouthmap.html" class="mm-back-link">
-            <i data-lucide="map"></i>
-            MouthMap
-        </a>
+    <div class="mm-header__right" style="display:flex;align-items:center;gap:8px;">
+        <div class="sv-view-toggle">
+            <a href="/portal/mouthmap.html" class="sv-view-toggle__btn">
+                <i data-lucide="smile"></i> MouthMap
+            </a>
+            <span class="sv-view-toggle__btn sv-view-toggle__active">
+                <i data-lucide="box"></i> 3D Scan
+            </span>
+        </div>
         <a href="/portal/patient.html" class="mm-back-link">
             <i data-lucide="arrow-left"></i>
             Back to Portal

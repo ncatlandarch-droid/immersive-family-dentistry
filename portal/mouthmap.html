@@ -765,7 +765,15 @@ body::before {
             </div>
         </div>
     </div>
-    <div class="mm-header__right">
+    <div class="mm-header__right" style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:8px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;">
+            <span style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;background:rgba(45,212,191,0.2);color:#2dd4bf;white-space:nowrap;">
+                <i data-lucide="smile"></i> MouthMap
+            </span>
+            <a href="/portal/scan-viewer.html" style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;color:#94a3b8;text-decoration:none;white-space:nowrap;border-left:1px solid rgba(255,255,255,0.08);transition:all 0.2s;" onmouseover="this.style.color='#f0f4f8';this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.color='#94a3b8';this.style.background=''">
+                <i data-lucide="box"></i> 3D Scan
+            </a>
+        </div>
         <a href="/portal/patient.html" class="mm-back-link">
             <i data-lucide="arrow-left"></i>
             Back to Portal
