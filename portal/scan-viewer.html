@@ -1463,6 +1463,15 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                         <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#fbbf24,#f97316,#dc2626);margin-right:4px;"></span> Gingival
                     </button>
                 </div>
+                <!-- Overlay Legend (shown when overlay active) -->
+                <div id="overlayLegend" class="sv-overlay-legend" style="display:none;">
+                    <div class="sv-legend-bar" id="legendBar"></div>
+                    <div class="sv-legend-labels">
+                        <span id="legendLow">Clean</span>
+                        <span id="legendMid">Moderate</span>
+                        <span id="legendHigh">Heavy</span>
+                    </div>
+                </div>
                 <p style="font-size:11px;color:var(--mm-text-muted);margin-top:8px;line-height:1.4;">
                     💡 Heat maps highlight trouble areas. Connect PALOMA AI for automated detection.
                 </p>
@@ -1786,6 +1795,26 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 </div>
 
 <style>
+/* Overlay Legend */
+.sv-overlay-legend {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.sv-legend-bar {
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 4px;
+}
+.sv-legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
 /* Tooth Popup */
 .tooth-popup {
     position: fixed;
@@ -3166,13 +3195,35 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             btn.classList.add('active');
 
             const overlay = btn.dataset.overlay;
-            state.models.forEach(m => {
-                if (overlay === 'none') {
-                    restoreVertexColors(m.mesh);
-                } else {
-                    applyOverlay(m.mesh, overlay);
+            const legend = document.getElementById('overlayLegend');
+            const legendBar = document.getElementById('legendBar');
+
+            if (overlay === 'none') {
+                legend.style.display = 'none';
+                state.models.forEach(m => restoreVertexColors(m.mesh));
+            } else {
+                // Show legend with appropriate colors and labels
+                legend.style.display = 'block';
+
+                if (overlay === 'plaque') {
+                    legendBar.style.background = 'linear-gradient(90deg, #22c55e, #eab308, #ef4444)';
+                    document.getElementById('legendLow').textContent = '✨ Clean';
+                    document.getElementById('legendMid').textContent = '⚡ Moderate';
+                    document.getElementById('legendHigh').textContent = '🔴 Heavy Buildup';
+                } else if (overlay === 'decay') {
+                    legendBar.style.background = 'linear-gradient(90deg, #60a5fa, #a855f7, #ec4899)';
+                    document.getElementById('legendLow').textContent = '💙 Low Risk';
+                    document.getElementById('legendMid').textContent = '💜 Medium Risk';
+                    document.getElementById('legendHigh').textContent = '💗 High Risk';
+                } else if (overlay === 'inflammation') {
+                    legendBar.style.background = 'linear-gradient(90deg, #fbbf24, #f97316, #dc2626)';
+                    document.getElementById('legendLow').textContent = '💛 Healthy';
+                    document.getElementById('legendMid').textContent = '🟠 Mild';
+                    document.getElementById('legendHigh').textContent = '🔴 Inflamed';
                 }
-            });
+
+                state.models.forEach(m => applyOverlay(m.mesh, overlay));
+            }
         });
     });
 
@@ -3285,21 +3336,24 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             { url: '/portal/demo-scans/Mandible_Base.ply', name: 'Mandible_Base.ply', arch: 1 }
         ];
 
-        // Check if first file exists
         try {
-            const check = await fetch(demoFiles[0].url, { method: 'HEAD' });
-            if (!check.ok) return; // No demo scans available
+            console.log('🦷 Auto-loading demo scans...');
 
-            // Hide drop zone, show loading
-            const dropZone = document.getElementById('sv-drop-zone');
-            if (dropZone) dropZone.style.display = 'none';
+            // Hide drop zone using existing JS reference
+            dropzone.style.display = 'none';
+            showLoading(true);
 
             // Load upper arch first, then lower
             await loadFileFromURL(demoFiles[0].url, demoFiles[0].name, demoFiles[0].arch);
+            console.log('✅ Upper arch loaded');
             await loadFileFromURL(demoFiles[1].url, demoFiles[1].name, demoFiles[1].arch);
+            console.log('✅ Lower arch loaded');
 
         } catch (e) {
-            console.log('No demo scans found, showing upload UI');
+            console.warn('Auto-load failed:', e.message);
+            // Show drop zone again if loading failed
+            dropzone.style.display = '';
+            showLoading(false);
         }
     }
 
