@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─── Load Patient Data ───
 async function loadPatientData() {
     try {
-        const basePath = '/data/patients/chris-harrison';
+        const basePath = '/data/patients/logan-burton';
 
         const [recordsRes, chartRes, planRes, timelineRes] = await Promise.all([
             fetch(`${basePath}/records.json`).then(r => r.ok ? r.json() : null),
@@ -58,10 +58,10 @@ async function loadPatientData() {
 
 function loadFallbackData() {
     patientData = {
-        patient: { firstName: 'Chris', lastName: 'Harrison', id: 'chris-harrison' },
-        lastVisit: '2026-05-14',
-        nextVisit: '2026-09-10',
-        overallHealth: { gumHealth: 'good', cavityRisk: 'low', areasToMonitor: 1, urgentFindings: 0 }
+        patient: { firstName: 'Logan', lastName: 'Burton', id: 'logan-burton' },
+        lastVisit: '2026-06-28',
+        nextVisit: '2026-12-15',
+        overallHealth: { gumHealth: 'good', cavityRisk: 'moderate', areasToMonitor: 3, urgentFindings: 1 }
     };
 
     dentalChart = {

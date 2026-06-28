@@ -1,0 +1,50 @@
+{
+  "pending": [
+    {
+      "procedure": "Porcelain Crown (PFZ)",
+      "tooth": "#14 — Upper Left First Molar",
+      "priority": "high",
+      "estimatedCost": 1250,
+      "insuranceEstimate": 750,
+      "patientEstimate": 500,
+      "scheduledDate": "2026-07-10",
+      "notes": "Marginal ridge fracture on existing amalgam. Full coverage crown to prevent catastrophic failure."
+    },
+    {
+      "procedure": "Caries Excavation + Restoration",
+      "tooth": "#30 — Lower Right First Molar",
+      "priority": "moderate",
+      "estimatedCost": 450,
+      "insuranceEstimate": 320,
+      "patientEstimate": 130,
+      "scheduledDate": null,
+      "notes": "Recurrent decay at filling margin. May need ceramic onlay if extensive."
+    },
+    {
+      "procedure": "Periodontal Maintenance",
+      "tooth": "Full mouth",
+      "priority": "routine",
+      "estimatedCost": 250,
+      "insuranceEstimate": 200,
+      "patientEstimate": 50,
+      "scheduledDate": "2026-12-15",
+      "notes": "6-month prophylaxis"
+    }
+  ],
+  "completed": [
+    {
+      "procedure": "Root Canal + Crown",
+      "tooth": "#19 — Lower Left First Molar",
+      "completedDate": "2024-09-22",
+      "cost": 2850,
+      "provider": "Dr. Brenes / Dr. Patel (Endo)"
+    },
+    {
+      "procedure": "Composite Filling",
+      "tooth": "#3 — Upper Right First Molar",
+      "completedDate": "2024-03-12",
+      "cost": 295,
+      "provider": "Dr. Brenes"
+    }
+  ]
+}

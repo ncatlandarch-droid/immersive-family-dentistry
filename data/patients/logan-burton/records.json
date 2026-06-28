@@ -1,0 +1,24 @@
+{
+  "patient": {
+    "firstName": "Logan",
+    "lastName": "Burton",
+    "id": "logan-burton",
+    "dob": "1992-03-15",
+    "phone": "336-555-0147",
+    "email": "logan.burton@email.com",
+    "address": "4821 Lake Jeanette Rd, Greensboro, NC 27455",
+    "insurance": {
+      "provider": "Delta Dental PPO",
+      "memberId": "DDL-9284710",
+      "groupNumber": "GRP-1138"
+    }
+  },
+  "lastVisit": "2026-06-28",
+  "nextVisit": "2026-12-15",
+  "overallHealth": {
+    "gumHealth": "good",
+    "cavityRisk": "moderate",
+    "areasToMonitor": 3,
+    "urgentFindings": 1
+  }
+}

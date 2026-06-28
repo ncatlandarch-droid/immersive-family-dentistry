@@ -758,10 +758,10 @@ body::before {
     </div>
     <div class="mm-header__center">
         <div class="mm-patient-badge">
-            <div class="mm-patient-avatar">SM</div>
+            <div class="mm-patient-avatar">LB</div>
             <div class="mm-patient-info">
-                <strong>Sarah Mitchell</strong>
-                <span>Last visit: May 15, 2026</span>
+                <strong>Logan Burton</strong>
+                <span>Last visit: June 28, 2026</span>
             </div>
         </div>
     </div>
@@ -946,8 +946,8 @@ function getQuadrant(n) {
 }
 
 const DEMO_PATIENT = {
-    name: 'Sarah Mitchell',
-    lastVisit: 'May 15, 2026',
+    name: 'Logan Burton',
+    lastVisit: 'June 28, 2026',
     teeth: {}
 };
 
@@ -1752,7 +1752,194 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.mm-view-btn').forEach(btn => {
         btn.addEventListener('click', () => setView(btn.dataset.view));
     });
+
+    // ─── Role-Based Mode ───
+    initRoleMode();
 });
+
+
+/* ═══════════════════════════════════════════════════════════
+   ROLE-BASED ACCESS SYSTEM
+   ?role=staff  → Edit notes, change status, annotate
+   ?role=patient (default) → Read-only
+   ═══════════════════════════════════════════════════════════ */
+
+let currentRole = 'patient'; // default read-only
+
+function initRoleMode() {
+    const params = new URLSearchParams(window.location.search);
+    currentRole = params.get('role') || 'patient';
+
+    if (currentRole === 'staff' || currentRole === 'admin') {
+        document.body.classList.add('staff-mode');
+        addStaffBadge();
+        addStaffToolbar();
+    }
+}
+
+function addStaffBadge() {
+    const header = document.querySelector('.mm-header__right');
+    if (!header) return;
+
+    const badge = document.createElement('div');
+    badge.className = 'staff-mode-badge';
+    badge.innerHTML = '🔒 Staff Mode';
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:5px 12px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;';
+    header.insertBefore(badge, header.firstChild);
+}
+
+function addStaffToolbar() {
+    // Inject CSS for staff edit elements
+    const style = document.createElement('style');
+    style.textContent = `
+        .staff-edit-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;
+            padding: 4px 10px; margin-left: 8px;
+            background: rgba(45, 212, 191, 0.12); color: #2dd4bf;
+            border: 1px solid rgba(45, 212, 191, 0.25); border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .staff-edit-btn:hover {
+            background: rgba(45, 212, 191, 0.25);
+            box-shadow: 0 0 8px rgba(45, 212, 191, 0.2);
+        }
+        .staff-inline-edit {
+            width: 100%; padding: 8px; margin-top: 6px;
+            font-family: 'Inter', sans-serif; font-size: 13px;
+            background: rgba(17, 24, 39, 0.8); color: #f1f5f9;
+            border: 1px solid rgba(45, 212, 191, 0.3); border-radius: 8px;
+            resize: vertical; min-height: 60px; outline: none;
+        }
+        .staff-inline-edit:focus { border-color: #2dd4bf; box-shadow: 0 0 8px rgba(45,212,191,0.2); }
+        .staff-save-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; font-family: 'Inter', sans-serif;
+            padding: 5px 14px; margin-top: 6px;
+            background: linear-gradient(135deg, #2dd4bf, #14b8a6); color: #0B0F19;
+            border: none; border-radius: 12px; cursor: pointer;
+        }
+        .staff-status-select {
+            font-size: 12px; font-family: 'Inter', sans-serif;
+            padding: 4px 8px; margin-left: 8px;
+            background: rgba(17, 24, 39, 0.9); color: #f1f5f9;
+            border: 1px solid rgba(45, 212, 191, 0.3); border-radius: 8px;
+        }
+        body:not(.staff-mode) .staff-edit-btn,
+        body:not(.staff-mode) .staff-status-select { display: none !important; }
+    `;
+    document.head.appendChild(style);
+}
+
+// Override updateInfoPanel to add edit controls in staff mode
+const _originalUpdateInfoPanel = updateInfoPanel;
+updateInfoPanel = function(data) {
+    _originalUpdateInfoPanel(data);
+
+    if (currentRole !== 'staff' && currentRole !== 'admin') return;
+
+    // Add edit buttons to notes section
+    const notesEl = document.getElementById('detail-notes');
+    if (notesEl) {
+        const currentText = notesEl.textContent;
+        notesEl.innerHTML = `
+            <span class="notes-text">${currentText}</span>
+            <button class="staff-edit-btn" onclick="editNotes(${data.number})">✏️ Edit</button>
+        `;
+    }
+
+    // Add status dropdown next to badge
+    const badgeWrap = document.getElementById('detail-badge-wrap');
+    if (badgeWrap) {
+        const select = document.createElement('select');
+        select.className = 'staff-status-select';
+        select.innerHTML = `
+            <option value="healthy" ${data.status === 'healthy' ? 'selected' : ''}>Healthy</option>
+            <option value="needs_attention" ${data.status === 'needs_attention' ? 'selected' : ''}>Needs Attention</option>
+            <option value="treated" ${data.status === 'treated' ? 'selected' : ''}>Treated</option>
+            <option value="planned" ${data.status === 'planned' ? 'selected' : ''}>Planned</option>
+            <option value="missing" ${data.status === 'missing' ? 'selected' : ''}>Missing</option>
+        `;
+        select.onchange = () => changeToothStatus(data.number, select.value);
+        badgeWrap.appendChild(select);
+    }
+
+    // Add edit to condition text
+    const condEl = document.getElementById('detail-condition');
+    if (condEl) {
+        const condText = condEl.textContent;
+        condEl.innerHTML = `
+            <span>${condText}</span>
+            <button class="staff-edit-btn" onclick="editCondition(${data.number})">✏️ Edit</button>
+        `;
+    }
+};
+
+function editNotes(toothNum) {
+    const notesEl = document.getElementById('detail-notes');
+    const currentText = DEMO_PATIENT.teeth[toothNum]?.notes || '';
+    notesEl.innerHTML = `
+        <textarea class="staff-inline-edit" id="notes-edit-area">${currentText}</textarea>
+        <button class="staff-save-btn" onclick="saveNotes(${toothNum})">💾 Save Notes</button>
+    `;
+    document.getElementById('notes-edit-area').focus();
+}
+
+function saveNotes(toothNum) {
+    const textarea = document.getElementById('notes-edit-area');
+    if (textarea && DEMO_PATIENT.teeth[toothNum]) {
+        DEMO_PATIENT.teeth[toothNum].notes = textarea.value;
+        // Re-render with updated data
+        selectTooth(selectedTooth);
+        showSaveToast('Notes saved');
+    }
+}
+
+function editCondition(toothNum) {
+    const condEl = document.getElementById('detail-condition');
+    const currentText = DEMO_PATIENT.teeth[toothNum]?.condition || '';
+    condEl.innerHTML = `
+        <textarea class="staff-inline-edit" id="condition-edit-area">${currentText}</textarea>
+        <button class="staff-save-btn" onclick="saveCondition(${toothNum})">💾 Save Condition</button>
+    `;
+    document.getElementById('condition-edit-area').focus();
+}
+
+function saveCondition(toothNum) {
+    const textarea = document.getElementById('condition-edit-area');
+    if (textarea && DEMO_PATIENT.teeth[toothNum]) {
+        DEMO_PATIENT.teeth[toothNum].condition = textarea.value;
+        selectTooth(selectedTooth);
+        showSaveToast('Condition updated');
+    }
+}
+
+function changeToothStatus(toothNum, newStatus) {
+    if (!DEMO_PATIENT.teeth[toothNum]) return;
+    DEMO_PATIENT.teeth[toothNum].status = newStatus;
+
+    // Update 3D model color
+    const mesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
+    if (mesh) {
+        mesh.material.color.setHex(STATUS_COLORS[newStatus] || 0xF5F5F0);
+        mesh.material.emissive.setHex(STATUS_EMISSIVE[newStatus] || 0x000000);
+        mesh.userData.toothData.status = newStatus;
+        mesh.userData.originalEmissive = STATUS_EMISSIVE[newStatus] || 0x000000;
+    }
+
+    // Re-render info panel
+    selectTooth(selectedTooth);
+    updateSummaryStats();
+    showSaveToast(`Tooth #${toothNum} → ${newStatus.replace('_', ' ')}`);
+}
+
+function showSaveToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 24px;background:rgba(45,212,191,0.9);color:#0B0F19;font-size:13px;font-weight:700;font-family:Inter,sans-serif;border-radius:24px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease;';
+    toast.textContent = `✅ ${message}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
 </script>
 
 </body>

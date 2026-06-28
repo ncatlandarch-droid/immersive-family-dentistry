@@ -1,0 +1,84 @@
+{
+  "visits": [
+    {
+      "date": "2019-06-14",
+      "type": "Oral Surgery",
+      "provider": "Dr. Brenes / Dr. Kim (OMS)",
+      "summary": "Extraction of all four wisdom teeth (#1, #16, #17, #32)",
+      "details": "All four third molars removed under IV sedation. #1 and #17 were fully impacted; #16 and #32 were partially erupted. Uneventful recovery.",
+      "teeth": [1, 16, 17, 32]
+    },
+    {
+      "date": "2020-01-22",
+      "type": "New Patient Exam",
+      "provider": "Dr. Brenes",
+      "summary": "Comprehensive exam, full mouth radiographs, and prophylaxis",
+      "details": "New patient intake. Full mouth series and panoramic radiograph taken. Overall good oral health. Mild gingivitis noted in lower anteriors — improved home care recommended.",
+      "teeth": []
+    },
+    {
+      "date": "2020-07-15",
+      "type": "Prophylaxis",
+      "provider": "RDH — Jamie",
+      "summary": "Routine cleaning and fluoride treatment",
+      "details": "6-month recall visit. Gingivitis resolved. No new findings. Fluoride varnish applied.",
+      "teeth": []
+    },
+    {
+      "date": "2021-06-09",
+      "type": "Prophylaxis",
+      "provider": "RDH — Jamie",
+      "summary": "Routine cleaning — patient noted teeth sensitivity to cold",
+      "details": "Prophylaxis completed. Patient reports intermittent cold sensitivity on upper right. Clinical exam unremarkable. Sensitivity toothpaste recommended. Monitor at next visit.",
+      "teeth": [3]
+    },
+    {
+      "date": "2022-06-22",
+      "type": "Periodic Exam + Prophylaxis",
+      "provider": "Dr. Brenes / RDH — Jamie",
+      "summary": "Annual exam — early enamel erosion noted on #8",
+      "details": "Periodic exam with bitewing radiographs. Early enamel erosion detected on lingual surface of #8. Patient reports occasional acid reflux. Discussed GERD referral. Fluoride varnish applied.",
+      "teeth": [8]
+    },
+    {
+      "date": "2023-06-14",
+      "type": "Periodic Exam + Prophylaxis",
+      "provider": "Dr. Brenes / RDH — Jamie",
+      "summary": "Annual exam — amalgam on #14 showing marginal wear",
+      "details": "Periodic exam and prophylaxis. Existing amalgam on #14 showing early marginal breakdown. Monitoring for now. Enamel erosion on #8 stable — patient managing reflux with GI specialist.",
+      "teeth": [8, 14]
+    },
+    {
+      "date": "2024-03-12",
+      "type": "Restorative",
+      "provider": "Dr. Brenes",
+      "summary": "Composite filling placed on #3 (MOD)",
+      "details": "Patient presented with sensitivity on #3. Caries detected on mesial and distal surfaces. Composite resin restoration (MOD) placed under local anesthesia. Good bond achieved.",
+      "teeth": [3]
+    },
+    {
+      "date": "2024-09-22",
+      "type": "Endodontic + Restorative",
+      "provider": "Dr. Brenes / Dr. Patel (Endo)",
+      "summary": "Root canal therapy and zirconia crown on #19",
+      "details": "Patient presented with spontaneous pain on #19. Pulp vitality testing confirmed irreversible pulpitis. Root canal completed by Dr. Patel (endodontist). Same-day zirconia crown prep and temporary placed. Final crown seated 2024-10-08.",
+      "teeth": [19]
+    },
+    {
+      "date": "2025-06-18",
+      "type": "Periodic Exam + Prophylaxis",
+      "provider": "Dr. Brenes / RDH — Jamie",
+      "summary": "Annual exam — #14 amalgam fracture progressing, #30 early recurrent decay",
+      "details": "Periodic exam with full mouth radiographs. #14 amalgam showing definitive marginal ridge fracture — crown treatment planned. #30 showing early demineralization at distal filling margin. #19 root canal and crown in excellent condition. #3 composite stable.",
+      "teeth": [14, 30]
+    },
+    {
+      "date": "2026-06-28",
+      "type": "Periodic Exam + Prophylaxis",
+      "provider": "Dr. Brenes / RDH — Jamie",
+      "summary": "6-month recall — AI-assisted exam with PALOMA",
+      "details": "First visit using PALOMA AI-assisted imaging. Full mouth assessed with AI confidence scoring. #14 fracture confirmed — crown scheduled for Jul 10. #30 recurrent decay confirmed by AI (91% confidence) — restoration needed within 4-6 weeks. #8 erosion stable. All other teeth healthy. Next visit scheduled Dec 15, 2026.",
+      "teeth": [8, 14, 30]
+    }
+  ]
+}
