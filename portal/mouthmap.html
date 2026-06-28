@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D MouthMap — Patient Portal | PALOMA</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   3D MouthMap — Dark Glassmorphism Theme
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+    --mm-bg: #0B0F19;
+    --mm-bg-secondary: #111827;
+    --mm-surface: rgba(17, 24, 39, 0.7);
+    --mm-surface-solid: #1a2332;
+    --mm-text: #F1F5F9;
+    --mm-text-muted: #94A3B8;
+    --mm-teal: #2dd4bf;
+    --mm-teal-dim: rgba(45, 212, 191, 0.15);
+    --mm-teal-glow: rgba(45, 212, 191, 0.3);
+    --mm-border: rgba(148, 163, 184, 0.12);
+    --mm-glass-border: rgba(255, 255, 255, 0.06);
+    --mm-healthy: #F5F5F0;
+    --mm-attention: #F59E0B;
+    --mm-treated: #3B82F6;
+    --mm-planned: #2dd4bf;
+    --mm-missing: #333333;
+    --mm-radius: 16px;
+    --mm-radius-sm: 10px;
+    --mm-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    --mm-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--mm-bg);
+    color: var(--mm-text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ─── Background Gradient ─── */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(45, 212, 191, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(45, 212, 191, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ═══ Header ═══ */
+.mm-header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: rgba(11, 15, 25, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--mm-border);
+}
+
+.mm-header__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mm-header__logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.3));
+}
+
+.mm-header__brand h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--mm-text);
+    letter-spacing: -0.02em;
+}
+
+.mm-header__brand h1 span {
+    color: var(--mm-teal);
+}
+
+.mm-header__brand p {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+    font-weight: 400;
+    margin-top: 1px;
+}
+
+.mm-header__center {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mm-patient-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--mm-surface);
+    border: 1px solid var(--mm-glass-border);
+    border-radius: 100px;
+    padding: 6px 18px 6px 8px;
+    backdrop-filter: blur(12px);
+}
+
+.mm-patient-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mm-teal), #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #0B0F19;
+}
+
+.mm-patient-info strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mm-text);
+}
+
+.mm-patient-info span {
+    font-size: 11px;
+    color: var(--mm-text-muted);
+}
+
+.mm-header__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mm-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mm-teal);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--mm-border);
+    transition: var(--mm-transition);
+}
+
+.mm-back-link:hover {
+    background: var(--mm-teal-dim);
+    border-color: var(--mm-teal);
+}
+
+/* ═══ Main Layout ═══ */
+.mm-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    height: calc(100vh - 73px);
+}
+
+/* ═══ 3D Viewer Panel ═══ */
+.mm-viewer {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0d1117 0%, #0B0F19 100%);
+}
+
+.mm-viewer canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Viewer controls overlay */
+.mm-viewer-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 5;
+}
+
+.mm-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mm-text-muted);
+    background: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--mm-glass-border);
+    cursor: pointer;
+    transition: var(--mm-transition);
+}
+
+.mm-view-btn:hover, .mm-view-btn.active {
+    color: var(--mm-teal);
+    border-color: var(--mm-teal);
+    background: rgba(45, 212, 191, 0.1);
+}
+
+.mm-view-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+/* Legend bar */
+.mm-legend {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 24px;
+    border-radius: 100px;
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--mm-glass-border);
+    z-index: 5;
+    white-space: nowrap;
+}
+
+.mm-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mm-text-muted);
+}
+
+.mm-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+}
+
+/* Tooth number labels overlay */
+.mm-tooth-label {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--mm-text-muted);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    z-index: 2;
+    opacity: 0.6;
+}
+
+/* ═══ Info Panel ═══ */
+.mm-info {
+    display: flex;
+    flex-direction: column;
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid var(--mm-border);
+    overflow-y: auto;
+}
+
+/* Panel header */
+.mm-info__header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--mm-border);
+}
+
+.mm-info__header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mm-text);
+    margin-bottom: 4px;
+}
+
+.mm-info__header p {
+    font-size: 13px;
+    color: var(--mm-text-muted);
+}
+
+/* Default state */
+.mm-info-default {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.mm-info-default__icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 16px rgba(45, 212, 191, 0.3));
+    border-radius: 16px;
+}
+
+.mm-info-default h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--mm-text);
+    margin-bottom: 8px;
+}
+
+.mm-info-default p {
+    font-size: 13px;
+    color: var(--mm-text-muted);
+    max-width: 260px;
+    line-height: 1.6;
+}
+
+/* Summary stats */
+.mm-summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 28px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.mm-stat-card {
+    background: var(--mm-surface);
+    border: 1px solid var(--mm-glass-border);
+    border-radius: var(--mm-radius-sm);
+    padding: 14px;
+    text-align: center;
+}
+
+.mm-stat-card__value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.mm-stat-card__label {
+    font-size: 11px;
+    color: var(--mm-text-muted);
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* Tooth detail view */
+.mm-tooth-detail {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.mm-tooth-detail.active {
+    display: flex;
+}
+
+.mm-info-default.hidden {
+    display: none;
+}
+
+/* Tooth title area */
+.mm-tooth-title {
+    padding: 24px;
+    border-bottom: 1px solid var(--mm-border);
+}
+
+.mm-tooth-number {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--mm-teal);
+    line-height: 1;
+}
+
+.mm-tooth-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--mm-text);
+    margin-top: 4px;
+}
+
+.mm-tooth-quadrant {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+    margin-top: 2px;
+}
+
+/* Status badge */
+.mm-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 12px;
+    letter-spacing: 0.02em;
+}
+
+.mm-status-badge--healthy {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.mm-status-badge--attention {
+    background: rgba(245, 158, 11, 0.12);
+    color: #F59E0B;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.mm-status-badge--treated {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3B82F6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.mm-status-badge--planned {
+    background: rgba(45, 212, 191, 0.12);
+    color: #2dd4bf;
+    border: 1px solid rgba(45, 212, 191, 0.2);
+}
+
+.mm-status-badge--missing {
+    background: rgba(100, 116, 139, 0.12);
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+/* Info sections */
+.mm-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--mm-border);
+}
+
+.mm-section:last-child {
+    border-bottom: none;
+}
+
+.mm-section__title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mm-section__title i {
+    width: 14px;
+    height: 14px;
+    color: var(--mm-teal);
+}
+
+.mm-condition-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--mm-text);
+}
+
+/* Treatment history items */
+.mm-history-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.mm-history-item + .mm-history-item {
+    border-top: 1px solid var(--mm-glass-border);
+}
+
+.mm-history-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mm-teal);
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.mm-history-content strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mm-text);
+}
+
+.mm-history-content span {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+}
+
+/* Planned procedures */
+.mm-planned-item {
+    background: var(--mm-teal-dim);
+    border: 1px solid rgba(45, 212, 191, 0.15);
+    border-radius: var(--mm-radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+}
+
+.mm-planned-item strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mm-teal);
+}
+
+.mm-planned-item span {
+    font-size: 12px;
+    color: var(--mm-text-muted);
+}
+
+/* Dentist notes */
+.mm-notes {
+    background: var(--mm-surface);
+    border: 1px solid var(--mm-glass-border);
+    border-radius: var(--mm-radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--mm-text-muted);
+    font-style: italic;
+}
+
+.mm-notes::before {
+    content: '"';
+    font-size: 24px;
+    color: var(--mm-teal);
+    font-style: normal;
+    line-height: 0;
+    vertical-align: -6px;
+    margin-right: 4px;
+}
+
+/* Close button */
+.mm-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--mm-surface);
+    border: 1px solid var(--mm-glass-border);
+    color: var(--mm-text-muted);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--mm-transition);
+    z-index: 5;
+}
+
+.mm-close-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ═══ Loading Overlay ═══ */
+.mm-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 15, 25, 0.9);
+    z-index: 20;
+    transition: opacity 0.6s ease;
+}
+
+.mm-loading.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mm-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--mm-border);
+    border-top-color: var(--mm-teal);
+    border-radius: 50%;
+    animation: mmSpin 0.8s linear infinite;
+}
+
+.mm-loading p {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--mm-text-muted);
+    font-weight: 500;
+}
+
+@keyframes mmSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ═══ Hover tooltip ═══ */
+.mm-tooltip {
+    position: fixed;
+    padding: 6px 12px;
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--mm-teal);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mm-teal);
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.mm-tooltip.visible {
+    opacity: 1;
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 900px) {
+    .mm-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 55vh 1fr;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .mm-info {
+        border-left: none;
+        border-top: 1px solid var(--mm-border);
+    }
+
+    .mm-header__center {
+        display: none;
+    }
+
+    .mm-header {
+        padding: 12px 16px;
+    }
+
+    .mm-legend {
+        gap: 12px;
+        padding: 8px 16px;
+        font-size: 10px;
+        bottom: 52px;
+    }
+
+    .mm-viewer-controls {
+        bottom: 12px;
+    }
+
+    .mm-view-btn span {
+        display: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .mm-header__brand h1 { font-size: 15px; }
+    .mm-header__brand p { display: none; }
+    .mm-header__logo { width: 34px; height: 34px; }
+
+    .mm-legend {
+        gap: 8px;
+        padding: 6px 12px;
+    }
+
+    .mm-legend-item {
+        font-size: 10px;
+    }
+
+    .mm-summary-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ═══ Scrollbar ═══ */
+.mm-info::-webkit-scrollbar { width: 4px; }
+.mm-info::-webkit-scrollbar-track { background: transparent; }
+.mm-info::-webkit-scrollbar-thumb { background: var(--mm-border); border-radius: 4px; }
+
+/* ═══ Glow pulse animation for selected tooth section ═══ */
+@keyframes mmPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.3); }
+    50% { box-shadow: 0 0 16px 4px rgba(45, 212, 191, 0.15); }
+}
+
+.mm-tooth-title {
+    animation: mmPulse 2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<header class="mm-header">
+    <div class="mm-header__left">
+        <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="mm-header__logo">
+        <div class="mm-header__brand">
+            <h1>🦷 Mouth<span>Map</span> 3D</h1>
+            <p>Lake Jeanette Family &amp; Implant Dentistry</p>
+        </div>
+    </div>
+    <div class="mm-header__center">
+        <div class="mm-patient-badge">
+            <div class="mm-patient-avatar">SM</div>
+            <div class="mm-patient-info">
+                <strong>Sarah Mitchell</strong>
+                <span>Last visit: May 15, 2026</span>
+            </div>
+        </div>
+    </div>
+    <div class="mm-header__right">
+        <a href="/portal/patient.html" class="mm-back-link">
+            <i data-lucide="arrow-left"></i>
+            Back to Portal
+        </a>
+    </div>
+</header>
+
+<!-- ═══ Main Layout ═══ -->
+<div class="mm-layout">
+
+    <!-- LEFT: 3D Viewer -->
+    <div class="mm-viewer" id="viewer-container">
+
+        <!-- Loading overlay -->
+        <div class="mm-loading" id="loading-overlay">
+            <div class="mm-loading-spinner"></div>
+            <p>Building your dental model…</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="mm-legend">
+            <div class="mm-legend-item">
+                <div class="mm-legend-dot" style="background: var(--mm-healthy);"></div>
+                Healthy
+            </div>
+            <div class="mm-legend-item">
+                <div class="mm-legend-dot" style="background: var(--mm-attention);"></div>
+                Needs Attention
+            </div>
+            <div class="mm-legend-item">
+                <div class="mm-legend-dot" style="background: var(--mm-treated);"></div>
+                Treated
+            </div>
+            <div class="mm-legend-item">
+                <div class="mm-legend-dot" style="background: var(--mm-planned);"></div>
+                Planned
+            </div>
+        </div>
+
+        <!-- View controls -->
+        <div class="mm-viewer-controls">
+            <button class="mm-view-btn active" data-view="front" title="Front View">
+                <i data-lucide="eye"></i><span>Front</span>
+            </button>
+            <button class="mm-view-btn" data-view="top" title="Top View">
+                <i data-lucide="scan"></i><span>Top</span>
+            </button>
+            <button class="mm-view-btn" data-view="upper" title="Upper Arch">
+                <i data-lucide="chevron-up"></i><span>Upper</span>
+            </button>
+            <button class="mm-view-btn" data-view="lower" title="Lower Arch">
+                <i data-lucide="chevron-down"></i><span>Lower</span>
+            </button>
+            <button class="mm-view-btn" data-view="reset" title="Reset View">
+                <i data-lucide="rotate-ccw"></i><span>Reset</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- RIGHT: Info Panel -->
+    <div class="mm-info" id="info-panel">
+        <div class="mm-info__header">
+            <h2>Dental Overview</h2>
+            <p>Interactive 3D tooth explorer</p>
+        </div>
+
+        <!-- Default state -->
+        <div class="mm-info-default" id="info-default">
+            <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="mm-info-default__icon">
+            <h3>Select a Tooth</h3>
+            <p>Click or tap any tooth on the 3D model to view detailed information, history, and treatment plans.</p>
+
+            <div class="mm-summary-stats" id="summary-stats">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <!-- Tooth detail (hidden by default) -->
+        <div class="mm-tooth-detail" id="tooth-detail">
+            <button class="mm-close-btn" id="close-detail" title="Close">✕</button>
+
+            <div class="mm-tooth-title">
+                <div class="mm-tooth-number" id="detail-number">#14</div>
+                <div class="mm-tooth-name" id="detail-name">Upper Left First Premolar</div>
+                <div class="mm-tooth-quadrant" id="detail-quadrant">Upper Left Quadrant</div>
+                <div id="detail-badge-wrap"></div>
+            </div>
+
+            <div class="mm-section">
+                <div class="mm-section__title">
+                    <i data-lucide="activity"></i> Condition
+                </div>
+                <div class="mm-condition-text" id="detail-condition">
+                    No issues detected.
+                </div>
+            </div>
+
+            <div class="mm-section" id="history-section">
+                <div class="mm-section__title">
+                    <i data-lucide="clock"></i> Treatment History
+                </div>
+                <div id="detail-history"></div>
+            </div>
+
+            <div class="mm-section" id="planned-section">
+                <div class="mm-section__title">
+                    <i data-lucide="calendar-check"></i> Planned Procedures
+                </div>
+                <div id="detail-planned"></div>
+            </div>
+
+            <div class="mm-section" id="notes-section">
+                <div class="mm-section__title">
+                    <i data-lucide="stethoscope"></i> Dentist Notes
+                </div>
+                <div class="mm-notes" id="detail-notes"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hover tooltip -->
+<div class="mm-tooltip" id="tooltip"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DEMO PATIENT DATA — All 32 Teeth (Universal Numbering)
+   ═══════════════════════════════════════════════════════════ */
+
+const TOOTH_NAMES = {
+    1:  'Upper Right Third Molar (Wisdom)',
+    2:  'Upper Right Second Molar',
+    3:  'Upper Right First Molar',
+    4:  'Upper Right Second Premolar',
+    5:  'Upper Right First Premolar',
+    6:  'Upper Right Canine (Cuspid)',
+    7:  'Upper Right Lateral Incisor',
+    8:  'Upper Right Central Incisor',
+    9:  'Upper Left Central Incisor',
+    10: 'Upper Left Lateral Incisor',
+    11: 'Upper Left Canine (Cuspid)',
+    12: 'Upper Left First Premolar',
+    13: 'Upper Left Second Premolar',
+    14: 'Upper Left First Molar',
+    15: 'Upper Left Second Molar',
+    16: 'Upper Left Third Molar (Wisdom)',
+    17: 'Lower Left Third Molar (Wisdom)',
+    18: 'Lower Left Second Molar',
+    19: 'Lower Left First Molar',
+    20: 'Lower Left Second Premolar',
+    21: 'Lower Left First Premolar',
+    22: 'Lower Left Canine (Cuspid)',
+    23: 'Lower Left Lateral Incisor',
+    24: 'Lower Left Central Incisor',
+    25: 'Lower Right Central Incisor',
+    26: 'Lower Right Lateral Incisor',
+    27: 'Lower Right Canine (Cuspid)',
+    28: 'Lower Right First Premolar',
+    29: 'Lower Right Second Premolar',
+    30: 'Lower Right First Molar',
+    31: 'Lower Right Second Molar',
+    32: 'Lower Right Third Molar (Wisdom)'
+};
+
+function getQuadrant(n) {
+    if (n >= 1 && n <= 8) return 'Upper Right Quadrant';
+    if (n >= 9 && n <= 16) return 'Upper Left Quadrant';
+    if (n >= 17 && n <= 24) return 'Lower Left Quadrant';
+    return 'Lower Right Quadrant';
+}
+
+const DEMO_PATIENT = {
+    name: 'Sarah Mitchell',
+    lastVisit: 'May 15, 2026',
+    teeth: {}
+};
+
+// Initialize all 32 teeth as healthy
+for (let i = 1; i <= 32; i++) {
+    DEMO_PATIENT.teeth[i] = {
+        number: i,
+        name: TOOTH_NAMES[i],
+        quadrant: getQuadrant(i),
+        status: 'healthy',
+        condition: 'No issues detected. Tooth appears healthy with normal enamel and gum attachment.',
+        history: [],
+        planned: [],
+        notes: 'Routine monitoring — no concerns.'
+    };
+}
+
+// Tooth #3 — Treated (composite filling)
+DEMO_PATIENT.teeth[3] = {
+    number: 3,
+    name: TOOTH_NAMES[3],
+    quadrant: getQuadrant(3),
+    status: 'treated',
+    condition: 'Occlusal cavity was identified and treated with a composite resin filling. The restoration is intact with good margins and no signs of recurrent decay.',
+    history: [
+        { date: 'Mar 12, 2025', procedure: 'Composite filling (MOD)', provider: 'Dr. Brenes' },
+        { date: 'Jan 8, 2025', procedure: 'Cavity detected on bitewing X-ray', provider: 'Dr. Brenes' }
+    ],
+    planned: [],
+    notes: 'Composite filling holding well. Monitor at next recall for any marginal breakdown. Patient reports no sensitivity.'
+};
+
+// Tooth #8 — Needs Attention (enamel erosion)
+DEMO_PATIENT.teeth[8] = {
+    number: 8,
+    name: TOOTH_NAMES[8],
+    quadrant: getQuadrant(8),
+    status: 'needs_attention',
+    condition: 'Moderate enamel erosion observed on the labial surface. Likely related to acid reflux or dietary acids. Early intervention recommended to prevent further progression.',
+    history: [
+        { date: 'May 15, 2026', procedure: 'Enamel erosion noted on clinical exam', provider: 'Dr. Brenes' },
+        { date: 'Nov 20, 2025', procedure: 'Mild wear pattern observed', provider: 'Dr. Brenes' }
+    ],
+    planned: [
+        { procedure: 'Fluoride varnish application', timeline: 'Next visit', est_cost: '$45' },
+        { procedure: 'Dietary counseling for acid reduction', timeline: 'Next visit', est_cost: '—' }
+    ],
+    notes: 'Discuss acid reflux management with patient. Consider prescription-strength fluoride toothpaste. Re-evaluate in 6 months for possible bonding.'
+};
+
+// Tooth #14 — Planned (crown)
+DEMO_PATIENT.teeth[14] = {
+    number: 14,
+    name: TOOTH_NAMES[14],
+    quadrant: getQuadrant(14),
+    status: 'planned',
+    condition: 'Large existing amalgam restoration with marginal ridge fracture. Tooth structure compromised — full coverage crown recommended to prevent catastrophic fracture.',
+    history: [
+        { date: 'May 15, 2026', procedure: 'Treatment plan presented for crown', provider: 'Dr. Brenes' },
+        { date: 'Aug 3, 2022', procedure: 'Amalgam filling placed (MOD)', provider: 'Dr. Previous' },
+        { date: 'Feb 14, 2018', procedure: 'Initial cavity treatment', provider: 'Dr. Previous' }
+    ],
+    planned: [
+        { procedure: 'Porcelain-fused-to-zirconia crown (PFZ)', timeline: 'Scheduled Jul 10, 2026', est_cost: '$1,250' },
+        { procedure: 'Build-up / core if needed', timeline: 'Same appointment', est_cost: '$285' }
+    ],
+    notes: 'Crown preparation scheduled. Patient opted for tooth-colored PFZ crown. Insurance pre-authorization submitted and approved. Marginal ridge crack is progressing — do not delay.'
+};
+
+// Tooth #19 — Treated (root canal + crown)
+DEMO_PATIENT.teeth[19] = {
+    number: 19,
+    name: TOOTH_NAMES[19],
+    quadrant: getQuadrant(19),
+    status: 'treated',
+    condition: 'Previously symptomatic tooth treated with root canal therapy and restored with a full-coverage zirconia crown. Currently asymptomatic with no periapical pathology on radiograph.',
+    history: [
+        { date: 'Sep 22, 2024', procedure: 'Zirconia crown seated (permanent)', provider: 'Dr. Brenes' },
+        { date: 'Sep 5, 2024', procedure: 'Crown prep + temporary crown', provider: 'Dr. Brenes' },
+        { date: 'Aug 15, 2024', procedure: 'Root canal therapy completed', provider: 'Dr. Patel (Endodontist)' },
+        { date: 'Aug 2, 2024', procedure: 'Emergency visit — acute pulpitis', provider: 'Dr. Brenes' }
+    ],
+    planned: [],
+    notes: 'Excellent prognosis. Crown margins sealed, no sensitivity. Annual periapical X-ray recommended to monitor healing. Patient very happy with result.'
+};
+
+// Tooth #30 — Needs Attention (recurrent decay)
+DEMO_PATIENT.teeth[30] = {
+    number: 30,
+    name: TOOTH_NAMES[30],
+    quadrant: getQuadrant(30),
+    status: 'needs_attention',
+    condition: 'Recurrent decay detected at the distal margin of an existing composite filling. The restoration will need to be replaced with a larger restoration or an onlay.',
+    history: [
+        { date: 'May 15, 2026', procedure: 'Recurrent decay identified on bitewing', provider: 'Dr. Brenes' },
+        { date: 'Jun 18, 2023', procedure: 'Composite filling placed (DO)', provider: 'Dr. Brenes' }
+    ],
+    planned: [
+        { procedure: 'Remove existing restoration + caries excavation', timeline: 'Scheduling', est_cost: '$320' },
+        { procedure: 'Possible ceramic onlay if decay is extensive', timeline: 'TBD after excavation', est_cost: '$950–$1,200' }
+    ],
+    notes: 'Schedule within 4-6 weeks. Extent of decay will determine if a direct composite or indirect onlay is needed. Discuss options with patient at next appointment.'
+};
+
+
+/* ═══════════════════════════════════════════════════════════
+   THREE.JS 3D MOUTHMAP ENGINE
+   ═══════════════════════════════════════════════════════════ */
+
+const STATUS_COLORS = {
+    healthy:         0xF5F5F0,
+    needs_attention: 0xF59E0B,
+    treated:         0x3B82F6,
+    planned:         0x2dd4bf,
+    missing:         0x333333
+};
+
+const STATUS_EMISSIVE = {
+    healthy:         0x000000,
+    needs_attention: 0x7a4f05,
+    treated:         0x1e3a5f,
+    planned:         0x0f5e56,
+    missing:         0x000000
+};
+
+let scene, camera, renderer, controls;
+let toothMeshes = [];
+let selectedTooth = null;
+let hoveredTooth = null;
+let raycaster, mouse;
+let autoRotate = true;
+let autoRotateSpeed = 0.002;
+const tooltip = document.getElementById('tooltip');
+const clock = new THREE.Clock();
+
+function init() {
+    const container = document.getElementById('viewer-container');
+    const rect = container.getBoundingClientRect();
+
+    // ─── Scene ───
+    scene = new THREE.Scene();
+
+    // ─── Camera ───
+    camera = new THREE.PerspectiveCamera(40, rect.width / rect.height, 0.1, 1000);
+    camera.position.set(0, 5, 85);
+
+    // ─── Renderer ───
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+    });
+    renderer.setSize(rect.width, rect.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+
+    // ─── Background: dark gradient ───
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = 2;
+    bgCanvas.height = 512;
+    const bgCtx = bgCanvas.getContext('2d');
+    const bgGrad = bgCtx.createLinearGradient(0, 0, 0, 512);
+    bgGrad.addColorStop(0, '#111827');
+    bgGrad.addColorStop(0.5, '#0B0F19');
+    bgGrad.addColorStop(1, '#060a12');
+    bgCtx.fillStyle = bgGrad;
+    bgCtx.fillRect(0, 0, 2, 512);
+    const bgTexture = new THREE.CanvasTexture(bgCanvas);
+    scene.background = bgTexture;
+
+    // ─── Orbit Controls ───
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.rotateSpeed = 0.6;
+    controls.zoomSpeed = 1.0;
+    controls.panSpeed = 0.4;
+    controls.minDistance = 30;
+    controls.maxDistance = 180;
+    controls.maxPolarAngle = Math.PI * 0.85;
+    controls.minPolarAngle = Math.PI * 0.15;
+    controls.target.set(0, 0, 0);
+
+    controls.addEventListener('start', () => { autoRotate = false; });
+
+    // ─── Premium Lighting ───
+    // Soft ambient fill
+    const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+    scene.add(ambient);
+
+    // Hemisphere for natural sky/ground color
+    const hemi = new THREE.HemisphereLight(0xc8e8ff, 0x444466, 0.4);
+    scene.add(hemi);
+
+    // Key light (warm, from upper-right-front)
+    const keyLight = new THREE.DirectionalLight(0xfff5e6, 0.9);
+    keyLight.position.set(40, 60, 50);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.camera.near = 1;
+    keyLight.shadow.camera.far = 200;
+    keyLight.shadow.camera.left = -50;
+    keyLight.shadow.camera.right = 50;
+    keyLight.shadow.camera.top = 50;
+    keyLight.shadow.camera.bottom = -50;
+    keyLight.shadow.bias = -0.002;
+    keyLight.shadow.radius = 4;
+    scene.add(keyLight);
+
+    // Fill light (cool, from left)
+    const fillLight = new THREE.DirectionalLight(0xd4eaff, 0.45);
+    fillLight.position.set(-40, 20, 30);
+    scene.add(fillLight);
+
+    // Rim light (from behind for edge highlight)
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.25);
+    rimLight.position.set(0, 30, -60);
+    scene.add(rimLight);
+
+    // Bottom bounce light
+    const bounceLight = new THREE.DirectionalLight(0xe8d5c4, 0.15);
+    bounceLight.position.set(0, -40, 20);
+    scene.add(bounceLight);
+
+    // Subtle teal accent point light (behind the arch)
+    const accentLight = new THREE.PointLight(0x2dd4bf, 0.3, 120);
+    accentLight.position.set(0, 0, -40);
+    scene.add(accentLight);
+
+    // ─── Raycaster ───
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
+    // ─── Build Teeth ───
+    buildDentalArch();
+
+    // ─── Events ───
+    renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+    renderer.domElement.addEventListener('click', onMouseClick, false);
+    renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('resize', onResize, false);
+
+    // ─── Summary stats ───
+    updateSummaryStats();
+
+    // ─── Hide loading ───
+    setTimeout(() => {
+        document.getElementById('loading-overlay').classList.add('fade-out');
+    }, 800);
+
+    // ─── Lucide ───
+    if (window.lucide) lucide.createIcons();
+
+    // ─── Start ───
+    animate();
+}
+
+
+/* ═══ Build Dental Arch ═══ */
+function buildDentalArch() {
+    // Parametric U-shape arch using cosine curve
+    // Upper arch: teeth 1 (right 3rd molar) → 16 (left 3rd molar)
+    // Array index 0..15 maps right→front→left
+
+    const archGroup = new THREE.Group();
+
+    buildArch(archGroup, 'upper'); // teeth 1-16
+    buildArch(archGroup, 'lower'); // teeth 17-32
+
+    // Subtle floor/gum plane for grounding
+    const planeGeo = new THREE.PlaneGeometry(80, 60);
+    const planeMat = new THREE.MeshStandardMaterial({
+        color: 0x0B0F19,
+        transparent: true,
+        opacity: 0.0
+    });
+    const plane = new THREE.Mesh(planeGeo, planeMat);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = -18;
+    plane.receiveShadow = true;
+    archGroup.add(plane);
+
+    scene.add(archGroup);
+}
+
+
+function buildArch(parent, arch) {
+    const isUpper = arch === 'upper';
+    const yOffset = isUpper ? 5 : -5;
+    const yFlip = isUpper ? 1 : -1;
+
+    // Arch shape: U-curve via parametric function
+    // 16 teeth positioned along a smooth parabolic/elliptical arch
+    // Index 0 = rightmost molar, index 15 = leftmost molar
+    // This matches Universal Numbering: upper 1→16 right-to-left, lower 17→32 left-to-right
+
+    for (let i = 0; i < 16; i++) {
+        // Tooth number per Universal system
+        let toothNum;
+        if (isUpper) {
+            toothNum = i + 1; // 1..16
+        } else {
+            // Lower arch: 17 (left wisdom) to 32 (right wisdom)
+            // Index 0 = left side = tooth 17, index 15 = right side = tooth 32
+            toothNum = i + 17; // 17..32
+        }
+
+        const toothData = DEMO_PATIENT.teeth[toothNum];
+
+        // ─── Position along arch ───
+        // Normalized parameter: t goes from -1 (right) to +1 (left)
+        const t = (i / 15) * 2 - 1;
+
+        // Parabolic U-shape: z = depth, x = lateral
+        // Wider arch for realistic proportions
+        const archWidth = 32;  // half-width
+        const archDepth = 22;  // how deep the U goes
+
+        const x = t * archWidth;
+        const z = -(1 - t * t) * archDepth; // parabola opens backward
+
+        // Slight vertical curve — teeth tilt outward
+        const y = yOffset + (Math.abs(t) * 1.5) * yFlip;
+
+        // ─── Determine tooth type ───
+        const type = getToothType(toothNum);
+
+        // ─── Geometry ───
+        const geo = createToothGeometry(type);
+
+        // ─── Material ───
+        const statusColor = STATUS_COLORS[toothData.status] || 0xF5F5F0;
+        const statusEmissive = STATUS_EMISSIVE[toothData.status] || 0x000000;
+
+        const mat = new THREE.MeshPhysicalMaterial({
+            color: statusColor,
+            roughness: 0.28,
+            metalness: 0.02,
+            clearcoat: 0.5,
+            clearcoatRoughness: 0.15,
+            emissive: statusEmissive,
+            emissiveIntensity: toothData.status !== 'healthy' ? 0.15 : 0,
+            envMapIntensity: 0.5,
+        });
+
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+
+        // Rotate tooth to face outward from the arch center
+        const angle = Math.atan2(x, z + archDepth);
+        mesh.rotation.y = angle;
+
+        // Upper teeth crowns point down, lower teeth crowns point up
+        if (!isUpper) {
+            mesh.rotation.z = Math.PI;
+        }
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        mesh.userData = {
+            toothNumber: toothNum,
+            toothData: toothData,
+            originalColor: statusColor,
+            originalEmissive: statusEmissive,
+            originalEmissiveIntensity: toothData.status !== 'healthy' ? 0.15 : 0
+        };
+
+        parent.add(mesh);
+        toothMeshes.push(mesh);
+    }
+}
+
+
+function getToothType(num) {
+    // Molars
+    if ([1,2,3,14,15,16,17,18,19,30,31,32].includes(num)) return 'molar';
+    // Premolars
+    if ([4,5,12,13,20,21,28,29].includes(num)) return 'premolar';
+    // Canines
+    if ([6,11,22,27].includes(num)) return 'canine';
+    // Incisors
+    return 'incisor';
+}
+
+
+function createToothGeometry(type) {
+    let geo;
+    const segments = 4;
+
+    switch (type) {
+        case 'molar':
+            geo = createRoundedBox(4.2, 6.0, 4.8, 0.6, segments);
+            break;
+        case 'premolar':
+            geo = createRoundedBox(3.4, 6.5, 3.6, 0.5, segments);
+            break;
+        case 'canine':
+            geo = createCanineGeometry();
+            break;
+        case 'incisor':
+            geo = createRoundedBox(2.8, 7.2, 2.2, 0.5, segments);
+            break;
+    }
+
+    return geo;
+}
+
+
+function createRoundedBox(width, height, depth, radius, segments) {
+    // Create a rounded box using beveled box approach
+    const shape = new THREE.Shape();
+    const w = width / 2 - radius;
+    const h = height / 2 - radius;
+
+    shape.moveTo(-w, -h - radius);
+    shape.lineTo(w, -h - radius);
+    shape.quadraticCurveTo(w + radius, -h - radius, w + radius, -h);
+    shape.lineTo(w + radius, h);
+    shape.quadraticCurveTo(w + radius, h + radius, w, h + radius);
+    shape.lineTo(-w, h + radius);
+    shape.quadraticCurveTo(-w - radius, h + radius, -w - radius, h);
+    shape.lineTo(-w - radius, -h);
+    shape.quadraticCurveTo(-w - radius, -h - radius, -w, -h - radius);
+
+    const extrudeSettings = {
+        depth: depth,
+        bevelEnabled: true,
+        bevelThickness: radius * 0.5,
+        bevelSize: radius * 0.3,
+        bevelSegments: segments,
+        curveSegments: segments
+    };
+
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    geo.center();
+    return geo;
+}
+
+
+function createCanineGeometry() {
+    // Canine: tapered, slightly pointed top
+    const pts = [];
+    pts.push(new THREE.Vector2(0, 0));
+    pts.push(new THREE.Vector2(1.6, 0));
+    pts.push(new THREE.Vector2(1.8, 1));
+    pts.push(new THREE.Vector2(1.7, 3));
+    pts.push(new THREE.Vector2(1.3, 5.5));
+    pts.push(new THREE.Vector2(0.6, 7));
+    pts.push(new THREE.Vector2(0, 7.5));
+
+    const geo = new THREE.LatheGeometry(pts, 8);
+    geo.center();
+    return geo;
+}
+
+
+/* ═══ Mouse Interaction ═══ */
+function onMouseMove(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(toothMeshes);
+
+    // Reset previous hover
+    if (hoveredTooth && hoveredTooth !== selectedTooth) {
+        const ud = hoveredTooth.userData;
+        hoveredTooth.material.emissive.setHex(ud.originalEmissive);
+        hoveredTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
+        hoveredTooth.scale.set(1, 1, 1);
+    }
+
+    if (intersects.length > 0) {
+        const mesh = intersects[0].object;
+        if (mesh.userData.toothNumber) {
+            hoveredTooth = mesh;
+            renderer.domElement.style.cursor = 'pointer';
+
+            // Hover glow
+            if (mesh !== selectedTooth) {
+                mesh.material.emissive.setHex(0x2dd4bf);
+                mesh.material.emissiveIntensity = 0.35;
+                mesh.scale.set(1.06, 1.06, 1.06);
+            }
+
+            // Tooltip
+            tooltip.textContent = `#${mesh.userData.toothNumber} — ${TOOTH_NAMES[mesh.userData.toothNumber].split('(')[0].trim()}`;
+            tooltip.style.left = event.clientX + 14 + 'px';
+            tooltip.style.top = event.clientY - 10 + 'px';
+            tooltip.classList.add('visible');
+        }
+    } else {
+        hoveredTooth = null;
+        renderer.domElement.style.cursor = 'grab';
+        tooltip.classList.remove('visible');
+    }
+}
+
+
+function onMouseClick(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(toothMeshes);
+
+    if (intersects.length > 0) {
+        const mesh = intersects[0].object;
+        if (mesh.userData.toothNumber) {
+            selectTooth(mesh);
+        }
+    }
+}
+
+
+function onTouchStart(event) {
+    if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(toothMeshes);
+
+        if (intersects.length > 0) {
+            const mesh = intersects[0].object;
+            if (mesh.userData.toothNumber) {
+                event.preventDefault();
+                selectTooth(mesh);
+            }
+        }
+    }
+}
+
+
+function selectTooth(mesh) {
+    // Reset previous selection
+    if (selectedTooth) {
+        const ud = selectedTooth.userData;
+        selectedTooth.material.emissive.setHex(ud.originalEmissive);
+        selectedTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
+        selectedTooth.scale.set(1, 1, 1);
+    }
+
+    selectedTooth = mesh;
+
+    // Highlight selected tooth
+    mesh.material.emissive.setHex(0x2dd4bf);
+    mesh.material.emissiveIntensity = 0.5;
+    mesh.scale.set(1.1, 1.1, 1.1);
+
+    // Stop auto-rotate
+    autoRotate = false;
+
+    // Update info panel
+    updateInfoPanel(mesh.userData.toothData);
+}
+
+
+/* ═══ Info Panel ═══ */
+function updateInfoPanel(data) {
+    const defaultPanel = document.getElementById('info-default');
+    const detailPanel = document.getElementById('tooth-detail');
+
+    defaultPanel.classList.add('hidden');
+    detailPanel.classList.add('active');
+
+    // Number & name
+    document.getElementById('detail-number').textContent = `#${data.number}`;
+    document.getElementById('detail-name').textContent = data.name;
+    document.getElementById('detail-quadrant').textContent = data.quadrant;
+
+    // Status badge
+    const badgeWrap = document.getElementById('detail-badge-wrap');
+    const statusLabels = {
+        healthy: 'Healthy',
+        needs_attention: 'Needs Attention',
+        treated: 'Treated',
+        planned: 'Planned',
+        missing: 'Missing'
+    };
+    const statusClass = {
+        healthy: 'mm-status-badge--healthy',
+        needs_attention: 'mm-status-badge--attention',
+        treated: 'mm-status-badge--treated',
+        planned: 'mm-status-badge--planned',
+        missing: 'mm-status-badge--missing'
+    };
+    const statusIcons = {
+        healthy: '✓',
+        needs_attention: '⚠',
+        treated: '🔧',
+        planned: '📅',
+        missing: '—'
+    };
+    badgeWrap.innerHTML = `<span class="mm-status-badge ${statusClass[data.status]}">${statusIcons[data.status]} ${statusLabels[data.status]}</span>`;
+
+    // Condition
+    document.getElementById('detail-condition').textContent = data.condition;
+
+    // History
+    const historySection = document.getElementById('history-section');
+    const historyContainer = document.getElementById('detail-history');
+    if (data.history && data.history.length > 0) {
+        historySection.style.display = 'block';
+        historyContainer.innerHTML = data.history.map(h => `
+            <div class="mm-history-item">
+                <div class="mm-history-dot"></div>
+                <div class="mm-history-content">
+                    <strong>${h.procedure}</strong>
+                    <span>${h.date} — ${h.provider}</span>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        historySection.style.display = 'none';
+    }
+
+    // Planned
+    const plannedSection = document.getElementById('planned-section');
+    const plannedContainer = document.getElementById('detail-planned');
+    if (data.planned && data.planned.length > 0) {
+        plannedSection.style.display = 'block';
+        plannedContainer.innerHTML = data.planned.map(p => `
+            <div class="mm-planned-item">
+                <strong>${p.procedure}</strong>
+                <span>${p.timeline} · Est. ${p.est_cost}</span>
+            </div>
+        `).join('');
+    } else {
+        plannedSection.style.display = 'none';
+    }
+
+    // Notes
+    const notesSection = document.getElementById('notes-section');
+    document.getElementById('detail-notes').textContent = data.notes;
+    notesSection.style.display = data.notes ? 'block' : 'none';
+
+    // Re-render icons
+    if (window.lucide) lucide.createIcons();
+}
+
+
+function closeDetail() {
+    document.getElementById('info-default').classList.remove('hidden');
+    document.getElementById('tooth-detail').classList.remove('active');
+
+    // Reset selected tooth
+    if (selectedTooth) {
+        const ud = selectedTooth.userData;
+        selectedTooth.material.emissive.setHex(ud.originalEmissive);
+        selectedTooth.material.emissiveIntensity = ud.originalEmissiveIntensity;
+        selectedTooth.scale.set(1, 1, 1);
+        selectedTooth = null;
+    }
+}
+
+
+function updateSummaryStats() {
+    const stats = { healthy: 0, needs_attention: 0, treated: 0, planned: 0 };
+    for (const key in DEMO_PATIENT.teeth) {
+        const s = DEMO_PATIENT.teeth[key].status;
+        if (stats[s] !== undefined) stats[s]++;
+    }
+
+    document.getElementById('summary-stats').innerHTML = `
+        <div class="mm-stat-card">
+            <div class="mm-stat-card__value" style="color: #22c55e;">${stats.healthy}</div>
+            <div class="mm-stat-card__label">Healthy</div>
+        </div>
+        <div class="mm-stat-card">
+            <div class="mm-stat-card__value" style="color: #F59E0B;">${stats.needs_attention}</div>
+            <div class="mm-stat-card__label">Need Attention</div>
+        </div>
+        <div class="mm-stat-card">
+            <div class="mm-stat-card__value" style="color: #3B82F6;">${stats.treated}</div>
+            <div class="mm-stat-card__label">Treated</div>
+        </div>
+        <div class="mm-stat-card">
+            <div class="mm-stat-card__value" style="color: #2dd4bf;">${stats.planned}</div>
+            <div class="mm-stat-card__label">Planned</div>
+        </div>
+    `;
+}
+
+
+/* ═══ View Controls ═══ */
+function setView(viewName) {
+    autoRotate = false;
+
+    const duration = 600;
+    const startPos = camera.position.clone();
+    const startTarget = controls.target.clone();
+    let endPos, endTarget;
+
+    switch (viewName) {
+        case 'front':
+            endPos = new THREE.Vector3(0, 5, 85);
+            endTarget = new THREE.Vector3(0, 0, 0);
+            break;
+        case 'top':
+            endPos = new THREE.Vector3(0, 90, 5);
+            endTarget = new THREE.Vector3(0, 0, -5);
+            break;
+        case 'upper':
+            endPos = new THREE.Vector3(0, 25, 60);
+            endTarget = new THREE.Vector3(0, 5, -8);
+            break;
+        case 'lower':
+            endPos = new THREE.Vector3(0, -15, 60);
+            endTarget = new THREE.Vector3(0, -5, -8);
+            break;
+        case 'reset':
+            endPos = new THREE.Vector3(0, 5, 85);
+            endTarget = new THREE.Vector3(0, 0, 0);
+            autoRotate = true;
+            break;
+    }
+
+    // Animate camera
+    const startTime = performance.now();
+
+    function animateCamera(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        controls.update();
+
+        if (progress < 1) {
+            requestAnimationFrame(animateCamera);
+        }
+    }
+
+    requestAnimationFrame(animateCamera);
+
+    // Update button states
+    document.querySelectorAll('.mm-view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewName);
+    });
+}
+
+
+/* ═══ Animation Loop ═══ */
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Auto-rotate
+    if (autoRotate) {
+        const group = scene.children.find(c => c.type === 'Group');
+        if (group) {
+            group.rotation.y += autoRotateSpeed;
+        }
+    }
+
+    // Subtle breathing animation on non-healthy teeth
+    const time = clock.getElapsedTime();
+    toothMeshes.forEach(mesh => {
+        if (mesh !== selectedTooth && mesh !== hoveredTooth) {
+            const status = mesh.userData.toothData.status;
+            if (status === 'needs_attention') {
+                mesh.material.emissiveIntensity = 0.12 + Math.sin(time * 2) * 0.06;
+            }
+        }
+    });
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+
+/* ═══ Resize ═══ */
+function onResize() {
+    const container = document.getElementById('viewer-container');
+    const rect = container.getBoundingClientRect();
+    camera.aspect = rect.width / rect.height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(rect.width, rect.height);
+}
+
+
+/* ═══ Init ═══ */
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+
+    // Close detail
+    document.getElementById('close-detail').addEventListener('click', closeDetail);
+
+    // View buttons
+    document.querySelectorAll('.mm-view-btn').forEach(btn => {
+        btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+});
+</script>
+
+</body>
+</html>
