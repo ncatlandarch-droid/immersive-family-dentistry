@@ -1128,18 +1128,18 @@ function init() {
 
     controls.addEventListener('start', () => { autoRotate = false; });
 
-    // ─── Premium Lighting ───
-    // Soft ambient fill
-    const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+    // ─── Neutral Lighting (preserves Medit scan vertex colors) ───
+    // Higher ambient so vertex colors read true
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambient);
 
-    // Hemisphere for natural sky/ground color
-    const hemi = new THREE.HemisphereLight(0xc8e8ff, 0x444466, 0.4);
+    // Hemisphere for soft top/bottom gradient
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x888888, 0.5);
     scene.add(hemi);
 
-    // Key light (warm, from upper-right-front)
-    const keyLight = new THREE.DirectionalLight(0xfff5e6, 0.9);
-    keyLight.position.set(40, 60, 50);
+    // Key light (pure white, from upper-front — no warm tint)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    keyLight.position.set(30, 50, 50);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
@@ -1153,25 +1153,20 @@ function init() {
     keyLight.shadow.radius = 4;
     scene.add(keyLight);
 
-    // Fill light (cool, from left)
-    const fillLight = new THREE.DirectionalLight(0xd4eaff, 0.45);
+    // Fill light (from left, neutral)
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.35);
     fillLight.position.set(-40, 20, 30);
     scene.add(fillLight);
 
-    // Rim light (from behind for edge highlight)
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.25);
+    // Rim light (from behind for edge definition)
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.2);
     rimLight.position.set(0, 30, -60);
     scene.add(rimLight);
 
-    // Bottom bounce light
-    const bounceLight = new THREE.DirectionalLight(0xe8d5c4, 0.15);
+    // Bottom bounce light (very subtle)
+    const bounceLight = new THREE.DirectionalLight(0xffffff, 0.1);
     bounceLight.position.set(0, -40, 20);
     scene.add(bounceLight);
-
-    // Subtle teal accent point light (behind the arch)
-    const accentLight = new THREE.PointLight(0x2dd4bf, 0.3, 120);
-    accentLight.position.set(0, 0, -40);
-    scene.add(accentLight);
 
     // ─── Raycaster ───
     raycaster = new THREE.Raycaster();
@@ -1243,14 +1238,27 @@ async function loadHybridScans() {
     
     // Realistic enamel material
     function makeScanMaterial(hasColors) {
+        if (hasColors) {
+            // Vertex colors from Medit scanner — use white base so natural
+            // tooth/gum colors show through untinted (matches Medit Web Viewer)
+            return new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,          // neutral — lets vertex colors dominate
+                roughness: 0.45,          // slightly matte, like real enamel
+                metalness: 0.0,
+                clearcoat: 0.15,          // subtle shine, not glassy
+                clearcoatRoughness: 0.3,
+                vertexColors: true,
+                side: THREE.DoubleSide
+            });
+        }
+        // Fallback if no vertex colors
         return new THREE.MeshPhysicalMaterial({
             color: 0xf0e6d8,
-            roughness: 0.28,
+            roughness: 0.35,
             metalness: 0.01,
-            clearcoat: 0.6,
-            clearcoatRoughness: 0.12,
-            envMapIntensity: 0.7,
-            vertexColors: hasColors,
+            clearcoat: 0.3,
+            clearcoatRoughness: 0.2,
+            vertexColors: false,
             side: THREE.DoubleSide
         });
     }
@@ -1421,16 +1429,19 @@ function setRenderMode(mode) {
     
     scanMeshes.forEach(function(mesh) {
         var mat = mesh.material;
+        var hasVC = mesh.geometry.hasAttribute('color');
         
         if (mode === 'solid') {
-            mat.color.setHex(0xf0e6d8);
+            mat.color.setHex(hasVC ? 0xffffff : 0xf0e6d8);
+            mat.vertexColors = hasVC;
             mat.transparent = false;
             mat.opacity = 1.0;
             mat.wireframe = false;
-            mat.roughness = 0.28;
-            mat.clearcoat = 0.6;
+            mat.roughness = 0.45;
+            mat.clearcoat = 0.15;
         } else if (mode === 'xray') {
             mat.color.setHex(0x88ccff);
+            mat.vertexColors = false;
             mat.transparent = true;
             mat.opacity = 0.35;
             mat.wireframe = false;
