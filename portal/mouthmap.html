@@ -834,22 +834,15 @@ body::before {
                 <i data-lucide="chevron-down"></i><span>Lower</span>
             </button>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <button class="mm-view-btn" onclick="toggleToothChart(); return false;" title="Toggle Tooth Chart" id="chart-toggle-btn" style="color:#2dd4bf;">
-                <i data-lucide="grid-3x3"></i><span>Chart</span>
+            <!-- Render Mode Buttons -->
+            <button class="mm-view-btn active" onclick="setRenderMode('solid')" id="btn-render-solid" title="Solid">
+                <i data-lucide="circle"></i><span>Solid</span>
             </button>
-            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <!-- Anatomy Layer Toggles -->
-            <button class="mm-view-btn anatomy-toggle" onclick="toggleAnatomyLayer('nerves')" title="Toggle Nerves" id="btn-nerves" style="color:#a78bfa;">
-                <span style="font-size:12px;">🧠</span><span>Nerves</span>
+            <button class="mm-view-btn" onclick="setRenderMode('xray')" id="btn-render-xray" title="X-Ray">
+                <i data-lucide="scan-line"></i><span>X-Ray</span>
             </button>
-            <button class="mm-view-btn anatomy-toggle" onclick="toggleAnatomyLayer('muscles')" title="Toggle Muscles" id="btn-muscles" style="color:#f87171;">
-                <span style="font-size:12px;">💪</span><span>Muscles</span>
-            </button>
-            <button class="mm-view-btn anatomy-toggle" onclick="toggleAnatomyLayer('gums')" title="Toggle Gums" id="btn-gums" style="color:#fb923c;">
-                <span style="font-size:12px;">🫦</span><span>Gums</span>
-            </button>
-            <button class="mm-view-btn anatomy-toggle" onclick="toggleAnatomyLayer('bone')" title="Toggle Bone" id="btn-bone" style="color:#94a3b8;">
-                <span style="font-size:12px;">🦴</span><span>Bone</span>
+            <button class="mm-view-btn" onclick="setRenderMode('status')" id="btn-render-status" title="Color by Status">
+                <i data-lucide="palette"></i><span>Status</span>
             </button>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
             <button class="mm-view-btn" data-view="reset" title="Reset View">
@@ -857,30 +850,6 @@ body::before {
             </button>
         </div>
 
-        <!-- Collapsible 2D Tooth Chart — sits ABOVE controls, doesn't overlap 3D -->
-        <div id="tooth-chart-panel" style="
-            position:absolute;bottom:48px;left:12px;right:12px;z-index:20;
-            pointer-events:none;">
-            <div id="tooth-chart-body" style="
-                display:none;pointer-events:auto;
-                background:rgba(15,20,35,0.95);border:1px solid rgba(45,212,191,0.2);
-                border-radius:12px;padding:12px 16px;backdrop-filter:blur(16px);
-                box-shadow:0 8px 32px rgba(0,0,0,0.4);margin-bottom:8px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">UPPER ARCH</span>
-                    <button onclick="toggleToothChart()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:0;">&times;</button>
-                </div>
-                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:6px;" id="upper-arch-chart"></div>
-                <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
-                <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">LOWER ARCH</span>
-                <div style="display:flex;justify-content:center;gap:2px;margin-top:4px;" id="lower-arch-chart"></div>
-                <div style="display:flex;justify-content:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);">
-                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#F5F5F0;display:inline-block;"></span>Healthy</span>
-                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>Attention</span>
-                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#3B82F6;display:inline-block;"></span>Treated</span>
-                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -893,6 +862,20 @@ body::before {
 
         <!-- Default state -->
         <div class="mm-info-default" id="info-default">
+            <!-- Tooth Chart in right panel -->
+            <div style="margin-bottom:16px;">
+                <h4 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Tooth Chart</h4>
+                <div style="display:flex;justify-content:center;gap:1px;margin-bottom:4px;flex-wrap:wrap;" id="upper-arch-chart"></div>
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
+                <div style="display:flex;justify-content:center;gap:1px;flex-wrap:wrap;" id="lower-arch-chart"></div>
+                <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
+                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F5F5F0;display:inline-block;"></span>OK</span>
+                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F59E0B;display:inline-block;"></span>Attn</span>
+                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#3B82F6;display:inline-block;"></span>Treated</span>
+                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
+                </div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 12px;"></div>
             <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="mm-info-default__icon">
             <h3>Select a Tooth</h3>
             <p>Click or tap any tooth on the 3D model to view detailed information, history, and treatment plans.</p>
@@ -1237,13 +1220,21 @@ let upperGroup, lowerGroup;
 async function loadHybridScans() {
     const loader = new THREE.PLYLoader();
     
-    // Groups for TMJ hinge rotation
+    // Single parent group — keeps both scans in their original coordinate alignment
+    const scanGroup = new THREE.Group();
+    scanGroup.name = 'dentalScans';
+    scene.add(scanGroup);
+    
+    // Upper stays fixed, lower gets a pivot for TMJ hinge
     upperGroup = new THREE.Group();
     upperGroup.name = 'upperJaw';
+    
+    // TMJ pivot group: positioned at the condyle, mandible rotates inside it
     lowerGroup = new THREE.Group();
-    lowerGroup.name = 'lowerJaw';
-    scene.add(upperGroup);
-    scene.add(lowerGroup);
+    lowerGroup.name = 'lowerJawPivot';
+    
+    scanGroup.add(upperGroup);
+    scanGroup.add(lowerGroup);
     
     let loaded = 0;
     const total = 2;
@@ -1331,27 +1322,24 @@ async function loadHybridScans() {
         
         scanLoaded = true;
         
-        // Compute combined bounds from BOTH groups
-        scanBounds = new THREE.Box3();
-        upperGroup.traverse(function(c) { if (c.isMesh && c.material.visible !== false) scanBounds.expandByObject(c); });
-        lowerGroup.traverse(function(c) { if (c.isMesh && c.material.visible !== false) scanBounds.expandByObject(c); });
-        
+        // Compute bounds from the scanGroup (both arches together)
+        scanBounds = new THREE.Box3().setFromObject(scanGroup);
         var center = scanBounds.getCenter(new THREE.Vector3());
         var size = scanBounds.getSize(new THREE.Vector3());
         var maxDim = Math.max(size.x, size.y, size.z);
         
-        // Center BOTH groups by the same offset (preserves relative alignment)
-        upperGroup.position.sub(center);
-        lowerGroup.position.sub(center);
+        // Center the entire group at origin (preserves relative alignment)
+        scanGroup.position.sub(center);
         
-        // Store base Y for jaw separation
-        upperGroup.userData.baseY = upperGroup.position.y;
-        lowerGroup.userData.baseY = lowerGroup.position.y;
+        // Set TMJ pivot point at the back-top of the mandible
+        // From scan data: mandible Y max ≈ 17.6, Z min ≈ -25.6
+        // After centering, shift by -center
+        var tmjY = 17.6 - center.y;   // top of mandible ramus
+        var tmjZ = -25.6 - center.z;  // posterior condyle
+        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, tmjY, tmjZ);
         
         // Recalculate bounds after centering
-        scanBounds = new THREE.Box3();
-        upperGroup.traverse(function(c) { if (c.isMesh) scanBounds.expandByObject(c); });
-        lowerGroup.traverse(function(c) { if (c.isMesh) scanBounds.expandByObject(c); });
+        scanBounds = new THREE.Box3().setFromObject(scanGroup);
         
         camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
         controls.target.set(0, 0, 0);
@@ -1378,22 +1366,105 @@ function updateLoadingProgress(loaded, total) {
     }
 }
 
-/* ═══ Jaw Open (Simple Y Separation) ═══ */
+/* ═══ TMJ Hinge Jaw Open ═══ 
+   Real jaw physics: the mandible rotates around the TMJ condyle 
+   at the back of the jaw. Upper jaw stays fixed. */
 function adjustJawOpen(value) {
     var pct = parseInt(value);
     var label = document.getElementById('jaw-open-label');
     if (label) label.textContent = pct + '%';
     
-    // Simple Y separation: upper moves up, lower moves down
-    // Max separation = 15 units (natural mouth opening range)
-    var sep = (pct / 100) * 15;
+    if (!lowerGroup) return;
     
-    if (upperGroup && upperGroup.userData.baseY !== undefined) {
-        upperGroup.position.y = upperGroup.userData.baseY + sep * 0.3;
+    // Max opening angle: ~30 degrees (natural range)
+    var maxAngle = 30 * (Math.PI / 180);
+    var angle = (pct / 100) * maxAngle;
+    var pivot = lowerGroup.userData.tmjPivot;
+    
+    if (!pivot) return;
+    
+    // Reset transform
+    lowerGroup.position.set(0, 0, 0);
+    lowerGroup.rotation.set(0, 0, 0);
+    lowerGroup.updateMatrixWorld(true);
+    
+    if (angle > 0) {
+        // Pivot technique: translate to pivot, rotate, translate back
+        // This makes the mandible swing open around the condyle
+        lowerGroup.position.set(
+            -pivot.x,
+            -pivot.y,
+            -pivot.z
+        );
+        lowerGroup.rotation.x = angle;
+        
+        // Re-offset by rotated pivot
+        var rotatedPivot = pivot.clone();
+        rotatedPivot.applyAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+        lowerGroup.position.add(rotatedPivot);
     }
-    if (lowerGroup && lowerGroup.userData.baseY !== undefined) {
-        lowerGroup.position.y = lowerGroup.userData.baseY - sep * 0.7;
-    }
+}
+
+/* ═══ Render Modes ═══ */
+var currentRenderMode = 'solid';
+
+function setRenderMode(mode) {
+    currentRenderMode = mode;
+    
+    // Update button states
+    ['solid', 'xray', 'status'].forEach(function(m) {
+        var btn = document.getElementById('btn-render-' + m);
+        if (btn) btn.classList.toggle('active', m === mode);
+    });
+    
+    scanMeshes.forEach(function(mesh) {
+        var mat = mesh.material;
+        
+        if (mode === 'solid') {
+            mat.color.setHex(0xf0e6d8);
+            mat.transparent = false;
+            mat.opacity = 1.0;
+            mat.wireframe = false;
+            mat.roughness = 0.28;
+            mat.clearcoat = 0.6;
+        } else if (mode === 'xray') {
+            mat.color.setHex(0x88ccff);
+            mat.transparent = true;
+            mat.opacity = 0.35;
+            mat.wireframe = false;
+            mat.roughness = 0.1;
+            mat.clearcoat = 0.0;
+        } else if (mode === 'status') {
+            // Color by status: use the invisible hitbox meshes to paint regions
+            mat.color.setHex(0xf0e6d8);
+            mat.transparent = false;
+            mat.opacity = 1.0;
+            mat.wireframe = false;
+            mat.roughness = 0.28;
+            mat.clearcoat = 0.6;
+        }
+        mat.needsUpdate = true;
+    });
+    
+    // In status mode, make hitbox meshes visible with status colors
+    toothMeshes.forEach(function(tm) {
+        if (mode === 'status') {
+            var num = tm.userData.toothNumber;
+            var status = DEMO_PATIENT.teeth[num] ? DEMO_PATIENT.teeth[num].status : 'healthy';
+            var colors = { healthy: 0x22c55e, needs_attention: 0xF59E0B, treated: 0x3B82F6, planned: 0x2dd4bf };
+            tm.material = new THREE.MeshPhysicalMaterial({
+                color: colors[status] || 0x22c55e,
+                transparent: true,
+                opacity: 0.6,
+                roughness: 0.3,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            tm.material.visible = true;
+        } else {
+            tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+        }
+    });
 }
 
 
