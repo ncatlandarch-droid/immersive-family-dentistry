@@ -11,11 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Three.js r128 (stable legacy global script support) -->
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-
+    <!-- Portal CSS -->
     <link rel="stylesheet" href="portal.css">
 </head>
 <body>
@@ -69,21 +65,21 @@
             <main class="portal-main">
                 <!-- View: 3D Scan -->
                 <div id="view-scan" class="portal-view active">
-                    <div class="mouth-viewer-container" id="mouthmap-container" style="position:relative;">
-                        <!-- Anatomy Layer Toggles -->
-                        <div id="anatomy-toggles" style="position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:10;">
-                            <button class="anatomy-toggle active" data-layer="teeth" title="Teeth">🦷 Teeth</button>
-                            <button class="anatomy-toggle" data-layer="gums" title="Gums">🫦 Gums</button>
-                            <button class="anatomy-toggle" data-layer="nerves" title="Nerves">🧠 Nerves</button>
-                            <button class="anatomy-toggle" data-layer="muscles" title="Muscles">💪 Muscles</button>
-                        </div>
-                        <!-- View Controls -->
-                        <div id="view-controls" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;">
-                            <button class="view-btn active" data-view="front">👁 Front</button>
-                            <button class="view-btn" data-view="top">⬆ Top</button>
-                            <button class="view-btn" data-view="upper">∧ Upper</button>
-                            <button class="view-btn" data-view="lower">∨ Lower</button>
-                            <button class="view-btn" data-view="reset">↺ Reset</button>
+                    <!-- MouthMap Hero Card — links to full experience -->
+                    <div class="mouth-viewer-container" id="mouthmap-container" style="position:relative; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #0B0F19 0%, #111827 50%, #0f172a 100%); cursor:pointer;" onclick="window.location.href='/portal/mouthmap'">
+                        <div style="text-align:center; padding:32px;">
+                            <div style="font-size:64px; margin-bottom:16px;">🦷</div>
+                            <h2 style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:700; color:#F1F5F9; margin:0 0 8px;">Your Interactive MouthMap</h2>
+                            <p style="font-family:'Inter',sans-serif; font-size:14px; color:#94A3B8; margin:0 0 20px; max-width:360px;">Explore your dental health in 3D — click teeth, toggle anatomy layers, and learn about your mouth.</p>
+                            <button style="font-family:'Inter',sans-serif; font-size:14px; font-weight:600; padding:12px 28px; background:linear-gradient(135deg,#2dd4bf,#14b8a6); color:#0B0F19; border:none; border-radius:24px; cursor:pointer; box-shadow:0 4px 20px rgba(45,212,191,0.3); transition:all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 28px rgba(45,212,191,0.4)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(45,212,191,0.3)'">
+                                🔬 Open My MouthMap →
+                            </button>
+                            <div style="margin-top:16px; display:flex; gap:16px; justify-content:center;">
+                                <span style="font-size:11px; color:#64748B;">🧠 Nerves</span>
+                                <span style="font-size:11px; color:#64748B;">💪 Muscles</span>
+                                <span style="font-size:11px; color:#64748B;">🫦 Gums</span>
+                                <span style="font-size:11px; color:#64748B;">🦴 Bone</span>
+                            </div>
                         </div>
                     </div>
 
@@ -184,6 +180,6 @@
         </div>
     </div>
 
-    <script src="patient-portal.js" type="module"></script>
+    <script src="patient-portal.js"></script>
 </body>
 </html>

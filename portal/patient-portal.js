@@ -3,7 +3,8 @@
    Loads patient data directly and initializes all views.
    ═══════════════════════════════════════════════════════════ */
 
-import { MouthViewer } from './mouth-viewer.js';
+// MouthMap 3D is now at /portal/mouthmap (standalone page)
+// Patient portal links to it instead of embedding
 
 // ─── State ───
 let patientData = null;
@@ -98,7 +99,6 @@ function loadFallbackData() {
 
 // ─── Initialize Portal ───
 function initPortal() {
-    try { init3DMouthMap(); } catch(e) { console.error('3D MouthMap init error:', e); }
     try { initNavigation(); } catch(e) { console.error('Nav init error:', e); }
     try { initOdontogram(); } catch(e) { console.error('Odontogram init error:', e); }
     try { initHealthSummary(); } catch(e) { console.error('Health init error:', e); }
@@ -108,99 +108,6 @@ function initPortal() {
     try { initMessages(); } catch(e) { console.error('Messages init error:', e); }
     try { initTimelineBar(); } catch(e) { console.error('TimelineBar init error:', e); }
     try { initPortalChat(); } catch(e) { console.error('Chat init error:', e); }
-}
-
-// ─── 3D MouthMap Viewer ───
-function init3DMouthMap() {
-    const container = document.getElementById('mouthmap-container');
-    if (!container) return;
-
-    // Set background dark for 3D viewer
-    container.style.background = '#0B0F19';
-
-    mouthViewer = new MouthViewer(container, {
-        backgroundColor: 0x0B0F19,
-        modelColor: 0xf5e6d3,
-        highlightColor: 0x2dd4bf,
-    });
-
-    // Load dental chart teeth
-    mouthViewer.loadDemoModel(dentalChart);
-
-    // Wire tooth clicks to info panel
-    mouthViewer.onToothClick = (userData) => {
-        if (userData.toothNumber) {
-            selectTooth(userData.toothNumber);
-        }
-    };
-
-    // Anatomy layer toggles
-    document.querySelectorAll('.anatomy-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const layer = btn.dataset.layer;
-            btn.classList.toggle('active');
-            const isActive = btn.classList.contains('active');
-
-            if (mouthViewer && mouthViewer.toggleLayer) {
-                mouthViewer.toggleLayer(layer, isActive);
-            } else {
-                // Basic toggle: show/hide tooth model for 'teeth'
-                if (layer === 'teeth' && mouthViewer.model) {
-                    mouthViewer.model.visible = isActive;
-                }
-                if (layer === 'nerves' && mouthViewer.renderNerves) {
-                    if (isActive) mouthViewer.renderNerves();
-                    else if (mouthViewer.nerveGroup) mouthViewer.nerveGroup.visible = false;
-                }
-                if (layer === 'muscles' && mouthViewer.renderMuscles) {
-                    if (isActive) mouthViewer.renderMuscles();
-                    else if (mouthViewer.muscleGroup) mouthViewer.muscleGroup.visible = false;
-                }
-                if (layer === 'gums' && mouthViewer.renderGumline) {
-                    if (isActive) mouthViewer.renderGumline();
-                    else if (mouthViewer.gumGroup) mouthViewer.gumGroup.visible = false;
-                }
-            }
-        });
-    });
-
-    // View controls
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const view = btn.dataset.view;
-
-            if (!mouthViewer) return;
-            const cam = mouthViewer.camera;
-            const ctrl = mouthViewer.controls;
-
-            switch (view) {
-                case 'front':
-                    cam.position.set(0, 0, 120);
-                    ctrl.target.set(0, 0, 0);
-                    break;
-                case 'top':
-                    cam.position.set(0, 120, 10);
-                    ctrl.target.set(0, 0, 0);
-                    break;
-                case 'upper':
-                    cam.position.set(0, 40, 80);
-                    ctrl.target.set(0, 8, 0);
-                    break;
-                case 'lower':
-                    cam.position.set(0, -40, 80);
-                    ctrl.target.set(0, -8, 0);
-                    break;
-                case 'reset':
-                    mouthViewer.resetView();
-                    break;
-            }
-            ctrl.update();
-        });
-    });
-
-    console.log('🦷 3D MouthMap initialized — Sketchfab replaced');
 }
 
 // ─── Interactive Odontogram (2D Dental Chart) ───
