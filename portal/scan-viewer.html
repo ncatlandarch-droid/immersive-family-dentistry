@@ -1412,8 +1412,8 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 </div>
                 <div class="sv-slider-row">
                     <span class="sv-slider-label">Metalness</span>
-                    <input type="range" class="sv-slider" id="sliderMetalness" min="0" max="100" value="0">
-                    <span class="sv-slider-val" id="valMetalness">0.00</span>
+                    <input type="range" class="sv-slider" id="sliderMetalness" min="0" max="100" value="82">
+                    <span class="sv-slider-val" id="valMetalness">0.82</span>
                 </div>
                 <div class="sv-slider-row">
                     <span class="sv-slider-label">Opacity</span>
@@ -2550,6 +2550,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         selectedToothNum = toothNum;
         showToothPopup(toothNum, e.clientX, e.clientY, hit.point);
+
+        // Sync: highlight on dental chart too
+        document.querySelectorAll('.dental-chart__tooth').forEach(t => t.classList.remove('active'));
+        const chartTooth = document.querySelector(`.dental-chart__tooth[data-tooth="${toothNum}"]`);
+        if (chartTooth) chartTooth.classList.add('active');
     }
 
     function showToothPopup(num, screenX, screenY, worldPoint) {
@@ -2654,9 +2659,12 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     // dblclick handler attached after initThree() — see Init section
 
     // ─── Dental Chart Integration ───
-    let chartOpen = true;
+    let chartOpen = false;
     const chartBody = document.getElementById('dentalChartBody');
     const chartChevron = document.getElementById('dentalChartChevron');
+    // Start collapsed
+    chartBody.classList.add('collapsed');
+    chartChevron.style.transform = 'rotate(180deg)';
 
     document.getElementById('dentalChartToggle').addEventListener('click', () => {
         chartOpen = !chartOpen;
