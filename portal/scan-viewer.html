@@ -1695,7 +1695,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         // If scan has real vertex colors (Medit/iTero/3Shape), use them!
         if (hasVertexColors && preset !== 'xray') {
-            matOpts.vertexColors = true;
+            matOpts.vertexColors = 2; // THREE.VertexColors = 2 in r128
             matOpts.color = new THREE.Color(0xffffff);
             matOpts.roughness = 0.35;
             matOpts.clearcoat = 0.2;
@@ -2411,7 +2411,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         // Enable vertex colors on material
         mesh.material.dispose();
         const mat = new THREE.MeshPhysicalMaterial({
-            vertexColors: true,
+            vertexColors: 2, // THREE.VertexColors = 2 in r128
             color: 0xffffff,
             roughness: 0.4,
             metalness: 0.0,
