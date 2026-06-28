@@ -1352,7 +1352,10 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             <div class="sv-section">
                 <div class="sv-section__title"><i data-lucide="palette"></i> Material</div>
                 <div class="sv-presets">
-                    <button class="sv-preset-btn active" data-preset="tooth">
+                    <button class="sv-preset-btn active" data-preset="scan">
+                        <span class="sv-preset-swatch" style="background:linear-gradient(135deg,#F0E6D8,#E8A0A0,#c49070);"></span> Scan Colors
+                    </button>
+                    <button class="sv-preset-btn" data-preset="tooth">
                         <span class="sv-preset-swatch" style="background:#F0E6D8;"></span> Tooth
                     </button>
                     <button class="sv-preset-btn" data-preset="gum">
@@ -1432,8 +1435,8 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
                 <div class="sv-slider-row">
                     <label>Bite / Open</label>
                     <div class="sv-slider-wrap">
-                        <input type="range" class="sv-slider" id="sliderMouthOpen" min="0" max="100" value="10">
-                        <span class="sv-slider-val" id="valMouthOpen">Bite</span>
+                        <input type="range" class="sv-slider" id="sliderMouthOpen" min="0" max="100" value="35">
+                        <span class="sv-slider-val" id="valMouthOpen">Open</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:6px;margin-top:6px;">
@@ -1692,8 +1695,8 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         // If scan has real vertex colors (Medit/iTero/3Shape), use them!
         if (hasVertexColors && preset !== 'xray') {
-            matOpts.vertexColors = true;
-            matOpts.color = 0xffffff; // White base lets vertex colors show true
+            matOpts.vertexColors = THREE.VertexColors || true;
+            matOpts.color = new THREE.Color(0xffffff); // White base lets vertex colors show true
             matOpts.roughness = 0.4;
             matOpts.clearcoat = 0.15;
             matOpts.clearcoatRoughness = 0.5;
@@ -1798,11 +1801,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         const scaleFactor = 60 / maxDim;
         mesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        // Position for multi-arch — close together like a real bite
+        // Position for multi-arch — match slider default (35% = 14 unit gap)
         if (state.models.length === 1) {
-            // Second arch — small gap to show natural bite
-            mesh.position.y = -3;
-            state.models[0].mesh.position.y = 3;
+            // Second arch — default gap so all teeth visible
+            mesh.position.y = -7;
+            state.models[0].mesh.position.y = 7;
         }
 
         scene.add(mesh);
@@ -2408,7 +2411,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         // Enable vertex colors on material
         mesh.material.dispose();
         const mat = new THREE.MeshPhysicalMaterial({
-            vertexColors: true,
+            vertexColors: THREE.VertexColors || true,
             color: 0xffffff,
             roughness: 0.4,
             metalness: 0.0,
