@@ -833,46 +833,37 @@ body::before {
             <button class="mm-view-btn" data-view="lower" title="Lower Arch">
                 <i data-lucide="chevron-down"></i><span>Lower</span>
             </button>
+            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
+            <button class="mm-view-btn" onclick="toggleToothChart(); return false;" title="Toggle Tooth Chart" id="chart-toggle-btn" style="color:#2dd4bf;">
+                <i data-lucide="grid-3x3"></i><span>Chart</span>
+            </button>
             <button class="mm-view-btn" data-view="reset" title="Reset View">
                 <i data-lucide="rotate-ccw"></i><span>Reset</span>
             </button>
         </div>
 
-        <!-- Collapsible 2D Tooth Chart -->
-        <div id="tooth-chart-panel" style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:20;transition:all 0.3s ease;">
-            <button id="tooth-chart-toggle" onclick="toggleToothChart()" style="
-                display:flex;align-items:center;gap:6px;padding:8px 16px;
-                background:rgba(15,20,35,0.9);border:1px solid rgba(45,212,191,0.3);
-                border-radius:12px 12px 0 0;color:#2dd4bf;font-size:12px;font-weight:600;
-                cursor:pointer;margin:0 auto;backdrop-filter:blur(12px);
-                box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
-                <span style="font-size:16px;">🦷</span> Tooth Chart
-                <i data-lucide="chevron-up" id="chart-chevron" style="width:14px;height:14px;transition:transform 0.3s;"></i>
-            </button>
+        <!-- Collapsible 2D Tooth Chart — sits ABOVE controls, doesn't overlap 3D -->
+        <div id="tooth-chart-panel" style="
+            position:absolute;bottom:48px;left:12px;right:12px;z-index:20;
+            pointer-events:none;">
             <div id="tooth-chart-body" style="
-                display:none;background:rgba(15,20,35,0.95);border:1px solid rgba(45,212,191,0.2);
-                border-radius:16px;padding:16px 20px;backdrop-filter:blur(16px);
-                box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:480px;">
-                <!-- Upper Arch -->
-                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:4px;">
-                    <span style="font-size:9px;color:#64748b;width:100%;text-align:center;">UPPER ARCH</span>
+                display:none;pointer-events:auto;
+                background:rgba(15,20,35,0.95);border:1px solid rgba(45,212,191,0.2);
+                border-radius:12px;padding:12px 16px;backdrop-filter:blur(16px);
+                box-shadow:0 8px 32px rgba(0,0,0,0.4);margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">UPPER ARCH</span>
+                    <button onclick="toggleToothChart()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:0;">&times;</button>
                 </div>
-                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:8px;" id="upper-arch-chart">
-                </div>
-                <div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0;"></div>
-                <!-- Lower Arch -->
-                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:4px;">
-                    <span style="font-size:9px;color:#64748b;width:100%;text-align:center;">LOWER ARCH</span>
-                </div>
-                <div style="display:flex;justify-content:center;gap:2px;" id="lower-arch-chart">
-                </div>
-                <!-- Legend -->
-                <div style="display:flex;justify-content:center;gap:12px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#F5F5F0;display:inline-block;"></span>Healthy</span>
-                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>Attention</span>
-                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#3B82F6;display:inline-block;"></span>Treated</span>
-                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
-                    <span style="font-size:9px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:2px;background:#333;display:inline-block;"></span>Missing</span>
+                <div style="display:flex;justify-content:center;gap:2px;margin-bottom:6px;" id="upper-arch-chart"></div>
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
+                <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">LOWER ARCH</span>
+                <div style="display:flex;justify-content:center;gap:2px;margin-top:4px;" id="lower-arch-chart"></div>
+                <div style="display:flex;justify-content:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#F5F5F0;display:inline-block;"></span>Healthy</span>
+                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>Attention</span>
+                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#3B82F6;display:inline-block;"></span>Treated</span>
+                    <span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
                 </div>
             </div>
         </div>
@@ -1213,298 +1204,187 @@ function init() {
 
 /* ═══ Build Dental Arch ═══ */
 function buildDentalArch() {
-    // Try loading segmented teeth first (Voltron mode)
-    // Falls back to full arch scan if segmented files aren't available
-    loadSegmentedTeeth().catch(() => {
-        console.log('[MouthMap] No segmented teeth — loading full arch scans');
-        loadRealScans();
-    });
+    // HYBRID: Full scans = visual. Segmentation = click identification.
+    loadHybridScans();
 }
-
 
 /* ═══════════════════════════════════════════════════════════
-   VOLTRON LOADER — Individual Segmented Teeth
-   Each tooth is its own mesh = clickable, highlightable, colorable
-   ═══════════════════════════════════════════════════════════ */
-
-async function loadSegmentedTeeth() {
-    const resp = await fetch('/portal/demo-scans/teeth/manifest.json');
-    if (!resp.ok) throw new Error('No manifest');
-    const manifest = await resp.json();
-    
-    if (!manifest.teeth || Object.keys(manifest.teeth).length < 5) {
-        throw new Error('Too few teeth in manifest');
-    }
-    
-    const loader = new THREE.PLYLoader();
-    const teethGroup = new THREE.Group();
-    teethGroup.name = 'segmentedTeeth';
-    const gumsGroup = new THREE.Group();
-    gumsGroup.name = 'gums';
-    
-    let loaded = 0;
-    const toothEntries = Object.entries(manifest.teeth);
-    const gumEntries = Object.entries(manifest.gums || {});
-    const total = toothEntries.length + gumEntries.length;
-    
-    // Load each tooth as its own mesh
-    for (const [toothNum, info] of toothEntries) {
-        try {
-            const geo = await loadPLY(loader, `/portal/demo-scans/teeth/${info.file}`);
-            geo.computeVertexNormals();
-            
-            const num = parseInt(toothNum);
-            const status = DEMO_PATIENT.teeth[num]?.status || 'healthy';
-            
-            const mat = new THREE.MeshPhysicalMaterial({
-                color: STATUS_COLORS[status] || 0xF5F5F0,
-                roughness: 0.30,
-                metalness: 0.02,
-                clearcoat: 0.6,
-                clearcoatRoughness: 0.1,
-                emissive: STATUS_EMISSIVE[status] || 0x000000,
-                emissiveIntensity: STATUS_EMISSIVE_INTENSITY[status] || 0,
-                side: THREE.DoubleSide
-            });
-            
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.name = `tooth_${toothNum}`;
-            mesh.userData.toothNumber = num;
-            mesh.userData.toothData = DEMO_PATIENT.teeth[num];
-            mesh.userData.originalColor = mat.color.getHex();
-            mesh.userData.originalEmissive = mat.emissive.getHex();
-            mesh.userData.originalEmissiveIntensity = mat.emissiveIntensity;
-            mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
-            mesh.castShadow = true;
-            
-            teethGroup.add(mesh);
-            toothMeshes.push(mesh);
-            loaded++;
-            updateLoadingProgress(loaded, total);
-        } catch (e) {
-            console.warn(`⚠ Failed to load tooth ${toothNum}:`, e);
-        }
-    }
-    
-    // Load gum meshes
-    for (const [archType, info] of gumEntries) {
-        try {
-            const geo = await loadPLY(loader, `/portal/demo-scans/teeth/${info.file}`);
-            geo.computeVertexNormals();
-            
-            const mat = new THREE.MeshPhysicalMaterial({
-                color: 0xE8A0A0,  // pinkish gum color
-                roughness: 0.55,
-                metalness: 0.0,
-                clearcoat: 0.2,
-                transparent: true,
-                opacity: 0.7,
-                side: THREE.DoubleSide
-            });
-            
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.name = `gum_${archType}`;
-            mesh.userData.archType = archType;
-            mesh.userData.baseY = 0;
-            gumsGroup.add(mesh);
-            scanMeshes.push(mesh);
-            loaded++;
-            updateLoadingProgress(loaded, total);
-        } catch (e) {
-            console.warn(`⚠ Failed to load gum ${archType}:`, e);
-        }
-    }
-    
-    scene.add(teethGroup);
-    scene.add(gumsGroup);
-    
-    // Store baseY for jaw open control
-    toothMeshes.forEach(m => { m.userData.baseY = m.position.y; });
-    
-    // Fit camera
-    const allGroup = new THREE.Group();
-    allGroup.add(teethGroup.clone());
-    allGroup.add(gumsGroup.clone());
-    scanBounds = new THREE.Box3().setFromObject(teethGroup);
-    if (gumsGroup.children.length > 0) {
-        scanBounds.expandByObject(gumsGroup);
-    }
-    const center = scanBounds.getCenter(new THREE.Vector3());
-    const size = scanBounds.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    
-    camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
-    controls.target.copy(center);
-    controls.update();
-    
-    scanLoaded = true;
-    
-    const loadingEl = document.getElementById('loading-overlay');
-    if (loadingEl) loadingEl.style.display = 'none';
-    
-    updateSummaryStats();
-    console.log(`🦷 Voltron mode: ${toothMeshes.length} teeth loaded as individual meshes`);
-}
-
-function loadPLY(loader, url) {
-    return new Promise((resolve, reject) => {
-        loader.load(url, resolve, undefined, reject);
-    });
-}
-
-
-/* ═══════════════════════════════════════════════════════════
-   REAL SCAN LOADER — PLY Files as Primary Model
-   The scan is BOTH the visual AND the click target.
-   Position-based mapping determines which tooth was clicked.
+   HYBRID LOADER
+   Full arch PLY scans render as the visual (high fidelity).
+   Segmented tooth PLYs loaded as INVISIBLE hitboxes for click ID.
    ═══════════════════════════════════════════════════════════ */
 
 let scanMeshes = [];
 let scanLoaded = false;
 let scanBounds = null;
+let upperGroup, lowerGroup;
 
-function loadRealScans() {
+async function loadHybridScans() {
     const loader = new THREE.PLYLoader();
-    const scanGroup = new THREE.Group();
-    scanGroup.name = 'realScans';
+    
+    // Groups for TMJ hinge rotation
+    upperGroup = new THREE.Group();
+    upperGroup.name = 'upperJaw';
+    lowerGroup = new THREE.Group();
+    lowerGroup.name = 'lowerJaw';
+    scene.add(upperGroup);
+    scene.add(lowerGroup);
+    
     let loaded = 0;
     const total = 2;
     
-    // Premium dental material — mimics real enamel/gum appearance
+    // Realistic enamel material
     function makeScanMaterial(hasColors) {
         return new THREE.MeshPhysicalMaterial({
             color: 0xf0e6d8,
-            roughness: 0.32,
+            roughness: 0.28,
             metalness: 0.01,
-            clearcoat: 0.5,
-            clearcoatRoughness: 0.15,
-            envMapIntensity: 0.6,
+            clearcoat: 0.6,
+            clearcoatRoughness: 0.12,
+            envMapIntensity: 0.7,
             vertexColors: hasColors,
             side: THREE.DoubleSide
         });
     }
     
-    function onScanLoaded() {
-        loaded++;
-        updateLoadingProgress(loaded, total);
-        
-        if (loaded >= total) {
-            scanLoaded = true;
-            
-            // Calculate bounds for position-based tooth mapping
-            scanBounds = new THREE.Box3().setFromObject(scanGroup);
-            const center = scanBounds.getCenter(new THREE.Vector3());
-            const size = scanBounds.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            
-            // Position camera for a nice dental view
-            camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
-            controls.target.copy(center);
-            controls.update();
-            
-            // Hide loading overlay
-            const loadingEl = document.getElementById('loading-overlay');
-            if (loadingEl) loadingEl.style.display = 'none';
-            
-            // Update stats
-            updateSummaryStats();
-            
-            console.log(`🦷 Dental scans loaded — ${scanMeshes.reduce((a, m) => a + m.geometry.attributes.position.count, 0)} total vertices`);
-            console.log(`📐 Bounds: ${size.x.toFixed(1)} x ${size.y.toFixed(1)} x ${size.z.toFixed(1)} mm`);
-            
-            // Auto-orient: rotate scan so teeth face the camera
-            // Medit scans typically need rotation to view from front
-            const scanCenter = scanBounds.getCenter(new THREE.Vector3());
-            scanGroup.position.sub(scanCenter); // center at origin
-
-            // Separate upper/lower for jaw control
-            scanMeshes.forEach(m => {
-                if (m.name === 'maxilla') {
-                    m.userData.baseY = m.position.y;
-                } else if (m.name === 'mandible') {
-                    m.userData.baseY = m.position.y;
-                }
-            });
+    // Load segmentation manifest for invisible click hitboxes
+    let manifest = null;
+    try {
+        const resp = await fetch('/portal/demo-scans/teeth/manifest.json');
+        if (resp.ok) manifest = await resp.json();
+    } catch(e) {}
+    
+    if (manifest && manifest.teeth) {
+        for (const [toothNum, info] of Object.entries(manifest.teeth)) {
+            try {
+                const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
+                const num = parseInt(toothNum);
+                const mat = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.name = 'tooth_hit_' + toothNum;
+                mesh.userData.toothNumber = num;
+                mesh.userData.toothData = DEMO_PATIENT.teeth[num];
+                mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
+                if (num <= 16) upperGroup.add(mesh); else lowerGroup.add(mesh);
+                toothMeshes.push(mesh);
+            } catch(e) {}
         }
+        console.log('[Hybrid] ' + toothMeshes.length + ' invisible tooth hitboxes loaded');
     }
     
-    // Load Maxilla (upper jaw)
+    // Load full Maxilla (VISUAL)
     loader.load('/portal/demo-scans/Maxilla_Base.ply', 
-        (geometry) => {
+        function(geometry) {
             geometry.computeVertexNormals();
-            const hasColors = geometry.hasAttribute('color');
-            const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
+            var hasColors = geometry.hasAttribute('color');
+            var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'maxilla';
             mesh.userData.archType = 'upper';
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-            scanGroup.add(mesh);
+            upperGroup.add(mesh);
             scanMeshes.push(mesh);
-            console.log(`✅ Maxilla: ${geometry.attributes.position.count.toLocaleString()} vertices`);
-            onScanLoaded();
+            loaded++;
+            finalize();
         },
-        (xhr) => {
-            if (xhr.total) updateLoadingProgress(xhr.loaded / xhr.total * 0.5, 1);
-        },
-        (err) => { console.warn('⚠ Maxilla failed:', err); onScanLoaded(); }
+        function(xhr) { if (xhr.total) updateLoadingProgress(xhr.loaded / xhr.total * 0.5, 1); },
+        function(err) { console.warn('Maxilla failed:', err); loaded++; finalize(); }
     );
     
-    // Load Mandible (lower jaw)
+    // Load full Mandible (VISUAL)
     loader.load('/portal/demo-scans/Mandible_Base.ply',
-        (geometry) => {
+        function(geometry) {
             geometry.computeVertexNormals();
-            const hasColors = geometry.hasAttribute('color');
-            const mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
+            var hasColors = geometry.hasAttribute('color');
+            var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
             mesh.name = 'mandible';
             mesh.userData.archType = 'lower';
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-            scanGroup.add(mesh);
+            lowerGroup.add(mesh);
             scanMeshes.push(mesh);
-            console.log(`✅ Mandible: ${geometry.attributes.position.count.toLocaleString()} vertices`);
-            onScanLoaded();
+            loaded++;
+            finalize();
         },
-        (xhr) => {},
-        (err) => { console.warn('⚠ Mandible failed:', err); onScanLoaded(); }
+        function() {},
+        function(err) { console.warn('Mandible failed:', err); loaded++; finalize(); }
     );
     
-    scene.add(scanGroup);
-}
-
-function updateLoadingProgress(loaded, total) {
-    const loadingEl = document.getElementById('loading-overlay');
-    if (loadingEl) {
-        const p = loadingEl.querySelector('p');
-        if (p) p.textContent = `Loading dental scans… ${Math.round(loaded/total*100)}%`;
+    function finalize() {
+        updateLoadingProgress(loaded, total);
+        if (loaded < total) return;
+        
+        scanLoaded = true;
+        
+        scanBounds = new THREE.Box3();
+        scanMeshes.forEach(function(m) { scanBounds.expandByObject(m); });
+        
+        var center = scanBounds.getCenter(new THREE.Vector3());
+        var size = scanBounds.getSize(new THREE.Vector3());
+        var maxDim = Math.max(size.x, size.y, size.z);
+        
+        // Center at origin
+        upperGroup.position.sub(center);
+        lowerGroup.position.sub(center);
+        
+        // Store base position and TMJ pivot
+        upperGroup.userData.basePos = upperGroup.position.clone();
+        lowerGroup.userData.basePos = lowerGroup.position.clone();
+        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, size.y * 0.1, -(size.z * 0.42));
+        
+        camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
+        controls.target.set(0, 0, 0);
+        controls.update();
+        
+        var loadingEl = document.getElementById('loading-overlay');
+        if (loadingEl) loadingEl.style.display = 'none';
+        
+        updateSummaryStats();
     }
 }
 
+function loadPLY(loader, url) {
+    return new Promise(function(resolve, reject) {
+        loader.load(url, resolve, undefined, reject);
+    });
+}
+
+function updateLoadingProgress(loaded, total) {
+    var loadingEl = document.getElementById('loading-overlay');
+    if (loadingEl) {
+        var p = loadingEl.querySelector('p');
+        if (p) p.textContent = 'Loading dental scans... ' + Math.round(loaded/total*100) + '%';
+    }
+}
+
+/* ═══ TMJ Hinge Jaw Open ═══ */
 function adjustJawOpen(value) {
-    const pct = parseInt(value);
-    const label = document.getElementById('jaw-open-label');
+    var pct = parseInt(value);
+    var label = document.getElementById('jaw-open-label');
     if (label) label.textContent = pct + '%';
     
-    const separation = pct * 0.3; // max 30 units of separation
+    if (!lowerGroup) return;
     
-    // Move segmented teeth
-    toothMeshes.forEach(m => {
-        const base = m.userData.baseY || 0;
-        if (m.userData.archType === 'upper') {
-            m.position.y = base + separation;
-        } else if (m.userData.archType === 'lower') {
-            m.position.y = base - separation;
-        }
-    });
+    // Natural jaw: mandible rotates around TMJ condyle (hinge at back)
+    var maxAngle = 25 * (Math.PI / 180); // 25 degrees max opening
+    var angle = (pct / 100) * maxAngle;
+    var pivot = lowerGroup.userData.tmjPivot;
     
-    // Move full scan meshes and gums
-    scanMeshes.forEach(m => {
-        const base = m.userData.baseY || 0;
-        if (m.name === 'maxilla' || m.userData.archType === 'upper') {
-            m.position.y = base + separation;
-        } else if (m.name === 'mandible' || m.userData.archType === 'lower') {
-            m.position.y = base - separation;
-        }
-    });
+    // Reset to base position first
+    var basePos = lowerGroup.userData.basePos;
+    if (basePos) {
+        lowerGroup.position.copy(basePos);
+    }
+    lowerGroup.rotation.set(0, 0, 0);
+    lowerGroup.updateMatrix();
+    
+    if (pivot && angle > 0) {
+        // Translate so pivot is at origin, rotate X, translate back
+        lowerGroup.position.sub(pivot);
+        lowerGroup.rotation.x = angle;
+        lowerGroup.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+        lowerGroup.position.add(pivot);
+    }
 }
 
 
