@@ -1341,12 +1341,10 @@ async function loadHybridScans() {
         // Center the entire group at origin (preserves relative alignment)
         scanGroup.position.sub(center);
         
-        // Set TMJ pivot point at the back-top of the mandible
-        // From scan data: mandible Y max ≈ 17.6, Z min ≈ -25.6
-        // After centering, shift by -center
-        var tmjY = 17.6 - center.y;   // top of mandible ramus
-        var tmjZ = -25.6 - center.z;  // posterior condyle
-        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, tmjY, tmjZ);
+        // Set TMJ pivot in ORIGINAL scan coordinates (lowerGroup children
+        // are in original space — only scanGroup.position moved)
+        // Mandible ramus top: Y ≈ 17.6, posterior condyle: Z ≈ -25.6
+        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, 17.6, -25.6);
         
         // Recalculate bounds after centering
         scanBounds = new THREE.Box3().setFromObject(scanGroup);
@@ -1399,19 +1397,12 @@ function adjustJawOpen(value) {
     lowerGroup.updateMatrixWorld(true);
     
     if (angle > 0) {
-        // Pivot technique: translate to pivot, rotate, translate back
-        // Negative X rotation = mandible swings DOWN (natural jaw open)
-        lowerGroup.position.set(
-            -pivot.x,
-            -pivot.y,
-            -pivot.z
-        );
-        lowerGroup.rotation.x = -angle;
-        
-        // Re-offset by rotated pivot
+        // Correct pivot rotation: position = pivot - Rx(angle)*pivot
+        // This rotates the mandible around the TMJ condyle
         var rotatedPivot = pivot.clone();
-        rotatedPivot.applyAxisAngle(new THREE.Vector3(1, 0, 0), -angle);
-        lowerGroup.position.add(rotatedPivot);
+        rotatedPivot.applyAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+        lowerGroup.position.copy(pivot).sub(rotatedPivot);
+        lowerGroup.rotation.x = angle;
     }
 }
 
