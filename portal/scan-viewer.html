@@ -16,12 +16,12 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- Three.js r128 + Loaders -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- Three.js r152 + Loaders -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/STLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/PLYLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/OBJLoader.js"></script>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
@@ -1674,9 +1674,9 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
     // ─── Create dental material ───
     function createDentalMaterial(preset, hasVertexColors) {
         const presets = {
-            tooth: { color: 0xF0E6D8, roughness: 0.35, metalness: 0.0, clearcoat: 0.3, clearcoatRoughness: 0.4, wireframe: false, opacity: 1.0, transparent: false },
-            gum:   { color: 0xE8A0A0, roughness: 0.55, metalness: 0.0, clearcoat: 0.15, clearcoatRoughness: 0.6, wireframe: false, opacity: 1.0, transparent: false },
-            bone:  { color: 0xF5F0E0, roughness: 0.45, metalness: 0.0, clearcoat: 0.2, clearcoatRoughness: 0.5, wireframe: false, opacity: 1.0, transparent: false },
+            tooth: { color: 0xE8D5C4, roughness: 0.32, metalness: 0.0, clearcoat: 0.4, clearcoatRoughness: 0.35, wireframe: false, opacity: 1.0, transparent: false },
+            gum:   { color: 0xD4848A, roughness: 0.50, metalness: 0.0, clearcoat: 0.20, clearcoatRoughness: 0.5, wireframe: false, opacity: 1.0, transparent: false },
+            bone:  { color: 0xF0E8D6, roughness: 0.42, metalness: 0.0, clearcoat: 0.25, clearcoatRoughness: 0.45, wireframe: false, opacity: 1.0, transparent: false },
             xray:  { color: 0x88ccff, roughness: 0.3, metalness: 0.1, clearcoat: 0.0, clearcoatRoughness: 0.5, wireframe: true, opacity: 0.6, transparent: true }
         };
         const p = presets[preset] || presets.tooth;
@@ -1686,7 +1686,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
             clearcoat: p.clearcoat,
             clearcoatRoughness: p.clearcoatRoughness,
             envMap: envMap,
-            envMapIntensity: hasVertexColors ? 0.4 : 0.8,
+            envMapIntensity: hasVertexColors ? 0.5 : 0.9,
             wireframe: p.wireframe,
             transparent: p.transparent,
             opacity: p.opacity,
@@ -1695,11 +1695,11 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
 
         // If scan has real vertex colors (Medit/iTero/3Shape), use them!
         if (hasVertexColors && preset !== 'xray') {
-            matOpts.vertexColors = THREE.VertexColors || true;
-            matOpts.color = new THREE.Color(0xffffff); // White base lets vertex colors show true
-            matOpts.roughness = 0.4;
-            matOpts.clearcoat = 0.15;
-            matOpts.clearcoatRoughness = 0.5;
+            matOpts.vertexColors = true;
+            matOpts.color = new THREE.Color(0xffffff);
+            matOpts.roughness = 0.35;
+            matOpts.clearcoat = 0.2;
+            matOpts.clearcoatRoughness = 0.4;
         } else {
             matOpts.color = p.color;
         }
@@ -2411,7 +2411,7 @@ input[type="color"].sv-color-input::-webkit-color-swatch {
         // Enable vertex colors on material
         mesh.material.dispose();
         const mat = new THREE.MeshPhysicalMaterial({
-            vertexColors: THREE.VertexColors || true,
+            vertexColors: true,
             color: 0xffffff,
             roughness: 0.4,
             metalness: 0.0,
