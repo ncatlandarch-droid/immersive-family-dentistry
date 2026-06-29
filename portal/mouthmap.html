@@ -2568,6 +2568,16 @@ function initRoleMode() {
         addStaffBadge();
         addStaffToolbar();
     }
+    
+    // Embed mode: hide header for iframe embedding in patient portal
+    if (params.get('embed') === 'true') {
+        document.body.classList.add('embed-mode');
+        const header = document.querySelector('header');
+        if (header) header.style.display = 'none';
+        // Reclaim header space for the viewer
+        const layout = document.querySelector('.mm-layout');
+        if (layout) layout.style.height = '100vh';
+    }
 }
 
 function addStaffBadge() {

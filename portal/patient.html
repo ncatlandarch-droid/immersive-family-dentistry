@@ -65,21 +65,23 @@
             <main class="portal-main">
                 <!-- View: 3D Scan -->
                 <div id="view-scan" class="portal-view active">
-                    <!-- MouthMap embedded directly — no landing needed -->
+                    <!-- MouthMap embedded directly -->
                     <div class="mouth-viewer-container" id="mouthmap-container" style="position:relative; overflow:hidden; border-radius:12px;">
                         <iframe id="mouthmap-frame" 
-                            src="/portal/mouthmap?role=patient&embed=true" 
+                            src="/portal/mouthmap?role=patient&embed=true&patient=logan-marrero" 
                             style="width:100%;height:100%;border:none;border-radius:12px;"
                             allow="fullscreen"
-                            title="MouthMap 3D"></iframe>
+                            title="MouthMap 3D — Your Interactive Dental Scan"></iframe>
                     </div>
-
-                    <!-- Tooth Info Panel -->
-                    <div id="tooth-info" class="tooth-info" style="display:none;">
-                        <button id="tooth-info-close" class="tooth-info__close">✕</button>
-                        <h3 id="tooth-name" class="tooth-info__name"></h3>
-                        <span id="tooth-status" class="tooth-badge"></span>
-                        <div id="tooth-findings" class="tooth-info__findings"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:0 4px;">
+                        <p style="font-size:12px;color:#94a3b8;margin:0;">
+                            🦷 Click on any tooth to see details • Use <strong>Findings</strong> button to see clinical overlays
+                        </p>
+                        <a href="/portal/mouthmap?role=patient&patient=logan-marrero" 
+                           target="_blank"
+                           style="font-size:12px;color:#2dd4bf;text-decoration:none;font-weight:600;white-space:nowrap;">
+                            Open Full View ↗
+                        </a>
                     </div>
                 </div>
 
