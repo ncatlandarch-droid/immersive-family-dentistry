@@ -560,7 +560,8 @@ a { color: var(--portal-teal); text-decoration: none; }
 .dental-grid__tooth.red { background: #FEE2E2; color: #991B1B; }
 .dental-grid__tooth.gray { background: #E2E8F0; color: #64748B; }
 .dental-grid__tooth.extracted { background: #E2E8F0; color: #94A3B8; text-decoration: line-through; }
-.dental-grid__tooth.teal { background: #CCFBF1; color: #115E59; }
+.dental-grid__tooth.teal { background: #F3E8FF; color: #6B21A8; }
+.dental-grid__tooth.purple { background: #F3E8FF; color: #6B21A8; }
 
 /* ─── Timeline ─── */
 .timeline {
@@ -1148,7 +1149,7 @@ a { color: var(--portal-teal); text-decoration: none; }
 .tooth-btn.status-needs_attention { background: #F59E0B; color: #1E293B; }
 .tooth-btn.status-extracted { background: #94A3B8; color: #1E293B; }
 .tooth-btn.status-missing { background: #94A3B8; color: #1E293B; }
-.tooth-btn.status-planned { background: #2dd4bf; color: #1E293B; }
+.tooth-btn.status-planned { background: #A855F7; }
 .tooth-btn.status-urgent { background: #EF4444; }
 
 .odontogram-legend {

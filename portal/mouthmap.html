@@ -41,7 +41,7 @@
     --mm-healthy: #F5F5F0;
     --mm-attention: #F59E0B;
     --mm-treated: #3B82F6;
-    --mm-planned: #2dd4bf;
+    --mm-planned: #A855F7;
     --mm-missing: #333333;
     --mm-radius: 16px;
     --mm-radius-sm: 10px;
@@ -906,8 +906,8 @@ body::before {
             </div>
         </div>
 
-        <!-- Legend (simplified) -->
-        <div class="mm-legend">
+        <!-- Legend removed — Clinical Findings panel serves this purpose -->
+        <div class="mm-legend" style="display:none;">
             <div class="mm-legend-item">
                 <div class="mm-legend-dot" style="background: var(--mm-healthy);"></div>
                 Healthy
@@ -1373,8 +1373,14 @@ async function loadHybridScans() {
     if (manifest && manifest.teeth) {
         for (const [toothNum, info] of Object.entries(manifest.teeth)) {
             try {
-                const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
                 const num = parseInt(toothNum);
+                // Skip loading hitboxes for missing/extracted teeth
+                var toothData = DEMO_PATIENT.teeth[num];
+                if (toothData && toothData.status === 'missing') {
+                    console.log('[Hybrid] Skipping missing tooth #' + num);
+                    continue;
+                }
+                const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
                 const mat = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.name = 'tooth_hit_' + toothNum;
@@ -1543,7 +1549,7 @@ function applyFindingsOverlay() {
         healthy: 0x22c55e,
         needs_attention: 0xF59E0B,
         treated: 0x3B82F6,
-        planned: 0x2dd4bf,
+        planned: 0xA855F7,
         missing: 0x64748B
     };
     

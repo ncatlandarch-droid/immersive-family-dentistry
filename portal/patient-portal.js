@@ -308,7 +308,7 @@ function initHealthSummary() {
                 needs_attention: 'yellow',
                 extracted: 'gray',
                 missing: 'gray',
-                planned: 'teal',
+                planned: 'purple',
                 urgent: 'red',
                 decay: 'red'
             };
