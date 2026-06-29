@@ -540,9 +540,9 @@ body::before {
 }
 
 .mm-status-badge--planned {
-    background: rgba(45, 212, 191, 0.12);
-    color: #2dd4bf;
-    border: 1px solid rgba(45, 212, 191, 0.2);
+    background: rgba(168, 85, 247, 0.12);
+    color: #A855F7;
+    border: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .mm-status-badge--missing {
@@ -865,8 +865,8 @@ body::before {
             <p>Building your dental model…</p>
         </div>
 
-        <!-- Findings Panel (3Shape-style overlay) -->
-        <div class="mm-findings-panel" id="findings-panel" style="display:none;">
+        <!-- Findings Panel (3Shape-style overlay) — visible by default -->
+        <div class="mm-findings-panel" id="findings-panel" style="display:block;">
             <div style="padding:12px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.08);">
                 <h3 style="margin:0;font-size:13px;font-weight:600;color:var(--mm-text);display:flex;align-items:center;gap:6px;">
                     <i data-lucide="layers" style="width:14px;height:14px;color:var(--mm-teal);"></i>
@@ -894,7 +894,7 @@ body::before {
                 </label>
                 <label class="mm-finding-toggle" data-finding="planned">
                     <input type="checkbox" checked onchange="toggleFindingOverlay('planned', this.checked)">
-                    <span class="mm-finding-dot" style="background:#2dd4bf;"></span>
+                    <span class="mm-finding-dot" style="background:#A855F7;"></span>
                     <span class="mm-finding-label">Planned Treatment</span>
                     <span class="mm-finding-count" id="count-planned">0</span>
                 </label>
@@ -1134,6 +1134,13 @@ for (let i = 1; i <= 32; i++) {
             });
             console.log(`[MouthMap] 📋 Dental chart loaded: ${chart.teeth.length} teeth`);
             updateSummaryStats();
+            // Apply findings overlays now that chart data is loaded
+            setTimeout(function() {
+                applyFindingsOverlay();
+                updateFindingsCounts();
+                var btn = document.getElementById('btn-findings');
+                if (btn) btn.classList.add('active');
+            }, 500);
         }
     } catch (e) {
         console.warn('[MouthMap] Could not load dental chart:', e.message);
@@ -1523,7 +1530,7 @@ function adjustJawOpen(value) {
 var currentRenderMode = 'solid';
 
 /* ═══ Findings Overlay System (3Shape-style) ═══ */
-var findingsVisible = false;
+var findingsVisible = true;
 var findingFilters = { treated: true, needs_attention: true, missing: true, planned: true };
 var overlayPulseTime = 0;
 
@@ -2084,14 +2091,45 @@ function selectToothByNumber(toothNum, hitPoint) {
         selectionRing = null;
     }
     
+    // Clear previous pin overlay (restore to findings state)
+    if (selectedTooth && selectedTooth !== toothNum) {
+        applyFindingsOverlay(); // reset all to findings state
+    }
+    
     // Store as NUMBER for chart sync
     selectedTooth = toothNum;
     
+    // PIN colored overlay on the selected tooth mesh
+    const statusColors = {
+        healthy: 0x22c55e,
+        needs_attention: 0xF59E0B,
+        treated: 0x3B82F6,
+        planned: 0xA855F7,
+        missing: 0x64748B
+    };
+    const toothMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
+    if (toothMesh) {
+        const color = statusColors[toothData.status] || 0x22c55e;
+        toothMesh.material = new THREE.MeshPhysicalMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.75,
+            roughness: 0.2,
+            emissive: color,
+            emissiveIntensity: 0.4,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        toothMesh.material.visible = true;
+        toothMesh.userData.isPinned = true;
+    }
+
     // If we have a hit point on the real scan, show a glowing ring
     if (hitPoint && scanLoaded) {
         const ringGeo = new THREE.RingGeometry(2.5, 3.2, 24);
+        const ringColor = statusColors[toothData.status] || 0x2dd4bf;
         const ringMat = new THREE.MeshBasicMaterial({
-            color: 0x2dd4bf,
+            color: ringColor,
             transparent: true,
             opacity: 0.7,
             side: THREE.DoubleSide,
@@ -2111,6 +2149,182 @@ function selectToothByNumber(toothNum, hitPoint) {
     
     // Sync tooth chart highlighting
     buildToothChart();
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   TOOTH ISOLATION MODE
+   Double-click a tooth → isolate it, ghost everything else,
+   zoom camera to focus on it. Escape or click arch to return.
+   ═══════════════════════════════════════════════════════════ */
+
+let isIsolationMode = false;
+let isolatedToothNum = null;
+let preIsolationState = null; // stores camera pos, target, mesh states
+
+function isolateTooth(toothNum) {
+    const toothMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
+    if (!toothMesh || isIsolationMode) return;
+    
+    isIsolationMode = true;
+    isolatedToothNum = toothNum;
+    autoRotate = false;
+    
+    // Save pre-isolation state
+    preIsolationState = {
+        cameraPos: camera.position.clone(),
+        cameraTarget: controls.target.clone(),
+        scanOpacities: [],
+        toothStates: []
+    };
+    
+    // Save and ghost all scan meshes
+    scanMeshes.forEach(mesh => {
+        preIsolationState.scanOpacities.push({
+            mesh: mesh,
+            transparent: mesh.material.transparent,
+            opacity: mesh.material.opacity
+        });
+        mesh.material.transparent = true;
+        mesh.material.opacity = 0.12;
+        mesh.material.needsUpdate = true;
+    });
+    
+    // Ghost all other tooth meshes, highlight isolated one
+    const statusColors = {
+        healthy: 0x22c55e,
+        needs_attention: 0xF59E0B,
+        treated: 0x3B82F6,
+        planned: 0xA855F7,
+        missing: 0x64748B
+    };
+    
+    toothMeshes.forEach(tm => {
+        if (tm.userData.toothNumber === toothNum) {
+            // Make isolated tooth bright and prominent
+            const toothData = DEMO_PATIENT.teeth[toothNum];
+            const color = statusColors[toothData?.status] || 0x22c55e;
+            tm.material = new THREE.MeshPhysicalMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.85,
+                roughness: 0.15,
+                emissive: color,
+                emissiveIntensity: 0.5,
+                side: THREE.DoubleSide,
+                depthWrite: true
+            });
+            tm.material.visible = true;
+            tm.scale.set(1.15, 1.15, 1.15);
+        } else {
+            // Ghost others
+            tm.material = new THREE.MeshBasicMaterial({
+                visible: false,
+                side: THREE.DoubleSide
+            });
+        }
+    });
+    
+    // Calculate tooth center for camera target
+    toothMesh.geometry.computeBoundingBox();
+    const bbox = toothMesh.geometry.boundingBox;
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+    toothMesh.localToWorld(center);
+    
+    // Animate camera to tooth
+    const duration = 700;
+    const startPos = camera.position.clone();
+    const startTarget = controls.target.clone();
+    const endTarget = center;
+    
+    // Position camera close-up, slightly angled
+    const direction = center.clone().sub(camera.position).normalize();
+    const endPos = center.clone().sub(direction.multiplyScalar(30));
+    endPos.y += 5; // Slight angle from above
+    
+    const startTime = performance.now();
+    function animateIsolation(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        controls.update();
+        
+        if (progress < 1) requestAnimationFrame(animateIsolation);
+    }
+    requestAnimationFrame(animateIsolation);
+    
+    // Show back button
+    showIsolationBackButton(true);
+    
+    console.log(`[Isolation] Tooth #${toothNum} isolated`);
+}
+
+function exitIsolation() {
+    if (!isIsolationMode || !preIsolationState) return;
+    
+    // Restore scan mesh opacities
+    preIsolationState.scanOpacities.forEach(saved => {
+        saved.mesh.material.transparent = saved.transparent;
+        saved.mesh.material.opacity = saved.opacity;
+        saved.mesh.material.needsUpdate = true;
+    });
+    
+    // Reset all tooth mesh scales
+    toothMeshes.forEach(tm => {
+        tm.scale.set(1, 1, 1);
+    });
+    
+    // Re-apply findings overlay (restores correct materials)
+    applyFindingsOverlay();
+    
+    // Animate camera back
+    const duration = 600;
+    const startPos = camera.position.clone();
+    const startTarget = controls.target.clone();
+    const endPos = preIsolationState.cameraPos;
+    const endTarget = preIsolationState.cameraTarget;
+    
+    const startTime = performance.now();
+    function animateBack(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        controls.update();
+        
+        if (progress < 1) requestAnimationFrame(animateBack);
+    }
+    requestAnimationFrame(animateBack);
+    
+    // Hide back button
+    showIsolationBackButton(false);
+    
+    isIsolationMode = false;
+    isolatedToothNum = null;
+    preIsolationState = null;
+    
+    console.log('[Isolation] Exited isolation mode');
+}
+
+function showIsolationBackButton(show) {
+    let btn = document.getElementById('isolation-back-btn');
+    if (!btn && show) {
+        btn = document.createElement('button');
+        btn.id = 'isolation-back-btn';
+        btn.innerHTML = '← Back to Full View';
+        btn.style.cssText = 'position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:100;padding:10px 24px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;background:rgba(168,85,247,0.2);color:#A855F7;border:1px solid rgba(168,85,247,0.3);border-radius:24px;cursor:pointer;backdrop-filter:blur(8px);transition:all 0.2s ease;';
+        btn.onmouseenter = () => { btn.style.background = 'rgba(168,85,247,0.35)'; };
+        btn.onmouseleave = () => { btn.style.background = 'rgba(168,85,247,0.2)'; };
+        btn.onclick = exitIsolation;
+        document.getElementById('viewer-container').appendChild(btn);
+    }
+    if (btn) btn.style.display = show ? 'block' : 'none';
 }
 
 
@@ -2545,11 +2759,55 @@ document.addEventListener('DOMContentLoaded', () => {
     init();
 
     // Close detail
-    document.getElementById('close-detail').addEventListener('click', closeDetail);
+    document.getElementById('close-detail').addEventListener('click', () => {
+        closeDetail();
+        if (isIsolationMode) exitIsolation();
+    });
 
     // View buttons
     document.querySelectorAll('.mm-view-btn').forEach(btn => {
         btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+
+    // ─── Double-click → Isolate Tooth ───
+    document.getElementById('viewer-container').addEventListener('dblclick', function(event) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        
+        if (isIsolationMode) {
+            // Double-click on ghosted arch → exit isolation
+            exitIsolation();
+            return;
+        }
+        
+        // Check tooth meshes first
+        if (toothMeshes.length > 0) {
+            const hits = raycaster.intersectObjects(toothMeshes);
+            if (hits.length > 0 && hits[0].object.userData.toothNumber) {
+                isolateTooth(hits[0].object.userData.toothNumber);
+                return;
+            }
+        }
+        // Check scan meshes (position-based)
+        if (scanLoaded && scanMeshes.length > 0) {
+            const scanHits = raycaster.intersectObjects(scanMeshes);
+            if (scanHits.length > 0) {
+                const toothNum = mapPositionToTooth(scanHits[0].point);
+                if (toothNum) {
+                    isolateTooth(toothNum);
+                    return;
+                }
+            }
+        }
+    });
+
+    // ─── Escape Key → Exit Isolation ───
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && isIsolationMode) {
+            exitIsolation();
+        }
     });
 
     // ─── Role-Based Mode ───
