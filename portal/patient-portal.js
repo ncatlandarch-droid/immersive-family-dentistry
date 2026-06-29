@@ -294,9 +294,26 @@ function initHealthSummary() {
         </div>
     `).join('');
 
-    // Dental chart grid
+    // Dental chart grid — colors match MouthMap overlay system
     const chartContainer = document.getElementById('health-chart');
     if (dentalChart?.teeth) {
+        // Derive color from status (matches MouthMap findings overlay)
+        function statusToColor(status) {
+            const map = {
+                healthy: 'green',
+                restored: 'blue',
+                treated: 'blue',
+                watch: 'yellow',
+                monitor: 'yellow',
+                needs_attention: 'yellow',
+                extracted: 'gray',
+                missing: 'gray',
+                planned: 'teal',
+                urgent: 'red',
+                decay: 'red'
+            };
+            return map[status] || 'green';
+        }
         const upperTeeth = dentalChart.teeth.filter(t => t.toothNumber <= 16).sort((a,b) => a.toothNumber - b.toothNumber);
         const lowerTeeth = dentalChart.teeth.filter(t => t.toothNumber > 16).sort((a,b) => b.toothNumber - a.toothNumber);
 
@@ -305,7 +322,7 @@ function initHealthSummary() {
             <p style="font-size:11px;color:var(--portal-muted);margin-bottom:12px;">Upper Arch (1-16)</p>
             <div class="dental-grid">
                 ${upperTeeth.map(t => `
-                    <div class="dental-grid__tooth ${t.color} ${t.status === 'extracted' ? 'extracted' : ''}"
+                    <div class="dental-grid__tooth ${statusToColor(t.status)} ${t.status === 'extracted' ? 'extracted' : ''}"
                          title="#${t.toothNumber} — ${t.name}: ${t.status}"
                          data-tooth="${t.toothNumber}"
                          style="cursor:pointer;">
@@ -316,7 +333,7 @@ function initHealthSummary() {
             <p style="font-size:11px;color:var(--portal-muted);margin:12px 0;">Lower Arch (32-17)</p>
             <div class="dental-grid">
                 ${lowerTeeth.map(t => `
-                    <div class="dental-grid__tooth ${t.color} ${t.status === 'extracted' ? 'extracted' : ''}"
+                    <div class="dental-grid__tooth ${statusToColor(t.status)} ${t.status === 'extracted' ? 'extracted' : ''}"
                          title="#${t.toothNumber} — ${t.name}: ${t.status}"
                          data-tooth="${t.toothNumber}"
                          style="cursor:pointer;">
@@ -326,9 +343,9 @@ function initHealthSummary() {
             </div>
             <div style="display:flex;gap:16px;margin-top:16px;font-size:11px;color:var(--portal-muted);">
                 <span>🟢 Healthy</span>
-                <span>🟡 Monitor</span>
-                <span>🔴 Needs Treatment</span>
-                <span>⬜ Extracted</span>
+                <span>🔵 Fillings</span>
+                <span>🟡 Watch</span>
+                <span>⬜ Missing</span>
             </div>
             <div id="health-tooth-detail" style="display:none;margin-top:16px;padding:16px 20px;background:var(--portal-surface-alt);border-radius:12px;border:1px solid var(--portal-border);animation:slideUp 0.25s ease;">
                 <button id="health-tooth-close" style="float:right;background:none;border:none;font-size:16px;color:var(--portal-muted);cursor:pointer;">✕</button>
