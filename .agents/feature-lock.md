@@ -1,26 +1,25 @@
 # 🔒 PALOMA Feature Lock — DO NOT BREAK
 
-> **Git Tag:** `v1.0-mouthmap-working`  
-> **Date Locked:** June 28, 2026  
-> **Rollback:** `git checkout v1.0-mouthmap-working`
+> **Git Tag:** `v2.0-colors-working`  
+> **Date Locked:** June 29, 2026  
+> **Rollback:** `git checkout v2.0-colors-working`
 
 ---
 
 ## ✅ Locked Features (MUST keep working)
 
-### 1. MouthMap 3D Scan Rendering
-- **Vertex colors** from Medit i700 PLY files show natural tooth/gum colors
-- Material: `color: 0xffffff` (white base, lets vertex colors through)
-- `vertexColors: true` when `geometry.hasAttribute('color')`
-- Low clearcoat (0.15), moderate roughness (0.45)
-- **DO NOT** set `color: 0xf0e6d8` or any tinted color when vertex colors exist
+### 1. MouthMap 3D Scan Rendering — COLORS WORKING
+- **MeshBasicMaterial** with `vertexColors: true` — UNLIT, shows scan colors exactly
+- **DO NOT** use MeshPhysicalMaterial or MeshStandardMaterial (washes out vertex colors)
+- **DO NOT** use MeshLambertMaterial (lighting still tints)
+- `renderer.toneMapping = THREE.NoToneMapping` — no tone mapping
+- `renderer.outputEncoding = THREE.LinearEncoding` — no double-gamma
 
 ### 2. Lighting (Neutral)
 - All lights pure white `0xffffff`
-- Ambient: 0.6 intensity
-- Hemisphere: white/gray, 0.5 intensity  
-- Key light: 0.7 from upper-front
-- **NO warm tints** (no `0xfff5e6`, no teal accent lights)
+- Ambient: 0.6, Hemisphere: 0.5, Key: 0.7
+- Lighting does NOT affect scan meshes (MeshBasicMaterial is unlit)
+- Lighting DOES affect tooth hitboxes in Status mode
 
 ### 3. Scan Alignment
 - Single parent `scanGroup` holds both `upperGroup` and `lowerGroup`
@@ -35,19 +34,18 @@
 - **DO NOT** use `-pivot + rotatedPivot` (that's inverted/backwards)
 
 ### 5. Render Modes
-- **Solid**: vertex colors, white base, natural look
-- **X-Ray**: blue translucent, no vertex colors
+- **Solid**: MeshBasicMaterial, vertex colors, natural look
 - **Status**: tooth hitbox meshes become visible with status colors
+- X-Ray: being removed (user request)
 
-### 6. Tooth Chart
+### 6. Tooth Chart & Right Panel
 - Lives in the **right info panel** (not floating overlay)
 - `selectedTooth` stores tooth NUMBER (int), not mesh reference
-- `buildToothChart()` called on tooth selection for sync
+- Right panel is INSIDE `mm-layout` grid — verify div nesting if editing HTML
 
 ### 7. Patient Data
 - Logan Marrero = Golden Demo patient
-- Delete patient works
-- Patient avatar on profile
+- Real dental data: Missing 1,16,17,32; Fillings on 3,4,14,15,19,30; Watch 18
 
 ---
 
@@ -61,5 +59,5 @@ Before ANY mouthmap.html change:
 
 If something breaks, rollback:
 ```bash
-git checkout v1.0-mouthmap-working -- portal/mouthmap.html
+git checkout v2.0-colors-working -- portal/mouthmap.html
 ```

@@ -253,6 +253,78 @@ body::before {
 }
 
 /* Legend bar */
+/* Findings Panel (3Shape-style overlay) */
+.mm-findings-panel {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 220px;
+    background: rgba(11, 15, 25, 0.92);
+    backdrop-filter: blur(20px);
+    border-radius: var(--mm-radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 10;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.mm-finding-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 12px;
+    color: var(--mm-text);
+}
+
+.mm-finding-toggle:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.mm-finding-toggle input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--mm-teal);
+    cursor: pointer;
+}
+
+.mm-finding-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.mm-finding-label {
+    flex: 1;
+    font-weight: 500;
+}
+
+.mm-finding-count {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--mm-text-muted);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Pulse animation for watch/concern teeth */
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+}
+
 .mm-legend {
     position: absolute;
     bottom: 60px;
@@ -793,7 +865,48 @@ body::before {
             <p>Building your dental model…</p>
         </div>
 
-        <!-- Legend -->
+        <!-- Findings Panel (3Shape-style overlay) -->
+        <div class="mm-findings-panel" id="findings-panel" style="display:none;">
+            <div style="padding:12px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                <h3 style="margin:0;font-size:13px;font-weight:600;color:var(--mm-text);display:flex;align-items:center;gap:6px;">
+                    <i data-lucide="layers" style="width:14px;height:14px;color:var(--mm-teal);"></i>
+                    Clinical Findings
+                </h3>
+            </div>
+            <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px;" id="findings-checkboxes">
+                <label class="mm-finding-toggle" data-finding="treated">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('treated', this.checked)">
+                    <span class="mm-finding-dot" style="background:#3B82F6;"></span>
+                    <span class="mm-finding-label">Composite Fillings</span>
+                    <span class="mm-finding-count" id="count-treated">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="needs_attention">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('needs_attention', this.checked)">
+                    <span class="mm-finding-dot" style="background:#F59E0B;"></span>
+                    <span class="mm-finding-label">Watch Areas</span>
+                    <span class="mm-finding-count" id="count-attention">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="missing">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('missing', this.checked)">
+                    <span class="mm-finding-dot" style="background:#64748B;"></span>
+                    <span class="mm-finding-label">Missing Teeth</span>
+                    <span class="mm-finding-count" id="count-missing">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="planned">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('planned', this.checked)">
+                    <span class="mm-finding-dot" style="background:#2dd4bf;"></span>
+                    <span class="mm-finding-label">Planned Treatment</span>
+                    <span class="mm-finding-count" id="count-planned">0</span>
+                </label>
+            </div>
+            <div style="padding:8px 14px;border-top:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:10px;color:#64748B;">
+                    Toggle overlays to highlight findings on the 3D scan
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend (simplified) -->
         <div class="mm-legend">
             <div class="mm-legend-item">
                 <div class="mm-legend-dot" style="background: var(--mm-healthy);"></div>
@@ -836,15 +949,9 @@ body::before {
                 <i data-lucide="chevron-down"></i><span>Lower</span>
             </button>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <!-- Render Mode Buttons -->
-            <button class="mm-view-btn active" onclick="setRenderMode('solid')" id="btn-render-solid" title="Solid">
-                <i data-lucide="circle"></i><span>Solid</span>
-            </button>
-            <button class="mm-view-btn" onclick="setRenderMode('xray')" id="btn-render-xray" title="X-Ray">
-                <i data-lucide="scan-line"></i><span>X-Ray</span>
-            </button>
-            <button class="mm-view-btn" onclick="setRenderMode('status')" id="btn-render-status" title="Color by Status">
-                <i data-lucide="palette"></i><span>Status</span>
+            <!-- Findings Overlay Toggle -->
+            <button class="mm-view-btn" onclick="toggleFindings()" id="btn-findings" title="Show/Hide Clinical Findings">
+                <i data-lucide="layers"></i><span>Findings</span>
             </button>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
             <button class="mm-view-btn" data-view="reset" title="Reset View">
@@ -1014,8 +1121,8 @@ for (let i = 1; i <= 32; i++) {
                 let status = 'healthy';
                 if (t.status === 'extracted') status = 'missing';
                 else if (t.status === 'restored' || t.status === 'treated') status = 'treated';
-                else if (t.status === 'decay' || t.status === 'needs_attention') status = 'needs_attention';
-                else if (t.status === 'planned' || t.status === 'watch') status = 'planned';
+                else if (t.status === 'decay' || t.status === 'needs_attention' || t.status === 'watch') status = 'needs_attention';
+                else if (t.status === 'planned') status = 'planned';
                 
                 // Only override if not already set with richer data, or if chart has findings
                 if (t.findings && t.findings.length && t.findings[0] !== 'No findings') {
@@ -1409,66 +1516,96 @@ function adjustJawOpen(value) {
 /* ═══ Render Modes ═══ */
 var currentRenderMode = 'solid';
 
-function setRenderMode(mode) {
-    currentRenderMode = mode;
+/* ═══ Findings Overlay System (3Shape-style) ═══ */
+var findingsVisible = false;
+var findingFilters = { treated: true, needs_attention: true, missing: true, planned: true };
+var overlayPulseTime = 0;
+
+function toggleFindings() {
+    findingsVisible = !findingsVisible;
+    var panel = document.getElementById('findings-panel');
+    var btn = document.getElementById('btn-findings');
     
-    // Update button states
-    ['solid', 'xray', 'status'].forEach(function(m) {
-        var btn = document.getElementById('btn-render-' + m);
-        if (btn) btn.classList.toggle('active', m === mode);
-    });
+    if (panel) panel.style.display = findingsVisible ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', findingsVisible);
     
-    scanMeshes.forEach(function(mesh) {
-        var mat = mesh.material;
-        var hasVC = mesh.geometry.hasAttribute('color');
-        
-        if (mode === 'solid') {
-            mat.color.setHex(hasVC ? 0xffffff : 0xf0e6d8);
-            mat.vertexColors = hasVC;
-            mat.transparent = false;
-            mat.opacity = 1.0;
-            mat.wireframe = false;
-            mat.roughness = 0.45;
-            mat.clearcoat = 0.15;
-        } else if (mode === 'xray') {
-            mat.color.setHex(0x88ccff);
-            mat.vertexColors = false;
-            mat.transparent = true;
-            mat.opacity = 0.35;
-            mat.wireframe = false;
-            mat.roughness = 0.1;
-            mat.clearcoat = 0.0;
-        } else if (mode === 'status') {
-            // Color by status: use the invisible hitbox meshes to paint regions
-            mat.color.setHex(0xf0e6d8);
-            mat.transparent = false;
-            mat.opacity = 1.0;
-            mat.wireframe = false;
-            mat.roughness = 0.28;
-            mat.clearcoat = 0.6;
-        }
-        mat.needsUpdate = true;
-    });
+    applyFindingsOverlay();
+    if (findingsVisible) updateFindingsCounts();
+}
+
+function toggleFindingOverlay(findingType, enabled) {
+    findingFilters[findingType] = enabled;
+    applyFindingsOverlay();
+}
+
+function applyFindingsOverlay() {
+    var overlayColors = {
+        healthy: 0x22c55e,
+        needs_attention: 0xF59E0B,
+        treated: 0x3B82F6,
+        planned: 0x2dd4bf,
+        missing: 0x64748B
+    };
     
-    // In status mode, make hitbox meshes visible with status colors
     toothMeshes.forEach(function(tm) {
-        if (mode === 'status') {
-            var num = tm.userData.toothNumber;
-            var status = DEMO_PATIENT.teeth[num] ? DEMO_PATIENT.teeth[num].status : 'healthy';
-            var colors = { healthy: 0x22c55e, needs_attention: 0xF59E0B, treated: 0x3B82F6, planned: 0x2dd4bf };
+        var num = tm.userData.toothNumber;
+        var toothData = DEMO_PATIENT.teeth[num];
+        var status = toothData ? toothData.status : 'healthy';
+        
+        // Show overlay if findings panel is open AND this status type is checked AND tooth has a finding
+        var showOverlay = findingsVisible && status !== 'healthy' && findingFilters[status];
+        
+        if (showOverlay) {
+            var color = overlayColors[status] || 0x22c55e;
+            var isWatch = (status === 'needs_attention' || status === 'planned');
             tm.material = new THREE.MeshPhysicalMaterial({
-                color: colors[status] || 0x22c55e,
+                color: color,
                 transparent: true,
-                opacity: 0.6,
+                opacity: isWatch ? 0.65 : 0.5,
                 roughness: 0.3,
+                emissive: color,
+                emissiveIntensity: isWatch ? 0.3 : 0.1,
                 side: THREE.DoubleSide,
                 depthWrite: false
             });
             tm.material.visible = true;
+            // Tag watch teeth for pulse animation
+            tm.userData.isPulsing = isWatch;
         } else {
             tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+            tm.userData.isPulsing = false;
         }
     });
+}
+
+function updateFindingsCounts() {
+    var counts = { treated: 0, needs_attention: 0, missing: 0, planned: 0 };
+    for (var i = 1; i <= 32; i++) {
+        var tooth = DEMO_PATIENT.teeth[i];
+        if (tooth && counts.hasOwnProperty(tooth.status)) {
+            counts[tooth.status]++;
+        }
+    }
+    var el;
+    el = document.getElementById('count-treated'); if (el) el.textContent = counts.treated;
+    el = document.getElementById('count-attention'); if (el) el.textContent = counts.needs_attention;
+    el = document.getElementById('count-missing'); if (el) el.textContent = counts.missing;
+    el = document.getElementById('count-planned'); if (el) el.textContent = counts.planned;
+}
+
+// Pulse animation for watch teeth (runs in render loop)
+function updatePulsingOverlays(time) {
+    toothMeshes.forEach(function(tm) {
+        if (tm.userData.isPulsing && tm.material && tm.material.emissiveIntensity !== undefined) {
+            tm.material.emissiveIntensity = 0.15 + 0.2 * Math.sin(time * 3);
+            tm.material.opacity = 0.45 + 0.2 * Math.sin(time * 3);
+        }
+    });
+}
+
+// Legacy setRenderMode — now simplified (solid only, no xray/status)
+function setRenderMode(mode) {
+    currentRenderMode = mode;
 }
 
 
@@ -2376,16 +2513,11 @@ function animate() {
         }
     }
 
-    // Subtle breathing animation on non-healthy teeth
+    // Pulse animation for findings overlays
     const time = clock.getElapsedTime();
-    toothMeshes.forEach(mesh => {
-        if (mesh !== selectedTooth && mesh !== hoveredTooth) {
-            const status = mesh.userData.toothData.status;
-            if (status === 'needs_attention') {
-                mesh.material.emissiveIntensity = 0.12 + Math.sin(time * 2) * 0.06;
-            }
-        }
-    });
+    if (findingsVisible) {
+        updatePulsingOverlays(time);
+    }
 
     controls.update();
     renderer.render(scene, camera);
