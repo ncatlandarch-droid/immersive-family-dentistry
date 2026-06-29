@@ -877,14 +877,26 @@ body::before {
                 <label class="mm-finding-toggle" data-finding="treated">
                     <input type="checkbox" checked onchange="toggleFindingOverlay('treated', this.checked)">
                     <span class="mm-finding-dot" style="background:#3B82F6;"></span>
-                    <span class="mm-finding-label">Composite Fillings</span>
+                    <span class="mm-finding-label">Restorations</span>
                     <span class="mm-finding-count" id="count-treated">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="caries">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('caries', this.checked)">
+                    <span class="mm-finding-dot" style="background:#EF4444;"></span>
+                    <span class="mm-finding-label">Caries / Decay</span>
+                    <span class="mm-finding-count" id="count-caries">0</span>
                 </label>
                 <label class="mm-finding-toggle" data-finding="needs_attention">
                     <input type="checkbox" checked onchange="toggleFindingOverlay('needs_attention', this.checked)">
                     <span class="mm-finding-dot" style="background:#F59E0B;"></span>
                     <span class="mm-finding-label">Watch Areas</span>
                     <span class="mm-finding-count" id="count-attention">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="calculus">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('calculus', this.checked)">
+                    <span class="mm-finding-dot" style="background:#F97316;"></span>
+                    <span class="mm-finding-label">Calculus / Tartar</span>
+                    <span class="mm-finding-count" id="count-calculus">0</span>
                 </label>
                 <label class="mm-finding-toggle" data-finding="missing">
                     <input type="checkbox" checked onchange="toggleFindingOverlay('missing', this.checked)">
@@ -1121,12 +1133,14 @@ for (let i = 1; i <= 32; i++) {
                 let status = 'healthy';
                 if (t.status === 'extracted') status = 'missing';
                 else if (t.status === 'restored' || t.status === 'treated') status = 'treated';
-                else if (t.status === 'decay' || t.status === 'needs_attention' || t.status === 'watch') status = 'needs_attention';
+                else if (t.status === 'decay' || t.status === 'caries') status = 'caries';
+                else if (t.status === 'calculus' || t.status === 'tartar') status = 'calculus';
+                else if (t.status === 'needs_attention' || t.status === 'watch') status = 'needs_attention';
                 else if (t.status === 'planned') status = 'planned';
                 
-                // Only override if not already set with richer data, or if chart has findings
+                // Always apply status from chart (fixes grey overlay bug)
+                DEMO_PATIENT.teeth[num].status = status;
                 if (t.findings && t.findings.length && t.findings[0] !== 'No findings') {
-                    DEMO_PATIENT.teeth[num].status = status;
                     DEMO_PATIENT.teeth[num].condition = t.findings.join('. ');
                 }
                 if (t.notes) DEMO_PATIENT.teeth[num].notes = t.notes;
@@ -1399,6 +1413,13 @@ async function loadHybridScans() {
             } catch(e) {}
         }
         console.log('[Hybrid] ' + toothMeshes.length + ' invisible tooth hitboxes loaded');
+        // Apply findings overlay now that meshes are ready
+        if (findingsVisible) {
+            applyFindingsOverlay();
+            updateFindingsCounts();
+            var btn = document.getElementById('btn-findings');
+            if (btn) btn.classList.add('active');
+        }
     }
     
     // Load full Maxilla (VISUAL)
@@ -1531,7 +1552,7 @@ var currentRenderMode = 'solid';
 
 /* ═══ Findings Overlay System (3Shape-style) ═══ */
 var findingsVisible = true;
-var findingFilters = { treated: true, needs_attention: true, missing: true, planned: true };
+var findingFilters = { treated: true, caries: true, needs_attention: true, calculus: true, missing: true, planned: true };
 var overlayPulseTime = 0;
 
 function toggleFindings() {
@@ -1556,6 +1577,8 @@ function applyFindingsOverlay() {
         healthy: 0x22c55e,
         needs_attention: 0xF59E0B,
         treated: 0x3B82F6,
+        caries: 0xEF4444,
+        calculus: 0xF97316,
         planned: 0xA855F7,
         missing: 0x64748B
     };
@@ -1571,13 +1594,10 @@ function applyFindingsOverlay() {
         if (showOverlay) {
             var color = overlayColors[status] || 0x22c55e;
             var isWatch = (status === 'needs_attention' || status === 'planned');
-            tm.material = new THREE.MeshPhysicalMaterial({
+            tm.material = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: isWatch ? 0.65 : 0.5,
-                roughness: 0.3,
-                emissive: color,
-                emissiveIntensity: isWatch ? 0.3 : 0.1,
+                opacity: isWatch ? 0.8 : 0.7,
                 side: THREE.DoubleSide,
                 depthWrite: false
             });
@@ -1592,7 +1612,7 @@ function applyFindingsOverlay() {
 }
 
 function updateFindingsCounts() {
-    var counts = { treated: 0, needs_attention: 0, missing: 0, planned: 0 };
+    var counts = { treated: 0, caries: 0, needs_attention: 0, calculus: 0, missing: 0, planned: 0 };
     for (var i = 1; i <= 32; i++) {
         var tooth = DEMO_PATIENT.teeth[i];
         if (tooth && counts.hasOwnProperty(tooth.status)) {
@@ -1601,7 +1621,9 @@ function updateFindingsCounts() {
     }
     var el;
     el = document.getElementById('count-treated'); if (el) el.textContent = counts.treated;
+    el = document.getElementById('count-caries'); if (el) el.textContent = counts.caries;
     el = document.getElementById('count-attention'); if (el) el.textContent = counts.needs_attention;
+    el = document.getElementById('count-calculus'); if (el) el.textContent = counts.calculus;
     el = document.getElementById('count-missing'); if (el) el.textContent = counts.missing;
     el = document.getElementById('count-planned'); if (el) el.textContent = counts.planned;
 }
@@ -2104,19 +2126,18 @@ function selectToothByNumber(toothNum, hitPoint) {
         healthy: 0x22c55e,
         needs_attention: 0xF59E0B,
         treated: 0x3B82F6,
+        caries: 0xEF4444,
+        calculus: 0xF97316,
         planned: 0xA855F7,
         missing: 0x64748B
     };
     const toothMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
     if (toothMesh) {
         const color = statusColors[toothData.status] || 0x22c55e;
-        toothMesh.material = new THREE.MeshPhysicalMaterial({
+        toothMesh.material = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: 0.75,
-            roughness: 0.2,
-            emissive: color,
-            emissiveIntensity: 0.4,
+            opacity: 0.85,
             side: THREE.DoubleSide,
             depthWrite: false
         });
@@ -2195,6 +2216,8 @@ function isolateTooth(toothNum) {
         healthy: 0x22c55e,
         needs_attention: 0xF59E0B,
         treated: 0x3B82F6,
+        caries: 0xEF4444,
+        calculus: 0xF97316,
         planned: 0xA855F7,
         missing: 0x64748B
     };
@@ -2204,13 +2227,10 @@ function isolateTooth(toothNum) {
             // Make isolated tooth bright and prominent
             const toothData = DEMO_PATIENT.teeth[toothNum];
             const color = statusColors[toothData?.status] || 0x22c55e;
-            tm.material = new THREE.MeshPhysicalMaterial({
+            tm.material = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: 0.85,
-                roughness: 0.15,
-                emissive: color,
-                emissiveIntensity: 0.5,
+                opacity: 0.9,
                 side: THREE.DoubleSide,
                 depthWrite: true
             });
