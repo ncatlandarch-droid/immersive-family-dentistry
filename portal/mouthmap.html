@@ -1413,6 +1413,21 @@ async function loadHybridScans() {
             } catch(e) {}
         }
         console.log('[Hybrid] ' + toothMeshes.length + ' invisible tooth hitboxes loaded');
+        
+        // ─── Tooth Position Diagnostic ───
+        // Universal Numbering: Upper Right = 1-8 (viewer left), Upper Left = 9-16 (viewer right)
+        // Lower Left = 17-24 (viewer right), Lower Right = 25-32 (viewer left)
+        console.log('[Diagnostic] Tooth center positions (world coords):');
+        toothMeshes.forEach(tm => {
+            tm.geometry.computeBoundingBox();
+            const c = new THREE.Vector3();
+            tm.geometry.boundingBox.getCenter(c);
+            const num = tm.userData.toothNumber;
+            const expectedSide = (num >= 1 && num <= 8) || (num >= 25 && num <= 32) ? 'RIGHT(+X)' : 'LEFT(-X)';
+            const actualSide = c.x > 0 ? 'RIGHT(+X)' : 'LEFT(-X)';
+            const match = expectedSide === actualSide ? '✅' : '❌ MIRRORED';
+            console.log(`  Tooth #${num}: x=${c.x.toFixed(1)}, y=${c.y.toFixed(1)}, z=${c.z.toFixed(1)} | Expected: ${expectedSide}, Actual: ${actualSide} ${match}`);
+        });
         // Apply findings overlay now that meshes are ready
         if (findingsVisible) {
             applyFindingsOverlay();
