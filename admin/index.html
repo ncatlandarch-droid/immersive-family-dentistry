@@ -1137,11 +1137,11 @@
         pointer-events: none;
     }
     .notif-toast {
-        display: flex; align-items: flex-start; gap: 12px;
-        padding: 14px 18px; border-radius: var(--admin-radius);
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 18px 22px; border-radius: var(--admin-radius);
         background: var(--admin-surface-solid); border: 1px solid var(--admin-border);
         box-shadow: var(--admin-shadow-lg); pointer-events: auto;
-        cursor: pointer; min-width: 320px; max-width: 400px;
+        cursor: pointer; min-width: 380px; max-width: 460px;
         animation: notif-toast-in 0.35s ease-out;
         transition: all 0.3s ease;
     }
@@ -1150,10 +1150,10 @@
         from { opacity: 0; transform: translateX(100%); }
         to { opacity: 1; transform: translateX(0); }
     }
-    .notif-toast-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .notif-toast-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
     .notif-toast-body { flex: 1; }
-    .notif-toast-title { font-size: 13px; font-weight: 600; color: var(--admin-text); margin-bottom: 2px; }
-    .notif-toast-desc { font-size: 12px; color: var(--admin-text-secondary); line-height: 1.4; }
+    .notif-toast-title { font-size: 15px; font-weight: 600; color: var(--admin-text); margin-bottom: 4px; }
+    .notif-toast-desc { font-size: 13px; color: var(--admin-text-secondary); line-height: 1.5; }
     .notif-toast-close {
         font-size: 18px; color: var(--admin-muted); flex-shrink: 0;
         padding: 0 4px; line-height: 1;
