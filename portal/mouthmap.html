@@ -1402,6 +1402,21 @@ async function loadHybridScans() {
                     continue;
                 }
                 const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
+                
+                // Fix mirroring: left-side teeth (9-16 upper left, 17-24 lower left)
+                // have positive X in PLY but should be negative X in the scene
+                const isLeftSide = (num >= 9 && num <= 16) || (num >= 17 && num <= 24);
+                if (isLeftSide) {
+                    const posAttr = geo.getAttribute('position');
+                    for (let vi = 0; vi < posAttr.count; vi++) {
+                        posAttr.setX(vi, -posAttr.getX(vi));
+                    }
+                    posAttr.needsUpdate = true;
+                    geo.computeBoundingBox();
+                    geo.computeVertexNormals();
+                    console.log('[Hybrid] Mirrored tooth #' + num + ' X coords');
+                }
+                
                 const mat = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.name = 'tooth_hit_' + toothNum;
@@ -1602,6 +1617,9 @@ function applyFindingsOverlay() {
         var num = tm.userData.toothNumber;
         var toothData = DEMO_PATIENT.teeth[num];
         var status = toothData ? toothData.status : 'healthy';
+        
+        // Reset scale from any selection/isolation
+        tm.scale.set(1, 1, 1);
         
         // Show overlay if findings panel is open AND this status type is checked AND tooth has a finding
         var showOverlay = findingsVisible && status !== 'healthy' && findingFilters[status];
@@ -2122,7 +2140,7 @@ function selectToothByNumber(toothNum, hitPoint) {
     const toothData = DEMO_PATIENT.teeth[toothNum];
     if (!toothData) return;
     
-    // Remove previous selection ring
+    // Remove previous selection ring (legacy cleanup)
     if (selectionRing) {
         scene.remove(selectionRing);
         selectionRing = null;
@@ -2136,7 +2154,7 @@ function selectToothByNumber(toothNum, hitPoint) {
     // Store as NUMBER for chart sync
     selectedTooth = toothNum;
     
-    // PIN colored overlay on the selected tooth mesh
+    // PIN colored overlay on the selected tooth mesh — covers entire tooth
     const statusColors = {
         healthy: 0x22c55e,
         needs_attention: 0xF59E0B,
@@ -2149,32 +2167,17 @@ function selectToothByNumber(toothNum, hitPoint) {
     const toothMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
     if (toothMesh) {
         const color = statusColors[toothData.status] || 0x22c55e;
+        // Selection overlay: brighter + slightly larger for "selected" feel
         toothMesh.material = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: 0.85,
+            opacity: 0.6,
             side: THREE.DoubleSide,
             depthWrite: false
         });
         toothMesh.material.visible = true;
+        toothMesh.scale.set(1.03, 1.03, 1.03); // slight scale-up for selection effect
         toothMesh.userData.isPinned = true;
-    }
-
-    // If we have a hit point on the real scan, show a glowing ring
-    if (hitPoint && scanLoaded) {
-        const ringGeo = new THREE.RingGeometry(2.5, 3.2, 24);
-        const ringColor = statusColors[toothData.status] || 0x2dd4bf;
-        const ringMat = new THREE.MeshBasicMaterial({
-            color: ringColor,
-            transparent: true,
-            opacity: 0.7,
-            side: THREE.DoubleSide,
-            depthTest: false
-        });
-        selectionRing = new THREE.Mesh(ringGeo, ringMat);
-        selectionRing.position.copy(hitPoint);
-        selectionRing.lookAt(camera.position);
-        scene.add(selectionRing);
     }
 
     // Stop auto-rotate
@@ -2214,7 +2217,7 @@ function isolateTooth(toothNum) {
         toothStates: []
     };
     
-    // Save and ghost all scan meshes
+    // Dim scan meshes (but keep photorealistic - just reduce brightness)
     scanMeshes.forEach(mesh => {
         preIsolationState.scanOpacities.push({
             mesh: mesh,
@@ -2222,41 +2225,27 @@ function isolateTooth(toothNum) {
             opacity: mesh.material.opacity
         });
         mesh.material.transparent = true;
-        mesh.material.opacity = 0.12;
+        mesh.material.opacity = 0.25;
         mesh.material.needsUpdate = true;
     });
     
-    // Ghost all other tooth meshes, highlight isolated one
-    const statusColors = {
-        healthy: 0x22c55e,
-        needs_attention: 0xF59E0B,
-        treated: 0x3B82F6,
-        caries: 0xEF4444,
-        calculus: 0xF97316,
-        planned: 0xA855F7,
-        missing: 0x64748B
-    };
-    
+    // Spotlight effect: isolated tooth hitbox stays invisible (scan shows through),
+    // all other tooth hitboxes get grey wash overlay
     toothMeshes.forEach(tm => {
         if (tm.userData.toothNumber === toothNum) {
-            // Make isolated tooth bright and prominent
-            const toothData = DEMO_PATIENT.teeth[toothNum];
-            const color = statusColors[toothData?.status] || 0x22c55e;
+            // Keep isolated tooth's hitbox invisible — scan is photorealistic underneath
+            tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+            tm.scale.set(1, 1, 1);
+        } else {
+            // Grey wash on other teeth to fade them
             tm.material = new THREE.MeshBasicMaterial({
-                color: color,
+                color: 0x1a2332,
                 transparent: true,
-                opacity: 0.9,
+                opacity: 0.7,
                 side: THREE.DoubleSide,
-                depthWrite: true
+                depthWrite: false
             });
             tm.material.visible = true;
-            tm.scale.set(1.15, 1.15, 1.15);
-        } else {
-            // Ghost others
-            tm.material = new THREE.MeshBasicMaterial({
-                visible: false,
-                side: THREE.DoubleSide
-            });
         }
     });
     
