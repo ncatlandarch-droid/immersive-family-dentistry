@@ -820,6 +820,11 @@ body::before {
     50% { box-shadow: 0 0 16px 4px rgba(45, 212, 191, 0.15); }
 }
 
+@keyframes chart-pulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(45,212,191,0.8), 0 0 4px rgba(255,255,255,0.5); }
+    50% { box-shadow: 0 0 20px rgba(45,212,191,1), 0 0 8px rgba(255,255,255,0.8), 0 0 30px rgba(45,212,191,0.4); }
+}
+
 .mm-tooth-title {
     animation: mmPulse 2s ease-in-out infinite;
 }
@@ -2215,12 +2220,12 @@ function onMouseMove(event) {
             hoveredTooth = mesh;
             renderer.domElement.style.cursor = 'pointer';
 
-            // Hover effect: teal-tinted overlay on the tooth mesh
-            if (mesh !== selectedTooth && !mesh.userData.isOverlayed) {
+            // Hover effect: white glow outline (not teal — avoid confusion with clinical status)
+            if (mesh && mesh !== selectedTooth && !mesh.userData.isOverlayed) {
                 mesh.material = new THREE.MeshBasicMaterial({
-                    color: 0x2dd4bf,
+                    color: 0xffffff,
                     transparent: true,
-                    opacity: 0.5,
+                    opacity: 0.35,
                     side: THREE.DoubleSide,
                     depthWrite: false
                 });
@@ -2820,45 +2825,45 @@ function buildToothChart() {
     const lowerEl = document.getElementById('lower-arch-chart');
     if (!upperEl || !lowerEl) return;
     
-    // Upper arch: teeth 1-16 (displayed right to left: 1..8 then 9..16)
-    let upperHTML = '';
-    for (let i = 1; i <= 16; i++) {
+    function toothCell(i, isUpper) {
         const tooth = DEMO_PATIENT.teeth[i] || { status: 'healthy' };
         const color = STATUS_HEX[tooth.status] || '#F5F5F0';
         const isSelected = selectedTooth === i;
-        const border = isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.15)';
-        const shadow = isSelected ? '0 0 8px rgba(45,212,191,0.6)' : 'none';
-        upperHTML += `<div onclick="selectToothByNumber(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
-            width:26px;height:30px;border-radius:4px 4px 6px 6px;
-            background:${color};border:${border};cursor:pointer;
+        
+        // SELECTED: bright ring, pulsing animation, scaled up, white bg glow
+        const border = isSelected 
+            ? '3px solid #2dd4bf' 
+            : '1px solid rgba(255,255,255,0.15)';
+        const shadow = isSelected 
+            ? '0 0 12px rgba(45,212,191,0.8), 0 0 4px rgba(255,255,255,0.5), inset 0 0 6px rgba(45,212,191,0.3)' 
+            : 'none';
+        const scale = isSelected ? 'scale(1.35)' : '';
+        const zIdx = isSelected ? 'z-index:10;' : '';
+        const anim = isSelected ? 'animation: chart-pulse 1.2s ease-in-out infinite;' : '';
+        const textColor = isSelected ? '#fff' : (tooth.status === 'healthy' ? '#555' : '#fff');
+        const bg = isSelected ? 'linear-gradient(135deg, ' + color + ', #2dd4bf)' : color;
+        const radius = isUpper ? '4px 4px 6px 6px' : '6px 6px 4px 4px';
+        const gap = (isUpper && i === 8) || (!isUpper && i === 25) ? 'margin-right:6px;' : '';
+        
+        return `<div id="chart-tooth-${i}" onclick="selectToothByNumber(${i})" ondblclick="isolateTooth(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
+            width:26px;height:30px;border-radius:${radius};
+            background:${bg};border:${border};cursor:pointer;
             display:flex;align-items:center;justify-content:center;
-            font-size:8px;font-weight:700;color:${tooth.status==='healthy'?'#555':'#fff'};
-            transition:all 0.2s;box-shadow:${shadow};
-            ${i === 8 ? 'margin-right:6px;' : ''}
-        " onmouseover="this.style.transform='scale(1.2)';this.style.zIndex=5" 
-           onmouseout="this.style.transform='';this.style.zIndex=''">${i}</div>`;
+            font-size:${isSelected ? '10px' : '8px'};font-weight:${isSelected ? '900' : '700'};color:${textColor};
+            transition:all 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:${shadow};
+            transform:${scale};${zIdx}${gap}${anim}position:relative;
+        " onmouseover="if(!${isSelected})this.style.transform='scale(1.2)';this.style.zIndex=5" 
+           onmouseout="if(!${isSelected}){this.style.transform='';this.style.zIndex=''}">${i}</div>`;
     }
+    
+    // Upper arch: teeth 1-16
+    let upperHTML = '';
+    for (let i = 1; i <= 16; i++) upperHTML += toothCell(i, true);
     upperEl.innerHTML = upperHTML;
     
-    // Lower arch: teeth 32-17 (displayed right to left: 32..25 then 24..17)
+    // Lower arch: teeth 32-17 (right to left)
     let lowerHTML = '';
-    for (let i = 32; i >= 17; i--) {
-        const tooth = DEMO_PATIENT.teeth[i] || { status: 'healthy' };
-        const color = STATUS_HEX[tooth.status] || '#F5F5F0';
-        const isSelected = selectedTooth === i;
-        const border = isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.15)';
-        const shadow = isSelected ? '0 0 8px rgba(45,212,191,0.6)' : 'none';
-        const num = i; // map: 32→1st position ... 17→16th position
-        lowerHTML += `<div onclick="selectToothByNumber(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
-            width:26px;height:30px;border-radius:6px 6px 4px 4px;
-            background:${color};border:${border};cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
-            font-size:8px;font-weight:700;color:${tooth.status==='healthy'?'#555':'#fff'};
-            transition:all 0.2s;box-shadow:${shadow};
-            ${i === 25 ? 'margin-right:6px;' : ''}
-        " onmouseover="this.style.transform='scale(1.2)';this.style.zIndex=5" 
-           onmouseout="this.style.transform='';this.style.zIndex=''">${i}</div>`;
-    }
+    for (let i = 32; i >= 17; i--) lowerHTML += toothCell(i, false);
     lowerEl.innerHTML = lowerHTML;
 }
 
@@ -2998,34 +3003,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Double-click → Isolate Tooth ───
     document.getElementById('viewer-container').addEventListener('dblclick', function(event) {
+        if (isIsolationMode) {
+            exitIsolation();
+            return;
+        }
+        
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         
-        if (isIsolationMode) {
-            // Double-click on ghosted arch → exit isolation
-            exitIsolation();
-            return;
-        }
-        
-        // Check tooth meshes first
-        if (toothMeshes.length > 0) {
-            const hits = raycaster.intersectObjects(toothMeshes);
-            if (hits.length > 0 && hits[0].object.userData.toothNumber) {
-                isolateTooth(hits[0].object.userData.toothNumber);
+        // Use nearest-tooth-center approach (same as click/hover)
+        const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+        const hits = raycaster.intersectObjects(scanVisuals);
+        if (hits.length > 0) {
+            const nearest = findNearestTooth(hits[0].point);
+            if (nearest) {
+                selectToothByNumber(nearest.num, hits[0].point);
+                isolateTooth(nearest.num);
                 return;
-            }
-        }
-        // Check scan meshes (position-based)
-        if (scanLoaded && scanMeshes.length > 0) {
-            const scanHits = raycaster.intersectObjects(scanMeshes);
-            if (scanHits.length > 0) {
-                const toothNum = mapPositionToTooth(scanHits[0].point);
-                if (toothNum) {
-                    isolateTooth(toothNum);
-                    return;
-                }
             }
         }
     });
