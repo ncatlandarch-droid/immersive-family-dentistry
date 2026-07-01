@@ -1538,6 +1538,9 @@ async function loadHybridScans() {
         
         updateSummaryStats();
         
+        // Compute tooth centers AFTER centering (world-space positions for nearest-center lookup)
+        computeToothCenters();
+        
         console.log('[Hybrid] Scene ready: ' + scanMeshes.length + ' visual scans + ' + 
             toothMeshes.length + ' tooth targets');
     }
@@ -2036,15 +2039,64 @@ function buildIncisorGeometry() {
 
 
 /* ═══ Mouse Interaction ═══ */
+
+// Pre-compute tooth centers for nearest-center lookup (bypasses bad segmentation)
+let toothCenters = []; // [{num, center: THREE.Vector3, mesh}]
+
+function computeToothCenters() {
+    toothCenters = [];
+    toothMeshes.forEach(tm => {
+        const vertCount = tm.geometry.getAttribute('position').count;
+        
+        // Skip massively oversized teeth (bad segmentation — includes gum tissue)
+        // tooth_06 has 8,935 verts spanning 54 units, clearly includes gum
+        if (vertCount > 4000) {
+            console.warn('[Hybrid] Skipping oversized tooth #' + tm.userData.toothNumber + 
+                ' (' + vertCount + ' verts — likely includes gum tissue)');
+            return;
+        }
+        
+        tm.geometry.computeBoundingBox();
+        const center = new THREE.Vector3();
+        tm.geometry.boundingBox.getCenter(center);
+        // Convert to world space
+        tm.localToWorld(center);
+        toothCenters.push({
+            num: tm.userData.toothNumber,
+            center: center,
+            mesh: tm
+        });
+    });
+    console.log('[Hybrid] Computed centers for ' + toothCenters.length + ' teeth (skipped oversized)');
+}
+
+// Find nearest tooth to a 3D world point
+function findNearestTooth(point, maxDist) {
+    maxDist = maxDist || 15; // reasonable threshold in mm
+    let best = null;
+    let bestDist = maxDist;
+    toothCenters.forEach(tc => {
+        const d = point.distanceTo(tc.center);
+        if (d < bestDist) {
+            bestDist = d;
+            best = tc;
+        }
+    });
+    return best;
+}
+
 function onMouseMove(event) {
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(toothMeshes);
+    
+    // Raycast against full scan visual (clean geometry)
+    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+    const intersects = raycaster.intersectObjects(scanVisuals);
 
-    // Reset previous hover — restore invisible (hybrid: scan shows through)
+    // Reset previous hover
     if (hoveredTooth && hoveredTooth !== selectedTooth) {
         if (!hoveredTooth.userData.isOverlayed) {
             hoveredTooth.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
@@ -2053,12 +2105,15 @@ function onMouseMove(event) {
     }
 
     if (intersects.length > 0) {
-        const mesh = intersects[0].object;
-        if (mesh.userData.toothNumber) {
+        const hitPoint = intersects[0].point;
+        const nearest = findNearestTooth(hitPoint);
+        
+        if (nearest) {
+            const mesh = nearest.mesh;
             hoveredTooth = mesh;
             renderer.domElement.style.cursor = 'pointer';
 
-            // Hover effect: teal-tinted semi-transparent overlay + slight scale
+            // Hover effect: teal-tinted overlay on the tooth mesh
             if (mesh !== selectedTooth && !mesh.userData.isOverlayed) {
                 mesh.material = new THREE.MeshBasicMaterial({
                     color: 0x2dd4bf,
@@ -2071,10 +2126,14 @@ function onMouseMove(event) {
             }
 
             // Tooltip
-            tooltip.textContent = `#${mesh.userData.toothNumber} — ${TOOTH_NAMES[mesh.userData.toothNumber].split('(')[0].trim()}`;
+            tooltip.textContent = `#${nearest.num} — ${TOOTH_NAMES[nearest.num].split('(')[0].trim()}`;
             tooltip.style.left = event.clientX + 14 + 'px';
             tooltip.style.top = event.clientY - 10 + 'px';
             tooltip.classList.add('visible');
+        } else {
+            hoveredTooth = null;
+            renderer.domElement.style.cursor = 'grab';
+            tooltip.classList.remove('visible');
         }
     } else {
         hoveredTooth = null;
@@ -2091,12 +2150,14 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
     
-    // Per-tooth architecture: tooth meshes ARE the visual — direct hit = correct tooth
-    const toothHits = raycaster.intersectObjects(toothMeshes);
-    if (toothHits.length > 0) {
-        const mesh = toothHits[0].object;
-        if (mesh.userData.toothNumber) {
-            selectToothByNumber(mesh.userData.toothNumber, toothHits[0].point);
+    // Raycast against full scan, then find nearest tooth center
+    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+    const hits = raycaster.intersectObjects(scanVisuals);
+    if (hits.length > 0) {
+        const hitPoint = hits[0].point;
+        const nearest = findNearestTooth(hitPoint);
+        if (nearest) {
+            selectToothByNumber(nearest.num, hitPoint);
             return;
         }
     }
