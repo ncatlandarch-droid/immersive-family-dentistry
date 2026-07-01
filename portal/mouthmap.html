@@ -2925,164 +2925,125 @@ function buildToothChart() {
     const container = document.getElementById('arch-chart-container');
     if (!container) return;
     
-    /* ═══ OLIVE-DENTAL-STYLE TOOTH CHART ═══
-       Pink gum shapes + realistic tooth outlines
-       Two separate arches: UPPER (top) and LOWER (bottom)
-       Patient's right = viewer's left
+    /* ═══ IMAGE-BACKED TOOTH CHART ═══
+       Uses a generated dental arch illustration as background.
+       Overlays interactive SVG hotspots on each tooth position.
+       The image = beauty, the SVG = interactivity.
+       
+       Image is 1024x1024. We use percentage-based positions
+       so the chart scales responsively.
     */
     
-    const W = 280, H = 380;
-    const CX = W / 2;
+    // Tooth hotspot positions as [x%, y%] on the 1024x1024 image
+    // Carefully mapped to each tooth in the illustration
+    const toothPositions = {
+        // UPPER ARCH — front teeth at top, molars go down the sides
+        // Upper Right: 1(back right) → 8(front center-right)
+        1:  [18.5, 36],   // 3rd molar
+        2:  [20,   28.5], // 2nd molar
+        3:  [23,   22],   // 1st molar
+        4:  [27.5, 16.5], // 2nd premolar
+        5:  [33,   12],   // 1st premolar
+        6:  [38,   8.5],  // canine
+        7:  [43.5, 6.5],  // lateral incisor
+        8:  [48,   5.5],  // central incisor
+        // Upper Left: 9(front center-left) → 16(back left)
+        9:  [52,   5.5],  // central incisor
+        10: [56.5, 6.5],  // lateral incisor
+        11: [62,   8.5],  // canine
+        12: [67,   12],   // 1st premolar
+        13: [72.5, 16.5], // 2nd premolar
+        14: [77,   22],   // 1st molar
+        15: [80,   28.5], // 2nd molar
+        16: [81.5, 36],   // 3rd molar
+        
+        // LOWER ARCH — front teeth at bottom, molars go up the sides
+        // Lower Left: 17(back left) → 24(front center-left)
+        17: [78,   58],   // 3rd molar
+        18: [76.5, 65],   // 2nd molar
+        19: [73.5, 72],   // 1st molar
+        20: [69,   78],   // 2nd premolar
+        21: [64,   83],   // 1st premolar
+        22: [59,   87],   // canine
+        23: [54.5, 90],   // lateral incisor
+        24: [51,   91.5], // central incisor
+        // Lower Right: 25(front center-right) → 32(back right)
+        25: [49,   91.5], // central incisor
+        26: [45.5, 90],   // lateral incisor
+        27: [41,   87],   // canine
+        28: [36,   83],   // 1st premolar
+        29: [31,   78],   // 2nd premolar
+        30: [26.5, 72],   // 1st molar
+        31: [23.5, 65],   // 2nd molar
+        32: [22,   58],   // 3rd molar
+    };
     
-    // Tooth positions around each arch (hand-tuned)
-    // Upper: front teeth at TOP, back teeth go down the sides
-    // [xOffset from center, yPosition, rotation in degrees]
-    const upperTeeth = [
-        [-105, 175, -85], // 1  3rd molar
-        [-102, 150, -75], // 2  2nd molar
-        [ -96, 128, -60], // 3  1st molar
-        [ -85, 108, -45], // 4  2nd premolar
-        [ -70,  92, -30], // 5  1st premolar
-        [ -52,  80, -15], // 6  canine
-        [ -30,  72,  -5], // 7  lateral incisor
-        [ -10,  68,   0], // 8  central incisor
-        [  10,  68,   0], // 9  central incisor
-        [  30,  72,   5], // 10 lateral incisor
-        [  52,  80,  15], // 11 canine
-        [  70,  92,  30], // 12 1st premolar
-        [  85, 108,  45], // 13 2nd premolar
-        [  96, 128,  60], // 14 1st molar
-        [ 102, 150,  75], // 15 2nd molar
-        [ 105, 175,  85], // 16 3rd molar
-    ];
+    // Status colors for the number badges
+    const badgeColors = {
+        'healthy': 'rgba(255,255,255,0.85)',
+        'restoration': '#f59e0b',
+        'decay': '#ef4444',
+        'watch': '#3b82f6',
+        'calculus': '#8b5cf6',
+        'missing': '#64748b',
+        'planned': '#06b6d4',
+        'recession': '#ec4899',
+        'cavity_risk': '#f97316',
+        'cracked': '#dc2626',
+        'worn': '#a855f7'
+    };
     
-    // Lower: front teeth at BOTTOM, back teeth go up the sides
-    const lowerTeeth = [
-        [  95, 215,  85], // 17 3rd molar
-        [  92, 238,  75], // 18 2nd molar
-        [  86, 258,  60], // 19 1st molar
-        [  76, 275,  45], // 20 2nd premolar
-        [  63, 288,  30], // 21 1st premolar
-        [  47, 298,  15], // 22 canine
-        [  27, 305,   5], // 23 lateral incisor
-        [   9, 308,   0], // 24 central incisor
-        [  -9, 308,   0], // 25 central incisor
-        [ -27, 305,  -5], // 26 lateral incisor
-        [ -47, 298, -15], // 27 canine
-        [ -63, 288, -30], // 28 1st premolar
-        [ -76, 275, -45], // 29 2nd premolar
-        [ -86, 258, -60], // 30 1st molar
-        [ -92, 238, -75], // 31 2nd molar
-        [ -95, 215, -85], // 32 3rd molar
-    ];
+    const badgeText = {
+        'healthy': '#1e293b',
+        'missing': '#fff',
+        'restoration': '#fff',
+        'decay': '#fff',
+        'watch': '#fff',
+        'calculus': '#fff',
+        'planned': '#fff',
+        'recession': '#fff',
+        'cavity_risk': '#fff',
+        'cracked': '#fff',
+        'worn': '#fff'
+    };
     
-    // Tooth sizes by type
-    function toothType(n) {
-        const t = n <= 16 ? n : (n <= 24 ? 49 - n : n - 16);
-        if (t <= 3 || t >= 14) return 'molar';
-        if (t <= 5 || t >= 12) return 'premolar';
-        if (t === 6 || t === 11) return 'canine';
-        return 'incisor';
-    }
+    // Build HTML: image + SVG overlay
+    let html = `<div style="position:relative;width:100%;max-width:400px;margin:0 auto;">
+        <img src="assets/dental-arch-chart.png" alt="Dental Arch Chart" style="width:100%;display:block;border-radius:8px;">
+        <svg viewBox="0 0 100 100" style="position:absolute;top:0;left:0;width:100%;height:100%;" xmlns="http://www.w3.org/2000/svg">`;
     
-    function toothDims(n) {
-        switch(toothType(n)) {
-            case 'molar':    return { w: 16, h: 14 };
-            case 'premolar': return { w: 12, h: 13 };
-            case 'canine':   return { w: 10, h: 14 };
-            case 'incisor':  return { w: 10, h: 12 };
-        }
-    }
-    
-    // Tooth shape SVG path
-    function toothShape(type, w, h) {
-        const hw = w/2, hh = h/2, r = 3;
-        if (type === 'molar') {
-            // Wide rectangle with bumpy top edge
-            return `M${-hw+r},${-hh} Q${-hw},${-hh} ${-hw},${-hh+r} L${-hw},${hh-r} Q${-hw},${hh} ${-hw+r},${hh} L${hw-r},${hh} Q${hw},${hh} ${hw},${hh-r} L${hw},${-hh+r} Q${hw},${-hh} ${hw-r},${-hh} Z`;
-        }
-        if (type === 'canine') {
-            // Pointed/diamond-ish
-            return `M0,${-hh-2} Q${hw},${-hh+2} ${hw},0 Q${hw},${hh-2} 0,${hh} Q${-hw},${hh-2} ${-hw},0 Q${-hw},${-hh+2} 0,${-hh-2} Z`;
-        }
-        // Premolar + Incisor: rounded rectangle
-        return `M${-hw+r},${-hh} L${hw-r},${-hh} Q${hw},${-hh} ${hw},${-hh+r} L${hw},${hh-r} Q${hw},${hh} ${hw-r},${hh} L${-hw+r},${hh} Q${-hw},${hh} ${-hw},${hh-r} L${-hw},${-hh+r} Q${-hw},${-hh} ${-hw+r},${-hh} Z`;
-    }
-    
-    // ═══ BUILD SVG ═══
-    let svg = `<svg width="100%" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;">`;
-    
-    // ─── Defs ───
-    svg += `<defs>
-        <filter id="selGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="b"/>
-            <feFlood flood-color="#2dd4bf" flood-opacity="0.7" result="c"/>
-            <feComposite in="c" in2="b" operator="in" result="g"/>
-            <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-    </defs>`;
-    
-    // ─── UPPER GUM SHAPE ───
-    svg += `<path d="M${CX-110},180 Q${CX-110},60 ${CX},55 Q${CX+110},60 ${CX+110},180 L${CX+80},180 Q${CX+80},95 ${CX},90 Q${CX-80},95 ${CX-80},180 Z" 
-        fill="rgba(219,112,147,0.25)" stroke="rgba(219,112,147,0.4)" stroke-width="1"/>`;
-    svg += `<text x="${CX}" y="145" text-anchor="middle" dominant-baseline="middle" fill="rgba(219,112,147,0.6)" font-size="13" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">UPPER</text>`;
-    
-    // ─── LOWER GUM SHAPE ───
-    svg += `<path d="M${CX-100},210 Q${CX-100},320 ${CX},325 Q${CX+100},320 ${CX+100},210 L${CX+72},210 Q${CX+72},290 ${CX},293 Q${CX-72},290 ${CX-72},210 Z" 
-        fill="rgba(219,112,147,0.25)" stroke="rgba(219,112,147,0.4)" stroke-width="1"/>`;
-    svg += `<text x="${CX}" y="255" text-anchor="middle" dominant-baseline="middle" fill="rgba(219,112,147,0.6)" font-size="13" font-weight="700" font-family="Inter,sans-serif" letter-spacing="2">LOWER</text>`;
-    
-    // ─── Side labels ───
-    svg += `<text x="6" y="14" fill="#64748b" font-size="9" font-family="Inter,sans-serif" font-weight="500">Right</text>`;
-    svg += `<text x="${W-6}" y="14" text-anchor="end" fill="#64748b" font-size="9" font-family="Inter,sans-serif" font-weight="500">Left</text>`;
-    
-    // ─── DRAW TEETH ───
-    function drawTooth(n, posData) {
-        const [xOff, y, rot] = posData;
-        const x = CX + xOff;
+    // Draw interactive hotspots for each tooth
+    for (let n = 1; n <= 32; n++) {
+        const pos = toothPositions[n];
+        if (!pos) continue;
+        const [x, y] = pos;
         const tooth = DEMO_PATIENT.teeth[n] || { status: 'healthy' };
-        const dims = toothDims(n);
-        const type = toothType(n);
-        const path = toothShape(type, dims.w, dims.h);
         const isSelected = selectedTooth === n;
         
-        // Colors
-        let fillColor, strokeColor, textColor;
-        if (tooth.status === 'missing') {
-            fillColor = '#1a1a2e'; strokeColor = '#333'; textColor = '#555';
-        } else if (tooth.status === 'healthy') {
-            fillColor = '#F5F5F0'; strokeColor = isSelected ? '#2dd4bf' : '#bbb'; textColor = '#333';
-        } else {
-            const c = STATUS_HEX[tooth.status] || '#F5F5F0';
-            fillColor = c; strokeColor = isSelected ? '#2dd4bf' : '#999'; textColor = '#fff';
-        }
+        const bgColor = badgeColors[tooth.status] || 'rgba(255,255,255,0.85)';
+        const txtColor = badgeText[tooth.status] || '#1e293b';
+        const r = isSelected ? 3.2 : 2.5;
+        const strokeColor = isSelected ? '#2dd4bf' : 'transparent';
+        const strokeW = isSelected ? 0.5 : 0;
+        const opacity = tooth.status === 'missing' ? 0.5 : 0.9;
         
-        const sw = isSelected ? 2.5 : 1;
-        const filter = isSelected ? 'filter="url(#selGlow)"' : '';
-        const opacity = tooth.status === 'missing' ? 0.35 : 1;
-        const scale = isSelected ? 1.2 : 1;
-        
-        svg += `<g transform="translate(${x},${y}) rotate(${rot}) scale(${scale})" 
-            style="cursor:pointer;opacity:${opacity}" 
-            onclick="selectToothByNumber(${n})" ondblclick="isolateTooth(${n})"
-            onmouseover="this.querySelector('.tf').setAttribute('stroke','#2dd4bf');this.querySelector('.tf').setAttribute('stroke-width','2.5')"
-            onmouseout="this.querySelector('.tf').setAttribute('stroke','${strokeColor}');this.querySelector('.tf').setAttribute('stroke-width','${sw}')"
-            >
+        html += `<g style="cursor:pointer;opacity:${opacity}" 
+            onclick="selectToothByNumber(${n})" ondblclick="isolateTooth(${n})">
             <title>#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}</title>
-            <path class="tf" d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${sw}" ${filter}/>
-            <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" 
-                fill="${textColor}" font-size="8" font-weight="700" font-family="Inter,sans-serif"
-                transform="rotate(${-rot})" style="pointer-events:none;">${n}</text>
+            <circle cx="${x}" cy="${y}" r="${r + 1}" fill="transparent" 
+                class="tooth-hover-${n}"/>
+            <circle cx="${x}" cy="${y}" r="${r}" fill="${bgColor}" 
+                stroke="${strokeColor}" stroke-width="${strokeW}"
+                onmouseover="this.setAttribute('r','${r+0.8}');this.setAttribute('stroke','#2dd4bf');this.setAttribute('stroke-width','0.5')"
+                onmouseout="this.setAttribute('r','${r}');this.setAttribute('stroke','${strokeColor}');this.setAttribute('stroke-width','${strokeW}')"/>
+            <text x="${x}" y="${y + 0.8}" text-anchor="middle" dominant-baseline="middle" 
+                fill="${txtColor}" font-size="2.2" font-weight="700" font-family="Inter,sans-serif"
+                style="pointer-events:none;">${n}</text>
         </g>`;
     }
     
-    // Upper teeth 1-16
-    for (let i = 0; i < 16; i++) drawTooth(i + 1, upperTeeth[i]);
-    // Lower teeth 17-32
-    for (let i = 0; i < 16; i++) drawTooth(i + 17, lowerTeeth[i]);
-    
-    svg += '</svg>';
-    container.innerHTML = svg;
+    html += '</svg></div>';
+    container.innerHTML = html;
 }
 
 /* ═══ Arch Visibility Toggles ═══ */
