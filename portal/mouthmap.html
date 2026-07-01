@@ -1021,6 +1021,10 @@ body::before {
                 <button class="mm-view-btn" data-view="reset" title="Reset View">
                     <i data-lucide="rotate-ccw"></i><span>Reset</span>
                 </button>
+                <div style="width:1px;height:16px;background:rgba(255,255,255,0.1);"></div>
+                <button class="mm-view-btn" onclick="startCalibration()" id="btn-calibrate" title="Manually identify each tooth for perfect mapping" style="color:#fbbf24;">
+                    <span>🎯 Calibrate</span>
+                </button>
             </div>
         </div>
 
@@ -1570,26 +1574,54 @@ async function loadHybridScans() {
 }
 
 /* ═══ AUTO-ASSIGN UNIVERSAL TOOTH NUMBERS ═══
-   The segmentation tool (watershed) numbers PLY files arbitrarily.
-   This function sorts teeth by their actual 3D position and assigns
-   correct universal numbers (1-16 upper, 17-32 lower).
-   
-   Method:
-   1. Force scene matrix update for accurate world positions
-   2. Use Maxilla/Mandible scan meshes as spatial anchors
-   3. Assign each tooth to nearest arch (upper/lower)
-   4. Sort each arch by angular position (atan2)
-   5. Assign universal numbers + move to correct group
+   Checks for saved manual calibration first (localStorage).
+   Falls back to auto-detection using Maxilla/Mandible spatial anchors.
 */
 function reassignToothNumbers() {
     if (toothMeshes.length === 0) return;
     
-    // Force scene graph matrix update for accurate world positions
+    // CHECK FOR SAVED MANUAL CALIBRATION FIRST
+    const savedCal = localStorage.getItem('paloma_tooth_calibration');
+    if (savedCal) {
+        try {
+            const calMap = JSON.parse(savedCal);
+            console.log('[Calibration] Applying saved manual calibration...');
+            let applied = 0;
+            
+            toothMeshes.forEach(tm => {
+                const oldName = tm.name; // e.g. 'tooth_25'
+                const oldNum = tm.userData.toothNumber;
+                const key = 'mesh_' + oldNum; // key from when calibration was saved
+                
+                if (calMap[key] !== undefined) {
+                    const newNum = calMap[key];
+                    tm.userData.toothNumber = newNum;
+                    tm.userData.archType = newNum <= 16 ? 'upper' : 'lower';
+                    tm.name = 'tooth_' + newNum;
+                    
+                    // Move to correct group
+                    const targetGroup = newNum <= 16 ? upperGroup : lowerGroup;
+                    if (tm.parent !== targetGroup) {
+                        tm.parent.remove(tm);
+                        targetGroup.add(tm);
+                    }
+                    applied++;
+                    console.log(`[Calibration] ${key} → #${newNum} ${TOOTH_NAMES[newNum]?.split('(')[0]?.trim() || ''}`);
+                }
+            });
+            
+            console.log(`[Calibration] Applied ${applied}/${toothMeshes.length} mappings from saved calibration`);
+            return; // Skip auto-detection
+        } catch(e) {
+            console.warn('[Calibration] Failed to apply saved calibration:', e);
+        }
+    }
+    
+    // AUTO-DETECT: Use Maxilla/Mandible scan meshes as spatial anchors
     scene.updateMatrixWorld(true);
     
     console.log('[ReNumber] Auto-assigning universal tooth numbers from 3D positions...');
     
-    // Find Maxilla and Mandible scan visual centers as spatial anchors
     let maxillaCenter = null, mandibleCenter = null;
     scanMeshes.forEach(sm => {
         if (!sm.userData.isScanVisual) return;
@@ -1603,7 +1635,6 @@ function reassignToothNumbers() {
     
     if (!maxillaCenter || !mandibleCenter) {
         console.warn('[ReNumber] Could not find Maxilla/Mandible scan meshes, falling back to Y midpoint');
-        // Fallback to Y midpoint
         const yVals = toothMeshes.map(tm => {
             tm.geometry.computeBoundingBox();
             const c = new THREE.Vector3();
@@ -1618,26 +1649,19 @@ function reassignToothNumbers() {
     
     console.log(`[ReNumber] Anchors: Maxilla Y=${maxillaCenter.y.toFixed(1)}, Mandible Y=${mandibleCenter.y.toFixed(1)}`);
     
-    // Compute world-space center for each mesh, filter tiny fragments
     const meshData = [];
     toothMeshes.forEach(tm => {
         const vc = tm.geometry.getAttribute('position').count;
-        if (vc < 100) {
-            console.log(`[ReNumber] Skipping tiny mesh (${vc} verts) — likely gum fragment`);
-            return;
-        }
+        if (vc < 100) return;
         
         tm.geometry.computeBoundingBox();
         const c = new THREE.Vector3();
         tm.geometry.boundingBox.getCenter(c);
         tm.localToWorld(c);
         
-        // Assign to nearest arch using 3D distance to scan visual center
         const distUpper = c.distanceTo(maxillaCenter);
         const distLower = c.distanceTo(mandibleCenter);
-        const isUpper = distUpper < distLower;
-        
-        meshData.push({ mesh: tm, center: c, oldNum: tm.userData.toothNumber, isUpper });
+        meshData.push({ mesh: tm, center: c, oldNum: tm.userData.toothNumber, isUpper: distUpper < distLower });
     });
     
     const upper = meshData.filter(d => d.isUpper);
@@ -1645,68 +1669,238 @@ function reassignToothNumbers() {
     
     console.log(`[ReNumber] Split: ${upper.length} upper, ${lower.length} lower`);
     
-    // Sort each arch by angular position
-    // atan2(x, z) where z+ = front teeth, x+ = patient's right
-    // Upper: sort by angle DESCENDING → right back (1) → right front (8) → left front (9) → left back (16)
-    upper.sort((a, b) => {
-        const angleA = Math.atan2(a.center.x, a.center.z);
-        const angleB = Math.atan2(b.center.x, b.center.z);
-        return angleB - angleA;
-    });
+    upper.sort((a, b) => Math.atan2(b.center.x, b.center.z) - Math.atan2(a.center.x, a.center.z));
+    lower.sort((a, b) => Math.atan2(a.center.x, a.center.z) - Math.atan2(b.center.x, b.center.z));
     
-    // Lower: sort by angle ASCENDING → left back (17) → left front (24) → right front (25) → right back (32)
-    lower.sort((a, b) => {
-        const angleA = Math.atan2(a.center.x, a.center.z);
-        const angleB = Math.atan2(b.center.x, b.center.z);
-        return angleA - angleB;
-    });
-    
-    // Assign universal numbers
     function assignArch(sortedTeeth, startNum, endNum) {
-        const count = endNum - startNum + 1; // 16
+        const count = endNum - startNum + 1;
         const n = sortedTeeth.length;
-        
         sortedTeeth.forEach((td, i) => {
             let num;
-            if (n >= count) {
-                num = startNum + i;
-            } else if (n === 1) {
-                num = startNum + Math.floor(count / 2);
-            } else {
-                num = startNum + Math.round(i * (count - 1) / (n - 1));
-            }
+            if (n >= count) num = startNum + i;
+            else if (n === 1) num = startNum + Math.floor(count / 2);
+            else num = startNum + Math.round(i * (count - 1) / (n - 1));
             num = Math.max(startNum, Math.min(endNum, num));
             
-            const oldNum = td.mesh.userData.toothNumber;
             td.mesh.userData.toothNumber = num;
             td.mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
             td.mesh.name = 'tooth_' + num;
             td.newNum = num;
-            
-            if (oldNum !== num) {
-                console.log(`[ReNumber] tooth_${oldNum} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''} (dist: upper=${td.center.distanceTo(maxillaCenter).toFixed(1)}, lower=${td.center.distanceTo(mandibleCenter).toFixed(1)})`);
-            }
         });
     }
     
     assignArch(upper, 1, 16);
     assignArch(lower, 17, 32);
     
-    // Move meshes to correct parent group
-    upper.forEach(td => {
-        if (td.mesh.parent !== upperGroup) {
-            td.mesh.parent.remove(td.mesh);
-            upperGroup.add(td.mesh);
-        }
-    });
-    lower.forEach(td => {
-        if (td.mesh.parent !== lowerGroup) {
-            td.mesh.parent.remove(td.mesh);
-            lowerGroup.add(td.mesh);
-        }
-    });
+    upper.forEach(td => { if (td.mesh.parent !== upperGroup) { td.mesh.parent.remove(td.mesh); upperGroup.add(td.mesh); } });
+    lower.forEach(td => { if (td.mesh.parent !== lowerGroup) { td.mesh.parent.remove(td.mesh); lowerGroup.add(td.mesh); } });
     
     console.log(`[ReNumber] Done. Upper: [${upper.map(t=>t.newNum).join(',')}] Lower: [${lower.map(t=>t.newNum).join(',')}]`);
+}
+
+/* ═══ CALIBRATION MODE ═══
+   Manual tooth identification tool.
+   User clicks each highlighted 3D tooth mesh, then assigns its correct number.
+   Saves to localStorage so it persists across sessions.
+*/
+let calibrationMode = false;
+let calibrationMap = {}; // meshOriginalNum → universalNum
+let calibrationIndex = 0;
+let calibrationMeshes = []; // sorted list of meshes to calibrate
+
+function startCalibration() {
+    if (toothMeshes.length === 0) {
+        alert('No tooth meshes loaded yet. Wait for the scan to finish loading.');
+        return;
+    }
+    
+    calibrationMode = true;
+    calibrationMap = {};
+    calibrationIndex = 0;
+    
+    // Store original numbers before any reassignment for stable keys
+    calibrationMeshes = toothMeshes.filter(tm => {
+        const vc = tm.geometry.getAttribute('position').count;
+        return vc >= 100; // skip tiny gum fragments
+    });
+    
+    // Save original mesh numbers as stable keys
+    calibrationMeshes.forEach((tm, i) => {
+        tm.userData._calibrationKey = 'mesh_' + tm.userData.toothNumber;
+        tm.userData._calibrationIndex = i;
+    });
+    
+    // Reset all tooth materials
+    toothMeshes.forEach(tm => {
+        tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+    });
+    
+    showCalibrationUI();
+    highlightCalibrationTooth();
+}
+
+function showCalibrationUI() {
+    // Create floating calibration panel
+    let panel = document.getElementById('calibration-panel');
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'calibration-panel';
+        panel.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #1e293b, #0f172a); color: white;
+            padding: 16px 24px; border-radius: 16px; z-index: 10000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); font-family: Inter, sans-serif;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            border: 1px solid rgba(45,212,191,0.3); min-width: 360px;
+        `;
+        document.body.appendChild(panel);
+    }
+    updateCalibrationPanel();
+}
+
+function updateCalibrationPanel() {
+    const panel = document.getElementById('calibration-panel');
+    if (!panel) return;
+    
+    const remaining = calibrationMeshes.length - calibrationIndex;
+    const current = calibrationMeshes[calibrationIndex];
+    
+    if (!current) {
+        // Done!
+        panel.innerHTML = `
+            <div style="font-size:18px;font-weight:700;color:#2dd4bf;">✅ Calibration Complete!</div>
+            <div style="font-size:13px;opacity:0.7;">${Object.keys(calibrationMap).length} teeth mapped</div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="saveCalibration()" style="padding:8px 20px;background:#2dd4bf;color:#0f172a;border:none;border-radius:8px;font-weight:700;cursor:pointer;">💾 Save</button>
+                <button onclick="cancelCalibration()" style="padding:8px 20px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Cancel</button>
+            </div>
+        `;
+        return;
+    }
+    
+    panel.innerHTML = `
+        <div style="font-size:14px;font-weight:700;color:#2dd4bf;">
+            🦷 CALIBRATION MODE — Tooth ${calibrationIndex + 1}/${calibrationMeshes.length}
+        </div>
+        <div style="font-size:13px;opacity:0.8;text-align:center;">
+            The <span style="color:#fbbf24;font-weight:700;">YELLOW highlighted</span> tooth in the 3D view —<br>
+            what tooth number is it? Click below:
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:380px;">
+            ${[...Array(32)].map((_, i) => {
+                const n = i + 1;
+                const used = Object.values(calibrationMap).includes(n);
+                return `<button onclick="assignCalibrationTooth(${n})" 
+                    style="width:32px;height:28px;font-size:11px;font-weight:700;
+                    border:1px solid ${used ? '#333' : '#2dd4bf'};border-radius:6px;
+                    background:${used ? '#1e293b' : '#0f172a'};
+                    color:${used ? '#555' : '#fff'};cursor:${used ? 'not-allowed' : 'pointer'};
+                    opacity:${used ? '0.4' : '1'};"
+                    ${used ? 'disabled' : ''}>${n}</button>`;
+            }).join('')}
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="skipCalibrationTooth()" style="padding:6px 16px;background:#374151;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Skip (not a tooth)</button>
+            <button onclick="cancelCalibration()" style="padding:6px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Cancel</button>
+        </div>
+    `;
+}
+
+function highlightCalibrationTooth() {
+    // Reset all teeth to invisible
+    calibrationMeshes.forEach(tm => {
+        tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+    });
+    
+    const current = calibrationMeshes[calibrationIndex];
+    if (!current) return;
+    
+    // Highlight current tooth in bright yellow
+    current.material = new THREE.MeshBasicMaterial({
+        color: 0xfbbf24,
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide,
+        depthWrite: false
+    });
+    
+    // Center camera on this tooth
+    current.geometry.computeBoundingBox();
+    const center = new THREE.Vector3();
+    current.geometry.boundingBox.getCenter(center);
+    current.localToWorld(center);
+    controls.target.copy(center);
+    controls.update();
+}
+
+function assignCalibrationTooth(num) {
+    const current = calibrationMeshes[calibrationIndex];
+    if (!current) return;
+    
+    calibrationMap[current.userData._calibrationKey] = num;
+    console.log(`[Calibration] ${current.userData._calibrationKey} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+    
+    calibrationIndex++;
+    highlightCalibrationTooth();
+    updateCalibrationPanel();
+}
+
+function skipCalibrationTooth() {
+    console.log(`[Calibration] Skipped mesh at index ${calibrationIndex} (not a real tooth)`);
+    calibrationIndex++;
+    highlightCalibrationTooth();
+    updateCalibrationPanel();
+}
+
+function saveCalibration() {
+    localStorage.setItem('paloma_tooth_calibration', JSON.stringify(calibrationMap));
+    console.log('[Calibration] Saved to localStorage:', calibrationMap);
+    
+    calibrationMode = false;
+    
+    // Remove panel
+    const panel = document.getElementById('calibration-panel');
+    if (panel) panel.remove();
+    
+    // Reset materials
+    toothMeshes.forEach(tm => {
+        tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+    });
+    
+    // Re-apply calibration
+    reassignToothNumbers();
+    computeToothCenters();
+    buildToothChart();
+    
+    // Reset camera
+    camera.position.set(0, 15, 75);
+    controls.target.set(0, -2, -5);
+    controls.update();
+    
+    alert('✅ Tooth calibration saved! Mapping will persist across sessions.');
+}
+
+function cancelCalibration() {
+    calibrationMode = false;
+    calibrationMap = {};
+    
+    const panel = document.getElementById('calibration-panel');
+    if (panel) panel.remove();
+    
+    // Reset materials
+    toothMeshes.forEach(tm => {
+        tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+    });
+    
+    // Reset camera
+    camera.position.set(0, 15, 75);
+    controls.target.set(0, -2, -5);
+    controls.update();
+}
+
+function clearCalibration() {
+    localStorage.removeItem('paloma_tooth_calibration');
+    alert('Calibration cleared. Refresh to use auto-detection.');
 }
 
 function loadPLY(loader, url) {
@@ -3044,47 +3238,47 @@ function buildToothChart() {
     */
     
     // Tooth hotspot positions as [x%, y%] on the 1024x1024 image
-    // Carefully mapped to each tooth in the illustration
+    // Positioned OUTSIDE the teeth (pulled outward from arch center)
     const toothPositions = {
-        // UPPER ARCH — front teeth at top, molars go down the sides
+        // UPPER ARCH — badges above/outside the teeth
         // Upper Right: 1(back right) → 8(front center-right)
-        1:  [18.5, 36],   // 3rd molar
-        2:  [20,   28.5], // 2nd molar
-        3:  [23,   22],   // 1st molar
-        4:  [27.5, 16.5], // 2nd premolar
-        5:  [33,   12],   // 1st premolar
-        6:  [38,   8.5],  // canine
-        7:  [43.5, 6.5],  // lateral incisor
-        8:  [48,   5.5],  // central incisor
+        1:  [13,   37],   // 3rd molar
+        2:  [14,   28],   // 2nd molar
+        3:  [17,   19],   // 1st molar
+        4:  [22,   13],   // 2nd premolar
+        5:  [28,    8],   // 1st premolar
+        6:  [34,    4.5], // canine
+        7:  [41,    2.5], // lateral incisor
+        8:  [47,    1.5], // central incisor
         // Upper Left: 9(front center-left) → 16(back left)
-        9:  [52,   5.5],  // central incisor
-        10: [56.5, 6.5],  // lateral incisor
-        11: [62,   8.5],  // canine
-        12: [67,   12],   // 1st premolar
-        13: [72.5, 16.5], // 2nd premolar
-        14: [77,   22],   // 1st molar
-        15: [80,   28.5], // 2nd molar
-        16: [81.5, 36],   // 3rd molar
+        9:  [53,    1.5], // central incisor
+        10: [59,    2.5], // lateral incisor
+        11: [66,    4.5], // canine
+        12: [72,    8],   // 1st premolar
+        13: [78,   13],   // 2nd premolar
+        14: [83,   19],   // 1st molar
+        15: [86,   28],   // 2nd molar
+        16: [87,   37],   // 3rd molar
         
-        // LOWER ARCH — front teeth at bottom, molars go up the sides
+        // LOWER ARCH — badges below/outside the teeth
         // Lower Left: 17(back left) → 24(front center-left)
-        17: [78,   58],   // 3rd molar
-        18: [76.5, 65],   // 2nd molar
-        19: [73.5, 72],   // 1st molar
-        20: [69,   78],   // 2nd premolar
-        21: [64,   83],   // 1st premolar
-        22: [59,   87],   // canine
-        23: [54.5, 90],   // lateral incisor
-        24: [51,   91.5], // central incisor
+        17: [84,   58],   // 3rd molar
+        18: [83,   66],   // 2nd molar
+        19: [80,   74],   // 1st molar
+        20: [75,   81],   // 2nd premolar
+        21: [70,   86],   // 1st premolar
+        22: [63,   91],   // canine
+        23: [57,   94],   // lateral incisor
+        24: [52,   96],   // central incisor
         // Lower Right: 25(front center-right) → 32(back right)
-        25: [49,   91.5], // central incisor
-        26: [45.5, 90],   // lateral incisor
-        27: [41,   87],   // canine
-        28: [36,   83],   // 1st premolar
-        29: [31,   78],   // 2nd premolar
-        30: [26.5, 72],   // 1st molar
-        31: [23.5, 65],   // 2nd molar
-        32: [22,   58],   // 3rd molar
+        25: [48,   96],   // central incisor
+        26: [43,   94],   // lateral incisor
+        27: [37,   91],   // canine
+        28: [30,   86],   // 1st premolar
+        29: [25,   81],   // 2nd premolar
+        30: [20,   74],   // 1st molar
+        31: [17,   66],   // 2nd molar
+        32: [16,   58],   // 3rd molar
     };
     
     // Status colors for the number badges
