@@ -216,22 +216,25 @@ body::before {
 /* Viewer controls overlay */
 .mm-viewer-controls {
     position: absolute;
-    bottom: 20px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     z-index: 5;
+    max-width: 96%;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .mm-view-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 4px;
+    padding: 6px 10px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--mm-text-muted);
     background: rgba(17, 24, 39, 0.8);
@@ -1382,191 +1385,158 @@ let upperGroup, lowerGroup;
 async function loadHybridScans() {
     const loader = new THREE.PLYLoader();
     
-    // Single parent group — keeps both scans in their original coordinate alignment
+    // Single parent group — keeps both arches in original coordinate alignment
     const scanGroup = new THREE.Group();
     scanGroup.name = 'dentalScans';
     scene.add(scanGroup);
     
-    // Upper stays fixed, lower gets a pivot for TMJ hinge
     upperGroup = new THREE.Group();
     upperGroup.name = 'upperJaw';
-    
-    // TMJ pivot group: positioned at the condyle, mandible rotates inside it
     lowerGroup = new THREE.Group();
     lowerGroup.name = 'lowerJawPivot';
-    
     scanGroup.add(upperGroup);
     scanGroup.add(lowerGroup);
     
-    let loaded = 0;
-    const total = 2;
+    // ─── Per-Tooth Architecture (replaces dual-layer hitbox system) ───
+    // Each tooth PLY is BOTH the visual AND the clickable mesh.
+    // Colors transferred from full scan → exact vertex match (dist=0.000)
     
-    // Realistic enamel material
-    function makeScanMaterial(hasColors) {
-        if (hasColors) {
-            // UNLIT: show vertex colors exactly as Medit scanner captured them
-            return new THREE.MeshBasicMaterial({
-                vertexColors: true,
-                side: THREE.DoubleSide
-            });
-        }
-        // Fallback if no vertex colors
-        return new THREE.MeshPhysicalMaterial({
-            color: 0xf0e6d8,
-            roughness: 0.35,
-            metalness: 0.01,
-            clearcoat: 0.3,
-            clearcoatRoughness: 0.2,
-            vertexColors: false,
-            side: THREE.DoubleSide
-        });
-    }
+    const TOOTH_ARCH = {}; // tooth number → 'upper' or 'lower'
+    for (let i = 1; i <= 16; i++) TOOTH_ARCH[i] = 'upper';
+    for (let i = 17; i <= 32; i++) TOOTH_ARCH[i] = 'lower';
     
-    // Load segmentation manifest for invisible click hitboxes
+    // Load manifest for tooth file list
     let manifest = null;
     try {
         const resp = await fetch('/portal/demo-scans/teeth/manifest.json');
         if (resp.ok) manifest = await resp.json();
     } catch(e) {}
     
+    let loadedCount = 0;
+    let totalToLoad = 2; // gum_upper + gum_lower
+    
+    // Count teeth to load
+    if (manifest && manifest.teeth) {
+        for (const [toothNum, info] of Object.entries(manifest.teeth)) {
+            const num = parseInt(toothNum);
+            const toothData = DEMO_PATIENT.teeth[num];
+            if (toothData && toothData.status === 'missing') continue;
+            totalToLoad++;
+        }
+    }
+    
+    // Load colored tooth PLYs as PRIMARY visual + clickable meshes
     if (manifest && manifest.teeth) {
         for (const [toothNum, info] of Object.entries(manifest.teeth)) {
             try {
                 const num = parseInt(toothNum);
-                // Skip loading hitboxes for missing/extracted teeth
-                var toothData = DEMO_PATIENT.teeth[num];
+                const toothData = DEMO_PATIENT.teeth[num];
                 if (toothData && toothData.status === 'missing') {
-                    console.log('[Hybrid] Skipping missing tooth #' + num);
+                    console.log('[PerTooth] Skipping missing tooth #' + num);
                     continue;
                 }
-                const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
                 
-                // Fix mirroring: left-side teeth (9-16 upper left, 17-24 lower left)
-                // have positive X in PLY but should be negative X in the scene
-                const isLeftSide = (num >= 9 && num <= 16) || (num >= 17 && num <= 24);
-                if (isLeftSide) {
-                    const posAttr = geo.getAttribute('position');
-                    for (let vi = 0; vi < posAttr.count; vi++) {
-                        posAttr.setX(vi, -posAttr.getX(vi));
-                    }
-                    posAttr.needsUpdate = true;
-                    geo.computeBoundingBox();
-                    geo.computeVertexNormals();
-                    console.log('[Hybrid] Mirrored tooth #' + num + ' X coords');
+                // Load COLORED version (has vertex colors from scan)
+                const geo = await loadPLY(loader, '/portal/demo-scans/teeth-colored/' + info.file);
+                geo.computeVertexNormals();
+                
+                const hasColors = geo.hasAttribute('color');
+                let mat;
+                if (hasColors) {
+                    // Photorealistic: show scan colors directly
+                    mat = new THREE.MeshBasicMaterial({
+                        vertexColors: true,
+                        side: THREE.DoubleSide
+                    });
+                } else {
+                    // Fallback: neutral tooth color
+                    mat = new THREE.MeshBasicMaterial({
+                        color: 0xf0e6d8,
+                        side: THREE.DoubleSide
+                    });
                 }
                 
-                const mat = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
                 const mesh = new THREE.Mesh(geo, mat);
-                mesh.name = 'tooth_hit_' + toothNum;
+                mesh.name = 'tooth_' + toothNum;
                 mesh.userData.toothNumber = num;
                 mesh.userData.toothData = DEMO_PATIENT.teeth[num];
-                mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
+                mesh.userData.archType = TOOTH_ARCH[num];
+                mesh.userData.isToothMesh = true;
+                // Store original material for restore after highlight/isolation
+                mesh.userData.originalMaterial = mat;
+                
                 if (num <= 16) upperGroup.add(mesh); else lowerGroup.add(mesh);
                 toothMeshes.push(mesh);
-            } catch(e) {}
-        }
-        console.log('[Hybrid] ' + toothMeshes.length + ' invisible tooth hitboxes loaded');
-        
-        // ─── Tooth Position Diagnostic ───
-        // Universal Numbering: Upper Right = 1-8 (viewer left), Upper Left = 9-16 (viewer right)
-        // Lower Left = 17-24 (viewer right), Lower Right = 25-32 (viewer left)
-        console.log('[Diagnostic] Tooth center positions (world coords):');
-        toothMeshes.forEach(tm => {
-            tm.geometry.computeBoundingBox();
-            const c = new THREE.Vector3();
-            tm.geometry.boundingBox.getCenter(c);
-            const num = tm.userData.toothNumber;
-            const expectedSide = (num >= 1 && num <= 8) || (num >= 25 && num <= 32) ? 'RIGHT(+X)' : 'LEFT(-X)';
-            const actualSide = c.x > 0 ? 'RIGHT(+X)' : 'LEFT(-X)';
-            const match = expectedSide === actualSide ? '✅' : '❌ MIRRORED';
-            console.log(`  Tooth #${num}: x=${c.x.toFixed(1)}, y=${c.y.toFixed(1)}, z=${c.z.toFixed(1)} | Expected: ${expectedSide}, Actual: ${actualSide} ${match}`);
-        });
-        // Apply findings overlay now that meshes are ready
-        if (findingsVisible) {
-            applyFindingsOverlay();
-            updateFindingsCounts();
-            var btn = document.getElementById('btn-findings');
-            if (btn) btn.classList.add('active');
-        }
-    }
-    
-    // Load full Maxilla (VISUAL)
-    loader.load('/portal/demo-scans/Maxilla_Base.ply', 
-        function(geometry) {
-            geometry.computeVertexNormals();
-            var hasColors = geometry.hasAttribute('color');
-            console.log('[Maxilla] hasColors:', hasColors, 'attributes:', Object.keys(geometry.attributes));
-            // If PLY has vertex colors, ensure they are in sRGB space for correct rendering
-            if (hasColors) {
-                var colorAttr = geometry.getAttribute('color');
-                console.log('[Maxilla] Color attribute:', colorAttr.count, 'vertices, first RGB:', 
-                    colorAttr.getX(0).toFixed(3), colorAttr.getY(0).toFixed(3), colorAttr.getZ(0).toFixed(3));
+                scanMeshes.push(mesh); // tooth meshes ARE the scan now
+                
+                loadedCount++;
+                updateLoadingProgress(loadedCount, totalToLoad);
+            } catch(e) {
+                console.warn('[PerTooth] Failed to load tooth #' + toothNum, e);
             }
-            var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
-            mesh.name = 'maxilla';
-            mesh.userData.archType = 'upper';
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            upperGroup.add(mesh);
-            scanMeshes.push(mesh);
-            loaded++;
-            finalize();
-        },
-        function(xhr) { if (xhr.total) updateLoadingProgress(xhr.loaded / xhr.total * 0.5, 1); },
-        function(err) { console.warn('Maxilla failed:', err); loaded++; finalize(); }
-    );
-    
-    // Load full Mandible (VISUAL)
-    loader.load('/portal/demo-scans/Mandible_Base.ply',
-        function(geometry) {
-            geometry.computeVertexNormals();
-            var hasColors = geometry.hasAttribute('color');
-            var mesh = new THREE.Mesh(geometry, makeScanMaterial(hasColors));
-            mesh.name = 'mandible';
-            mesh.userData.archType = 'lower';
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            lowerGroup.add(mesh);
-            scanMeshes.push(mesh);
-            loaded++;
-            finalize();
-        },
-        function() {},
-        function(err) { console.warn('Mandible failed:', err); loaded++; finalize(); }
-    );
-    
-    function finalize() {
-        updateLoadingProgress(loaded, total);
-        if (loaded < total) return;
-        
-        scanLoaded = true;
-        
-        // Compute bounds from the scanGroup (both arches together)
-        scanBounds = new THREE.Box3().setFromObject(scanGroup);
-        var center = scanBounds.getCenter(new THREE.Vector3());
-        var size = scanBounds.getSize(new THREE.Vector3());
-        var maxDim = Math.max(size.x, size.y, size.z);
-        
-        // Center the entire group at origin (preserves relative alignment)
-        scanGroup.position.sub(center);
-        
-        // Set TMJ pivot in ORIGINAL scan coordinates (lowerGroup children
-        // are in original space — only scanGroup.position moved)
-        // Mandible ramus top: Y ≈ 17.6, posterior condyle: Z ≈ -25.6
-        lowerGroup.userData.tmjPivot = new THREE.Vector3(0, 17.6, -25.6);
-        
-        // Recalculate bounds after centering
-        scanBounds = new THREE.Box3().setFromObject(scanGroup);
-        
-        camera.position.set(0, maxDim * 0.3, maxDim * 1.2);
-        controls.target.set(0, 0, 0);
-        controls.update();
-        
-        var loadingEl = document.getElementById('loading-overlay');
-        if (loadingEl) loadingEl.style.display = 'none';
-        
-        updateSummaryStats();
+        }
+        console.log('[PerTooth] ' + toothMeshes.length + ' colored tooth meshes loaded');
     }
+    
+    // Load gum meshes (visual only, not clickable)
+    for (const gumFile of ['gum_upper.ply', 'gum_lower.ply']) {
+        try {
+            const geo = await loadPLY(loader, '/portal/demo-scans/teeth-colored/' + gumFile);
+            geo.computeVertexNormals();
+            const hasColors = geo.hasAttribute('color');
+            const mat = hasColors 
+                ? new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide })
+                : new THREE.MeshBasicMaterial({ color: 0xe8b4b8, side: THREE.DoubleSide });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.name = gumFile.replace('.ply', '');
+            mesh.userData.isGum = true;
+            mesh.userData.originalMaterial = mat;
+            if (gumFile.includes('upper')) upperGroup.add(mesh); else lowerGroup.add(mesh);
+            scanMeshes.push(mesh);
+            loadedCount++;
+            updateLoadingProgress(loadedCount, totalToLoad);
+        } catch(e) {
+            console.warn('[PerTooth] Failed to load gum:', gumFile, e);
+        }
+    }
+    
+    // Apply findings overlay now that meshes are ready
+    if (findingsVisible) {
+        applyFindingsOverlay();
+        updateFindingsCounts();
+        var btn = document.getElementById('btn-findings');
+        if (btn) btn.classList.add('active');
+    }
+    
+    // ─── Finalize: center, set TMJ pivot, position camera ───
+    scanLoaded = true;
+    
+    scanBounds = new THREE.Box3().setFromObject(scanGroup);
+    var center = scanBounds.getCenter(new THREE.Vector3());
+    var size = scanBounds.getSize(new THREE.Vector3());
+    
+    // Center the entire group at origin
+    scanGroup.position.sub(center);
+    
+    // TMJ pivot for jaw hinge
+    lowerGroup.userData.tmjPivot = new THREE.Vector3(0, 17.6, -25.6);
+    
+    // Recalculate bounds after centering
+    scanBounds = new THREE.Box3().setFromObject(scanGroup);
+    
+    // Set camera to "looking into open mouth" default
+    var maxDim = Math.max(size.x, size.y, size.z);
+    camera.position.set(0, 15, 75);
+    controls.target.set(0, -2, -5);
+    controls.update();
+    
+    var loadingEl = document.getElementById('loading-overlay');
+    if (loadingEl) loadingEl.style.display = 'none';
+    
+    updateSummaryStats();
+    
+    console.log('[PerTooth] Scene ready. ' + toothMeshes.length + ' teeth + ' + 
+        scanMeshes.filter(m => m.userData.isGum).length + ' gum meshes');
 }
 
 function loadPLY(loader, url) {
@@ -1676,11 +1646,14 @@ function applyFindingsOverlay() {
                 side: THREE.DoubleSide,
                 depthWrite: false
             });
-            tm.material.visible = true;
-            // Tag watch teeth for pulse animation
+            tm.userData.isOverlayed = true;
             tm.userData.isPulsing = isWatch;
         } else {
-            tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+            // Restore photorealistic original material (per-tooth architecture)
+            if (tm.userData.originalMaterial) {
+                tm.material = tm.userData.originalMaterial;
+            }
+            tm.userData.isOverlayed = false;
             tm.userData.isPulsing = false;
         }
     });
@@ -2069,12 +2042,10 @@ function onMouseMove(event) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(toothMeshes);
 
-    // Reset previous hover
+    // Reset previous hover — restore original material
     if (hoveredTooth && hoveredTooth !== selectedTooth) {
-        const ud = hoveredTooth.userData;
-        if (hoveredTooth.material && hoveredTooth.material.emissive) {
-            hoveredTooth.material.emissive.setHex(ud.originalEmissive || 0x000000);
-            hoveredTooth.material.emissiveIntensity = ud.originalEmissiveIntensity || 0;
+        if (hoveredTooth.userData.originalMaterial && !hoveredTooth.userData.isOverlayed) {
+            hoveredTooth.material = hoveredTooth.userData.originalMaterial;
         }
         hoveredTooth.scale.set(1, 1, 1);
     }
@@ -2085,15 +2056,16 @@ function onMouseMove(event) {
             hoveredTooth = mesh;
             renderer.domElement.style.cursor = 'pointer';
 
-            // Hover glow
-            if (mesh !== selectedTooth && mesh.material && mesh.material.emissive) {
-                if (!mesh.userData.originalEmissive) {
-                    mesh.userData.originalEmissive = mesh.material.emissive.getHex();
-                    mesh.userData.originalEmissiveIntensity = mesh.material.emissiveIntensity;
-                }
-                mesh.material.emissive.setHex(0x2dd4bf);
-                mesh.material.emissiveIntensity = 0.35;
-                mesh.scale.set(1.06, 1.06, 1.06);
+            // Hover effect: teal-tinted semi-transparent overlay + slight scale
+            if (mesh !== selectedTooth && !mesh.userData.isOverlayed) {
+                mesh.material = new THREE.MeshBasicMaterial({
+                    color: 0x2dd4bf,
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                mesh.scale.set(1.03, 1.03, 1.03);
             }
 
             // Tooltip
@@ -2117,28 +2089,13 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
     
-    // 1st priority: Segmented tooth meshes (direct tooth number)
-    if (toothMeshes.length > 0) {
-        const toothHits = raycaster.intersectObjects(toothMeshes);
-        if (toothHits.length > 0) {
-            const mesh = toothHits[0].object;
-            if (mesh.userData.toothNumber) {
-                selectToothByNumber(mesh.userData.toothNumber, toothHits[0].point);
-                return;
-            }
-        }
-    }
-    
-    // 2nd priority: Full scan meshes (position-based mapping)
-    if (scanLoaded && scanMeshes.length > 0) {
-        const scanHits = raycaster.intersectObjects(scanMeshes);
-        if (scanHits.length > 0) {
-            const hitPoint = scanHits[0].point;
-            const toothNum = mapPositionToTooth(hitPoint);
-            if (toothNum && DEMO_PATIENT.teeth[toothNum]) {
-                selectToothByNumber(toothNum, hitPoint);
-                return;
-            }
+    // Per-tooth architecture: tooth meshes ARE the visual — direct hit = correct tooth
+    const toothHits = raycaster.intersectObjects(toothMeshes);
+    if (toothHits.length > 0) {
+        const mesh = toothHits[0].object;
+        if (mesh.userData.toothNumber) {
+            selectToothByNumber(mesh.userData.toothNumber, toothHits[0].point);
+            return;
         }
     }
 }
@@ -2263,39 +2220,29 @@ function isolateTooth(toothNum) {
     preIsolationState = {
         cameraPos: camera.position.clone(),
         cameraTarget: controls.target.clone(),
-        scanOpacities: [],
-        toothStates: []
+        meshStates: []
     };
     
-    // Dim scan meshes (but keep photorealistic - just reduce brightness)
+    // Dim all NON-isolated teeth + gum meshes
     scanMeshes.forEach(mesh => {
-        preIsolationState.scanOpacities.push({
+        preIsolationState.meshStates.push({
             mesh: mesh,
-            transparent: mesh.material.transparent,
-            opacity: mesh.material.opacity
+            material: mesh.material
         });
-        mesh.material.transparent = true;
-        mesh.material.opacity = 0.25;
-        mesh.material.needsUpdate = true;
-    });
-    
-    // Spotlight effect: isolated tooth hitbox stays invisible (scan shows through),
-    // all other tooth hitboxes get grey wash overlay
-    toothMeshes.forEach(tm => {
-        if (tm.userData.toothNumber === toothNum) {
-            // Keep isolated tooth's hitbox invisible — scan is photorealistic underneath
-            tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
-            tm.scale.set(1, 1, 1);
+        
+        if (mesh.userData.toothNumber === toothNum) {
+            // Keep isolated tooth photorealistic — use original material
+            mesh.material = mesh.userData.originalMaterial;
+            mesh.scale.set(1, 1, 1);
         } else {
-            // Grey wash on other teeth to fade them
-            tm.material = new THREE.MeshBasicMaterial({
-                color: 0x1a2332,
+            // Grey wash on everything else
+            mesh.material = new THREE.MeshBasicMaterial({
+                color: mesh.userData.isGum ? 0x1a2332 : 0x2a3342,
                 transparent: true,
-                opacity: 0.7,
+                opacity: mesh.userData.isGum ? 0.15 : 0.3,
                 side: THREE.DoubleSide,
                 depthWrite: false
             });
-            tm.material.visible = true;
         }
     });
     
@@ -2340,11 +2287,9 @@ function isolateTooth(toothNum) {
 function exitIsolation() {
     if (!isIsolationMode || !preIsolationState) return;
     
-    // Restore scan mesh opacities
-    preIsolationState.scanOpacities.forEach(saved => {
-        saved.mesh.material.transparent = saved.transparent;
-        saved.mesh.material.opacity = saved.opacity;
-        saved.mesh.material.needsUpdate = true;
+    // Restore all mesh materials from pre-isolation state
+    preIsolationState.meshStates.forEach(saved => {
+        saved.mesh.material = saved.material;
     });
     
     // Reset all tooth mesh scales
