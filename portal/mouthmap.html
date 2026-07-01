@@ -216,16 +216,20 @@ body::before {
 /* Viewer controls overlay */
 .mm-viewer-controls {
     position: absolute;
-    bottom: 12px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     z-index: 5;
-    max-width: 96%;
-    flex-wrap: wrap;
-    justify-content: center;
+    max-width: 98%;
+    padding: 6px 8px;
+    background: rgba(10, 15, 25, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .mm-view-btn {
@@ -972,41 +976,52 @@ body::before {
 
         <!-- View controls — patient-friendly labels per Dr. Brenes -->
         <div class="mm-viewer-controls">
-            <div style="display:flex;align-items:center;gap:8px;padding:0 8px;">
-                <span style="font-size:11px;color:#94a3b8;white-space:nowrap;">🦷 Jaw</span>
-                <input type="range" id="jaw-open-slider" min="0" max="100" value="35" 
-                    style="width:100px;accent-color:#2dd4bf;cursor:pointer;"
-                    oninput="adjustJawOpen(this.value)">
-                <span id="jaw-open-label" style="font-size:11px;color:#64748b;min-width:28px;">35%</span>
+            <!-- Row 1: View Angles -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:center;width:100%;">
+                <button class="mm-view-btn" data-view="right" title="Your Right Side">
+                    <i data-lucide="chevron-right"></i><span>Right</span>
+                </button>
+                <button class="mm-view-btn" data-view="upper" title="Looking Down at Upper Teeth">
+                    <i data-lucide="chevron-up"></i><span>Upper</span>
+                </button>
+                <button class="mm-view-btn active" data-view="front" title="Facing Forward">
+                    <i data-lucide="eye"></i><span>Front</span>
+                </button>
+                <button class="mm-view-btn" data-view="lower" title="Looking Up at Lower Teeth">
+                    <i data-lucide="chevron-down"></i><span>Lower</span>
+                </button>
+                <button class="mm-view-btn" data-view="left" title="Your Left Side">
+                    <i data-lucide="chevron-left"></i><span>Left</span>
+                </button>
+                <button class="mm-view-btn" data-view="bite" title="Teeth Closed">
+                    <i data-lucide="minimize-2"></i><span>Bite</span>
+                </button>
             </div>
-            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <button class="mm-view-btn active" data-view="front" title="Facing Forward">
-                <i data-lucide="eye"></i><span>Facing Forward</span>
-            </button>
-            <button class="mm-view-btn" data-view="left" title="Your Left Side">
-                <i data-lucide="chevron-left"></i><span>Left Side</span>
-            </button>
-            <button class="mm-view-btn" data-view="right" title="Your Right Side">
-                <i data-lucide="chevron-right"></i><span>Right Side</span>
-            </button>
-            <button class="mm-view-btn" data-view="upper" title="Looking Down at Upper Teeth">
-                <i data-lucide="chevron-up"></i><span>Upper Teeth</span>
-            </button>
-            <button class="mm-view-btn" data-view="lower" title="Looking Up at Lower Teeth">
-                <i data-lucide="chevron-down"></i><span>Lower Teeth</span>
-            </button>
-            <button class="mm-view-btn" data-view="bite" title="Teeth Closed">
-                <i data-lucide="minimize-2"></i><span>Bite Together</span>
-            </button>
-            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <!-- Findings Overlay Toggle -->
-            <button class="mm-view-btn" onclick="toggleFindings()" id="btn-findings" title="Show/Hide Clinical Findings">
-                <i data-lucide="layers"></i><span>Findings</span>
-            </button>
-            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <button class="mm-view-btn" data-view="reset" title="Reset View">
-                <i data-lucide="rotate-ccw"></i><span>Reset</span>
-            </button>
+            <!-- Row 2: Jaw + Toggles + Actions -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:4px;">
+                <div style="display:flex;align-items:center;gap:4px;padding:0 4px;">
+                    <span style="font-size:10px;color:#94a3b8;">🦷</span>
+                    <input type="range" id="jaw-open-slider" min="0" max="100" value="35" 
+                        style="width:70px;accent-color:#2dd4bf;cursor:pointer;"
+                        oninput="adjustJawOpen(this.value)">
+                    <span id="jaw-open-label" style="font-size:10px;color:#64748b;min-width:24px;">35%</span>
+                </div>
+                <div style="width:1px;height:16px;background:rgba(255,255,255,0.1);"></div>
+                <!-- Arch Visibility Toggles -->
+                <button class="mm-view-btn active" id="btn-toggle-upper" onclick="toggleArchVisibility('upper')" title="Show/Hide Upper Arch">
+                    <span>👆 Upper</span>
+                </button>
+                <button class="mm-view-btn active" id="btn-toggle-lower" onclick="toggleArchVisibility('lower')" title="Show/Hide Lower Arch">
+                    <span>👇 Lower</span>
+                </button>
+                <div style="width:1px;height:16px;background:rgba(255,255,255,0.1);"></div>
+                <button class="mm-view-btn" onclick="toggleFindings()" id="btn-findings" title="Show/Hide Clinical Findings">
+                    <i data-lucide="layers"></i><span>Findings</span>
+                </button>
+                <button class="mm-view-btn" data-view="reset" title="Reset View">
+                    <i data-lucide="rotate-ccw"></i><span>Reset</span>
+                </button>
+            </div>
         </div>
 
         </div>
@@ -1018,18 +1033,17 @@ body::before {
             <p>Click any tooth to see its condition & treatment plan</p>
         </div>
 
-        <!-- Tooth Chart — ALWAYS visible (syncs with 3D viewer) -->
-        <div style="padding:0 16px 8px;" id="tooth-chart-section">
-            <h4 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">🦷 Tooth Chart <span style="font-size:9px;color:#475569;text-transform:none;letter-spacing:0;">(click to select)</span></h4>
-            <div style="display:flex;justify-content:center;gap:1px;margin-bottom:4px;flex-wrap:wrap;" id="upper-arch-chart"></div>
-            <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
-            <div style="display:flex;justify-content:center;gap:1px;flex-wrap:wrap;" id="lower-arch-chart"></div>
-            <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
+        <!-- Arch-Shaped Tooth Chart — ALWAYS visible (syncs with 3D viewer) -->
+        <div style="padding:0 12px 8px;" id="tooth-chart-section">
+            <h4 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 6px;">🦷 Tooth Chart <span style="font-size:9px;color:#475569;text-transform:none;letter-spacing:0;">(click to select · double-click to isolate)</span></h4>
+            <div id="arch-chart-container" style="display:flex;justify-content:center;"></div>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
                 <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F5F5F0;display:inline-block;"></span>OK</span>
                 <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F59E0B;display:inline-block;"></span>Attn</span>
                 <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#3B82F6;display:inline-block;"></span>Treated</span>
                 <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#EF4444;display:inline-block;"></span>Decay</span>
-                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#A855F7;display:inline-block;"></span>Planned</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#333;display:inline-block;"></span>Missing</span>
             </div>
         </div>
         <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 8px;"></div>
@@ -2752,7 +2766,7 @@ function showAnatomyOverlay(layer) {
                 metalness: 0.0,
                 transparent: true,
                 opacity: 0.25,
-                wireframe: false,
+        wireframe: false,
                 side: THREE.DoubleSide
             });
             const boneMesh = new THREE.Mesh(boneGeo, boneMat);
@@ -2821,50 +2835,182 @@ const STATUS_HEX = {
 };
 
 function buildToothChart() {
-    const upperEl = document.getElementById('upper-arch-chart');
-    const lowerEl = document.getElementById('lower-arch-chart');
-    if (!upperEl || !lowerEl) return;
+    const container = document.getElementById('arch-chart-container');
+    if (!container) return;
     
-    function toothCell(i, isUpper) {
-        const tooth = DEMO_PATIENT.teeth[i] || { status: 'healthy' };
-        const color = STATUS_HEX[tooth.status] || '#F5F5F0';
-        const isSelected = selectedTooth === i;
-        
-        // SELECTED: bright ring, pulsing animation, scaled up, white bg glow
-        const border = isSelected 
-            ? '3px solid #2dd4bf' 
-            : '1px solid rgba(255,255,255,0.15)';
-        const shadow = isSelected 
-            ? '0 0 12px rgba(45,212,191,0.8), 0 0 4px rgba(255,255,255,0.5), inset 0 0 6px rgba(45,212,191,0.3)' 
-            : 'none';
-        const scale = isSelected ? 'scale(1.35)' : '';
-        const zIdx = isSelected ? 'z-index:10;' : '';
-        const anim = isSelected ? 'animation: chart-pulse 1.2s ease-in-out infinite;' : '';
-        const textColor = isSelected ? '#fff' : (tooth.status === 'healthy' ? '#555' : '#fff');
-        const bg = isSelected ? 'linear-gradient(135deg, ' + color + ', #2dd4bf)' : color;
-        const radius = isUpper ? '4px 4px 6px 6px' : '6px 6px 4px 4px';
-        const gap = (isUpper && i === 8) || (!isUpper && i === 25) ? 'margin-right:6px;' : '';
-        
-        return `<div id="chart-tooth-${i}" onclick="selectToothByNumber(${i})" ondblclick="isolateTooth(${i})" title="#${i} ${TOOTH_NAMES[i]}" style="
-            width:26px;height:30px;border-radius:${radius};
-            background:${bg};border:${border};cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
-            font-size:${isSelected ? '10px' : '8px'};font-weight:${isSelected ? '900' : '700'};color:${textColor};
-            transition:all 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:${shadow};
-            transform:${scale};${zIdx}${gap}${anim}position:relative;
-        " onmouseover="if(!${isSelected})this.style.transform='scale(1.2)';this.style.zIndex=5" 
-           onmouseout="if(!${isSelected}){this.style.transform='';this.style.zIndex=''}">${i}</div>`;
+    /* ═══ SVG ARCH-SHAPED TOOTH CHART ═══
+       Anatomically correct U-shaped layout with distinct tooth shapes.
+       Teeth are arranged looking down at the mouth from above.
+       Patient's right = viewer's left side of chart.
+    */
+    
+    const W = 280, H = 220; // SVG dimensions
+    const CX = W / 2, CY = H / 2; // center
+    
+    // Tooth shape paths (relative to center, scaled to ~size)
+    // Types: molar (wide, cusps), premolar (narrow, 2-bump), canine (pointed), incisor (flat)
+    function toothPath(type, w, h) {
+        switch(type) {
+            case 'molar':
+                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L${-w/4},${h/2+2} L0,${h/2} L${w/4},${h/2+2} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} L${w/4},${-h/2-2} L0,${-h/2} L${-w/4},${-h/2-2} Z`;
+            case 'premolar':
+                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L0,${h/2+1} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} L0,${-h/2-1} Z`;
+            case 'canine':
+                return `M${-w/2},${-h/3} Q${-w/2},${h/3} 0,${h/2+2} Q${w/2},${h/3} ${w/2},${-h/3} Q${w/3},${-h/2-1} 0,${-h/2-2} Q${-w/3},${-h/2-1} ${-w/2},${-h/3} Z`;
+            case 'incisor':
+                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} Z`;
+            default:
+                return `M${-w/2},${-h/2} L${-w/2},${h/2} L${w/2},${h/2} L${w/2},${-h/2} Z`;
+        }
     }
     
-    // Upper arch: teeth 1-16
-    let upperHTML = '';
-    for (let i = 1; i <= 16; i++) upperHTML += toothCell(i, true);
-    upperEl.innerHTML = upperHTML;
+    // Tooth type by number (universal numbering)
+    function toothType(n) {
+        const t = n <= 16 ? n : (n <= 24 ? 49 - n : n - 16); // normalize to 1-16
+        if (t <= 3 || t >= 14) return 'molar';
+        if (t <= 5 || t >= 12) return 'premolar';
+        if (t === 6 || t === 11) return 'canine';
+        return 'incisor'; // 7,8,9,10
+    }
     
-    // Lower arch: teeth 32-17 (right to left)
-    let lowerHTML = '';
-    for (let i = 32; i >= 17; i--) lowerHTML += toothCell(i, false);
-    lowerEl.innerHTML = lowerHTML;
+    function toothSize(n) {
+        const type = toothType(n);
+        switch(type) {
+            case 'molar': return { w: 14, h: 13 };
+            case 'premolar': return { w: 10, h: 11 };
+            case 'canine': return { w: 9, h: 12 };
+            case 'incisor': return { w: 8, h: 10 };
+        }
+    }
+    
+    // Arch positions: U-shaped curve
+    // Upper: teeth 1-16 going from right-back (1) around the front (8,9) to left-back (16)
+    // Lower: teeth 32-17 going from right-back (32) around the front (25,24) to left-back (17)
+    
+    // Parametric U: angle from -PI*0.52 (right back) to +PI*0.52 (left back)
+    const archAngles = [0.52, 0.44, 0.37, 0.30, 0.22, 0.15, 0.08, 0.025]; // back to front
+    
+    const upperR = 70;  // upper arch radius
+    const lowerR = 58;  // lower arch radius (tighter)
+    
+    function toothPos(toothNum) {
+        let angle, r, flipDir;
+        
+        if (toothNum >= 1 && toothNum <= 8) {
+            // Upper right: 1(back) → 8(front)
+            const idx = toothNum - 1;
+            angle = -Math.PI * archAngles[idx];
+            r = upperR;
+            flipDir = 1;
+        } else if (toothNum >= 9 && toothNum <= 16) {
+            // Upper left: 9(front) → 16(back)
+            const idx = 16 - toothNum;
+            angle = Math.PI * archAngles[idx];
+            r = upperR;
+            flipDir = 1;
+        } else if (toothNum >= 17 && toothNum <= 24) {
+            // Lower left: 17(back) → 24(front)
+            const idx = toothNum - 17;
+            angle = Math.PI * archAngles[idx];
+            r = lowerR;
+            flipDir = -1;
+        } else {
+            // Lower right: 25(front) → 32(back)
+            const idx = 32 - toothNum;
+            angle = -Math.PI * archAngles[idx];
+            r = lowerR;
+            flipDir = -1;
+        }
+        
+        const archY = flipDir === 1 ? CY - 18 : CY + 18;
+        return {
+            x: CX + r * Math.sin(angle),
+            y: archY - flipDir * r * Math.cos(angle),
+            rotation: (angle * 180 / Math.PI)
+        };
+    }
+    
+    // Build SVG
+    let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">`;
+    
+    // Labels
+    svg += `<text x="${CX}" y="${CY-2}" text-anchor="middle" dominant-baseline="middle" fill="#475569" font-size="8" font-family="Inter,sans-serif" font-weight="600">YOUR TEETH</text>`;
+    svg += `<text x="14" y="16" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Right</text>`;
+    svg += `<text x="${W-14}" y="16" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Left</text>`;
+    
+    // Draw all 32 teeth
+    for (let n = 1; n <= 32; n++) {
+        const tooth = DEMO_PATIENT.teeth[n] || { status: 'healthy' };
+        const color = STATUS_HEX[tooth.status] || '#F5F5F0';
+        const isSelected = selectedTooth === n;
+        const pos = toothPos(n);
+        const size = toothSize(n);
+        const type = toothType(n);
+        const path = toothPath(type, size.w, size.h);
+        
+        const fillColor = tooth.status === 'missing' ? '#1a1a2e' : color;
+        const strokeColor = isSelected ? '#2dd4bf' : 'rgba(255,255,255,0.2)';
+        const strokeWidth = isSelected ? 2.5 : 0.8;
+        const textColor = tooth.status === 'healthy' ? '#555' : (tooth.status === 'missing' ? '#666' : '#fff');
+        const filter = isSelected ? 'url(#selectedGlow)' : '';
+        const opacity = tooth.status === 'missing' ? 0.4 : 1;
+        
+        svg += `<g transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${pos.rotation.toFixed(1)})" 
+            style="cursor:pointer;opacity:${opacity}" 
+            onclick="selectToothByNumber(${n})" 
+            ondblclick="isolateTooth(${n})"
+            onmouseover="this.querySelector('.tooth-fill').setAttribute('stroke','#2dd4bf');this.querySelector('.tooth-fill').setAttribute('stroke-width','2')"
+            onmouseout="this.querySelector('.tooth-fill').setAttribute('stroke','${strokeColor}');this.querySelector('.tooth-fill').setAttribute('stroke-width','${strokeWidth}')"
+            >
+            <title>#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}</title>
+            <path class="tooth-fill" d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${filter ? `filter="${filter}"` : ''}/>
+            <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" 
+                fill="${textColor}" font-size="6.5" font-weight="700" font-family="Inter,sans-serif"
+                transform="rotate(${(-pos.rotation).toFixed(1)})"
+                style="pointer-events:none;">${n}</text>
+        </g>`;
+    }
+    
+    // Glow filter for selected tooth
+    svg += `<defs>
+        <filter id="selectedGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feFlood flood-color="#2dd4bf" flood-opacity="0.6" result="color"/>
+            <feComposite in="color" in2="blur" operator="in" result="glow"/>
+            <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+    </defs>`;
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+/* ═══ Arch Visibility Toggles ═══ */
+let upperArchVisible = true;
+let lowerArchVisible = true;
+
+function toggleArchVisibility(arch) {
+    if (arch === 'upper') {
+        upperArchVisible = !upperArchVisible;
+        if (typeof upperGroup !== 'undefined' && upperGroup) upperGroup.visible = upperArchVisible;
+        toothMeshes.forEach(m => {
+            if (m.userData.toothNumber >= 1 && m.userData.toothNumber <= 16) {
+                m.visible = upperArchVisible;
+            }
+        });
+        const btn = document.getElementById('btn-toggle-upper');
+        if (btn) btn.classList.toggle('active', upperArchVisible);
+    } else {
+        lowerArchVisible = !lowerArchVisible;
+        if (typeof lowerGroup !== 'undefined' && lowerGroup) lowerGroup.visible = lowerArchVisible;
+        toothMeshes.forEach(m => {
+            if (m.userData.toothNumber >= 17 && m.userData.toothNumber <= 32) {
+                m.visible = lowerArchVisible;
+            }
+        });
+        const btn = document.getElementById('btn-toggle-lower');
+        if (btn) btn.classList.toggle('active', lowerArchVisible);
+    }
 }
 
 
