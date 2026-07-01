@@ -910,6 +910,30 @@ body::before {
                     <span class="mm-finding-label">Planned Treatment</span>
                     <span class="mm-finding-count" id="count-planned">0</span>
                 </label>
+                <label class="mm-finding-toggle" data-finding="recession">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('recession', this.checked)">
+                    <span class="mm-finding-dot" style="background:#A0522D;"></span>
+                    <span class="mm-finding-label">Gum Recession</span>
+                    <span class="mm-finding-count" id="count-recession">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="incipient">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('incipient', this.checked)">
+                    <span class="mm-finding-dot" style="background:#FBBF24;"></span>
+                    <span class="mm-finding-label">Early Cavity Risk</span>
+                    <span class="mm-finding-count" id="count-incipient">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="fracture">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('fracture', this.checked)">
+                    <span class="mm-finding-dot" style="background:#EC4899;"></span>
+                    <span class="mm-finding-label">Cracked Tooth</span>
+                    <span class="mm-finding-count" id="count-fracture">0</span>
+                </label>
+                <label class="mm-finding-toggle" data-finding="wear">
+                    <input type="checkbox" checked onchange="toggleFindingOverlay('wear', this.checked)">
+                    <span class="mm-finding-dot" style="background:#6366F1;"></span>
+                    <span class="mm-finding-label">Worn Enamel</span>
+                    <span class="mm-finding-count" id="count-wear">0</span>
+                </label>
             </div>
             <div style="padding:8px 14px;border-top:1px solid rgba(255,255,255,0.08);">
                 <div style="font-size:10px;color:#64748B;">
@@ -938,27 +962,33 @@ body::before {
             </div>
         </div>
 
-        <!-- View controls -->
+        <!-- View controls — patient-friendly labels per Dr. Brenes -->
         <div class="mm-viewer-controls">
             <div style="display:flex;align-items:center;gap:8px;padding:0 8px;">
                 <span style="font-size:11px;color:#94a3b8;white-space:nowrap;">🦷 Jaw</span>
-                <input type="range" id="jaw-open-slider" min="0" max="100" value="0" 
+                <input type="range" id="jaw-open-slider" min="0" max="100" value="35" 
                     style="width:100px;accent-color:#2dd4bf;cursor:pointer;"
                     oninput="adjustJawOpen(this.value)">
-                <span id="jaw-open-label" style="font-size:11px;color:#64748b;min-width:28px;">0%</span>
+                <span id="jaw-open-label" style="font-size:11px;color:#64748b;min-width:28px;">35%</span>
             </div>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-            <button class="mm-view-btn active" data-view="front" title="Front View">
-                <i data-lucide="eye"></i><span>Front</span>
+            <button class="mm-view-btn active" data-view="front" title="Facing Forward">
+                <i data-lucide="eye"></i><span>Facing Forward</span>
             </button>
-            <button class="mm-view-btn" data-view="top" title="Top View">
-                <i data-lucide="scan"></i><span>Top</span>
+            <button class="mm-view-btn" data-view="left" title="Your Left Side">
+                <i data-lucide="chevron-left"></i><span>Left Side</span>
             </button>
-            <button class="mm-view-btn" data-view="upper" title="Upper Arch">
-                <i data-lucide="chevron-up"></i><span>Upper</span>
+            <button class="mm-view-btn" data-view="right" title="Your Right Side">
+                <i data-lucide="chevron-right"></i><span>Right Side</span>
             </button>
-            <button class="mm-view-btn" data-view="lower" title="Lower Arch">
-                <i data-lucide="chevron-down"></i><span>Lower</span>
+            <button class="mm-view-btn" data-view="upper" title="Looking Down at Upper Teeth">
+                <i data-lucide="chevron-up"></i><span>Upper Teeth</span>
+            </button>
+            <button class="mm-view-btn" data-view="lower" title="Looking Up at Lower Teeth">
+                <i data-lucide="chevron-down"></i><span>Lower Teeth</span>
+            </button>
+            <button class="mm-view-btn" data-view="bite" title="Teeth Closed">
+                <i data-lucide="minimize-2"></i><span>Bite Together</span>
             </button>
             <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
             <!-- Findings Overlay Toggle -->
@@ -976,8 +1006,8 @@ body::before {
     <!-- RIGHT: Info Panel -->
     <div class="mm-info" id="info-panel">
         <div class="mm-info__header">
-            <h2>Dental Overview</h2>
-            <p>Interactive 3D tooth explorer</p>
+            <h2>Your Mouth</h2>
+            <p>Click any tooth to see its condition & treatment plan</p>
         </div>
 
         <!-- Default state -->
@@ -1135,6 +1165,10 @@ for (let i = 1; i <= 32; i++) {
                 else if (t.status === 'restored' || t.status === 'treated') status = 'treated';
                 else if (t.status === 'decay' || t.status === 'caries') status = 'caries';
                 else if (t.status === 'calculus' || t.status === 'tartar') status = 'calculus';
+                else if (t.status === 'recession') status = 'recession';
+                else if (t.status === 'incipient' || t.status === 'early_cavity') status = 'incipient';
+                else if (t.status === 'fracture' || t.status === 'cracked') status = 'fracture';
+                else if (t.status === 'wear' || t.status === 'worn') status = 'wear';
                 else if (t.status === 'needs_attention' || t.status === 'watch') status = 'needs_attention';
                 else if (t.status === 'planned') status = 'planned';
                 
@@ -1209,7 +1243,8 @@ function init() {
 
     // ─── Camera ───
     camera = new THREE.PerspectiveCamera(40, rect.width / rect.height, 0.1, 1000);
-    camera.position.set(0, 5, 85);
+    // Default: looking into open mouth — both arches visible (Dr. Brenes feedback)
+    camera.position.set(0, 15, 75);
 
     // ─── Renderer ───
     renderer = new THREE.WebGLRenderer({
@@ -1251,7 +1286,7 @@ function init() {
     controls.maxDistance = 180;
     controls.maxPolarAngle = Math.PI * 0.85;
     controls.minPolarAngle = Math.PI * 0.15;
-    controls.target.set(0, 0, 0);
+    controls.target.set(0, -2, -5);
 
     controls.addEventListener('start', () => { autoRotate = false; });
 
@@ -1321,6 +1356,9 @@ function init() {
 
     // ─── Start ───
     animate();
+
+    // ─── Default to open bite (Dr. Brenes: occlusal surfaces must be visible on load) ───
+    setTimeout(() => { adjustJawOpen(35); }, 1200);
 }
 
 
@@ -1582,7 +1620,7 @@ var currentRenderMode = 'solid';
 
 /* ═══ Findings Overlay System (3Shape-style) ═══ */
 var findingsVisible = true;
-var findingFilters = { treated: true, caries: true, needs_attention: true, calculus: true, missing: true, planned: true };
+var findingFilters = { treated: true, caries: true, needs_attention: true, calculus: true, missing: true, planned: true, recession: true, incipient: true, fracture: true, wear: true };
 var overlayPulseTime = 0;
 
 function toggleFindings() {
@@ -1610,7 +1648,11 @@ function applyFindingsOverlay() {
         caries: 0xEF4444,
         calculus: 0xF97316,
         planned: 0xA855F7,
-        missing: 0x64748B
+        missing: 0x64748B,
+        recession: 0xA0522D,
+        incipient: 0xFBBF24,
+        fracture: 0xEC4899,
+        wear: 0x6366F1
     };
     
     toothMeshes.forEach(function(tm) {
@@ -1645,7 +1687,7 @@ function applyFindingsOverlay() {
 }
 
 function updateFindingsCounts() {
-    var counts = { treated: 0, caries: 0, needs_attention: 0, calculus: 0, missing: 0, planned: 0 };
+    var counts = { treated: 0, caries: 0, needs_attention: 0, calculus: 0, missing: 0, planned: 0, recession: 0, incipient: 0, fracture: 0, wear: 0 };
     for (var i = 1; i <= 32; i++) {
         var tooth = DEMO_PATIENT.teeth[i];
         if (tooth && counts.hasOwnProperty(tooth.status)) {
@@ -1659,6 +1701,10 @@ function updateFindingsCounts() {
     el = document.getElementById('count-calculus'); if (el) el.textContent = counts.calculus;
     el = document.getElementById('count-missing'); if (el) el.textContent = counts.missing;
     el = document.getElementById('count-planned'); if (el) el.textContent = counts.planned;
+    el = document.getElementById('count-recession'); if (el) el.textContent = counts.recession;
+    el = document.getElementById('count-incipient'); if (el) el.textContent = counts.incipient;
+    el = document.getElementById('count-fracture'); if (el) el.textContent = counts.fracture;
+    el = document.getElementById('count-wear'); if (el) el.textContent = counts.wear;
 }
 
 // Pulse animation for watch teeth (runs in render loop)
@@ -2162,7 +2208,11 @@ function selectToothByNumber(toothNum, hitPoint) {
         caries: 0xEF4444,
         calculus: 0xF97316,
         planned: 0xA855F7,
-        missing: 0x64748B
+        missing: 0x64748B,
+        recession: 0xA0522D,
+        incipient: 0xFBBF24,
+        fracture: 0xEC4899,
+        wear: 0x6366F1
     };
     const toothMesh = toothMeshes.find(m => m.userData.toothNumber === toothNum);
     if (toothMesh) {
@@ -2635,7 +2685,8 @@ function buildBoneMesh() { return null; /* handled inline */ }
 
 const STATUS_HEX = {
     healthy: '#F5F5F0', needs_attention: '#F59E0B', treated: '#3B82F6',
-    planned: '#2dd4bf', missing: '#333333'
+    caries: '#EF4444', calculus: '#F97316', planned: '#A855F7', missing: '#333333',
+    recession: '#A0522D', incipient: '#FBBF24', fracture: '#EC4899', wear: '#6366F1'
 };
 
 function buildToothChart() {
@@ -2697,25 +2748,51 @@ function setView(viewName) {
 
     switch (viewName) {
         case 'front':
-            endPos = new THREE.Vector3(0, 5, 85);
-            endTarget = new THREE.Vector3(0, 0, 0);
+            // "Facing Forward" — looking into open mouth, both arches visible
+            endPos = new THREE.Vector3(0, 15, 75);
+            endTarget = new THREE.Vector3(0, -2, -5);
             break;
-        case 'top':
-            endPos = new THREE.Vector3(0, 90, 5);
-            endTarget = new THREE.Vector3(0, 0, -5);
+        case 'left':
+            // "Left Side" — patient's left (viewer's right)
+            endPos = new THREE.Vector3(-70, 10, 15);
+            endTarget = new THREE.Vector3(0, -2, -5);
+            break;
+        case 'right':
+            // "Right Side" — patient's right (viewer's left)
+            endPos = new THREE.Vector3(70, 10, 15);
+            endTarget = new THREE.Vector3(0, -2, -5);
             break;
         case 'upper':
-            endPos = new THREE.Vector3(0, 25, 60);
+            // "Upper Teeth" — looking down at upper arch
+            endPos = new THREE.Vector3(0, 70, 15);
             endTarget = new THREE.Vector3(0, 5, -8);
             break;
         case 'lower':
-            endPos = new THREE.Vector3(0, -15, 60);
+            // "Lower Teeth" — looking up at lower arch
+            endPos = new THREE.Vector3(0, -50, 15);
             endTarget = new THREE.Vector3(0, -5, -8);
             break;
+        case 'bite':
+            // "Bite Together" — close jaw, front view
+            endPos = new THREE.Vector3(0, 5, 80);
+            endTarget = new THREE.Vector3(0, 0, -5);
+            // Close the jaw
+            adjustJawOpen(0);
+            var slider = document.getElementById('jaw-open-slider');
+            if (slider) slider.value = 0;
+            var label = document.getElementById('jaw-open-label');
+            if (label) label.textContent = '0%';
+            break;
         case 'reset':
-            endPos = new THREE.Vector3(0, 5, 85);
-            endTarget = new THREE.Vector3(0, 0, 0);
-            autoRotate = true;
+            // Back to default open-mouth full view
+            endPos = new THREE.Vector3(0, 15, 75);
+            endTarget = new THREE.Vector3(0, -2, -5);
+            // Re-open jaw to default
+            adjustJawOpen(35);
+            var slider2 = document.getElementById('jaw-open-slider');
+            if (slider2) slider2.value = 35;
+            var label2 = document.getElementById('jaw-open-label');
+            if (label2) label2.textContent = '35%';
             break;
     }
 
