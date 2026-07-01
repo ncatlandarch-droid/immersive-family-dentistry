@@ -1557,12 +1557,118 @@ async function loadHybridScans() {
         
         updateSummaryStats();
         
+        // AUTO-FIX tooth numbering based on actual 3D positions
+        // (manifest numbering is arbitrary from segmentation tool)
+        reassignToothNumbers();
+        
         // Compute tooth centers AFTER centering (world-space positions for nearest-center lookup)
         computeToothCenters();
         
         console.log('[Hybrid] Scene ready: ' + scanMeshes.length + ' visual scans + ' + 
             toothMeshes.length + ' tooth targets');
     }
+}
+
+/* ═══ AUTO-ASSIGN UNIVERSAL TOOTH NUMBERS ═══
+   The segmentation tool (watershed) numbers PLY files arbitrarily.
+   This function sorts teeth by their actual 3D position and assigns
+   correct universal numbers (1-16 upper, 17-32 lower).
+   
+   Method:
+   1. Compute world-space center of each tooth mesh
+   2. Split into upper/lower by Y coordinate
+   3. Sort each arch by angular position (atan2)
+   4. Assign universal numbers based on sorted position
+   5. Move meshes to correct parent group
+*/
+function reassignToothNumbers() {
+    if (toothMeshes.length === 0) return;
+    
+    console.log('[ReNumber] Auto-assigning universal tooth numbers from 3D positions...');
+    
+    // Compute world-space center for each mesh
+    const meshData = toothMeshes.map(tm => {
+        tm.geometry.computeBoundingBox();
+        const c = new THREE.Vector3();
+        tm.geometry.boundingBox.getCenter(c);
+        tm.localToWorld(c);
+        return { mesh: tm, center: c, oldNum: tm.userData.toothNumber };
+    });
+    
+    // Find Y midpoint to split upper/lower
+    const yValues = meshData.map(d => d.center.y);
+    const yMid = (Math.max(...yValues) + Math.min(...yValues)) / 2;
+    
+    const upper = meshData.filter(d => d.center.y > yMid);
+    const lower = meshData.filter(d => d.center.y <= yMid);
+    
+    console.log(`[ReNumber] Split: ${upper.length} upper, ${lower.length} lower (Y midpoint: ${yMid.toFixed(1)})`);
+    
+    // Sort each arch by angular position
+    // atan2(x, z) where z+ = front teeth, x+ = patient's right
+    // Upper: sort by angle DESCENDING → right back (1) → right front (8) → left front (9) → left back (16)
+    upper.sort((a, b) => {
+        const angleA = Math.atan2(a.center.x, a.center.z);
+        const angleB = Math.atan2(b.center.x, b.center.z);
+        return angleB - angleA;
+    });
+    
+    // Lower: sort by angle ASCENDING → left back (17) → left front (24) → right front (25) → right back (32)
+    lower.sort((a, b) => {
+        const angleA = Math.atan2(a.center.x, a.center.z);
+        const angleB = Math.atan2(b.center.x, b.center.z);
+        return angleA - angleB;
+    });
+    
+    // Assign universal numbers
+    // If there are fewer than 16 teeth per arch, distribute across 1-16 / 17-32
+    function assignArch(sortedTeeth, startNum, endNum) {
+        const count = endNum - startNum + 1; // 16
+        const n = sortedTeeth.length;
+        
+        sortedTeeth.forEach((td, i) => {
+            // Map index to universal number (distribute evenly)
+            let num;
+            if (n >= count) {
+                num = startNum + i; // more teeth than positions? just go sequential
+            } else if (n === 1) {
+                num = startNum + Math.floor(count / 2); // single tooth → middle
+            } else {
+                // Spread evenly: e.g. 14 teeth across 16 positions
+                num = startNum + Math.round(i * (count - 1) / (n - 1));
+            }
+            num = Math.max(startNum, Math.min(endNum, num));
+            
+            const oldNum = td.mesh.userData.toothNumber;
+            td.mesh.userData.toothNumber = num;
+            td.mesh.userData.archType = num <= 16 ? 'upper' : 'lower';
+            td.mesh.name = 'tooth_' + num;
+            td.newNum = num;
+            
+            if (oldNum !== num) {
+                console.log(`[ReNumber] tooth_${oldNum} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+            }
+        });
+    }
+    
+    assignArch(upper, 1, 16);
+    assignArch(lower, 17, 32);
+    
+    // Move meshes to correct parent group
+    upper.forEach(td => {
+        if (td.mesh.parent !== upperGroup) {
+            td.mesh.parent.remove(td.mesh);
+            upperGroup.add(td.mesh);
+        }
+    });
+    lower.forEach(td => {
+        if (td.mesh.parent !== lowerGroup) {
+            td.mesh.parent.remove(td.mesh);
+            lowerGroup.add(td.mesh);
+        }
+    });
+    
+    console.log(`[ReNumber] Done. Upper: [${upper.map(t=>t.newNum).join(',')}] Lower: [${lower.map(t=>t.newNum).join(',')}]`);
 }
 
 function loadPLY(loader, url) {
