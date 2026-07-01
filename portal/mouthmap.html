@@ -2184,25 +2184,7 @@ function computeToothCenters() {
         tc.mesh = best;
     });
     
-    // DEBUG: Add visible spheres at each template position
-    // Red = upper, Blue = lower — remove these once calibration is verified
-    const debugGroup = scene.getObjectByName('debug_tooth_positions');
-    if (debugGroup) scene.remove(debugGroup);
-    const dbg = new THREE.Group();
-    dbg.name = 'debug_tooth_positions';
-    toothCenters.forEach(tc => {
-        const isUpper = tc.num <= 16;
-        const geo = new THREE.SphereGeometry(0.8, 8, 8);
-        const mat = new THREE.MeshBasicMaterial({ 
-            color: isUpper ? 0xff4444 : 0x4488ff,
-            transparent: true, opacity: 0.7
-        });
-        const sphere = new THREE.Mesh(geo, mat);
-        sphere.position.copy(tc.center);
-        dbg.add(sphere);
-    });
-    scene.add(dbg);
-    console.log('[DentalArch] DEBUG: Added 32 spheres (red=upper, blue=lower). Remove after calibration.');
+    // (Debug spheres removed — using scene-graph tooth identification now)
     
     // Log all positions
     console.log('[DentalArch] 32-tooth template:');
