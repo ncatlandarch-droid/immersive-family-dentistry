@@ -2867,101 +2867,117 @@ function buildToothChart() {
        Patient's right = viewer's left side of chart.
     */
     
-    const W = 420, H = 340; // SVG dimensions — fill the panel
+    const W = 380, H = 260; // SVG dimensions
     const CX = W / 2, CY = H / 2; // center
     
-    // Tooth shape paths (relative to center, scaled to ~size)
-    // Types: molar (wide, cusps), premolar (narrow, 2-bump), canine (pointed), incisor (flat)
+    // Tooth shape paths — simple rounded rectangles per type
     function toothPath(type, w, h) {
+        const r = 3; // corner radius
         switch(type) {
             case 'molar':
-                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L${-w/4},${h/2+2} L0,${h/2} L${w/4},${h/2+2} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} L${w/4},${-h/2-2} L0,${-h/2} L${-w/4},${-h/2-2} Z`;
+                return `M${-w/2+r},${-h/2} L${w/2-r},${-h/2} Q${w/2},${-h/2} ${w/2},${-h/2+r} L${w/2},${h/2-r} Q${w/2},${h/2} ${w/2-r},${h/2} L${-w/2+r},${h/2} Q${-w/2},${h/2} ${-w/2},${h/2-r} L${-w/2},${-h/2+r} Q${-w/2},${-h/2} ${-w/2+r},${-h/2} Z`;
             case 'premolar':
-                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L0,${h/2+1} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} L0,${-h/2-1} Z`;
+                return `M${-w/2+r},${-h/2} L${w/2-r},${-h/2} Q${w/2},${-h/2} ${w/2},${-h/2+r} L${w/2},${h/2-r} Q${w/2},${h/2} ${w/2-r},${h/2} L${-w/2+r},${h/2} Q${-w/2},${h/2} ${-w/2},${h/2-r} L${-w/2},${-h/2+r} Q${-w/2},${-h/2} ${-w/2+r},${-h/2} Z`;
             case 'canine':
-                return `M${-w/2},${-h/3} Q${-w/2},${h/3} 0,${h/2+2} Q${w/2},${h/3} ${w/2},${-h/3} Q${w/3},${-h/2-1} 0,${-h/2-2} Q${-w/3},${-h/2-1} ${-w/2},${-h/3} Z`;
+                return `M0,${-h/2-2} Q${w/2},${-h/2} ${w/2},0 Q${w/2},${h/2} 0,${h/2} Q${-w/2},${h/2} ${-w/2},0 Q${-w/2},${-h/2} 0,${-h/2-2} Z`;
             case 'incisor':
-                return `M${-w/2},${-h/2} Q${-w/2-1},0 ${-w/2},${h/2} L${w/2},${h/2} Q${w/2+1},0 ${w/2},${-h/2} Z`;
+                return `M${-w/2+2},${-h/2} L${w/2-2},${-h/2} Q${w/2},${-h/2} ${w/2},${-h/2+2} L${w/2},${h/2-2} Q${w/2},${h/2} ${w/2-2},${h/2} L${-w/2+2},${h/2} Q${-w/2},${h/2} ${-w/2},${h/2-2} L${-w/2},${-h/2+2} Q${-w/2},${-h/2} ${-w/2+2},${-h/2} Z`;
             default:
-                return `M${-w/2},${-h/2} L${-w/2},${h/2} L${w/2},${h/2} L${w/2},${-h/2} Z`;
+                return `M${-w/2},${-h/2} L${w/2},${-h/2} L${w/2},${h/2} L${-w/2},${h/2} Z`;
         }
     }
     
-    // Tooth type by number (universal numbering)
+    // Tooth type & size
     function toothType(n) {
-        const t = n <= 16 ? n : (n <= 24 ? 49 - n : n - 16); // normalize to 1-16
+        const t = n <= 16 ? n : (n <= 24 ? 49 - n : n - 16);
         if (t <= 3 || t >= 14) return 'molar';
         if (t <= 5 || t >= 12) return 'premolar';
         if (t === 6 || t === 11) return 'canine';
-        return 'incisor'; // 7,8,9,10
+        return 'incisor';
     }
     
     function toothSize(n) {
         const type = toothType(n);
         switch(type) {
-            case 'molar': return { w: 22, h: 20 };
-            case 'premolar': return { w: 16, h: 17 };
-            case 'canine': return { w: 14, h: 18 };
-            case 'incisor': return { w: 12, h: 15 };
+            case 'molar': return { w: 22, h: 18 };
+            case 'premolar': return { w: 16, h: 16 };
+            case 'canine': return { w: 14, h: 17 };
+            case 'incisor': return { w: 13, h: 14 };
         }
     }
     
-    // Arch positions: U-shaped curve
-    // Upper: teeth 1-16 going from right-back (1) around the front (8,9) to left-back (16)
-    // Lower: teeth 32-17 going from right-back (32) around the front (25,24) to left-back (17)
+    /* ═══ EXPLICIT TOOTH POSITIONS ═══
+       Hand-tuned U-shape matching standard dental charts.
+       [x_offset_from_center, y_position]
+       
+       Upper arch: teeth at TOP, opening downward
+       Lower arch: teeth at BOTTOM, opening upward
+       Patient's RIGHT = viewer's LEFT
+    */
     
-    // Parametric U: angle from -PI*0.52 (right back) to +PI*0.52 (left back)
-    const archAngles = [0.52, 0.44, 0.37, 0.30, 0.22, 0.15, 0.08, 0.025]; // back to front
+    const gap = 16; // vertical gap between arches
     
-    const upperR = 110;  // upper arch radius
-    const lowerR = 90;   // lower arch radius (tighter)
+    // Upper arch positions: tooth 1 (back right) → 8 (front right) | 9 (front left) → 16 (back left)
+    const upperPos = [
+        [-160, 105], // 1  - 3rd molar (back right)
+        [-155,  78], // 2  - 2nd molar
+        [-145,  55], // 3  - 1st molar
+        [-128,  36], // 4  - 2nd premolar
+        [-108,  22], // 5  - 1st premolar
+        [ -82,  12], // 6  - canine
+        [ -50,   5], // 7  - lateral incisor
+        [ -18,   2], // 8  - central incisor (front)
+        [  18,   2], // 9  - central incisor (front)
+        [  50,   5], // 10 - lateral incisor
+        [  82,  12], // 11 - canine
+        [ 108,  22], // 12 - 1st premolar
+        [ 128,  36], // 13 - 2nd premolar
+        [ 145,  55], // 14 - 1st molar
+        [ 155,  78], // 15 - 2nd molar
+        [ 160, 105], // 16 - 3rd molar (back left)
+    ];
+    
+    // Lower arch positions: tooth 17 (back left) → 24 (front left) | 25 (front right) → 32 (back right)
+    const lowerPos = [
+        [ 148, 155], // 17 - 3rd molar (back left)
+        [ 143, 180], // 18 - 2nd molar
+        [ 133, 200], // 19 - 1st molar
+        [ 118, 216], // 20 - 2nd premolar
+        [  98, 228], // 21 - 1st premolar
+        [  74, 237], // 22 - canine
+        [  44, 244], // 23 - lateral incisor
+        [  16, 247], // 24 - central incisor (front)
+        [ -16, 247], // 25 - central incisor (front)
+        [ -44, 244], // 26 - lateral incisor
+        [ -74, 237], // 27 - canine
+        [ -98, 228], // 28 - 1st premolar
+        [-118, 216], // 29 - 2nd premolar
+        [-133, 200], // 30 - 1st molar
+        [-143, 180], // 31 - 2nd molar
+        [-148, 155], // 32 - 3rd molar (back right)
+    ];
     
     function toothPos(toothNum) {
-        let angle, r, flipDir;
-        
-        if (toothNum >= 1 && toothNum <= 8) {
-            // Upper right: 1(back) → 8(front)
-            const idx = toothNum - 1;
-            angle = -Math.PI * archAngles[idx];
-            r = upperR;
-            flipDir = 1;
-        } else if (toothNum >= 9 && toothNum <= 16) {
-            // Upper left: 9(front) → 16(back)
-            const idx = 16 - toothNum;
-            angle = Math.PI * archAngles[idx];
-            r = upperR;
-            flipDir = 1;
-        } else if (toothNum >= 17 && toothNum <= 24) {
-            // Lower left: 17(back) → 24(front)
-            const idx = toothNum - 17;
-            angle = Math.PI * archAngles[idx];
-            r = lowerR;
-            flipDir = -1;
+        if (toothNum >= 1 && toothNum <= 16) {
+            const p = upperPos[toothNum - 1];
+            return { x: CX + p[0], y: p[1] };
         } else {
-            // Lower right: 25(front) → 32(back)
-            const idx = 32 - toothNum;
-            angle = -Math.PI * archAngles[idx];
-            r = lowerR;
-            flipDir = -1;
+            const p = lowerPos[toothNum - 17];
+            return { x: CX + p[0], y: p[1] };
         }
-        
-        const archY = flipDir === 1 ? CY - 18 : CY + 18;
-        return {
-            x: CX + r * Math.sin(angle),
-            y: archY - flipDir * r * Math.cos(angle),
-            rotation: (angle * 180 / Math.PI)
-        };
     }
     
     // Build SVG
     let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">`;
     
-    // Labels
-    svg += `<text x="${CX}" y="${CY-2}" text-anchor="middle" dominant-baseline="middle" fill="#475569" font-size="12" font-family="Inter,sans-serif" font-weight="600">YOUR TEETH</text>`;
-    svg += `<text x="18" y="22" fill="#64748b" font-size="11" font-family="Inter,sans-serif" font-weight="500">Right</text>`;
-    svg += `<text x="${W-18}" y="22" text-anchor="end" fill="#64748b" font-size="11" font-family="Inter,sans-serif" font-weight="500">Left</text>`;
+    // Background + labels
+    svg += `<text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle" fill="#3d4f5f" font-size="11" font-family="Inter,sans-serif" font-weight="600">YOUR TEETH</text>`;
+    svg += `<text x="16" y="16" fill="#64748b" font-size="10" font-family="Inter,sans-serif" font-weight="500">Right</text>`;
+    svg += `<text x="${W-16}" y="16" text-anchor="end" fill="#64748b" font-size="10" font-family="Inter,sans-serif" font-weight="500">Left</text>`;
+    // Midline
+    svg += `<line x1="${CX}" y1="5" x2="${CX}" y2="${H-5}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,4"/>`;
     
-    // Draw all 32 teeth
+    // Draw all 32 teeth — NO rotation, numbers always upright
     for (let n = 1; n <= 32; n++) {
         const tooth = DEMO_PATIENT.teeth[n] || { status: 'healthy' };
         const color = STATUS_HEX[tooth.status] || '#F5F5F0';
@@ -2971,25 +2987,25 @@ function buildToothChart() {
         const type = toothType(n);
         const path = toothPath(type, size.w, size.h);
         
-        const fillColor = tooth.status === 'missing' ? '#1a1a2e' : color;
-        const strokeColor = isSelected ? '#2dd4bf' : 'rgba(255,255,255,0.2)';
-        const strokeWidth = isSelected ? 2.5 : 0.8;
-        const textColor = tooth.status === 'healthy' ? '#555' : (tooth.status === 'missing' ? '#666' : '#fff');
+        const fillColor = tooth.status === 'missing' ? '#1e1e2e' : color;
+        const strokeColor = isSelected ? '#2dd4bf' : 'rgba(255,255,255,0.25)';
+        const strokeWidth = isSelected ? 2.5 : 1;
+        const textColor = tooth.status === 'healthy' ? '#444' : (tooth.status === 'missing' ? '#555' : '#fff');
         const filter = isSelected ? 'url(#selectedGlow)' : '';
         const opacity = tooth.status === 'missing' ? 0.4 : 1;
+        const scale = isSelected ? 1.15 : 1;
         
-        svg += `<g transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) rotate(${pos.rotation.toFixed(1)})" 
+        svg += `<g transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)}) scale(${scale})" 
             style="cursor:pointer;opacity:${opacity}" 
             onclick="selectToothByNumber(${n})" 
             ondblclick="isolateTooth(${n})"
-            onmouseover="this.querySelector('.tooth-fill').setAttribute('stroke','#2dd4bf');this.querySelector('.tooth-fill').setAttribute('stroke-width','2')"
+            onmouseover="this.querySelector('.tooth-fill').setAttribute('stroke','#2dd4bf');this.querySelector('.tooth-fill').setAttribute('stroke-width','2.5')"
             onmouseout="this.querySelector('.tooth-fill').setAttribute('stroke','${strokeColor}');this.querySelector('.tooth-fill').setAttribute('stroke-width','${strokeWidth}')"
             >
             <title>#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}</title>
             <path class="tooth-fill" d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${filter ? `filter="${filter}"` : ''}/>
             <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" 
-                fill="${textColor}" font-size="9.5" font-weight="800" font-family="Inter,sans-serif"
-                transform="rotate(${(-pos.rotation).toFixed(1)})"
+                fill="${textColor}" font-size="10" font-weight="800" font-family="Inter,sans-serif"
                 style="pointer-events:none;">${n}</text>
         </g>`;
     }
