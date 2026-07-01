@@ -1013,25 +1013,27 @@ body::before {
             <p>Click any tooth to see its condition & treatment plan</p>
         </div>
 
+        <!-- Tooth Chart — ALWAYS visible (syncs with 3D viewer) -->
+        <div style="padding:0 16px 8px;" id="tooth-chart-section">
+            <h4 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">🦷 Tooth Chart <span style="font-size:9px;color:#475569;text-transform:none;letter-spacing:0;">(click to select)</span></h4>
+            <div style="display:flex;justify-content:center;gap:1px;margin-bottom:4px;flex-wrap:wrap;" id="upper-arch-chart"></div>
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
+            <div style="display:flex;justify-content:center;gap:1px;flex-wrap:wrap;" id="lower-arch-chart"></div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F5F5F0;display:inline-block;"></span>OK</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F59E0B;display:inline-block;"></span>Attn</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#3B82F6;display:inline-block;"></span>Treated</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#EF4444;display:inline-block;"></span>Decay</span>
+                <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
+            </div>
+        </div>
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 8px;"></div>
+
         <!-- Default state -->
         <div class="mm-info-default" id="info-default">
-            <!-- Tooth Chart in right panel -->
-            <div style="margin-bottom:16px;">
-                <h4 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Tooth Chart</h4>
-                <div style="display:flex;justify-content:center;gap:1px;margin-bottom:4px;flex-wrap:wrap;" id="upper-arch-chart"></div>
-                <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div>
-                <div style="display:flex;justify-content:center;gap:1px;flex-wrap:wrap;" id="lower-arch-chart"></div>
-                <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
-                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F5F5F0;display:inline-block;"></span>OK</span>
-                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#F59E0B;display:inline-block;"></span>Attn</span>
-                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#3B82F6;display:inline-block;"></span>Treated</span>
-                    <span style="font-size:7px;color:#94a3b8;display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:1px;background:#2dd4bf;display:inline-block;"></span>Planned</span>
-                </div>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 12px;"></div>
             <img src="/images/paloma/paloma-icon.png" alt="PALOMA" class="mm-info-default__icon">
             <h3>Select a Tooth</h3>
-            <p>Click or tap any tooth on the 3D model to view detailed information, history, and treatment plans.</p>
+            <p>Click or tap any tooth on the 3D model — or tap a tooth in the chart above — to view detailed information, history, and treatment plans.</p>
 
             <div class="mm-summary-stats" id="summary-stats">
                 <!-- Filled by JS -->
@@ -1429,10 +1431,12 @@ async function loadHybridScans() {
                 const geo = await loadPLY(loader, '/portal/demo-scans/teeth/' + info.file);
                 geo.computeVertexNormals();
                 
-                // Start INVISIBLE — full scan provides the visual
+                // Visually transparent but RAYCASTABLE (visible:false skips raycasting!)
                 const mat = new THREE.MeshBasicMaterial({
-                    visible: false,
-                    side: THREE.DoubleSide
+                    transparent: true,
+                    opacity: 0,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
                 });
                 
                 const mesh = new THREE.Mesh(geo, mat);
@@ -1650,7 +1654,7 @@ function applyFindingsOverlay() {
             tm.userData.isPulsing = isWatch;
         } else {
             // Hybrid mode: tooth meshes are invisible by default (full scan shows through)
-            tm.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+            tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
             tm.userData.isOverlayed = false;
             tm.userData.isPulsing = false;
         }
@@ -2043,7 +2047,7 @@ function onMouseMove(event) {
     // Reset previous hover — restore invisible (hybrid: scan shows through)
     if (hoveredTooth && hoveredTooth !== selectedTooth) {
         if (!hoveredTooth.userData.isOverlayed) {
-            hoveredTooth.material = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
+            hoveredTooth.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
         }
         hoveredTooth.scale.set(1, 1, 1);
     }
