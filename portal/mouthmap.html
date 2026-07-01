@@ -2194,99 +2194,85 @@ function computeToothCenters() {
     });
 }
 
-// Determine which tooth was clicked based on hit point + hit mesh ancestry
-function findNearestTooth(point, hitMesh) {
-    /* ═══ APPROACH: Use scene graph + angular position ═══
-       1. Check if hit mesh is child of upperGroup or lowerGroup
-       2. Use X coordinate for left vs right
-       3. Use angular position along arch for specific tooth number
-       
-       This bypasses the template entirely — no calibration needed.
-    */
+// ═══ TOOTH IDENTIFICATION ═══
+// Primary: raycast against invisible tooth PLY meshes (they know their universal number)
+// Fallback: scan visual hit + angular position estimation
+
+function findToothFromRaycast(raycaster) {
+    // PRIMARY: Check invisible tooth meshes first (exact identification)
+    const visibleTeeth = toothMeshes.filter(m => m.visible);
+    const toothHits = raycaster.intersectObjects(visibleTeeth);
     
-    // Step 1: Determine upper vs lower from mesh hierarchy
-    let isUpper = true; // default to upper
-    if (hitMesh) {
+    if (toothHits.length > 0) {
+        const hitMesh = toothHits[0].object;
+        const num = hitMesh.userData.toothNumber;
+        if (num >= 1 && num <= 32) {
+            console.log(`[ToothID] ✓ DIRECT HIT on tooth mesh → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+            const tc = toothCenters.find(tc => tc.num === num);
+            return { num, mesh: hitMesh, center: toothHits[0].point, tc };
+        }
+    }
+    
+    // FALLBACK: Hit scan visual, estimate from position
+    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+    const scanHits = raycaster.intersectObjects(scanVisuals);
+    
+    if (scanHits.length > 0) {
+        const hitPoint = scanHits[0].point;
+        const hitMesh = scanHits[0].object;
+        
+        // Determine upper/lower from parent group
+        let isUpper = true;
         let parent = hitMesh;
         while (parent) {
             if (parent === upperGroup) { isUpper = true; break; }
             if (parent === lowerGroup) { isUpper = false; break; }
             parent = parent.parent;
         }
-    }
-    
-    // Step 2: Compute angular position on the arch
-    // After centering, the scan is at origin.
-    // Front teeth face toward +Z (camera at Z=75 for front view).
-    // Patient's right = +X (viewer sees it on left), patient's left = -X
-    // X-axis: negative = patient's left, positive = patient's right
-    
-    // We need the angle from the front of the arch.
-    // Front teeth: Z is most positive (closest to camera)
-    // Back teeth: Z is most negative (farthest from camera)
-    
-    // Compute the arch angle from center
-    // atan2(x, z) gives angle where front (z+) = 0, right (x+) = π/2
-    const angle = Math.atan2(point.x, point.z); // radians, range [-π, π]
-    // angle ≈ 0 → front teeth
-    // angle > 0 → patient's right side (teeth 1-8 upper, 25-32 lower)
-    // angle < 0 → patient's left side (teeth 9-16 upper, 17-24 lower)
-    
-    const absAngle = Math.abs(angle);
-    
-    // Map angle to tooth position within quadrant (0=front, 7=back)
-    // Standard arch: front incisors ≈ 0°, canine ≈ 20°, premolars ≈ 30-40°, molars ≈ 45-80°
-    // Angular thresholds for each tooth position (in radians)
-    const thresholds = [
-        0.08,  // central incisor boundary (very front)
-        0.18,  // lateral incisor
-        0.30,  // canine
-        0.42,  // 1st premolar
-        0.55,  // 2nd premolar
-        0.72,  // 1st molar
-        0.92,  // 2nd molar
-        Math.PI // 3rd molar (everything beyond)
-    ];
-    
-    // Find which position (0-7) this angle maps to
-    let pos = 0;
-    for (let i = 0; i < thresholds.length; i++) {
-        if (absAngle < thresholds[i]) { pos = i; break; }
-    }
-    
-    // Step 3: Convert to universal tooth number
-    let toothNum;
-    if (isUpper) {
-        if (angle >= 0) {
-            // Upper right quadrant: teeth 8(front) → 1(back)
-            toothNum = 8 - pos;
-        } else {
-            // Upper left quadrant: teeth 9(front) → 16(back)
-            toothNum = 9 + pos;
+        
+        // Find nearest tooth mesh by distance (since we missed the exact mesh)
+        let bestDist = Infinity, bestMesh = null;
+        toothMeshes.forEach(tm => {
+            if (!tm.visible) return;
+            // Only check same arch
+            const tmUpper = tm.userData.toothNumber <= 16;
+            if (tmUpper !== isUpper) return;
+            
+            tm.geometry.computeBoundingBox();
+            const c = new THREE.Vector3();
+            tm.geometry.boundingBox.getCenter(c);
+            tm.localToWorld(c);
+            const d = hitPoint.distanceTo(c);
+            if (d < bestDist) { bestDist = d; bestMesh = tm; }
+        });
+        
+        if (bestMesh && bestDist < 15) {
+            const num = bestMesh.userData.toothNumber;
+            console.log(`[ToothID] ~ NEAREST mesh (dist=${bestDist.toFixed(1)}) → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+            const tc = toothCenters.find(tc => tc.num === num);
+            return { num, mesh: bestMesh, center: hitPoint, tc };
         }
-    } else {
-        if (angle < 0) {
-            // Lower left quadrant: teeth 24(front) → 17(back)
-            toothNum = 24 - pos;
-        } else {
-            // Lower right quadrant: teeth 25(front) → 32(back)
-            toothNum = 25 + pos;
+        
+        // Last resort: angle-based estimation
+        const angle = Math.atan2(hitPoint.x, hitPoint.z);
+        const absAngle = Math.abs(angle);
+        const thresholds = [0.08, 0.18, 0.30, 0.42, 0.55, 0.72, 0.92, Math.PI];
+        let pos = 7;
+        for (let i = 0; i < thresholds.length; i++) {
+            if (absAngle < thresholds[i]) { pos = i; break; }
         }
+        
+        let num;
+        if (isUpper) { num = angle >= 0 ? 8 - pos : 9 + pos; }
+        else { num = angle < 0 ? 24 - pos : 25 + pos; }
+        num = Math.max(1, Math.min(32, num));
+        
+        console.log(`[ToothID] ⚠ ANGLE fallback → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+        const tc = toothCenters.find(tc => tc.num === num);
+        return { num, mesh: null, center: hitPoint, tc };
     }
     
-    // Clamp to valid range
-    toothNum = Math.max(1, Math.min(32, toothNum));
-    
-    console.log(`[ToothID] hit(${point.x.toFixed(1)}, ${point.y.toFixed(1)}, ${point.z.toFixed(1)}) angle=${(angle*180/Math.PI).toFixed(1)}° ${isUpper ? 'UPPER' : 'LOWER'} → #${toothNum} ${TOOTH_NAMES[toothNum]?.split('(')[0]?.trim() || ''}`);
-    
-    // Find the best matching mesh from toothCenters (for overlay effects)
-    let bestTC = toothCenters.find(tc => tc.num === toothNum);
-    if (!bestTC) {
-        // Fallback: create minimal entry
-        bestTC = { num: toothNum, center: point.clone(), mesh: null };
-    }
-    
-    return bestTC;
+    return null;
 }
 
 function onMouseMove(event) {
@@ -2295,10 +2281,6 @@ function onMouseMove(event) {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    
-    // Raycast against full scan visual (clean geometry)
-    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
-    const intersects = raycaster.intersectObjects(scanVisuals);
 
     // Reset previous hover
     if (hoveredTooth && hoveredTooth !== selectedTooth) {
@@ -2308,40 +2290,31 @@ function onMouseMove(event) {
         hoveredTooth.scale.set(1, 1, 1);
     }
 
-    if (intersects.length > 0) {
-        const hitPoint = intersects[0].point;
-        const hitMesh = intersects[0].object;
-        const nearest = findNearestTooth(hitPoint, hitMesh);
-        
-        // DEBUG: log removed (now inside findNearestTooth)
-        
-        if (nearest) {
-            const mesh = nearest.mesh;
-            hoveredTooth = mesh;
-            renderer.domElement.style.cursor = 'pointer';
+    const result = findToothFromRaycast(raycaster);
+    
+    if (result) {
+        const mesh = result.mesh;
+        hoveredTooth = mesh;
+        renderer.domElement.style.cursor = 'pointer';
 
-            // Hover effect: white glow outline (not teal — avoid confusion with clinical status)
-            if (mesh && mesh !== selectedTooth && !mesh.userData.isOverlayed) {
-                mesh.material = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.35,
-                    side: THREE.DoubleSide,
-                    depthWrite: false
-                });
-                mesh.scale.set(1.03, 1.03, 1.03);
-            }
-
-            // Tooltip
-            tooltip.textContent = `#${nearest.num} — ${TOOTH_NAMES[nearest.num].split('(')[0].trim()}`;
-            tooltip.style.left = event.clientX + 14 + 'px';
-            tooltip.style.top = event.clientY - 10 + 'px';
-            tooltip.classList.add('visible');
-        } else {
-            hoveredTooth = null;
-            renderer.domElement.style.cursor = 'grab';
-            tooltip.classList.remove('visible');
+        // Hover effect: white glow outline
+        if (mesh && mesh !== selectedTooth && !mesh.userData.isOverlayed) {
+            mesh.material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.35,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            mesh.scale.set(1.03, 1.03, 1.03);
         }
+
+        // Tooltip
+        const name = TOOTH_NAMES[result.num] ? TOOTH_NAMES[result.num].split('(')[0].trim() : '';
+        tooltip.textContent = `#${result.num} — ${name}`;
+        tooltip.style.left = event.clientX + 14 + 'px';
+        tooltip.style.top = event.clientY - 10 + 'px';
+        tooltip.classList.add('visible');
     } else {
         hoveredTooth = null;
         renderer.domElement.style.cursor = 'grab';
@@ -2357,17 +2330,9 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
     
-    // Raycast against full scan, then find nearest tooth center
-    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
-    const hits = raycaster.intersectObjects(scanVisuals);
-    if (hits.length > 0) {
-        const hitPoint = hits[0].point;
-        const hitMesh = hits[0].object;
-        const nearest = findNearestTooth(hitPoint, hitMesh);
-        if (nearest) {
-            selectToothByNumber(nearest.num, hitPoint);
-            return;
-        }
+    const result = findToothFromRaycast(raycaster);
+    if (result) {
+        selectToothByNumber(result.num, result.center);
     }
 }
 
