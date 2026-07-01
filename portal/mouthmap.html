@@ -2045,11 +2045,13 @@ let toothCenters = []; // [{num, center: THREE.Vector3, mesh}]
 
 function computeToothCenters() {
     toothCenters = [];
+    
+    // Step 1: Compute real centers from PLY files
+    const realCenters = [];
     toothMeshes.forEach(tm => {
         const vertCount = tm.geometry.getAttribute('position').count;
         
         // Skip massively oversized teeth (bad segmentation — includes gum tissue)
-        // tooth_06 has 8,935 verts spanning 54 units, clearly includes gum
         if (vertCount > 4000) {
             console.warn('[Hybrid] Skipping oversized tooth #' + tm.userData.toothNumber + 
                 ' (' + vertCount + ' verts — likely includes gum tissue)');
@@ -2059,22 +2061,51 @@ function computeToothCenters() {
         tm.geometry.computeBoundingBox();
         const center = new THREE.Vector3();
         tm.geometry.boundingBox.getCenter(center);
-        // Convert to world space
         tm.localToWorld(center);
-        toothCenters.push({
+        
+        const entry = {
             num: tm.userData.toothNumber,
             center: center,
-            mesh: tm
-        });
+            mesh: tm,
+            isMirror: false
+        };
+        realCenters.push(entry);
+        toothCenters.push(entry);
     });
-    console.log('[Hybrid] Computed centers for ' + toothCenters.length + ' teeth (skipped oversized)');
+    
+    // Step 2: Mirror centers to the empty side of the mouth
+    // The segmentation only produced PLYs for one side (positive X after centering).
+    // Mirror each center across X=0 with dental-convention partner numbers:
+    //   Upper: 1↔16, 2↔15, 3↔14, 4↔13, 5↔12, 6↔11, 7↔10, 8↔9
+    //   Lower: 17↔32, 18↔31, 19↔30, 20↔29, 21↔28, 22↔27, 23↔26, 24↔25
+    const mirrorMap = {};
+    for (let i = 1; i <= 8; i++) { mirrorMap[i] = 17 - i; mirrorMap[17 - i] = i; }
+    for (let i = 17; i <= 24; i++) { mirrorMap[i] = 49 - i; mirrorMap[49 - i] = i; }
+    
+    const existingNums = new Set(realCenters.map(c => c.num));
+    
+    realCenters.forEach(tc => {
+        const partnerNum = mirrorMap[tc.num];
+        if (partnerNum && !existingNums.has(partnerNum)) {
+            // Create mirrored center for the empty side
+            toothCenters.push({
+                num: partnerNum,
+                center: new THREE.Vector3(-tc.center.x, tc.center.y, tc.center.z),
+                mesh: tc.mesh, // reuse mesh reference (overlay goes on real side)
+                isMirror: true
+            });
+        }
+    });
+    
+    console.log('[Hybrid] ' + realCenters.length + ' real + ' + 
+        (toothCenters.length - realCenters.length) + ' mirrored = ' + 
+        toothCenters.length + ' total tooth centers');
 }
 
-// Find nearest tooth to a 3D world point
-function findNearestTooth(point, maxDist) {
-    maxDist = maxDist || 15; // reasonable threshold in mm
+// Find nearest tooth to a 3D world point (no distance threshold — always finds one)
+function findNearestTooth(point) {
     let best = null;
-    let bestDist = maxDist;
+    let bestDist = Infinity;
     toothCenters.forEach(tc => {
         const d = point.distanceTo(tc.center);
         if (d < bestDist) {
