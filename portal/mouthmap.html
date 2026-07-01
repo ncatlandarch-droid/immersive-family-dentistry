@@ -2212,18 +2212,99 @@ function computeToothCenters() {
     });
 }
 
-// Find nearest tooth to a 3D world point
-function findNearestTooth(point) {
-    let best = null;
-    let bestDist = Infinity;
-    toothCenters.forEach(tc => {
-        const d = point.distanceTo(tc.center);
-        if (d < bestDist) {
-            bestDist = d;
-            best = tc;
+// Determine which tooth was clicked based on hit point + hit mesh ancestry
+function findNearestTooth(point, hitMesh) {
+    /* ═══ APPROACH: Use scene graph + angular position ═══
+       1. Check if hit mesh is child of upperGroup or lowerGroup
+       2. Use X coordinate for left vs right
+       3. Use angular position along arch for specific tooth number
+       
+       This bypasses the template entirely — no calibration needed.
+    */
+    
+    // Step 1: Determine upper vs lower from mesh hierarchy
+    let isUpper = true; // default to upper
+    if (hitMesh) {
+        let parent = hitMesh;
+        while (parent) {
+            if (parent === upperGroup) { isUpper = true; break; }
+            if (parent === lowerGroup) { isUpper = false; break; }
+            parent = parent.parent;
         }
-    });
-    return best;
+    }
+    
+    // Step 2: Compute angular position on the arch
+    // After centering, the scan is at origin.
+    // Front teeth face toward +Z (camera at Z=75 for front view).
+    // Patient's right = +X (viewer sees it on left), patient's left = -X
+    // X-axis: negative = patient's left, positive = patient's right
+    
+    // We need the angle from the front of the arch.
+    // Front teeth: Z is most positive (closest to camera)
+    // Back teeth: Z is most negative (farthest from camera)
+    
+    // Compute the arch angle from center
+    // atan2(x, z) gives angle where front (z+) = 0, right (x+) = π/2
+    const angle = Math.atan2(point.x, point.z); // radians, range [-π, π]
+    // angle ≈ 0 → front teeth
+    // angle > 0 → patient's right side (teeth 1-8 upper, 25-32 lower)
+    // angle < 0 → patient's left side (teeth 9-16 upper, 17-24 lower)
+    
+    const absAngle = Math.abs(angle);
+    
+    // Map angle to tooth position within quadrant (0=front, 7=back)
+    // Standard arch: front incisors ≈ 0°, canine ≈ 20°, premolars ≈ 30-40°, molars ≈ 45-80°
+    // Angular thresholds for each tooth position (in radians)
+    const thresholds = [
+        0.08,  // central incisor boundary (very front)
+        0.18,  // lateral incisor
+        0.30,  // canine
+        0.42,  // 1st premolar
+        0.55,  // 2nd premolar
+        0.72,  // 1st molar
+        0.92,  // 2nd molar
+        Math.PI // 3rd molar (everything beyond)
+    ];
+    
+    // Find which position (0-7) this angle maps to
+    let pos = 0;
+    for (let i = 0; i < thresholds.length; i++) {
+        if (absAngle < thresholds[i]) { pos = i; break; }
+    }
+    
+    // Step 3: Convert to universal tooth number
+    let toothNum;
+    if (isUpper) {
+        if (angle >= 0) {
+            // Upper right quadrant: teeth 8(front) → 1(back)
+            toothNum = 8 - pos;
+        } else {
+            // Upper left quadrant: teeth 9(front) → 16(back)
+            toothNum = 9 + pos;
+        }
+    } else {
+        if (angle < 0) {
+            // Lower left quadrant: teeth 24(front) → 17(back)
+            toothNum = 24 - pos;
+        } else {
+            // Lower right quadrant: teeth 25(front) → 32(back)
+            toothNum = 25 + pos;
+        }
+    }
+    
+    // Clamp to valid range
+    toothNum = Math.max(1, Math.min(32, toothNum));
+    
+    console.log(`[ToothID] hit(${point.x.toFixed(1)}, ${point.y.toFixed(1)}, ${point.z.toFixed(1)}) angle=${(angle*180/Math.PI).toFixed(1)}° ${isUpper ? 'UPPER' : 'LOWER'} → #${toothNum} ${TOOTH_NAMES[toothNum]?.split('(')[0]?.trim() || ''}`);
+    
+    // Find the best matching mesh from toothCenters (for overlay effects)
+    let bestTC = toothCenters.find(tc => tc.num === toothNum);
+    if (!bestTC) {
+        // Fallback: create minimal entry
+        bestTC = { num: toothNum, center: point.clone(), mesh: null };
+    }
+    
+    return bestTC;
 }
 
 function onMouseMove(event) {
@@ -2247,10 +2328,10 @@ function onMouseMove(event) {
 
     if (intersects.length > 0) {
         const hitPoint = intersects[0].point;
-        const nearest = findNearestTooth(hitPoint);
+        const hitMesh = intersects[0].object;
+        const nearest = findNearestTooth(hitPoint, hitMesh);
         
-        // DEBUG: log hit position and nearest tooth (remove after calibration)
-        if (nearest) console.log(`[Hit] (${hitPoint.x.toFixed(1)}, ${hitPoint.y.toFixed(1)}, ${hitPoint.z.toFixed(1)}) → #${nearest.num} ${TOOTH_NAMES[nearest.num]?.split('(')[0]?.trim() || ''}`);
+        // DEBUG: log removed (now inside findNearestTooth)
         
         if (nearest) {
             const mesh = nearest.mesh;
@@ -2299,7 +2380,8 @@ function onMouseClick(event) {
     const hits = raycaster.intersectObjects(scanVisuals);
     if (hits.length > 0) {
         const hitPoint = hits[0].point;
-        const nearest = findNearestTooth(hitPoint);
+        const hitMesh = hits[0].object;
+        const nearest = findNearestTooth(hitPoint, hitMesh);
         if (nearest) {
             selectToothByNumber(nearest.num, hitPoint);
             return;
