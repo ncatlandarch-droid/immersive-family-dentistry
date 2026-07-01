@@ -1702,14 +1702,89 @@ function reassignToothNumbers() {
 }
 
 /* ═══ CALIBRATION MODE ═══
-   Manual tooth identification tool.
-   User clicks each highlighted 3D tooth mesh, then assigns its correct number.
-   Saves to localStorage so it persists across sessions.
+   Manual tooth identification tool with MESH CLUSTERING.
+   Nearby mesh fragments are grouped into whole-tooth clusters
+   so the user sees complete teeth, not fragments.
 */
 let calibrationMode = false;
-let calibrationMap = {}; // meshOriginalNum → universalNum
+let calibrationMap = {}; // meshKey → universalNum
 let calibrationIndex = 0;
-let calibrationMeshes = []; // sorted list of meshes to calibrate
+let calibrationClusters = []; // [{meshes: [...], center, keys: [...]}]
+
+// Cluster nearby mesh fragments into whole-tooth groups
+function clusterToothMeshes() {
+    scene.updateMatrixWorld(true);
+    
+    // Get centers + filter tiny fragments
+    const items = [];
+    toothMeshes.forEach(tm => {
+        const vc = tm.geometry.getAttribute('position').count;
+        if (vc < 50) return; // skip dust
+        
+        tm.geometry.computeBoundingBox();
+        const c = new THREE.Vector3();
+        tm.geometry.boundingBox.getCenter(c);
+        tm.localToWorld(c);
+        items.push({ mesh: tm, center: c });
+    });
+    
+    // Union-Find clustering: merge meshes within 6mm of each other
+    const CLUSTER_DIST = 6.0;
+    const parent = items.map((_, i) => i);
+    
+    function find(x) {
+        while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; }
+        return x;
+    }
+    function union(a, b) { parent[find(a)] = find(b); }
+    
+    for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+            if (items[i].center.distanceTo(items[j].center) < CLUSTER_DIST) {
+                union(i, j);
+            }
+        }
+    }
+    
+    // Group by cluster root
+    const groups = {};
+    items.forEach((item, i) => {
+        const root = find(i);
+        if (!groups[root]) groups[root] = [];
+        groups[root].push(item);
+    });
+    
+    // Build cluster objects
+    const clusters = Object.values(groups).map(group => {
+        const center = new THREE.Vector3();
+        group.forEach(g => center.add(g.center));
+        center.divideScalar(group.length);
+        
+        const meshes = group.map(g => g.mesh);
+        const keys = meshes.map(m => 'mesh_' + m.userData.toothNumber);
+        const totalVerts = meshes.reduce((sum, m) => sum + m.geometry.getAttribute('position').count, 0);
+        
+        return { meshes, center, keys, totalVerts };
+    });
+    
+    // Sort by position: upper-right-back → upper-left-back → lower-left-back → lower-right-back
+    clusters.sort((a, b) => {
+        // Upper first (higher Y), then by angle
+        if (a.center.y > 0 && b.center.y <= 0) return -1;
+        if (a.center.y <= 0 && b.center.y > 0) return 1;
+        const angleA = Math.atan2(a.center.x, a.center.z);
+        const angleB = Math.atan2(b.center.x, b.center.z);
+        if (a.center.y > 0) return angleB - angleA; // upper: right-back first
+        return angleA - angleB; // lower: left-back first
+    });
+    
+    console.log(`[Cluster] ${items.length} mesh fragments → ${clusters.length} tooth clusters`);
+    clusters.forEach((cl, i) => {
+        console.log(`  Cluster ${i+1}: ${cl.meshes.length} meshes, ${cl.totalVerts} verts, pos=(${cl.center.x.toFixed(1)}, ${cl.center.y.toFixed(1)}, ${cl.center.z.toFixed(1)})`);
+    });
+    
+    return clusters;
+}
 
 function startCalibration() {
     if (toothMeshes.length === 0) {
@@ -1721,17 +1796,8 @@ function startCalibration() {
     calibrationMap = {};
     calibrationIndex = 0;
     
-    // Store original numbers before any reassignment for stable keys
-    calibrationMeshes = toothMeshes.filter(tm => {
-        const vc = tm.geometry.getAttribute('position').count;
-        return vc >= 100; // skip tiny gum fragments
-    });
-    
-    // Save original mesh numbers as stable keys
-    calibrationMeshes.forEach((tm, i) => {
-        tm.userData._calibrationKey = 'mesh_' + tm.userData.toothNumber;
-        tm.userData._calibrationIndex = i;
-    });
+    // Cluster fragments into whole teeth
+    calibrationClusters = clusterToothMeshes();
     
     // Reset all tooth materials
     toothMeshes.forEach(tm => {
@@ -1743,7 +1809,6 @@ function startCalibration() {
 }
 
 function showCalibrationUI() {
-    // Create floating calibration panel
     let panel = document.getElementById('calibration-panel');
     if (!panel) {
         panel = document.createElement('div');
@@ -1754,7 +1819,7 @@ function showCalibrationUI() {
             padding: 16px 24px; border-radius: 16px; z-index: 10000;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5); font-family: Inter, sans-serif;
             display: flex; flex-direction: column; align-items: center; gap: 12px;
-            border: 1px solid rgba(45,212,191,0.3); min-width: 360px;
+            border: 1px solid rgba(45,212,191,0.3); min-width: 380px;
         `;
         document.body.appendChild(panel);
     }
@@ -1765,8 +1830,7 @@ function updateCalibrationPanel() {
     const panel = document.getElementById('calibration-panel');
     if (!panel) return;
     
-    const remaining = calibrationMeshes.length - calibrationIndex;
-    const current = calibrationMeshes[calibrationIndex];
+    const current = calibrationClusters[calibrationIndex];
     
     if (!current) {
         // Done!
@@ -1781,20 +1845,23 @@ function updateCalibrationPanel() {
         return;
     }
     
+    const meshInfo = `${current.meshes.length} fragment${current.meshes.length > 1 ? 's' : ''}, ${current.totalVerts} verts`;
+    
     panel.innerHTML = `
         <div style="font-size:14px;font-weight:700;color:#2dd4bf;">
-            🦷 CALIBRATION MODE — Tooth ${calibrationIndex + 1}/${calibrationMeshes.length}
+            🦷 CALIBRATION — Tooth ${calibrationIndex + 1}/${calibrationClusters.length}
         </div>
+        <div style="font-size:12px;opacity:0.5;">${meshInfo}</div>
         <div style="font-size:13px;opacity:0.8;text-align:center;">
-            The <span style="color:#fbbf24;font-weight:700;">YELLOW highlighted</span> tooth in the 3D view —<br>
-            what tooth number is it? Click below:
+            The <span style="color:#fbbf24;font-weight:700;">YELLOW highlighted</span> tooth —<br>
+            what number is it? (rotate the 3D view to check)
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:380px;">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:400px;">
             ${[...Array(32)].map((_, i) => {
                 const n = i + 1;
                 const used = Object.values(calibrationMap).includes(n);
                 return `<button onclick="assignCalibrationTooth(${n})" 
-                    style="width:32px;height:28px;font-size:11px;font-weight:700;
+                    style="width:34px;height:30px;font-size:12px;font-weight:700;
                     border:1px solid ${used ? '#333' : '#2dd4bf'};border-radius:6px;
                     background:${used ? '#1e293b' : '#0f172a'};
                     color:${used ? '#555' : '#fff'};cursor:${used ? 'not-allowed' : 'pointer'};
@@ -1803,7 +1870,7 @@ function updateCalibrationPanel() {
             }).join('')}
         </div>
         <div style="display:flex;gap:8px;">
-            <button onclick="skipCalibrationTooth()" style="padding:6px 16px;background:#374151;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Skip (not a tooth)</button>
+            <button onclick="skipCalibrationTooth()" style="padding:6px 16px;background:#374151;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Skip (gum/not a tooth)</button>
             <button onclick="cancelCalibration()" style="padding:6px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:12px;cursor:pointer;">Cancel</button>
         </div>
     `;
@@ -1811,37 +1878,47 @@ function updateCalibrationPanel() {
 
 function highlightCalibrationTooth() {
     // Reset all teeth to invisible
-    calibrationMeshes.forEach(tm => {
+    toothMeshes.forEach(tm => {
         tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
     });
     
-    const current = calibrationMeshes[calibrationIndex];
-    if (!current) return;
+    const cluster = calibrationClusters[calibrationIndex];
+    if (!cluster) return;
     
-    // Highlight current tooth in bright yellow
-    current.material = new THREE.MeshBasicMaterial({
-        color: 0xfbbf24,
-        transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide,
-        depthWrite: false
+    // Highlight ALL meshes in this cluster in bright yellow
+    cluster.meshes.forEach(m => {
+        m.material = new THREE.MeshBasicMaterial({
+            color: 0xfbbf24,
+            transparent: true,
+            opacity: 0.75,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
     });
     
-    // Center camera on this tooth
-    current.geometry.computeBoundingBox();
-    const center = new THREE.Vector3();
-    current.geometry.boundingBox.getCenter(center);
-    current.localToWorld(center);
-    controls.target.copy(center);
+    // Center camera on cluster center
+    controls.target.copy(cluster.center);
+    
+    // Position camera to show tooth in context
+    const isUpper = cluster.center.y > 0;
+    camera.position.set(
+        cluster.center.x * 0.3,
+        cluster.center.y + (isUpper ? 25 : -25),
+        cluster.center.z + 55
+    );
     controls.update();
 }
 
 function assignCalibrationTooth(num) {
-    const current = calibrationMeshes[calibrationIndex];
-    if (!current) return;
+    const cluster = calibrationClusters[calibrationIndex];
+    if (!cluster) return;
     
-    calibrationMap[current.userData._calibrationKey] = num;
-    console.log(`[Calibration] ${current.userData._calibrationKey} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+    // Assign ALL meshes in this cluster the same tooth number
+    cluster.keys.forEach(key => {
+        calibrationMap[key] = num;
+    });
+    
+    console.log(`[Calibration] Cluster ${calibrationIndex + 1} (${cluster.meshes.length} meshes) → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
     
     calibrationIndex++;
     highlightCalibrationTooth();
@@ -1849,7 +1926,7 @@ function assignCalibrationTooth(num) {
 }
 
 function skipCalibrationTooth() {
-    console.log(`[Calibration] Skipped mesh at index ${calibrationIndex} (not a real tooth)`);
+    console.log(`[Calibration] Skipped cluster ${calibrationIndex + 1} (gum/not a tooth)`);
     calibrationIndex++;
     highlightCalibrationTooth();
     updateCalibrationPanel();
@@ -1861,11 +1938,9 @@ function saveCalibration() {
     
     calibrationMode = false;
     
-    // Remove panel
     const panel = document.getElementById('calibration-panel');
     if (panel) panel.remove();
     
-    // Reset materials
     toothMeshes.forEach(tm => {
         tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
     });
@@ -1875,7 +1950,6 @@ function saveCalibration() {
     computeToothCenters();
     buildToothChart();
     
-    // Reset camera
     camera.position.set(0, 15, 75);
     controls.target.set(0, -2, -5);
     controls.update();
@@ -1890,12 +1964,10 @@ function cancelCalibration() {
     const panel = document.getElementById('calibration-panel');
     if (panel) panel.remove();
     
-    // Reset materials
     toothMeshes.forEach(tm => {
         tm.material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
     });
     
-    // Reset camera
     camera.position.set(0, 15, 75);
     controls.target.set(0, -2, -5);
     controls.update();
@@ -1926,58 +1998,49 @@ async function startAICalibration() {
     calibrationMap = {};
     calibrationIndex = 0;
     
-    // Filter real teeth (skip tiny gum fragments)
-    calibrationMeshes = toothMeshes.filter(tm => {
-        const vc = tm.geometry.getAttribute('position').count;
-        return vc >= 100;
-    });
+    // Use same clustering as manual calibration
+    calibrationClusters = clusterToothMeshes();
     
-    calibrationMeshes.forEach((tm, i) => {
-        tm.userData._calibrationKey = 'mesh_' + tm.userData.toothNumber;
-        tm.userData._calibrationIndex = i;
-    });
-    
-    // Show AI progress panel
     showAICalibrationPanel('Starting AI identification...');
     
-    // Set front view for best visibility
+    // Set front view
     camera.position.set(0, 15, 75);
     controls.target.set(0, -2, -5);
     controls.update();
     
-    // Process each tooth
-    for (let i = 0; i < calibrationMeshes.length; i++) {
+    // Process each CLUSTER (whole tooth)
+    for (let i = 0; i < calibrationClusters.length; i++) {
         calibrationIndex = i;
-        const mesh = calibrationMeshes[i];
+        const cluster = calibrationClusters[i];
         
-        showAICalibrationPanel(`🤖 Identifying tooth ${i + 1}/${calibrationMeshes.length}...`);
+        showAICalibrationPanel(`🤖 Identifying tooth ${i + 1}/${calibrationClusters.length}...`);
         
-        // Highlight this tooth, dim all others
-        calibrationMeshes.forEach(tm => {
+        // Highlight all meshes in this cluster, dim everything else
+        toothMeshes.forEach(tm => {
             tm.material = new THREE.MeshBasicMaterial({
                 transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false
             });
         });
-        mesh.material = new THREE.MeshBasicMaterial({
-            color: 0xfbbf24, transparent: true, opacity: 0.7,
-            side: THREE.DoubleSide, depthWrite: false
+        cluster.meshes.forEach(m => {
+            m.material = new THREE.MeshBasicMaterial({
+                color: 0xfbbf24, transparent: true, opacity: 0.75,
+                side: THREE.DoubleSide, depthWrite: false
+            });
         });
         
-        // Center camera on tooth for close-up
-        mesh.geometry.computeBoundingBox();
-        const center = new THREE.Vector3();
-        mesh.geometry.boundingBox.getCenter(center);
-        mesh.localToWorld(center);
-        
-        // Position camera to show tooth in context of the full arch
-        const isUpper = center.y > 0;
-        camera.position.set(center.x * 0.5, center.y + (isUpper ? 30 : -30), center.z + 50);
-        controls.target.copy(center);
+        // Position camera to show tooth in context
+        const isUpper = cluster.center.y > 0;
+        camera.position.set(
+            cluster.center.x * 0.3,
+            cluster.center.y + (isUpper ? 25 : -25),
+            cluster.center.z + 55
+        );
+        controls.target.copy(cluster.center);
         controls.update();
         
         // Render and capture
         renderer.render(scene, camera);
-        await new Promise(r => setTimeout(r, 100)); // let frame render
+        await new Promise(r => setTimeout(r, 150));
         renderer.render(scene, camera);
         
         const dataUrl = renderer.domElement.toDataURL('image/jpeg', 0.8);
@@ -1985,39 +2048,38 @@ async function startAICalibration() {
         
         // Ask Gemini Vision
         try {
-            const toothNum = await identifyToothWithGemini(base64, i, calibrationMeshes.length);
+            const toothNum = await identifyToothWithGemini(base64, i, calibrationClusters.length);
             if (toothNum && toothNum >= 1 && toothNum <= 32) {
-                // Check if already assigned
                 if (!Object.values(calibrationMap).includes(toothNum)) {
-                    calibrationMap[mesh.userData._calibrationKey] = toothNum;
-                    console.log(`[AI Cal] ✓ Mesh ${i+1} → #${toothNum} ${TOOTH_NAMES[toothNum]?.split('(')[0]?.trim() || ''}`);
+                    // Assign ALL meshes in cluster
+                    cluster.keys.forEach(key => {
+                        calibrationMap[key] = toothNum;
+                    });
+                    console.log(`[AI Cal] ✓ Cluster ${i+1} (${cluster.meshes.length} meshes) → #${toothNum} ${TOOTH_NAMES[toothNum]?.split('(')[0]?.trim() || ''}`);
                 } else {
-                    console.log(`[AI Cal] ⚠ #${toothNum} already assigned, skipping mesh ${i+1}`);
+                    console.log(`[AI Cal] ⚠ #${toothNum} already assigned, skipping cluster ${i+1}`);
                 }
             } else {
-                console.log(`[AI Cal] ? Could not identify mesh ${i+1} (response: ${toothNum})`);
+                console.log(`[AI Cal] ? Could not identify cluster ${i+1} (response: ${toothNum})`);
             }
         } catch(e) {
-            console.warn(`[AI Cal] Error on mesh ${i+1}:`, e);
+            console.warn(`[AI Cal] Error on cluster ${i+1}:`, e);
         }
         
-        // Small delay between API calls
         await new Promise(r => setTimeout(r, 300));
     }
     
-    // Reset all tooth materials
+    // Reset
     toothMeshes.forEach(tm => {
         tm.material = new THREE.MeshBasicMaterial({
             transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false
         });
     });
     
-    // Reset camera
     camera.position.set(0, 15, 75);
     controls.target.set(0, -2, -5);
     controls.update();
     
-    // Show review panel
     const mapped = Object.keys(calibrationMap).length;
     showAIReviewPanel(mapped);
 }
