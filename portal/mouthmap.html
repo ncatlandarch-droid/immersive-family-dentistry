@@ -1575,34 +1575,75 @@ async function loadHybridScans() {
    correct universal numbers (1-16 upper, 17-32 lower).
    
    Method:
-   1. Compute world-space center of each tooth mesh
-   2. Split into upper/lower by Y coordinate
-   3. Sort each arch by angular position (atan2)
-   4. Assign universal numbers based on sorted position
-   5. Move meshes to correct parent group
+   1. Force scene matrix update for accurate world positions
+   2. Use Maxilla/Mandible scan meshes as spatial anchors
+   3. Assign each tooth to nearest arch (upper/lower)
+   4. Sort each arch by angular position (atan2)
+   5. Assign universal numbers + move to correct group
 */
 function reassignToothNumbers() {
     if (toothMeshes.length === 0) return;
     
+    // Force scene graph matrix update for accurate world positions
+    scene.updateMatrixWorld(true);
+    
     console.log('[ReNumber] Auto-assigning universal tooth numbers from 3D positions...');
     
-    // Compute world-space center for each mesh
-    const meshData = toothMeshes.map(tm => {
+    // Find Maxilla and Mandible scan visual centers as spatial anchors
+    let maxillaCenter = null, mandibleCenter = null;
+    scanMeshes.forEach(sm => {
+        if (!sm.userData.isScanVisual) return;
+        sm.geometry.computeBoundingBox();
+        const c = new THREE.Vector3();
+        sm.geometry.boundingBox.getCenter(c);
+        sm.localToWorld(c);
+        if (sm.name === 'maxilla') maxillaCenter = c.clone();
+        if (sm.name === 'mandible') mandibleCenter = c.clone();
+    });
+    
+    if (!maxillaCenter || !mandibleCenter) {
+        console.warn('[ReNumber] Could not find Maxilla/Mandible scan meshes, falling back to Y midpoint');
+        // Fallback to Y midpoint
+        const yVals = toothMeshes.map(tm => {
+            tm.geometry.computeBoundingBox();
+            const c = new THREE.Vector3();
+            tm.geometry.boundingBox.getCenter(c);
+            tm.localToWorld(c);
+            return c.y;
+        });
+        const yMid = (Math.max(...yVals) + Math.min(...yVals)) / 2;
+        maxillaCenter = new THREE.Vector3(0, yMid + 10, 0);
+        mandibleCenter = new THREE.Vector3(0, yMid - 10, 0);
+    }
+    
+    console.log(`[ReNumber] Anchors: Maxilla Y=${maxillaCenter.y.toFixed(1)}, Mandible Y=${mandibleCenter.y.toFixed(1)}`);
+    
+    // Compute world-space center for each mesh, filter tiny fragments
+    const meshData = [];
+    toothMeshes.forEach(tm => {
+        const vc = tm.geometry.getAttribute('position').count;
+        if (vc < 100) {
+            console.log(`[ReNumber] Skipping tiny mesh (${vc} verts) — likely gum fragment`);
+            return;
+        }
+        
         tm.geometry.computeBoundingBox();
         const c = new THREE.Vector3();
         tm.geometry.boundingBox.getCenter(c);
         tm.localToWorld(c);
-        return { mesh: tm, center: c, oldNum: tm.userData.toothNumber };
+        
+        // Assign to nearest arch using 3D distance to scan visual center
+        const distUpper = c.distanceTo(maxillaCenter);
+        const distLower = c.distanceTo(mandibleCenter);
+        const isUpper = distUpper < distLower;
+        
+        meshData.push({ mesh: tm, center: c, oldNum: tm.userData.toothNumber, isUpper });
     });
     
-    // Find Y midpoint to split upper/lower
-    const yValues = meshData.map(d => d.center.y);
-    const yMid = (Math.max(...yValues) + Math.min(...yValues)) / 2;
+    const upper = meshData.filter(d => d.isUpper);
+    const lower = meshData.filter(d => !d.isUpper);
     
-    const upper = meshData.filter(d => d.center.y > yMid);
-    const lower = meshData.filter(d => d.center.y <= yMid);
-    
-    console.log(`[ReNumber] Split: ${upper.length} upper, ${lower.length} lower (Y midpoint: ${yMid.toFixed(1)})`);
+    console.log(`[ReNumber] Split: ${upper.length} upper, ${lower.length} lower`);
     
     // Sort each arch by angular position
     // atan2(x, z) where z+ = front teeth, x+ = patient's right
@@ -1621,20 +1662,17 @@ function reassignToothNumbers() {
     });
     
     // Assign universal numbers
-    // If there are fewer than 16 teeth per arch, distribute across 1-16 / 17-32
     function assignArch(sortedTeeth, startNum, endNum) {
         const count = endNum - startNum + 1; // 16
         const n = sortedTeeth.length;
         
         sortedTeeth.forEach((td, i) => {
-            // Map index to universal number (distribute evenly)
             let num;
             if (n >= count) {
-                num = startNum + i; // more teeth than positions? just go sequential
+                num = startNum + i;
             } else if (n === 1) {
-                num = startNum + Math.floor(count / 2); // single tooth → middle
+                num = startNum + Math.floor(count / 2);
             } else {
-                // Spread evenly: e.g. 14 teeth across 16 positions
                 num = startNum + Math.round(i * (count - 1) / (n - 1));
             }
             num = Math.max(startNum, Math.min(endNum, num));
@@ -1646,7 +1684,7 @@ function reassignToothNumbers() {
             td.newNum = num;
             
             if (oldNum !== num) {
-                console.log(`[ReNumber] tooth_${oldNum} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+                console.log(`[ReNumber] tooth_${oldNum} → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''} (dist: upper=${td.center.distanceTo(maxillaCenter).toFixed(1)}, lower=${td.center.distanceTo(mandibleCenter).toFixed(1)})`);
             }
         });
     }
@@ -3091,24 +3129,25 @@ function buildToothChart() {
         const tooth = DEMO_PATIENT.teeth[n] || { status: 'healthy' };
         const isSelected = selectedTooth === n;
         
-        const bgColor = badgeColors[tooth.status] || 'rgba(255,255,255,0.85)';
+        const bgColor = badgeColors[tooth.status] || 'rgba(255,255,255,0.95)';
         const txtColor = badgeText[tooth.status] || '#1e293b';
-        const r = isSelected ? 3.2 : 2.5;
-        const strokeColor = isSelected ? '#2dd4bf' : 'transparent';
-        const strokeW = isSelected ? 0.5 : 0;
-        const opacity = tooth.status === 'missing' ? 0.5 : 0.9;
+        const r = isSelected ? 3.8 : 3.0;
+        const strokeColor = isSelected ? '#2dd4bf' : 'rgba(0,0,0,0.5)';
+        const strokeW = isSelected ? 0.6 : 0.3;
+        const opacity = tooth.status === 'missing' ? 0.5 : 1;
         
         html += `<g style="cursor:pointer;opacity:${opacity}" 
             onclick="selectToothByNumber(${n})" ondblclick="isolateTooth(${n})">
             <title>#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}</title>
-            <circle cx="${x}" cy="${y}" r="${r + 1}" fill="transparent" 
+            <circle cx="${x}" cy="${y}" r="${r + 1.5}" fill="transparent" 
                 class="tooth-hover-${n}"/>
+            <circle cx="${x}" cy="${y}" r="${r + 0.4}" fill="rgba(0,0,0,0.4)"/>
             <circle cx="${x}" cy="${y}" r="${r}" fill="${bgColor}" 
                 stroke="${strokeColor}" stroke-width="${strokeW}"
-                onmouseover="this.setAttribute('r','${r+0.8}');this.setAttribute('stroke','#2dd4bf');this.setAttribute('stroke-width','0.5')"
+                onmouseover="this.setAttribute('r','${r+0.8}');this.setAttribute('stroke','#2dd4bf');this.setAttribute('stroke-width','0.6')"
                 onmouseout="this.setAttribute('r','${r}');this.setAttribute('stroke','${strokeColor}');this.setAttribute('stroke-width','${strokeW}')"/>
             <text x="${x}" y="${y + 0.8}" text-anchor="middle" dominant-baseline="middle" 
-                fill="${txtColor}" font-size="2.2" font-weight="700" font-family="Inter,sans-serif"
+                fill="${txtColor}" font-size="2.8" font-weight="800" font-family="Inter,sans-serif"
                 style="pointer-events:none;">${n}</text>
         </g>`;
     }
