@@ -2066,108 +2066,108 @@ function computeToothCenters() {
     toothCenters = [];
     
     /* ═══ PARAMETRIC DENTAL ARCH TEMPLATE ═══
-       Creates 32 ideal tooth positions based on standard dental anatomy.
-       Completely bypasses PLY file numbering (which is unreliable).
-       
-       Calibration source: actual scan geometry analysis:
-       - Scan centered at bounding box center ≈ (0, 12, 0) before centering
-       - After centering: origin at center, scan spans ≈ ±33 X, ±15 Y, ±25 Z
-       - Upper arch: Y≈0..6, Z≈-2..+23 (Z increases towards posterior)
-       - Lower arch: Y≈-10..3, Z≈-24..-2 (Z decreases towards posterior)
-       - Patient's LEFT = positive X, Patient's RIGHT = negative X
-       
-       Universal Numbering:
-       1-8: Upper Right (1=3rd molar back, 8=central incisor front)
-       9-16: Upper Left (9=central incisor front, 16=3rd molar back)
-       17-24: Lower Left (17=3rd molar back, 24=central incisor front)
-       25-32: Lower Right (25=central incisor front, 32=3rd molar back)
+       Calibrated from actual tooth PLY positions (not scan bounding box).
+       PLY numbering is unreliable, but their POSITIONS are accurate.
+       We compute arch statistics from real tooth data, then create
+       an ideal template around those measurements.
     */
     
-    // AUTO-CALIBRATE: Compute actual scan bounding box to position the arch template
-    const scanBox = new THREE.Box3();
-    scanMeshes.forEach(m => {
-        if (m.userData.isScanVisual) {
-            m.geometry.computeBoundingBox();
-            const b = m.geometry.boundingBox.clone();
-            b.applyMatrix4(m.matrixWorld);
-            scanBox.union(b);
-        }
+    // Step 1: Gather real tooth PLY centers (world space, after centering)
+    const upperPLYs = []; // teeth 1-16 from PLY files
+    const lowerPLYs = []; // teeth 17-32
+    toothMeshes.forEach(tm => {
+        const vc = tm.geometry.getAttribute('position').count;
+        if (vc > 4000) return; // skip oversized (gum tissue)
+        tm.geometry.computeBoundingBox();
+        const c = new THREE.Vector3();
+        tm.geometry.boundingBox.getCenter(c);
+        tm.localToWorld(c);
+        const n = tm.userData.toothNumber;
+        if (n >= 1 && n <= 16) upperPLYs.push(c);
+        else if (n >= 17 && n <= 32) lowerPLYs.push(c);
     });
     
-    const scanSize = new THREE.Vector3();
-    const scanCenter = new THREE.Vector3();
-    scanBox.getSize(scanSize);
-    scanBox.getCenter(scanCenter);
+    // Compute statistics from real positions
+    function stats(pts) {
+        if (pts.length === 0) return { meanX: 0, meanY: 0, meanZ: 0, minZ: -10, maxZ: 10, minX: -20, maxX: 20 };
+        let sx=0, sy=0, sz=0, minZ=Infinity, maxZ=-Infinity, minX=Infinity, maxX=-Infinity;
+        pts.forEach(p => {
+            sx += p.x; sy += p.y; sz += p.z;
+            if (p.z < minZ) minZ = p.z;
+            if (p.z > maxZ) maxZ = p.z;
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+        });
+        const n = pts.length;
+        return { meanX: sx/n, meanY: sy/n, meanZ: sz/n, minZ, maxZ, minX, maxX };
+    }
     
-    console.log('[DentalArch] Scan bbox:', 
-        `center(${scanCenter.x.toFixed(1)}, ${scanCenter.y.toFixed(1)}, ${scanCenter.z.toFixed(1)})`,
-        `size(${scanSize.x.toFixed(1)}, ${scanSize.y.toFixed(1)}, ${scanSize.z.toFixed(1)})`);
+    const uStats = stats(upperPLYs);
+    const lStats = stats(lowerPLYs);
     
-    // Scale arch to fit scan: arch width ≈ 70% of scan X extent
-    const archHW = scanSize.x * 0.35;   // half-width
-    const archD = scanSize.z * 0.25;     // depth of each arch
+    console.log('[DentalArch] Upper PLY stats:', JSON.stringify(uStats, (k,v) => typeof v === 'number' ? +v.toFixed(1) : v));
+    console.log('[DentalArch] Lower PLY stats:', JSON.stringify(lStats, (k,v) => typeof v === 'number' ? +v.toFixed(1) : v));
     
-    // Y levels: upper arch at +25% of height, lower at -25%
-    const upperY = scanCenter.y + scanSize.y * 0.15;
-    const lowerY = scanCenter.y - scanSize.y * 0.20;
+    // Step 2: Compute arch parameters from real data
+    // The PLY teeth are all on one side (positive X). We need the arch to span BOTH sides.
+    // The arch half-width should match where the teeth actually are.
+    const archHW = Math.max(Math.abs(uStats.maxX), Math.abs(lStats.maxX), 20);
     
-    // Z offsets: upper arch posterior (positive Z), lower arch anterior (negative Z)
-    const upperZ0 = scanCenter.z + scanSize.z * 0.20;
-    const lowerZ0 = scanCenter.z - scanSize.z * 0.20;
+    // Arch depth = half the Z range of teeth
+    const upperZRange = uStats.maxZ - uStats.minZ;
+    const lowerZRange = lStats.maxZ - lStats.minZ;
+    const archD_upper = upperZRange * 0.5 || 13;
+    const archD_lower = lowerZRange * 0.5 || 12;
+    
+    // Y levels from real tooth positions
+    const upperY = uStats.meanY;
+    const lowerY = lStats.meanY;
+    
+    // Z centers from real tooth positions
+    const upperZ0 = (uStats.minZ + uStats.maxZ) / 2;
+    const lowerZ0 = (lStats.minZ + lStats.maxZ) / 2;
+    
+    console.log('[DentalArch] Calibrated:', 
+        `archHW=${archHW.toFixed(1)}, upperD=${archD_upper.toFixed(1)}, lowerD=${archD_lower.toFixed(1)}`,
+        `upperY=${upperY.toFixed(1)}, lowerY=${lowerY.toFixed(1)}`,
+        `upperZ0=${upperZ0.toFixed(1)}, lowerZ0=${lowerZ0.toFixed(1)}`);
     
     function archPoint(hw, d, z0, y, angle) {
         return new THREE.Vector3(hw * Math.sin(angle), y, d * Math.cos(angle) + z0);
     }
     
     // Distribute 8 teeth per quadrant along the arch curve
-    // Molars get wider spacing, incisors get tighter spacing
-    const spacing = [0.47, 0.40, 0.32, 0.24, 0.17, 0.11, 0.06, 0.02]; // normalized angles from back to front
+    const spacing = [0.47, 0.40, 0.32, 0.24, 0.17, 0.11, 0.06, 0.02];
     
-    // UPPER RIGHT: teeth 1(back) → 8(front), angles from -π*0.47 → -π*0.02
+    // UPPER RIGHT: teeth 1(back) → 8(front)
     for (let i = 0; i < 8; i++) {
         const angle = -Math.PI * spacing[i];
-        toothCenters.push({
-            num: i + 1,
-            center: archPoint(archHW, archD, upperZ0, upperY, angle),
-            mesh: null
-        });
+        toothCenters.push({ num: i + 1, center: archPoint(archHW, archD_upper, upperZ0, upperY, angle), mesh: null });
     }
     
-    // UPPER LEFT: teeth 9(front) → 16(back), angles from +π*0.02 → +π*0.47
+    // UPPER LEFT: teeth 9(front) → 16(back)
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * spacing[7 - i]; // reverse: front first
-        toothCenters.push({
-            num: i + 9,
-            center: archPoint(archHW, archD, upperZ0, upperY, angle),
-            mesh: null
-        });
+        const angle = Math.PI * spacing[7 - i];
+        toothCenters.push({ num: i + 9, center: archPoint(archHW, archD_upper, upperZ0, upperY, angle), mesh: null });
     }
     
-    // LOWER LEFT: teeth 17(back) → 24(front), angles from +π*0.47 → +π*0.02
+    // LOWER LEFT: teeth 17(back) → 24(front)
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * spacing[i]; // back to front on left
-        toothCenters.push({
-            num: i + 17,
-            center: archPoint(archHW * 0.95, archD, lowerZ0, lowerY, angle),
-            mesh: null
-        });
+        const angle = Math.PI * spacing[i];
+        toothCenters.push({ num: i + 17, center: archPoint(archHW * 0.93, archD_lower, lowerZ0, lowerY, angle), mesh: null });
     }
     
-    // LOWER RIGHT: teeth 25(front) → 32(back), angles from -π*0.02 → -π*0.47
+    // LOWER RIGHT: teeth 25(front) → 32(back)
     for (let i = 0; i < 8; i++) {
-        const angle = -Math.PI * spacing[7 - i]; // front to back on right
-        toothCenters.push({
-            num: i + 25,
-            center: archPoint(archHW * 0.95, archD, lowerZ0, lowerY, angle),
-            mesh: null
-        });
+        const angle = -Math.PI * spacing[7 - i];
+        toothCenters.push({ num: i + 25, center: archPoint(archHW * 0.93, archD_lower, lowerZ0, lowerY, angle), mesh: null });
     }
     
-    // Match each template position to closest PLY mesh (for overlay effects)
+    // Match each template position to closest PLY mesh
     const meshCenters = [];
     toothMeshes.forEach(tm => {
         const vc = tm.geometry.getAttribute('position').count;
-        if (vc > 4000) return; // skip oversized
+        if (vc > 4000) return;
         tm.geometry.computeBoundingBox();
         const c = new THREE.Vector3();
         tm.geometry.boundingBox.getCenter(c);
@@ -2184,8 +2184,28 @@ function computeToothCenters() {
         tc.mesh = best;
     });
     
-    // Debug: log all positions to console for calibration
-    console.log('[DentalArch] 32-tooth template created:');
+    // DEBUG: Add visible spheres at each template position
+    // Red = upper, Blue = lower — remove these once calibration is verified
+    const debugGroup = scene.getObjectByName('debug_tooth_positions');
+    if (debugGroup) scene.remove(debugGroup);
+    const dbg = new THREE.Group();
+    dbg.name = 'debug_tooth_positions';
+    toothCenters.forEach(tc => {
+        const isUpper = tc.num <= 16;
+        const geo = new THREE.SphereGeometry(0.8, 8, 8);
+        const mat = new THREE.MeshBasicMaterial({ 
+            color: isUpper ? 0xff4444 : 0x4488ff,
+            transparent: true, opacity: 0.7
+        });
+        const sphere = new THREE.Mesh(geo, mat);
+        sphere.position.copy(tc.center);
+        dbg.add(sphere);
+    });
+    scene.add(dbg);
+    console.log('[DentalArch] DEBUG: Added 32 spheres (red=upper, blue=lower). Remove after calibration.');
+    
+    // Log all positions
+    console.log('[DentalArch] 32-tooth template:');
     toothCenters.forEach(tc => {
         const c = tc.center;
         console.log(`  #${tc.num} ${TOOTH_NAMES[tc.num] || ''}: (${c.x.toFixed(1)}, ${c.y.toFixed(1)}, ${c.z.toFixed(1)})`);
@@ -2228,6 +2248,9 @@ function onMouseMove(event) {
     if (intersects.length > 0) {
         const hitPoint = intersects[0].point;
         const nearest = findNearestTooth(hitPoint);
+        
+        // DEBUG: log hit position and nearest tooth (remove after calibration)
+        if (nearest) console.log(`[Hit] (${hitPoint.x.toFixed(1)}, ${hitPoint.y.toFixed(1)}, ${hitPoint.z.toFixed(1)}) → #${nearest.num} ${TOOTH_NAMES[nearest.num]?.split('(')[0]?.trim() || ''}`);
         
         if (nearest) {
             const mesh = nearest.mesh;
@@ -2844,7 +2867,7 @@ function buildToothChart() {
        Patient's right = viewer's left side of chart.
     */
     
-    const W = 280, H = 220; // SVG dimensions
+    const W = 340, H = 280; // SVG dimensions (larger for readability)
     const CX = W / 2, CY = H / 2; // center
     
     // Tooth shape paths (relative to center, scaled to ~size)
@@ -2876,10 +2899,10 @@ function buildToothChart() {
     function toothSize(n) {
         const type = toothType(n);
         switch(type) {
-            case 'molar': return { w: 14, h: 13 };
-            case 'premolar': return { w: 10, h: 11 };
-            case 'canine': return { w: 9, h: 12 };
-            case 'incisor': return { w: 8, h: 10 };
+            case 'molar': return { w: 18, h: 16 };
+            case 'premolar': return { w: 13, h: 14 };
+            case 'canine': return { w: 11, h: 15 };
+            case 'incisor': return { w: 10, h: 12 };
         }
     }
     
@@ -2890,8 +2913,8 @@ function buildToothChart() {
     // Parametric U: angle from -PI*0.52 (right back) to +PI*0.52 (left back)
     const archAngles = [0.52, 0.44, 0.37, 0.30, 0.22, 0.15, 0.08, 0.025]; // back to front
     
-    const upperR = 70;  // upper arch radius
-    const lowerR = 58;  // lower arch radius (tighter)
+    const upperR = 88;  // upper arch radius
+    const lowerR = 72;  // lower arch radius (tighter)
     
     function toothPos(toothNum) {
         let angle, r, flipDir;
@@ -2934,9 +2957,9 @@ function buildToothChart() {
     let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">`;
     
     // Labels
-    svg += `<text x="${CX}" y="${CY-2}" text-anchor="middle" dominant-baseline="middle" fill="#475569" font-size="8" font-family="Inter,sans-serif" font-weight="600">YOUR TEETH</text>`;
-    svg += `<text x="14" y="16" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Right</text>`;
-    svg += `<text x="${W-14}" y="16" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Left</text>`;
+    svg += `<text x="${CX}" y="${CY-2}" text-anchor="middle" dominant-baseline="middle" fill="#475569" font-size="10" font-family="Inter,sans-serif" font-weight="600">YOUR TEETH</text>`;
+    svg += `<text x="16" y="18" fill="#64748b" font-size="9" font-family="Inter,sans-serif">Right</text>`;
+    svg += `<text x="${W-16}" y="18" text-anchor="end" fill="#64748b" font-size="9" font-family="Inter,sans-serif">Left</text>`;
     
     // Draw all 32 teeth
     for (let n = 1; n <= 32; n++) {
@@ -2965,7 +2988,7 @@ function buildToothChart() {
             <title>#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}</title>
             <path class="tooth-fill" d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${filter ? `filter="${filter}"` : ''}/>
             <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" 
-                fill="${textColor}" font-size="6.5" font-weight="700" font-family="Inter,sans-serif"
+                fill="${textColor}" font-size="8" font-weight="700" font-family="Inter,sans-serif"
                 transform="rotate(${(-pos.rotation).toFixed(1)})"
                 style="pointer-events:none;">${n}</text>
         </g>`;
