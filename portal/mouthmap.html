@@ -3515,47 +3515,48 @@ function buildToothChart() {
     */
     
     // Tooth hotspot positions as [x%, y%] on the 1024x1024 image
-    // Positioned OUTSIDE the teeth (pulled outward from arch center)
+    // Positioned OUTSIDE the teeth using expanded viewBox
+    // Image occupies 0-100, badges can go negative or past 100
     const toothPositions = {
-        // UPPER ARCH — badges above/outside the teeth
+        // UPPER ARCH — badges ABOVE the image
         // Upper Right: 1(back right) → 8(front center-right)
-        1:  [13,   37],   // 3rd molar
-        2:  [14,   28],   // 2nd molar
-        3:  [17,   19],   // 1st molar
-        4:  [22,   13],   // 2nd premolar
-        5:  [28,    8],   // 1st premolar
-        6:  [34,    4.5], // canine
-        7:  [41,    2.5], // lateral incisor
-        8:  [47,    1.5], // central incisor
+        1:  [8,    38],   // 3rd molar
+        2:  [6,    28],   // 2nd molar
+        3:  [8,    18],   // 1st molar
+        4:  [14,   10],   // 2nd premolar
+        5:  [22,    4],   // 1st premolar
+        6:  [30,   -1],   // canine
+        7:  [39,   -4],   // lateral incisor
+        8:  [46,   -5],   // central incisor
         // Upper Left: 9(front center-left) → 16(back left)
-        9:  [53,    1.5], // central incisor
-        10: [59,    2.5], // lateral incisor
-        11: [66,    4.5], // canine
-        12: [72,    8],   // 1st premolar
-        13: [78,   13],   // 2nd premolar
-        14: [83,   19],   // 1st molar
-        15: [86,   28],   // 2nd molar
-        16: [87,   37],   // 3rd molar
+        9:  [54,   -5],   // central incisor
+        10: [61,   -4],   // lateral incisor
+        11: [70,   -1],   // canine
+        12: [78,    4],   // 1st premolar
+        13: [86,   10],   // 2nd premolar
+        14: [92,   18],   // 1st molar
+        15: [94,   28],   // 2nd molar
+        16: [92,   38],   // 3rd molar
         
-        // LOWER ARCH — badges well below/outside the teeth
+        // LOWER ARCH — badges BELOW the image
         // Lower Left: 17(back left) → 24(front center-left)
-        17: [88,   56],   // 3rd molar
-        18: [87,   64],   // 2nd molar
-        19: [85,   72],   // 1st molar
-        20: [80,   80],   // 2nd premolar
-        21: [74,   87],   // 1st premolar
-        22: [66,   93],   // canine
-        23: [58,   97],   // lateral incisor
-        24: [52,   99],   // central incisor
+        17: [92,   58],   // 3rd molar
+        18: [94,   68],   // 2nd molar
+        19: [92,   78],   // 1st molar
+        20: [86,   86],   // 2nd premolar
+        21: [78,   92],   // 1st premolar
+        22: [70,   97],   // canine
+        23: [61,  101],   // lateral incisor
+        24: [54,  103],   // central incisor
         // Lower Right: 25(front center-right) → 32(back right)
-        25: [48,   99],   // central incisor
-        26: [42,   97],   // lateral incisor
-        27: [34,   93],   // canine
-        28: [26,   87],   // 1st premolar
-        29: [20,   80],   // 2nd premolar
-        30: [15,   72],   // 1st molar
-        31: [13,   64],   // 2nd molar
-        32: [12,   56],   // 3rd molar
+        25: [46,  103],   // central incisor
+        26: [39,  101],   // lateral incisor
+        27: [30,   97],   // canine
+        28: [22,   92],   // 1st premolar
+        29: [14,   86],   // 2nd premolar
+        30: [8,    78],   // 1st molar
+        31: [6,    68],   // 2nd molar
+        32: [8,    58],   // 3rd molar
     };
     
     // Status colors for the number badges
@@ -3587,10 +3588,11 @@ function buildToothChart() {
         'worn': '#fff'
     };
     
-    // Build HTML: image + SVG overlay
+    // Build HTML: SVG with embedded image + badge overlays
+    // viewBox extends beyond the image so badges sit outside the teeth
     let html = `<div style="position:relative;width:100%;max-width:400px;margin:0 auto;">
-        <img src="assets/dental-arch-chart.png" alt="Dental Arch Chart" style="width:100%;display:block;border-radius:8px;">
-        <svg viewBox="0 0 100 100" style="position:absolute;top:0;left:0;width:100%;height:100%;" xmlns="http://www.w3.org/2000/svg">`;
+        <svg viewBox="-15 -8 130 116" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg">
+        <image href="assets/dental-arch-chart.png" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet" style="border-radius:8px;"/>`;
     
     // Draw interactive hotspots for each tooth
     for (let n = 1; n <= 32; n++) {
