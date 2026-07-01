@@ -2046,63 +2046,134 @@ let toothCenters = []; // [{num, center: THREE.Vector3, mesh}]
 function computeToothCenters() {
     toothCenters = [];
     
-    // Step 1: Compute real centers from PLY files
-    const realCenters = [];
+    /* ═══ PARAMETRIC DENTAL ARCH TEMPLATE ═══
+       Creates 32 ideal tooth positions based on standard dental anatomy.
+       Completely bypasses PLY file numbering (which is unreliable).
+       
+       Calibration source: actual scan geometry analysis:
+       - Scan centered at bounding box center ≈ (0, 12, 0) before centering
+       - After centering: origin at center, scan spans ≈ ±33 X, ±15 Y, ±25 Z
+       - Upper arch: Y≈0..6, Z≈-2..+23 (Z increases towards posterior)
+       - Lower arch: Y≈-10..3, Z≈-24..-2 (Z decreases towards posterior)
+       - Patient's LEFT = positive X, Patient's RIGHT = negative X
+       
+       Universal Numbering:
+       1-8: Upper Right (1=3rd molar back, 8=central incisor front)
+       9-16: Upper Left (9=central incisor front, 16=3rd molar back)
+       17-24: Lower Left (17=3rd molar back, 24=central incisor front)
+       25-32: Lower Right (25=central incisor front, 32=3rd molar back)
+    */
+    
+    // AUTO-CALIBRATE: Compute actual scan bounding box to position the arch template
+    const scanBox = new THREE.Box3();
+    scanMeshes.forEach(m => {
+        if (m.userData.isScanVisual) {
+            m.geometry.computeBoundingBox();
+            const b = m.geometry.boundingBox.clone();
+            b.applyMatrix4(m.matrixWorld);
+            scanBox.union(b);
+        }
+    });
+    
+    const scanSize = new THREE.Vector3();
+    const scanCenter = new THREE.Vector3();
+    scanBox.getSize(scanSize);
+    scanBox.getCenter(scanCenter);
+    
+    console.log('[DentalArch] Scan bbox:', 
+        `center(${scanCenter.x.toFixed(1)}, ${scanCenter.y.toFixed(1)}, ${scanCenter.z.toFixed(1)})`,
+        `size(${scanSize.x.toFixed(1)}, ${scanSize.y.toFixed(1)}, ${scanSize.z.toFixed(1)})`);
+    
+    // Scale arch to fit scan: arch width ≈ 70% of scan X extent
+    const archHW = scanSize.x * 0.35;   // half-width
+    const archD = scanSize.z * 0.25;     // depth of each arch
+    
+    // Y levels: upper arch at +25% of height, lower at -25%
+    const upperY = scanCenter.y + scanSize.y * 0.15;
+    const lowerY = scanCenter.y - scanSize.y * 0.20;
+    
+    // Z offsets: upper arch posterior (positive Z), lower arch anterior (negative Z)
+    const upperZ0 = scanCenter.z + scanSize.z * 0.20;
+    const lowerZ0 = scanCenter.z - scanSize.z * 0.20;
+    
+    function archPoint(hw, d, z0, y, angle) {
+        return new THREE.Vector3(hw * Math.sin(angle), y, d * Math.cos(angle) + z0);
+    }
+    
+    // Distribute 8 teeth per quadrant along the arch curve
+    // Molars get wider spacing, incisors get tighter spacing
+    const spacing = [0.47, 0.40, 0.32, 0.24, 0.17, 0.11, 0.06, 0.02]; // normalized angles from back to front
+    
+    // UPPER RIGHT: teeth 1(back) → 8(front), angles from -π*0.47 → -π*0.02
+    for (let i = 0; i < 8; i++) {
+        const angle = -Math.PI * spacing[i];
+        toothCenters.push({
+            num: i + 1,
+            center: archPoint(archHW, archD, upperZ0, upperY, angle),
+            mesh: null
+        });
+    }
+    
+    // UPPER LEFT: teeth 9(front) → 16(back), angles from +π*0.02 → +π*0.47
+    for (let i = 0; i < 8; i++) {
+        const angle = Math.PI * spacing[7 - i]; // reverse: front first
+        toothCenters.push({
+            num: i + 9,
+            center: archPoint(archHW, archD, upperZ0, upperY, angle),
+            mesh: null
+        });
+    }
+    
+    // LOWER LEFT: teeth 17(back) → 24(front), angles from +π*0.47 → +π*0.02
+    for (let i = 0; i < 8; i++) {
+        const angle = Math.PI * spacing[i]; // back to front on left
+        toothCenters.push({
+            num: i + 17,
+            center: archPoint(archHW * 0.95, archD, lowerZ0, lowerY, angle),
+            mesh: null
+        });
+    }
+    
+    // LOWER RIGHT: teeth 25(front) → 32(back), angles from -π*0.02 → -π*0.47
+    for (let i = 0; i < 8; i++) {
+        const angle = -Math.PI * spacing[7 - i]; // front to back on right
+        toothCenters.push({
+            num: i + 25,
+            center: archPoint(archHW * 0.95, archD, lowerZ0, lowerY, angle),
+            mesh: null
+        });
+    }
+    
+    // Match each template position to closest PLY mesh (for overlay effects)
+    const meshCenters = [];
     toothMeshes.forEach(tm => {
-        const vertCount = tm.geometry.getAttribute('position').count;
-        
-        // Skip massively oversized teeth (bad segmentation — includes gum tissue)
-        if (vertCount > 4000) {
-            console.warn('[Hybrid] Skipping oversized tooth #' + tm.userData.toothNumber + 
-                ' (' + vertCount + ' verts — likely includes gum tissue)');
-            return;
-        }
-        
+        const vc = tm.geometry.getAttribute('position').count;
+        if (vc > 4000) return; // skip oversized
         tm.geometry.computeBoundingBox();
-        const center = new THREE.Vector3();
-        tm.geometry.boundingBox.getCenter(center);
-        tm.localToWorld(center);
-        
-        const entry = {
-            num: tm.userData.toothNumber,
-            center: center,
-            mesh: tm,
-            isMirror: false
-        };
-        realCenters.push(entry);
-        toothCenters.push(entry);
+        const c = new THREE.Vector3();
+        tm.geometry.boundingBox.getCenter(c);
+        tm.localToWorld(c);
+        meshCenters.push({ mesh: tm, center: c });
     });
     
-    // Step 2: Mirror centers to the empty side of the mouth
-    // The segmentation only produced PLYs for one side (positive X after centering).
-    // Mirror each center across X=0 with dental-convention partner numbers:
-    //   Upper: 1↔16, 2↔15, 3↔14, 4↔13, 5↔12, 6↔11, 7↔10, 8↔9
-    //   Lower: 17↔32, 18↔31, 19↔30, 20↔29, 21↔28, 22↔27, 23↔26, 24↔25
-    const mirrorMap = {};
-    for (let i = 1; i <= 8; i++) { mirrorMap[i] = 17 - i; mirrorMap[17 - i] = i; }
-    for (let i = 17; i <= 24; i++) { mirrorMap[i] = 49 - i; mirrorMap[49 - i] = i; }
-    
-    const existingNums = new Set(realCenters.map(c => c.num));
-    
-    realCenters.forEach(tc => {
-        const partnerNum = mirrorMap[tc.num];
-        if (partnerNum && !existingNums.has(partnerNum)) {
-            // Create mirrored center for the empty side
-            toothCenters.push({
-                num: partnerNum,
-                center: new THREE.Vector3(-tc.center.x, tc.center.y, tc.center.z),
-                mesh: tc.mesh, // reuse mesh reference (overlay goes on real side)
-                isMirror: true
-            });
-        }
+    toothCenters.forEach(tc => {
+        let best = null, bestD = Infinity;
+        meshCenters.forEach(mc => {
+            const d = tc.center.distanceTo(mc.center);
+            if (d < bestD) { bestD = d; best = mc.mesh; }
+        });
+        tc.mesh = best;
     });
     
-    console.log('[Hybrid] ' + realCenters.length + ' real + ' + 
-        (toothCenters.length - realCenters.length) + ' mirrored = ' + 
-        toothCenters.length + ' total tooth centers');
+    // Debug: log all positions to console for calibration
+    console.log('[DentalArch] 32-tooth template created:');
+    toothCenters.forEach(tc => {
+        const c = tc.center;
+        console.log(`  #${tc.num} ${TOOTH_NAMES[tc.num] || ''}: (${c.x.toFixed(1)}, ${c.y.toFixed(1)}, ${c.z.toFixed(1)})`);
+    });
 }
 
-// Find nearest tooth to a 3D world point (no distance threshold — always finds one)
+// Find nearest tooth to a 3D world point
 function findNearestTooth(point) {
     let best = null;
     let bestDist = Infinity;
