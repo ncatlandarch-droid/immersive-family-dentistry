@@ -3505,85 +3505,63 @@ function buildToothChart() {
     const container = document.getElementById('arch-chart-container');
     if (!container) return;
     
-    // Status colors
     const badgeColors = {
-        'healthy': 'rgba(255,255,255,0.95)', 'restoration': '#f59e0b',
+        'healthy': '#e2e8f0', 'restoration': '#f59e0b',
         'decay': '#ef4444', 'watch': '#3b82f6', 'calculus': '#8b5cf6',
-        'missing': '#64748b', 'planned': '#06b6d4', 'recession': '#ec4899',
+        'missing': '#374151', 'planned': '#06b6d4', 'recession': '#ec4899',
         'cavity_risk': '#f97316', 'cracked': '#dc2626', 'worn': '#a855f7'
     };
-    const badgeText = {
-        'healthy': '#1e293b', 'missing': '#fff', 'restoration': '#fff',
+    const badgeTextColors = {
+        'healthy': '#1e293b', 'missing': '#6b7280', 'restoration': '#fff',
         'decay': '#fff', 'watch': '#fff', 'calculus': '#fff', 'planned': '#fff',
         'recession': '#fff', 'cavity_risk': '#fff', 'cracked': '#fff', 'worn': '#fff'
     };
     
-    function makeBadge(n) {
+    function cell(n) {
         const tooth = DEMO_PATIENT.teeth[n] || { status: 'healthy' };
-        const isSelected = selectedTooth === n;
-        const bg = badgeColors[tooth.status] || 'rgba(255,255,255,0.95)';
-        const txt = badgeText[tooth.status] || '#1e293b';
-        const border = isSelected ? '2px solid #2dd4bf' : '1px solid rgba(0,0,0,0.2)';
-        const shadow = isSelected ? '0 0 8px rgba(45,212,191,0.6)' : 'none';
-        const opacity = tooth.status === 'missing' ? '0.5' : '1';
-        
+        const sel = selectedTooth === n;
+        const bg = badgeColors[tooth.status] || '#e2e8f0';
+        const fg = badgeTextColors[tooth.status] || '#1e293b';
+        const bdr = sel ? '2px solid #2dd4bf' : '1px solid rgba(100,116,139,0.3)';
+        const glow = sel ? 'box-shadow:0 0 8px rgba(45,212,191,0.7);' : '';
+        const op = tooth.status === 'missing' ? 'opacity:0.45;text-decoration:line-through;' : '';
         return `<button onclick="selectToothByNumber(${n})" ondblclick="isolateTooth(${n})"
             title="#${n} ${TOOTH_NAMES[n] || ''} — ${tooth.status}"
-            style="width:26px;height:24px;font-size:10px;font-weight:700;
-            background:${bg};color:${txt};border:${border};border-radius:5px;
-            cursor:pointer;opacity:${opacity};box-shadow:${shadow};
-            padding:0;margin:0;line-height:1;font-family:Inter,sans-serif;
-            transition:all 0.15s;"
-            onmouseover="this.style.transform='scale(1.2)';this.style.boxShadow='0 0 8px rgba(45,212,191,0.6)'"
-            onmouseout="this.style.transform='scale(1)';this.style.boxShadow='${shadow}'"
+            style="width:22px;height:28px;font-size:9px;font-weight:700;border-radius:4px;
+            background:${bg};color:${fg};border:${bdr};cursor:pointer;padding:0;
+            font-family:Inter,sans-serif;transition:all 0.15s;${glow}${op}"
+            onmouseover="this.style.transform='scale(1.15)';this.style.borderColor='#2dd4bf'"
+            onmouseout="this.style.transform='scale(1)';this.style.borderColor='${sel ? '#2dd4bf' : 'rgba(100,116,139,0.3)'}'"
         >${n}</button>`;
     }
     
-    // Upper: 1-8 right side | 9-16 left side
-    const upperRight = [1,2,3,4,5,6,7,8].map(n => makeBadge(n)).join('');
-    const upperLeft = [9,10,11,12,13,14,15,16].map(n => makeBadge(n)).join('');
-    
-    // Lower: 32-25 right side | 24-17 left side (mirrored to match upper)
-    const lowerRight = [32,31,30,29,28,27,26,25].map(n => makeBadge(n)).join('');
-    const lowerLeft = [24,23,22,21,20,19,18,17].map(n => makeBadge(n)).join('');
-    
     container.innerHTML = `
-        <div style="width:100%;max-width:400px;margin:0 auto;">
-            <!-- UPPER NUMBERS -->
-            <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-bottom:4px;">
-                <span style="font-size:9px;color:#94a3b8;margin-right:4px;font-weight:600;">R</span>
-                ${upperRight}
-                <span style="width:1px;height:16px;background:rgba(45,212,191,0.3);margin:0 2px;"></span>
-                ${upperLeft}
-                <span style="font-size:9px;color:#94a3b8;margin-left:4px;font-weight:600;">L</span>
+        <div style="font-family:Inter,sans-serif;text-align:center;">
+            <div style="font-size:9px;color:#64748b;letter-spacing:2px;margin-bottom:6px;">TOOTH CHART <span style="opacity:0.5;font-size:8px;">(click to select · double-click to isolate)</span></div>
+            
+            <!-- UPPER ROW -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:0px;margin-bottom:2px;">
+                <span style="font-size:8px;color:#64748b;width:12px;text-align:right;margin-right:3px;">R</span>
+                ${[1,2,3,4,5,6,7,8].map(n => cell(n)).join('')}
+                <span style="width:2px;height:24px;background:rgba(45,212,191,0.4);margin:0 2px;border-radius:1px;"></span>
+                ${[9,10,11,12,13,14,15,16].map(n => cell(n)).join('')}
+                <span style="font-size:8px;color:#64748b;width:12px;margin-left:3px;">L</span>
             </div>
             
-            <div style="font-size:8px;color:#64748b;text-align:center;margin-bottom:2px;letter-spacing:1px;">UPPER</div>
-            
-            <!-- ARCH IMAGE -->
-            <div style="position:relative;margin:0 auto;max-width:320px;">
-                <img src="assets/dental-arch-chart.png" alt="Dental Arch" 
-                    style="width:100%;display:block;border-radius:8px;opacity:0.85;">
+            <!-- DIVIDER -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin:4px 0;">
+                <div style="flex:1;max-width:160px;height:1px;background:linear-gradient(to right, transparent, rgba(45,212,191,0.3), rgba(45,212,191,0.5));"></div>
+                <span style="font-size:7px;color:#475569;letter-spacing:1px;">UPPER ─── LOWER</span>
+                <div style="flex:1;max-width:160px;height:1px;background:linear-gradient(to left, transparent, rgba(45,212,191,0.3), rgba(45,212,191,0.5));"></div>
             </div>
             
-            <div style="font-size:8px;color:#64748b;text-align:center;margin-top:2px;margin-bottom:2px;letter-spacing:1px;">LOWER</div>
-            
-            <!-- LOWER NUMBERS -->
-            <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-top:4px;">
-                <span style="font-size:9px;color:#94a3b8;margin-right:4px;font-weight:600;">R</span>
-                ${lowerRight}
-                <span style="width:1px;height:16px;background:rgba(45,212,191,0.3);margin:0 2px;"></span>
-                ${lowerLeft}
-                <span style="font-size:9px;color:#94a3b8;margin-left:4px;font-weight:600;">L</span>
-            </div>
-            
-            <!-- LEGEND -->
-            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;font-size:8px;">
-                <span style="display:flex;align-items:center;gap:2px;"><span style="width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid #ccc;"></span>Healthy</span>
-                <span style="display:flex;align-items:center;gap:2px;"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>Treated</span>
-                <span style="display:flex;align-items:center;gap:2px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;"></span>Decay</span>
-                <span style="display:flex;align-items:center;gap:2px;"><span style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;"></span>Planned</span>
-                <span style="display:flex;align-items:center;gap:2px;"><span style="width:8px;height:8px;border-radius:50%;background:#64748b;"></span>Missing</span>
+            <!-- LOWER ROW -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:0px;margin-top:2px;">
+                <span style="font-size:8px;color:#64748b;width:12px;text-align:right;margin-right:3px;">R</span>
+                ${[32,31,30,29,28,27,26,25].map(n => cell(n)).join('')}
+                <span style="width:2px;height:24px;background:rgba(45,212,191,0.4);margin:0 2px;border-radius:1px;"></span>
+                ${[24,23,22,21,20,19,18,17].map(n => cell(n)).join('')}
+                <span style="font-size:8px;color:#64748b;width:12px;margin-left:3px;">L</span>
             </div>
         </div>
     `;
