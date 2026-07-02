@@ -3,3 +3,7 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+output/
+output2/
+segment_teeth.py
+requirements.txt
