@@ -1,489 +1,519 @@
+#!/usr/bin/env python3
 """
-PALOMA AI - Advanced Dental Mesh Segmentation (MeshSegNet-inspired)
-==================================================================
-Upgraded pipeline using multi-scale curvature analysis + watershed 
-segmentation on the mesh surface. This mimics the core idea behind 
-MeshSegNet's per-face classification but uses geometric heuristics 
-instead of a trained neural network.
+segment_teeth.py  --  Curvature-based segmentation of a full dental-arch PLY mesh
+                      into individual teeth for the PALOMA dental-AI platform.
 
-Key improvements over v1:
-  1. Multi-scale curvature (fine + coarse neighborhoods)
-  2. Watershed-style region growing from curvature minima
-  3. Arch-curve fitting (parabolic) for better tooth ordering
-  4. Size-based cluster merging/splitting
-  5. Per-face labels → cleaner tooth boundaries
+Pipeline
+--------
+1. Load a full-arch PLY (gums + teeth as one mesh, mm scale, RGB vertex colors).
+2. Estimate per-vertex surface curvature (normal variation across the 1-ring).
+3. Treat high-curvature vertices as boundaries (gingival margin + interproximal
+   grooves), erode faces that touch them, and find connected components of what
+   remains -- these are tooth "seeds".
+4. Region-grow the eroded boundary vertices back onto the nearest seed so no
+   geometry / colour is lost  ("curvature_region_growing").
+5. Classify each region as tooth / gum by vertex count and crown protrusion.
+6. Order the teeth along the arch and assign Universal Numbers (1-32), detecting
+   gaps for missing teeth.
+7. Export every tooth + the gum as separate binary PLY files (colours preserved)
+   and write a manifest.json.
 
-Output: individual tooth PLY files + gum mesh + manifest.json
+NOTE
+----
+Pure-geometry segmentation of intraoral scans is imperfect: expect to review the
+output and tune --curvature-percentile per scanner.  Use --debug to export a
+curvature heat-map PLY, and --flip-upper / --flip-lower if the left/right
+numbering comes out mirrored (there is no way to recover patient handedness from
+geometry alone).
+
+Usage
+-----
+    # both arches at once (writes one combined manifest)
+    python segment_teeth.py --maxilla maxilla.ply --mandible mandible.ply --outdir output
+
+    # a single file, explicit arch
+    python segment_teeth.py --input scan.ply --arch upper --outdir output
+
+    # tuning / fixing mirrored numbering
+    python segment_teeth.py --maxilla maxilla.ply --mandible mandible.ply \
+        --outdir output --curvature-percentile 82 --flip-upper --debug
 """
 
-import os
+import argparse
 import json
-import numpy as np
+import os
 import sys
+import time
+from collections import deque, defaultdict
 
-try:
-    import trimesh
-    from scipy.spatial import cKDTree
-    from scipy.ndimage import label as nd_label
-    from sklearn.cluster import DBSCAN
-except ImportError:
-    print("Installing dependencies...")
-    os.system(f"{sys.executable} -m pip install trimesh scipy scikit-learn")
-    import trimesh
-    from scipy.spatial import cKDTree
-    from scipy.ndimage import label as nd_label
-    from sklearn.cluster import DBSCAN
+import numpy as np
+import trimesh
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
 
 
-TOOTH_NAMES = {
-    1: 'Upper Right Third Molar', 2: 'Upper Right Second Molar',
-    3: 'Upper Right First Molar', 4: 'Upper Right Second Premolar',
-    5: 'Upper Right First Premolar', 6: 'Upper Right Canine',
-    7: 'Upper Right Lateral Incisor', 8: 'Upper Right Central Incisor',
-    9: 'Upper Left Central Incisor', 10: 'Upper Left Lateral Incisor',
-    11: 'Upper Left Canine', 12: 'Upper Left First Premolar',
-    13: 'Upper Left Second Premolar', 14: 'Upper Left First Molar',
-    15: 'Upper Left Second Molar', 16: 'Upper Left Third Molar',
-    17: 'Lower Left Third Molar', 18: 'Lower Left Second Molar',
-    19: 'Lower Left First Molar', 20: 'Lower Left Second Premolar',
-    21: 'Lower Left First Premolar', 22: 'Lower Left Canine',
-    23: 'Lower Left Lateral Incisor', 24: 'Lower Left Central Incisor',
-    25: 'Lower Right Central Incisor', 26: 'Lower Right Lateral Incisor',
-    27: 'Lower Right Canine', 28: 'Lower Right First Premolar',
-    29: 'Lower Right Second Premolar', 30: 'Lower Right First Molar',
-    31: 'Lower Right Second Molar', 32: 'Lower Right Third Molar'
+# --------------------------------------------------------------------------- #
+#  logging
+# --------------------------------------------------------------------------- #
+def log(msg, indent=0):
+    print(("  " * indent) + msg, flush=True)
+
+
+# --------------------------------------------------------------------------- #
+#  I/O
+# --------------------------------------------------------------------------- #
+def load_mesh(path):
+    log(f"Loading {path} ...")
+    mesh = trimesh.load(path, process=False)
+    if isinstance(mesh, trimesh.Scene):
+        # concatenate any multi-geometry scene into one mesh
+        mesh = trimesh.util.concatenate(tuple(mesh.geometry.values()))
+    if not isinstance(mesh, trimesh.Trimesh):
+        raise ValueError(f"{path} did not load as a triangle mesh.")
+    log(f"vertices: {len(mesh.vertices):,}   faces: {len(mesh.faces):,}", 1)
+
+    # ensure we have vertex colours to preserve; default to light grey if absent
+    if mesh.visual.kind != "vertex" or mesh.visual.vertex_colors is None:
+        log("no vertex colours found -- filling neutral grey", 1)
+        grey = np.tile([200, 200, 200, 255], (len(mesh.vertices), 1)).astype(np.uint8)
+        mesh.visual = trimesh.visual.ColorVisuals(mesh=mesh, vertex_colors=grey)
+    else:
+        # force RGBA uint8
+        vc = np.asarray(mesh.visual.vertex_colors)
+        if vc.shape[1] == 3:
+            vc = np.hstack([vc, np.full((len(vc), 1), 255, np.uint8)])
+        mesh.visual.vertex_colors = vc.astype(np.uint8)
+    return mesh
+
+
+def export_region(mesh, vertex_mask, path):
+    """Extract the sub-mesh for the given boolean vertex mask (colours kept)."""
+    vidx = np.where(vertex_mask)[0]
+    if len(vidx) == 0:
+        return 0, 0
+    # keep faces whose majority (>=2) vertices belong to the region
+    fmask = vertex_mask[mesh.faces].sum(axis=1) >= 2
+    faces = mesh.faces[fmask]
+    if len(faces) == 0:
+        return len(vidx), 0
+
+    used = np.unique(faces)
+    remap = -np.ones(len(mesh.vertices), dtype=np.int64)
+    remap[used] = np.arange(len(used))
+    sub = trimesh.Trimesh(
+        vertices=mesh.vertices[used],
+        faces=remap[faces],
+        vertex_colors=np.asarray(mesh.visual.vertex_colors)[used],
+        process=False,
+    )
+    sub.export(path, file_type="ply", encoding="binary")
+    return len(sub.vertices), len(sub.faces)
+
+
+# --------------------------------------------------------------------------- #
+#  geometry helpers
+# --------------------------------------------------------------------------- #
+def occlusal_axis(vertices):
+    """Smallest-variance PCA axis ~= vertical (gum->crown) axis of the arch."""
+    c = vertices - vertices.mean(axis=0)
+    cov = np.cov(c.T)
+    w, v = np.linalg.eigh(cov)
+    return v[:, np.argmin(w)]  # unit vector
+
+
+def compute_curvature(mesh, smooth_iters=2):
+    """
+    Fast per-vertex curvature proxy = mean angular deviation between a vertex
+    normal and its 1-ring neighbour normals.  High at creases (gingival margin,
+    interproximal grooves, cusp tips).  Range roughly [0, 2].
+    """
+    log("Computing per-vertex curvature (normal variation) ...", 1)
+    normals = np.asarray(mesh.vertex_normals)
+    edges = mesh.edges_unique  # (E,2)
+    i, j = edges[:, 0], edges[:, 1]
+
+    dev = 1.0 - np.einsum("ij,ij->i", normals[i], normals[j])  # per-edge, [0,2]
+    curv = np.zeros(len(mesh.vertices))
+    deg = np.zeros(len(mesh.vertices))
+    np.add.at(curv, i, dev)
+    np.add.at(curv, j, dev)
+    np.add.at(deg, i, 1.0)
+    np.add.at(deg, j, 1.0)
+    curv /= np.maximum(deg, 1.0)
+
+    # light Laplacian smoothing of the scalar field to suppress scanner noise
+    if smooth_iters > 0:
+        adj = _vertex_adjacency(mesh)
+        for _ in range(smooth_iters):
+            curv = 0.5 * curv + 0.5 * (adj @ curv)
+    return curv
+
+
+def _vertex_adjacency(mesh):
+    """Row-normalised sparse adjacency for scalar smoothing / label growing."""
+    edges = mesh.edges_unique
+    n = len(mesh.vertices)
+    rows = np.concatenate([edges[:, 0], edges[:, 1]])
+    cols = np.concatenate([edges[:, 1], edges[:, 0]])
+    data = np.ones(len(rows))
+    A = csr_matrix((data, (rows, cols)), shape=(n, n))
+    deg = np.asarray(A.sum(axis=1)).ravel()
+    deg[deg == 0] = 1.0
+    Dinv = csr_matrix((1.0 / deg, (np.arange(n), np.arange(n))), shape=(n, n))
+    return Dinv @ A
+
+
+# --------------------------------------------------------------------------- #
+#  segmentation
+# --------------------------------------------------------------------------- #
+def segment(mesh, curv, percentile, min_v, max_v, up_axis):
+    """
+    Cut at high-curvature vertices, label connected components, region-grow,
+    then classify regions into teeth vs gum.
+
+    Returns
+    -------
+    labels : (N,) int      per-vertex region id (>=0), -1 = unassigned
+    teeth  : list[int]     region ids classified as teeth
+    gum    : list[int]     region ids classified as gum
+    """
+    n = len(mesh.vertices)
+    thr = np.percentile(curv, percentile)
+    boundary = curv > thr
+    log(f"curvature threshold @ p{percentile:.0f} = {thr:.3f} "
+        f"-> {boundary.sum():,} boundary vertices", 1)
+
+    # ---- connected components on the NON-boundary sub-graph (tooth seeds) ----
+    keep = ~boundary
+    edges = mesh.edges_unique
+    e_keep = edges[keep[edges[:, 0]] & keep[edges[:, 1]]]
+    rows = np.concatenate([e_keep[:, 0], e_keep[:, 1]])
+    cols = np.concatenate([e_keep[:, 1], e_keep[:, 0]])
+    graph = csr_matrix((np.ones(len(rows)), (rows, cols)), shape=(n, n))
+    ncomp, comp = connected_components(graph, directed=False)
+
+    # only non-boundary vertices carry a valid seed label
+    labels = np.full(n, -1, dtype=np.int64)
+    labels[keep] = comp[keep]
+    log(f"found {ncomp:,} raw components before filtering", 1)
+
+    # ---- region-grow: flood boundary vertices onto nearest seed label --------
+    labels = _grow_labels(mesh, labels)
+
+    # ---- measure every region ------------------------------------------------
+    up = up_axis / np.linalg.norm(up_axis)
+    proj = mesh.vertices @ up
+    # orient so that "crown" side is the +proj end (teeth stick further out than
+    # the broad gum base -> the extreme 2% of proj should be tooth cusps)
+    regions = {}
+    for lab in np.unique(labels):
+        if lab < 0:
+            continue
+        idx = np.where(labels == lab)[0]
+        regions[lab] = {
+            "idx": idx,
+            "n": len(idx),
+            "proj_span": proj[idx].max() - proj[idx].min(),
+            "proj_mean": proj[idx].mean(),
+            "center": mesh.vertices[idx].mean(axis=0),
+        }
+
+    if not regions:
+        return labels, [], []
+
+    # the biggest region is the gum base
+    gum_seed = max(regions, key=lambda k: regions[k]["n"])
+    global_span = proj.max() - proj.min()
+
+    teeth, gum = [], [gum_seed]
+    for lab, r in regions.items():
+        if lab == gum_seed:
+            continue
+        is_tooth = (
+            min_v <= r["n"] <= max_v
+            and r["proj_span"] > 0.12 * global_span  # must protrude a bit
+        )
+        (teeth if is_tooth else gum).append(lab)
+
+    log(f"classified {len(teeth)} tooth region(s), "
+        f"{len(gum)} gum/other region(s)", 1)
+    return labels, teeth, gum
+
+
+def _grow_labels(mesh, labels):
+    """Multi-source BFS: assign each -1 vertex the label of a labelled neighbour."""
+    neighbours = mesh.vertex_neighbors  # list of arrays
+    q = deque(np.where(labels >= 0)[0].tolist())
+    while q:
+        v = q.popleft()
+        lv = labels[v]
+        for w in neighbours[v]:
+            if labels[w] == -1:
+                labels[w] = lv
+                q.append(w)
+    return labels
+
+
+# --------------------------------------------------------------------------- #
+#  Universal tooth numbering
+# --------------------------------------------------------------------------- #
+# per-quadrant: (central-incisor number, step toward the molars)
+QUAD_RULES = {
+    ("upper", "right"): (8, -1),   # 8..1
+    ("upper", "left"): (9, +1),    # 9..16
+    ("lower", "right"): (25, +1),  # 25..32
+    ("lower", "left"): (24, -1),   # 24..17
 }
 
 
-def compute_multiscale_curvature(mesh, k_fine=8, k_coarse=25):
-    """Multi-scale curvature using normal deviation at two neighborhood sizes.
-    Fine scale catches inter-tooth grooves.
-    Coarse scale catches tooth-gum boundaries."""
-    vertices = mesh.vertices
-    normals = mesh.vertex_normals
-    n = len(vertices)
-    
-    tree = cKDTree(vertices)
-    
-    # Fine scale
-    _, idx_fine = tree.query(vertices, k=k_fine)
-    fine_normals = normals[idx_fine[:, 1:]]
-    curv_fine = np.var(fine_normals, axis=1).sum(axis=1)
-    
-    # Coarse scale
-    _, idx_coarse = tree.query(vertices, k=k_coarse)
-    coarse_normals = normals[idx_coarse[:, 1:]]
-    curv_coarse = np.var(coarse_normals, axis=1).sum(axis=1)
-    
-    # Normalize each
-    if curv_fine.max() > 0:
-        curv_fine /= curv_fine.max()
-    if curv_coarse.max() > 0:
-        curv_coarse /= curv_coarse.max()
-    
-    # Combined: fine catches grooves, coarse catches gum line
-    combined = 0.6 * curv_fine + 0.4 * curv_coarse
-    return combined
+def order_along_arch(centers):
+    """Greedy nearest-neighbour walk from one terminal molar to the other."""
+    n = len(centers)
+    if n <= 2:
+        return list(range(n))
+    o, _, lr = _plane_axes(centers)
+    # terminal teeth = extremes of the widest (left-right) axis
+    xproj = (centers - o) @ lr
+    start = int(np.argmin(xproj))
+    order, used = [start], {start}
+    while len(order) < n:
+        last = centers[order[-1]]
+        d = np.linalg.norm(centers - last, axis=1)
+        d[list(used)] = np.inf
+        nxt = int(np.argmin(d))
+        order.append(nxt)
+        used.add(nxt)
+    return order
 
 
-def build_adjacency(mesh):
-    """Build vertex adjacency from faces — needed for region growing."""
-    n = len(mesh.vertices)
-    adj = [set() for _ in range(n)]
-    for f in mesh.faces:
-        adj[f[0]].update([f[1], f[2]])
-        adj[f[1]].update([f[0], f[2]])
-        adj[f[2]].update([f[0], f[1]])
-    return adj
+def _plane_axes(centers):
+    """Return (origin, anterior-posterior axis, left-right axis) in occlusal plane."""
+    c = centers - centers.mean(axis=0)
+    cov = np.cov(c[:, :2].T) if centers.shape[1] >= 2 else np.cov(c.T)
+    # use the two largest-variance axes of the full 3-D set, drop vertical later
+    cov3 = np.cov(c.T)
+    w, v = np.linalg.eigh(cov3)
+    order = np.argsort(w)[::-1]
+    lr = v[:, order[0]]   # widest spread = left-right (molar to molar)
+    ap = v[:, order[1]]   # next = anterior-posterior
+    return centers.mean(axis=0), ap, lr
 
 
-def watershed_segment(vertices, curvature, adjacency, seed_threshold=0.15, barrier_threshold=0.45):
-    """Watershed-style region growing from low-curvature seeds.
-    
-    1. Seeds = vertices with curvature < seed_threshold (flat tooth surfaces)
-    2. Grow regions outward, stopping at curvature > barrier_threshold (grooves/boundaries)
-    3. Each connected seed region becomes a segment
+def assign_numbers(centers, arch, flip):
     """
-    n = len(vertices)
-    labels = np.full(n, -1, dtype=int)
-    
-    # Find seed regions (low curvature = tooth surfaces)
-    seeds = curvature < seed_threshold
-    
-    # Label connected components among seeds
-    visited = np.zeros(n, dtype=bool)
-    current_label = 0
-    
-    # BFS to find connected seed components
-    for start in range(n):
-        if not seeds[start] or visited[start]:
-            continue
-        
-        queue = [start]
-        visited[start] = True
-        component = []
-        
-        while queue:
-            v = queue.pop(0)
-            component.append(v)
-            labels[v] = current_label
-            
-            for neighbor in adjacency[v]:
-                if not visited[neighbor] and seeds[neighbor]:
-                    visited[neighbor] = True
-                    queue.append(neighbor)
-        
-        if len(component) >= 30:  # minimum seed size
-            current_label += 1
-        else:
-            # Too small, reset
-            for v in component:
-                labels[v] = -1
-    
-    print(f"    Seed regions: {current_label}")
-    
-    # Region growing: expand each seed into neighboring non-barrier vertices
-    changed = True
-    iterations = 0
-    while changed and iterations < 50:
-        changed = False
-        iterations += 1
-        for v in range(n):
-            if labels[v] != -1:
-                continue
-            if curvature[v] > barrier_threshold:
-                continue  # this is a boundary vertex, don't label
-            
-            # Check neighbors for labels
-            neighbor_labels = {}
-            for nb in adjacency[v]:
-                if labels[nb] >= 0:
-                    neighbor_labels[labels[nb]] = neighbor_labels.get(labels[nb], 0) + 1
-            
-            if neighbor_labels:
-                # Assign to the most common neighbor label
-                best_label = max(neighbor_labels, key=neighbor_labels.get)
-                labels[v] = best_label
-                changed = True
-    
-    print(f"    Region growing: {iterations} iterations")
-    return labels, current_label
+    Map each tooth (row of `centers`) to a Universal number.
+    Returns dict {row_index: (number, uncertain_bool)} and list of missing numbers.
+    """
+    n = len(centers)
+    o, ap, lr = _plane_axes(centers)
+    order = order_along_arch(centers)
+    ordered_c = centers[order]
 
+    # anterior apex = tooth farthest from the line joining the two terminal teeth
+    p0, p1 = ordered_c[0], ordered_c[-1]
+    seg = p1 - p0
+    seg_n = seg / (np.linalg.norm(seg) + 1e-9)
+    perp = ordered_c - p0 - np.outer((ordered_c - p0) @ seg_n, seg_n)
+    apex = int(np.argmax(np.linalg.norm(perp, axis=1)))
 
-def fit_arch_curve(vertices, labels, n_labels):
-    """Fit a parabolic arch curve and sort teeth along it.
-    Returns cluster info sorted from right to left along the dental arch."""
-    
-    clusters = []
-    for label_id in range(n_labels):
-        mask = labels == label_id
-        count = mask.sum()
-        if count < 50:
-            continue
-        
-        cluster_verts = vertices[mask]
-        centroid = cluster_verts.mean(axis=0)
-        clusters.append({
-            'label': label_id,
-            'centroid': centroid,
-            'count': count,
-            'mask': mask
-        })
-    
-    if not clusters:
-        return clusters
-    
-    # PCA on centroids to find arch direction
-    centroids = np.array([c['centroid'] for c in clusters])
-    mean_c = centroids.mean(axis=0)
-    centered = centroids - mean_c
-    
-    if len(centered) < 3:
-        # Not enough points for PCA, just sort by x
-        clusters.sort(key=lambda c: c['centroid'][0])
-        return clusters
-    
-    cov = np.cov(centered.T)
-    eigenvalues, eigenvectors = np.linalg.eigh(cov)
-    idx = eigenvalues.argsort()[::-1]
-    
-    # Project onto arch width (PC1) and depth (PC2)
-    pc1 = eigenvectors[:, idx[0]]
-    pc2 = eigenvectors[:, idx[1]]
-    
-    arch_x = centered @ pc1
-    arch_z = centered @ pc2
-    
-    # Sort by angle around arch center (gives natural L→R or R→L ordering)
-    for i, c in enumerate(clusters):
-        c['arch_angle'] = np.arctan2(arch_z[i], arch_x[i])
-    
-    clusters.sort(key=lambda c: c['arch_angle'])
-    return clusters
+    # split ordered list into two quadrants at the midline (apex / apex+1)
+    left_side = order[: apex + 1]
+    right_side = order[apex + 1:]
 
+    # decide which physical group is patient-right via the left-right axis sign
+    def group_lr(rows):
+        return np.mean((centers[rows] - o) @ lr) if len(rows) else 0.0
 
-def merge_small_clusters(clusters, vertices, labels, min_vertices=200):
-    """Merge clusters that are too small into their nearest neighbor."""
-    if len(clusters) <= 1:
-        return clusters, labels
-    
-    merged = True
-    while merged:
-        merged = False
-        small = [c for c in clusters if c['count'] < min_vertices]
-        if not small:
-            break
-        
-        for sc in small:
-            # Find nearest larger cluster
-            best_dist = float('inf')
-            best_target = None
-            for oc in clusters:
-                if oc['label'] == sc['label'] or oc['count'] < min_vertices:
-                    continue
-                dist = np.linalg.norm(sc['centroid'] - oc['centroid'])
-                if dist < best_dist:
-                    best_dist = dist
-                    best_target = oc
-            
-            if best_target:
-                # Merge sc into best_target
-                mask = labels == sc['label']
-                labels[mask] = best_target['label']
-                best_target['count'] += sc['count']
-                best_target['mask'] = labels == best_target['label']
-                best_target['centroid'] = vertices[best_target['mask']].mean(axis=0)
-                clusters.remove(sc)
-                merged = True
-                break
-    
-    return clusters, labels
-
-
-def split_large_clusters(clusters, vertices, labels, tree, max_vertices_ratio=0.15, total_verts=1):
-    """Split clusters that are suspiciously large (likely merged teeth)."""
-    new_clusters = []
-    max_label = max(c['label'] for c in clusters) + 1
-    
-    for c in clusters:
-        ratio = c['count'] / total_verts
-        if ratio > max_vertices_ratio and c['count'] > 5000:
-            # Try sub-clustering with tighter DBSCAN
-            cluster_verts = vertices[c['mask']]
-            mean_edge_approx = np.mean(np.linalg.norm(
-                cluster_verts[:100] - cluster_verts[1:101], axis=1
-            )) if len(cluster_verts) > 101 else 1.0
-            
-            sub_clustering = DBSCAN(eps=mean_edge_approx * 0.8, min_samples=20).fit(cluster_verts)
-            sub_labels = sub_clustering.labels_
-            n_sub = len(set(sub_labels)) - (1 if -1 in sub_labels else 0)
-            
-            if n_sub >= 2:
-                print(f"    Split cluster {c['label']} ({c['count']} verts) into {n_sub} sub-clusters")
-                orig_indices = np.where(c['mask'])[0]
-                for sub_id in range(n_sub):
-                    sub_mask = sub_labels == sub_id
-                    if sub_mask.sum() < 50:
-                        continue
-                    new_label = max_label
-                    max_label += 1
-                    indices = orig_indices[sub_mask]
-                    labels[indices] = new_label
-                    new_clusters.append({
-                        'label': new_label,
-                        'centroid': vertices[indices].mean(axis=0),
-                        'count': len(indices),
-                        'mask': labels == new_label
-                    })
-            else:
-                new_clusters.append(c)
-        else:
-            new_clusters.append(c)
-    
-    return new_clusters, labels
-
-
-def segment_arch_v2(mesh, arch_type='upper'):
-    """Segment a dental arch using multi-scale curvature + watershed."""
-    vertices = mesh.vertices
-    n_verts = len(vertices)
-    
-    print(f"\n{'='*60}")
-    print(f"Segmenting {arch_type} arch: {n_verts:,} vertices, {len(mesh.faces):,} faces")
-    print(f"{'='*60}")
-    
-    # Step 1: Multi-scale curvature
-    print("  Step 1: Computing multi-scale curvature...")
-    curvature = compute_multiscale_curvature(mesh)
-    print(f"    Curvature range: [{curvature.min():.4f}, {curvature.max():.4f}]")
-    print(f"    Median: {np.median(curvature):.4f}, P25: {np.percentile(curvature, 25):.4f}, P75: {np.percentile(curvature, 75):.4f}")
-    
-    # Step 2: Build adjacency
-    print("  Step 2: Building vertex adjacency...")
-    adjacency = build_adjacency(mesh)
-    
-    # Step 3: Watershed segmentation
-    print("  Step 3: Watershed region growing...")
-    # Adaptive thresholds based on curvature distribution
-    seed_thresh = np.percentile(curvature, 30)  # bottom 30% = flat tooth surfaces
-    barrier_thresh = np.percentile(curvature, 70)  # top 30% = grooves/boundaries
-    print(f"    Seed threshold: {seed_thresh:.4f}, Barrier: {barrier_thresh:.4f}")
-    
-    labels, n_regions = watershed_segment(vertices, curvature, adjacency, seed_thresh, barrier_thresh)
-    labeled_count = (labels >= 0).sum()
-    print(f"    Labeled: {labeled_count:,} / {n_verts:,} vertices ({100*labeled_count/n_verts:.1f}%)")
-    
-    # Step 4: Fit arch curve and sort
-    print("  Step 4: Fitting arch curve...")
-    clusters = fit_arch_curve(vertices, labels, n_regions)
-    print(f"    Raw clusters: {len(clusters)}")
-    
-    # Step 5: Merge small clusters
-    print("  Step 5: Merging small clusters...")
-    clusters, labels = merge_small_clusters(clusters, vertices, labels, min_vertices=150)
-    print(f"    After merge: {len(clusters)}")
-    
-    # Step 6: Split suspiciously large clusters
-    print("  Step 6: Checking for oversized clusters...")
-    tree = cKDTree(vertices)
-    clusters, labels = split_large_clusters(clusters, vertices, labels, tree, 
-                                             max_vertices_ratio=0.12, total_verts=n_verts)
-    print(f"    After split: {len(clusters)}")
-    
-    # Re-sort along arch
-    clusters = fit_arch_curve(vertices, labels, max(c['label'] for c in clusters) + 1 if clusters else 0)
-    
-    # Step 7: Assign Universal Numbering
-    print("  Step 7: Assigning tooth numbers...")
-    teeth = {}
-    n_found = len(clusters)
-    
-    if arch_type == 'upper':
-        for i, info in enumerate(clusters):
-            if n_found <= 16:
-                tooth_num = int(round(1 + (i / max(n_found - 1, 1)) * 15))
-            else:
-                tooth_num = min(i + 1, 16)
-            # Avoid duplicates
-            while tooth_num in teeth:
-                tooth_num += 1
-            if tooth_num <= 16:
-                teeth[tooth_num] = info
-    else:
-        for i, info in enumerate(clusters):
-            if n_found <= 16:
-                tooth_num = int(round(17 + (i / max(n_found - 1, 1)) * 15))
-            else:
-                tooth_num = min(i + 17, 32)
-            while tooth_num in teeth:
-                tooth_num += 1
-            if tooth_num <= 32:
-                teeth[tooth_num] = info
-    
-    print(f"  Result: {len(teeth)} teeth identified")
-    return teeth, labels
-
-
-def extract_submesh(mesh, mask):
-    """Extract a clean submesh from a vertex mask."""
-    vert_indices = np.where(mask)[0]
-    if len(vert_indices) < 3:
-        return None
-    
-    vert_set = set(vert_indices.tolist())
-    face_mask = np.array([
-        f[0] in vert_set and f[1] in vert_set and f[2] in vert_set
-        for f in mesh.faces
-    ])
-    
-    if face_mask.sum() == 0:
-        return None
-    
-    selected_faces = mesh.faces[face_mask]
-    old_to_new = {old: new for new, old in enumerate(vert_indices)}
-    new_faces = np.array([[old_to_new[v] for v in face] for face in selected_faces])
-    new_vertices = mesh.vertices[vert_indices]
-    
-    return trimesh.Trimesh(vertices=new_vertices, faces=new_faces, process=True)
-
-
-def run_segmentation_v2(scan_dir, output_dir):
-    """Main pipeline v2."""
-    os.makedirs(output_dir, exist_ok=True)
-    
-    manifest = {
-        'patient': 'logan-marrero',
-        'scanner': 'Medit i700',
-        'scan_date': '2026-06-28',
-        'version': 2,
-        'method': 'multi-scale-curvature-watershed',
-        'teeth': {},
-        'gums': {}
+    a_is_right = group_lr(left_side) < group_lr(right_side)
+    if flip:
+        a_is_right = not a_is_right
+    groups = {
+        "right": left_side if a_is_right else right_side,
+        "left": right_side if a_is_right else left_side,
     }
-    
-    for arch_file, arch_type in [('Maxilla_Base.ply', 'upper'), ('Mandible_Base.ply', 'lower')]:
-        filepath = os.path.join(scan_dir, arch_file)
-        if not os.path.exists(filepath):
-            print(f"  [!] {arch_file} not found, skipping")
+
+    result = {}
+    for side, rows in groups.items():
+        if not rows:
             continue
-        
-        print(f"\n  Loading {arch_file}...")
-        mesh = trimesh.load(filepath)
-        print(f"  Loaded: {len(mesh.vertices):,} vertices, {len(mesh.faces):,} faces")
-        
-        teeth, labels = segment_arch_v2(mesh, arch_type)
-        
-        # Export teeth
-        for tooth_num, info in teeth.items():
-            tooth_mesh = extract_submesh(mesh, info['mask'])
-            if tooth_mesh is None or len(tooth_mesh.vertices) < 20:
-                continue
-            
-            filename = f"tooth_{tooth_num:02d}.ply"
-            tooth_mesh.export(os.path.join(output_dir, filename))
-            
-            manifest['teeth'][str(tooth_num)] = {
-                'file': filename,
-                'name': TOOTH_NAMES.get(tooth_num, f'Tooth #{tooth_num}'),
-                'vertices': len(tooth_mesh.vertices),
-                'faces': len(tooth_mesh.faces)
-            }
-            print(f"  [OK] #{tooth_num:2d} {TOOTH_NAMES.get(tooth_num, '?'):35s} {len(tooth_mesh.vertices):6,} verts")
-        
-        # Export gum
-        gum_mask = labels == -1
-        gum_mesh = extract_submesh(mesh, gum_mask)
-        if gum_mesh and len(gum_mesh.vertices) > 100:
-            gum_file = f"gum_{arch_type}.ply"
-            gum_mesh.export(os.path.join(output_dir, gum_file))
-            manifest['gums'][arch_type] = {
-                'file': gum_file,
-                'vertices': len(gum_mesh.vertices),
-                'faces': len(gum_mesh.faces)
-            }
-            print(f"  [OK] Gum ({arch_type}): {len(gum_mesh.vertices):,} verts")
-    
-    # Write manifest
-    manifest_path = os.path.join(output_dir, 'manifest.json')
-    with open(manifest_path, 'w') as f:
-        json.dump(manifest, f, indent=2)
-    
-    return manifest
+        start_num, step = QUAD_RULES[(arch, side)]
+        # rows are ordered terminal->apex for left_side, apex->terminal for right.
+        # we want to walk central-incisor -> molar, so put the apex end first.
+        rows = list(rows)
+        # ensure ordering starts at the central-incisor (apex) end
+        if np.linalg.norm(centers[rows[0]] - ordered_c[apex]) > \
+           np.linalg.norm(centers[rows[-1]] - ordered_c[apex]):
+            rows = rows[::-1]
+
+        # spacing-based gap detection so missing middle teeth skip a number
+        num = start_num
+        prev_c = None
+        # typical mesio-distal spacing (median of gaps in this quadrant)
+        pts = centers[rows]
+        if len(pts) > 1:
+            gaps = np.linalg.norm(np.diff(pts, axis=0), axis=1)
+            typ = np.median(gaps)
+        else:
+            typ = 9.0  # mm fallback
+        for k, row in enumerate(rows):
+            if prev_c is not None:
+                gap = np.linalg.norm(centers[row] - prev_c)
+                skips = int(round(gap / typ)) - 1 if typ > 0 else 0
+                skips = max(0, min(skips, 6))
+                num += step * skips
+            # clamp within the arch's legal range
+            lo, hi = (1, 16) if arch == "upper" else (17, 32)
+            uncertain = not (lo <= num <= hi)
+            result[row] = (int(np.clip(num, lo, hi)), uncertain)
+            prev_c = centers[row]
+            num += step
+
+    # resolve any duplicate numbers -> mark later ones uncertain
+    seen = {}
+    for row, (num, unc) in list(result.items()):
+        if num in seen:
+            result[row] = (num, True)
+            result[seen[num]] = (result[seen[num]][0], True)
+        else:
+            seen[num] = row
+
+    full = set(range(1, 17)) if arch == "upper" else set(range(17, 33))
+    missing = sorted(full - {v[0] for v in result.values()})
+    return result, missing
 
 
-if __name__ == '__main__':
-    SCAN_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'portal', 'demo-scans')
-    OUTPUT_DIR = os.path.join(SCAN_DIR, 'teeth')
-    
-    print("=" * 60)
-    print("PALOMA AI - Dental Mesh Segmentation v2")
-    print("Method: Multi-Scale Curvature + Watershed")
-    print("Patient: Logan Marrero")
-    print("=" * 60)
-    
-    manifest = run_segmentation_v2(SCAN_DIR, OUTPUT_DIR)
-    
-    print(f"\n{'='*60}")
-    print(f"DONE! {len(manifest['teeth'])} teeth segmented")
-    print(f"Output: {OUTPUT_DIR}")
-    print(f"{'='*60}")
+# --------------------------------------------------------------------------- #
+#  per-arch driver
+# --------------------------------------------------------------------------- #
+def process_arch(path, arch, outdir, args, manifest):
+    log(f"\n=== Processing {arch.upper()} arch: {os.path.basename(path)} ===")
+    mesh = load_mesh(path)
+    up = occlusal_axis(mesh.vertices)
+    curv = compute_curvature(mesh, smooth_iters=args.smooth)
+
+    if args.debug:
+        _export_curvature_debug(mesh, curv, os.path.join(outdir, f"debug_curvature_{arch}.ply"))
+
+    labels, teeth, gum = segment(
+        mesh, curv, args.curvature_percentile,
+        args.min_vertices, args.max_vertices, up,
+    )
+
+    # gum export (all gum-classified regions merged)
+    gum_mask = np.isin(labels, gum)
+    gum_name = f"gum_{arch}.ply"
+    gv, gf = export_region(mesh, gum_mask, os.path.join(outdir, gum_name))
+    log(f"exported {gum_name}  ({gv:,} v / {gf:,} f)", 1)
+
+    if not teeth:
+        log("!! no teeth segmented -- try lowering --curvature-percentile", 1)
+        full = set(range(1, 17)) if arch == "upper" else set(range(17, 33))
+        manifest["missing"].extend(sorted(full))
+        return
+
+    centers = np.array([mesh.vertices[labels == lab].mean(axis=0) for lab in teeth])
+    flip = args.flip_upper if arch == "upper" else args.flip_lower
+    numbering, missing = assign_numbers(centers, arch, flip)
+
+    log(f"assigning Universal numbers ({'flipped' if flip else 'default'} handedness) ...", 1)
+    for row, lab in enumerate(teeth):
+        number, uncertain = numbering.get(row, (None, True))
+        if number is None:
+            continue
+        mask = labels == lab
+        fname = f"tooth_{number:02d}.ply"
+        v, f = export_region(mesh, mask, os.path.join(outdir, fname))
+        center = mesh.vertices[mask].mean(axis=0).round(3).tolist()
+        flag = "  [UNCERTAIN]" if uncertain else ""
+        log(f"tooth {number:2d} -> {fname}  ({v:,} v / {f:,} f){flag}", 1)
+        manifest["teeth"][str(number)] = {
+            "file": fname,
+            "vertices": int(v),
+            "faces": int(f),
+            "center": center,
+            "arch": arch,
+            "uncertain": bool(uncertain),
+        }
+    manifest["missing"].extend(missing)
+
+
+def _export_curvature_debug(mesh, curv, path):
+    c = (curv - curv.min()) / (np.ptp(curv) + 1e-9)
+    colors = (np.column_stack([c, 1 - c, np.zeros_like(c)]) * 255).astype(np.uint8)
+    colors = np.hstack([colors, np.full((len(c), 1), 255, np.uint8)])
+    dbg = trimesh.Trimesh(vertices=mesh.vertices, faces=mesh.faces,
+                          vertex_colors=colors, process=False)
+    dbg.export(path, file_type="ply", encoding="binary")
+    log(f"debug curvature map -> {os.path.basename(path)} (red=high)", 1)
+
+
+# --------------------------------------------------------------------------- #
+#  main
+# --------------------------------------------------------------------------- #
+def build_parser():
+    p = argparse.ArgumentParser(
+        description="Curvature-based dental-arch -> individual-tooth segmentation.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument("--maxilla", help="upper arch PLY")
+    p.add_argument("--mandible", help="lower arch PLY")
+    p.add_argument("--input", help="single arch PLY (use with --arch)")
+    p.add_argument("--arch", choices=["upper", "lower"],
+                   help="arch type for --input")
+    p.add_argument("--outdir", default="output", help="output directory")
+    p.add_argument("--curvature-percentile", type=float, default=80.0,
+                   help="vertices above this curvature percentile are boundaries")
+    p.add_argument("--min-vertices", type=int, default=500,
+                   help="minimum vertices for a region to count as a tooth")
+    p.add_argument("--max-vertices", type=int, default=6000,
+                   help="maximum vertices for a region to count as a tooth")
+    p.add_argument("--smooth", type=int, default=2,
+                   help="Laplacian smoothing passes on the curvature field")
+    p.add_argument("--flip-upper", action="store_true",
+                   help="mirror left/right numbering for the upper arch")
+    p.add_argument("--flip-lower", action="store_true",
+                   help="mirror left/right numbering for the lower arch")
+    p.add_argument("--debug", action="store_true",
+                   help="export a curvature heat-map PLY per arch")
+    return p
+
+
+def main(argv=None):
+    args = build_parser().parse_args(argv)
+
+    jobs = []
+    if args.maxilla:
+        jobs.append((args.maxilla, "upper"))
+    if args.mandible:
+        jobs.append((args.mandible, "lower"))
+    if args.input:
+        if not args.arch:
+            sys.exit("--input requires --arch upper|lower")
+        jobs.append((args.input, args.arch))
+    if not jobs:
+        sys.exit("Nothing to do: pass --maxilla/--mandible or --input --arch.")
+
+    os.makedirs(args.outdir, exist_ok=True)
+    t0 = time.time()
+    manifest = {"teeth": {}, "missing": [],
+                "segmentation_method": "curvature_region_growing"}
+
+    for path, arch in jobs:
+        if not os.path.isfile(path):
+            log(f"!! file not found, skipping: {path}")
+            continue
+        process_arch(path, arch, args.outdir, args, manifest)
+
+    manifest["missing"] = sorted(set(manifest["missing"]))
+    with open(os.path.join(args.outdir, "manifest.json"), "w") as fh:
+        json.dump(manifest, fh, indent=2)
+
+    log(f"\nDone in {time.time() - t0:.1f}s. "
+        f"{len(manifest['teeth'])} teeth exported to '{args.outdir}/'.")
+    log(f"manifest -> {os.path.join(args.outdir, 'manifest.json')}")
+    log("Review results in a mesh viewer; re-run with --debug / adjusted "
+        "--curvature-percentile / --flip-* if needed.")
+
+
+if __name__ == "__main__":
+    main()

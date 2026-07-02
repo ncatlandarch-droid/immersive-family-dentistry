@@ -1,0 +1,171 @@
+{
+  "teeth": {
+    "9": {
+      "file": "tooth_09.ply",
+      "vertices": 3908,
+      "faces": 7360,
+      "center": [
+        -28.623,
+        13.511,
+        -15.315
+      ],
+      "arch": "upper",
+      "uncertain": false
+    },
+    "10": {
+      "file": "tooth_10.ply",
+      "vertices": 3378,
+      "faces": 6342,
+      "center": [
+        -23.229,
+        12.312,
+        -17.847
+      ],
+      "arch": "upper",
+      "uncertain": false
+    },
+    "15": {
+      "file": "tooth_15.ply",
+      "vertices": 2607,
+      "faces": 4900,
+      "center": [
+        -19.216,
+        11.588,
+        10.465
+      ],
+      "arch": "upper",
+      "uncertain": false
+    },
+    "14": {
+      "file": "tooth_14.ply",
+      "vertices": 2272,
+      "faces": 4234,
+      "center": [
+        -14.244,
+        10.939,
+        8.731
+      ],
+      "arch": "upper",
+      "uncertain": false
+    },
+    "16": {
+      "file": "tooth_16.ply",
+      "vertices": 3677,
+      "faces": 6932,
+      "center": [
+        10.59,
+        13.839,
+        21.874
+      ],
+      "arch": "upper",
+      "uncertain": true
+    },
+    "8": {
+      "file": "tooth_08.ply",
+      "vertices": 5108,
+      "faces": 9766,
+      "center": [
+        18.056,
+        12.599,
+        9.881
+      ],
+      "arch": "upper",
+      "uncertain": false
+    },
+    "25": {
+      "file": "tooth_25.ply",
+      "vertices": 2755,
+      "faces": 5098,
+      "center": [
+        2.112,
+        7.91,
+        24.046
+      ],
+      "arch": "lower",
+      "uncertain": false
+    },
+    "24": {
+      "file": "tooth_24.ply",
+      "vertices": 4038,
+      "faces": 7742,
+      "center": [
+        -15.424,
+        7.334,
+        12.725
+      ],
+      "arch": "lower",
+      "uncertain": false
+    },
+    "23": {
+      "file": "tooth_23.ply",
+      "vertices": 2736,
+      "faces": 5158,
+      "center": [
+        -20.053,
+        7.354,
+        6.767
+      ],
+      "arch": "lower",
+      "uncertain": false
+    },
+    "22": {
+      "file": "tooth_22.ply",
+      "vertices": 1919,
+      "faces": 3578,
+      "center": [
+        -15.717,
+        7.604,
+        4.668
+      ],
+      "arch": "lower",
+      "uncertain": false
+    },
+    "26": {
+      "file": "tooth_26.ply",
+      "vertices": 4981,
+      "faces": 9526,
+      "center": [
+        18.778,
+        9.149,
+        5.839
+      ],
+      "arch": "lower",
+      "uncertain": false
+    },
+    "27": {
+      "file": "tooth_27.ply",
+      "vertices": 726,
+      "faces": 1203,
+      "center": [
+        32.662,
+        7.702,
+        -13.51
+      ],
+      "arch": "lower",
+      "uncertain": false
+    }
+  },
+  "missing": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    11,
+    12,
+    13,
+    17,
+    18,
+    19,
+    20,
+    21,
+    28,
+    29,
+    30,
+    31,
+    32
+  ],
+  "segmentation_method": "curvature_region_growing"
+}

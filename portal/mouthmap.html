@@ -1028,6 +1028,9 @@ body::before {
                 <button class="mm-view-btn" onclick="startAICalibration()" id="btn-ai-calibrate" title="AI auto-identifies each tooth using Gemini Vision" style="color:#2dd4bf;">
                     <span>🤖 AI Detect</span>
                 </button>
+                <button class="mm-view-btn" onclick="togglePaintMode()" id="btn-paint" title="Paint teeth on the 3D scan to define boundaries" style="color:#f472b6;">
+                    <span>🖌️ Paint</span>
+                </button>
             </div>
         </div>
 
@@ -1257,9 +1260,25 @@ const STATUS_EMISSIVE_INTENSITY = {
 
 let scene, camera, renderer, controls;
 let toothMeshes = [];
-let selectedTooth = null;  // stores tooth NUMBER (int), not mesh
+let selectedTooth = null;
 let hoveredTooth = null;
+let findingsVisible = false;
+let renderMode = 'solid';
 let raycaster, mouse;
+
+// ═══ PAINT MODE STATE ═══
+let paintMode = false;
+let paintBrushRadius = 5; // mm radius
+let paintCurrentTooth = 1; // which tooth number to paint
+let paintMap = {}; // faceIndex → toothNumber for each scan mesh
+let paintOriginalColors = null; // backup of original vertex colors
+let paintIsDragging = false;
+const PAINT_TOOTH_COLORS = {}; // generated per-tooth colors
+// Generate distinct colors for each tooth
+for (let i = 1; i <= 32; i++) {
+    const hue = ((i - 1) * 11.25) % 360; // spread across hue wheel
+    PAINT_TOOTH_COLORS[i] = new THREE.Color().setHSL(hue / 360, 0.8, 0.55);
+}
 let autoRotate = true;
 let autoRotateSpeed = 0.002;
 const tooltip = document.getElementById('tooltip');
@@ -2234,6 +2253,268 @@ var findingsVisible = true;
 var findingFilters = { treated: true, caries: true, needs_attention: true, calculus: true, missing: true, planned: true, recession: true, incipient: true, fracture: true, wear: true };
 var overlayPulseTime = 0;
 
+/* ═══ PAINT-TO-SELECT TOOL ═══
+   Lets the dentist/admin paint directly on the 3D scan mesh
+   to define tooth boundaries. Click+drag to paint faces,
+   assign to a tooth number, save permanently.
+*/
+
+function togglePaintMode() {
+    paintMode = !paintMode;
+    const btn = document.getElementById('btn-paint');
+    
+    if (paintMode) {
+        btn.classList.add('active');
+        btn.style.background = 'rgba(244,114,182,0.3)';
+        
+        // Load saved paint map
+        loadPaintMap();
+        
+        // Backup original vertex colors
+        backupVertexColors();
+        
+        // Apply any existing paint
+        applyPaintColors();
+        
+        // Show paint UI panel
+        showPaintPanel();
+        
+        // Disable orbit controls drag (we'll use mouse for painting)
+        controls.enableRotate = false;
+        
+        console.log('[Paint] 🖌️ Paint mode ENABLED');
+    } else {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        
+        // Restore original vertex colors
+        restoreVertexColors();
+        
+        // Hide paint panel
+        const panel = document.getElementById('paint-panel');
+        if (panel) panel.remove();
+        
+        // Re-enable orbit controls
+        controls.enableRotate = true;
+        
+        console.log('[Paint] Paint mode DISABLED');
+    }
+}
+
+function showPaintPanel() {
+    // Remove existing
+    const old = document.getElementById('paint-panel');
+    if (old) old.remove();
+    
+    const panel = document.createElement('div');
+    panel.id = 'paint-panel';
+    panel.style.cssText = `
+        position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+        background:rgba(15,23,42,0.95);border:1px solid rgba(244,114,182,0.3);
+        border-radius:12px;padding:12px 16px;z-index:1000;
+        font-family:Inter,sans-serif;color:#e2e8f0;min-width:340px;
+        backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    `;
+    
+    // Tooth number grid
+    let toothGrid = '';
+    for (let row = 0; row < 4; row++) {
+        const start = row === 0 ? 1 : row === 1 ? 11 : row === 2 ? 21 : 31;
+        const end = start + 10;
+        toothGrid += '<div style="display:flex;gap:2px;margin:1px 0;">';
+        for (let n = start; n <= Math.min(end, 32); n++) {
+            const hue = ((n - 1) * 11.25) % 360;
+            const isSel = n === paintCurrentTooth;
+            const bg = isSel ? `hsl(${hue},80%,55%)` : `hsl(${hue},40%,25%)`;
+            const border = isSel ? '2px solid #fff' : '1px solid rgba(255,255,255,0.2)';
+            toothGrid += `<button onclick="setPaintTooth(${n})" 
+                style="width:24px;height:22px;font-size:8px;font-weight:700;
+                background:${bg};color:#fff;border:${border};border-radius:3px;
+                cursor:pointer;font-family:Inter,sans-serif;">${n}</button>`;
+        }
+        toothGrid += '</div>';
+    }
+    
+    panel.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:700;color:#f472b6;">🖌️ PAINT MODE</span>
+            <span style="font-size:10px;color:#94a3b8;">Hold Shift + drag to rotate</span>
+        </div>
+        
+        <div style="font-size:9px;color:#94a3b8;margin-bottom:4px;">Select tooth # to paint:</div>
+        ${toothGrid}
+        
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+            <label style="font-size:9px;color:#94a3b8;">Brush:</label>
+            <input type="range" min="2" max="15" value="${paintBrushRadius}" 
+                oninput="paintBrushRadius=+this.value;document.getElementById('brush-val').textContent=this.value+'mm'"
+                style="flex:1;accent-color:#f472b6;">
+            <span id="brush-val" style="font-size:9px;color:#e2e8f0;min-width:30px;">${paintBrushRadius}mm</span>
+        </div>
+        
+        <div style="display:flex;gap:6px;margin-top:8px;">
+            <button onclick="savePaintMap()" style="flex:1;padding:6px;font-size:10px;font-weight:700;
+                background:rgba(45,212,191,0.3);border:1px solid #2dd4bf;border-radius:6px;
+                color:#2dd4bf;cursor:pointer;">💾 Save</button>
+            <button onclick="clearPaintMap()" style="flex:1;padding:6px;font-size:10px;font-weight:700;
+                background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5);border-radius:6px;
+                color:#ef4444;cursor:pointer;">🗑️ Clear All</button>
+            <button onclick="togglePaintMode()" style="flex:1;padding:6px;font-size:10px;font-weight:700;
+                background:rgba(100,116,139,0.3);border:1px solid rgba(100,116,139,0.5);border-radius:6px;
+                color:#94a3b8;cursor:pointer;">✕ Done</button>
+        </div>
+        
+        <div style="font-size:8px;color:#64748b;margin-top:6px;text-align:center;">
+            Click or drag on teeth to paint · Selected: <strong style="color:#f472b6;">Tooth #<span id="paint-current-num">${paintCurrentTooth}</span></strong>
+        </div>
+    `;
+    
+    document.getElementById('mm-viewport').appendChild(panel);
+}
+
+function setPaintTooth(n) {
+    paintCurrentTooth = n;
+    document.getElementById('paint-current-num').textContent = n;
+    // Refresh panel to update button highlights
+    showPaintPanel();
+}
+
+function backupVertexColors() {
+    paintOriginalColors = {};
+    scanMeshes.forEach(m => {
+        if (!m.userData.isScanVisual) return;
+        const geo = m.geometry;
+        if (geo.hasAttribute('color')) {
+            paintOriginalColors[m.name] = geo.getAttribute('color').array.slice();
+        }
+    });
+}
+
+function restoreVertexColors() {
+    if (!paintOriginalColors) return;
+    scanMeshes.forEach(m => {
+        if (!m.userData.isScanVisual) return;
+        const backup = paintOriginalColors[m.name];
+        if (backup && m.geometry.hasAttribute('color')) {
+            const colorAttr = m.geometry.getAttribute('color');
+            colorAttr.array.set(backup);
+            colorAttr.needsUpdate = true;
+        }
+    });
+    paintOriginalColors = null;
+}
+
+function applyPaintColors() {
+    // Apply saved paint map colors to the mesh
+    scanMeshes.forEach(mesh => {
+        if (!mesh.userData.isScanVisual) return;
+        const geo = mesh.geometry;
+        if (!geo.hasAttribute('color') || !geo.index) return;
+        
+        const colorAttr = geo.getAttribute('color');
+        const index = geo.index.array;
+        const meshName = mesh.name || '';
+        
+        for (const key in paintMap) {
+            if (!key.startsWith(meshName + '_')) continue;
+            const faceIdx = parseInt(key.split('_').pop());
+            const toothNum = paintMap[key];
+            const color = PAINT_TOOTH_COLORS[toothNum];
+            if (!color) continue;
+            
+            // Color all 3 vertices of this face
+            for (let v = 0; v < 3; v++) {
+                const vi = index[faceIdx * 3 + v];
+                if (vi !== undefined) {
+                    colorAttr.setXYZ(vi, color.r, color.g, color.b);
+                }
+            }
+        }
+        colorAttr.needsUpdate = true;
+    });
+}
+
+function paintFacesAtPoint(hitPoint, hitMesh, hitFaceIdx) {
+    if (!paintMode || !hitMesh?.userData.isScanVisual) return;
+    
+    const geo = hitMesh.geometry;
+    if (!geo.hasAttribute('color') || !geo.index) return;
+    
+    const positions = geo.getAttribute('position');
+    const colorAttr = geo.getAttribute('color');
+    const index = geo.index.array;
+    const meshName = hitMesh.name || '';
+    const color = PAINT_TOOTH_COLORS[paintCurrentTooth];
+    if (!color) return;
+    
+    // Convert hit point to local space
+    const localHit = hitMesh.worldToLocal(hitPoint.clone());
+    
+    let painted = 0;
+    const totalFaces = index.length / 3;
+    
+    for (let f = 0; f < totalFaces; f++) {
+        // Get face center
+        const i0 = index[f * 3], i1 = index[f * 3 + 1], i2 = index[f * 3 + 2];
+        const cx = (positions.getX(i0) + positions.getX(i1) + positions.getX(i2)) / 3;
+        const cy = (positions.getY(i0) + positions.getY(i1) + positions.getY(i2)) / 3;
+        const cz = (positions.getZ(i0) + positions.getZ(i1) + positions.getZ(i2)) / 3;
+        
+        const dx = cx - localHit.x, dy = cy - localHit.y, dz = cz - localHit.z;
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        
+        if (dist <= paintBrushRadius) {
+            const key = meshName + '_' + f;
+            paintMap[key] = paintCurrentTooth;
+            
+            // Color the vertices
+            colorAttr.setXYZ(i0, color.r, color.g, color.b);
+            colorAttr.setXYZ(i1, color.r, color.g, color.b);
+            colorAttr.setXYZ(i2, color.r, color.g, color.b);
+            painted++;
+        }
+    }
+    
+    if (painted > 0) {
+        colorAttr.needsUpdate = true;
+    }
+}
+
+function savePaintMap() {
+    localStorage.setItem('paloma_paint_map', JSON.stringify(paintMap));
+    const count = Object.keys(paintMap).length;
+    console.log(`[Paint] 💾 Saved ${count} painted faces`);
+    
+    // Show confirmation
+    const btn = document.querySelector('[onclick="savePaintMap()"]');
+    if (btn) {
+        btn.textContent = '✅ Saved!';
+        setTimeout(() => { btn.textContent = '💾 Save'; }, 2000);
+    }
+}
+
+function loadPaintMap() {
+    const saved = localStorage.getItem('paloma_paint_map');
+    if (saved) {
+        try {
+            paintMap = JSON.parse(saved);
+            console.log(`[Paint] Loaded ${Object.keys(paintMap).length} painted faces`);
+        } catch(e) { paintMap = {}; }
+    }
+}
+
+function clearPaintMap() {
+    if (!confirm('Clear all painted teeth? This cannot be undone.')) return;
+    paintMap = {};
+    localStorage.removeItem('paloma_paint_map');
+    restoreVertexColors();
+    backupVertexColors();
+    console.log('[Paint] 🗑️ All paint cleared');
+}
+
+// Load paint map on startup (for priority 1 tooth detection)
+try { loadPaintMap(); } catch(e) {}
+
 function toggleFindings() {
     findingsVisible = !findingsVisible;
     var panel = document.getElementById('findings-panel');
@@ -2810,31 +3091,29 @@ function computeToothCenters() {
 }
 
 // ═══ TOOTH IDENTIFICATION ═══
-// Primary: raycast against invisible tooth PLY meshes (they know their universal number)
-// Fallback: scan visual hit + angular position estimation
+// PRIMARY: Nearest arch-template center (works without individual tooth meshes)
+// OVERRIDE: Paint map from localStorage (if user has painted teeth)
+// SECONDARY: Direct hit on invisible tooth PLY mesh
 
 function findToothFromRaycast(raycaster) {
-    // PRIMARY: Check invisible tooth meshes first (exact identification)
-    const visibleTeeth = toothMeshes.filter(m => m.visible);
-    const toothHits = raycaster.intersectObjects(visibleTeeth);
-    
-    if (toothHits.length > 0) {
-        const hitMesh = toothHits[0].object;
-        const num = hitMesh.userData.toothNumber;
-        if (num >= 1 && num <= 32) {
-            console.log(`[ToothID] ✓ DIRECT HIT on tooth mesh → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
-            const tc = toothCenters.find(tc => tc.num === num);
-            return { num, mesh: hitMesh, center: toothHits[0].point, tc };
-        }
-    }
-    
-    // FALLBACK: Hit scan visual, estimate from position
+    // Step 1: Raycast against scan visuals (the actual 3D scan mesh)
     const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
     const scanHits = raycaster.intersectObjects(scanVisuals);
     
     if (scanHits.length > 0) {
         const hitPoint = scanHits[0].point;
         const hitMesh = scanHits[0].object;
+        const hitFaceIdx = scanHits[0].faceIndex;
+        
+        // PRIORITY 1: Check paint map override
+        const meshName = hitMesh.name || '';
+        const pmKey = meshName + '_' + hitFaceIdx;
+        if (paintMap[pmKey]) {
+            const num = paintMap[pmKey];
+            console.log(`[ToothID] 🎨 PAINT MAP → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+            const tc = toothCenters.find(tc => tc.num === num);
+            return { num, mesh: null, center: hitPoint, tc };
+        }
         
         // Determine upper/lower from parent group
         let isUpper = true;
@@ -2845,30 +3124,38 @@ function findToothFromRaycast(raycaster) {
             parent = parent.parent;
         }
         
-        // Find nearest tooth mesh by distance (since we missed the exact mesh)
-        let bestDist = Infinity, bestMesh = null;
-        toothMeshes.forEach(tm => {
-            if (!tm.visible) return;
-            // Only check same arch
-            const tmUpper = tm.userData.toothNumber <= 16;
-            if (tmUpper !== isUpper) return;
+        // PRIORITY 2: Nearest arch-template center (PRIMARY METHOD)
+        // Uses the 32-tooth template positions computed in computeToothCenters()
+        if (toothCenters.length > 0) {
+            let bestTC = null, bestDist = Infinity;
+            toothCenters.forEach(tc => {
+                // Filter to same arch
+                const tcUpper = tc.num <= 16;
+                if (tcUpper !== isUpper) return;
+                const d = hitPoint.distanceTo(tc.center);
+                if (d < bestDist) { bestDist = d; bestTC = tc; }
+            });
             
-            tm.geometry.computeBoundingBox();
-            const c = new THREE.Vector3();
-            tm.geometry.boundingBox.getCenter(c);
-            tm.localToWorld(c);
-            const d = hitPoint.distanceTo(c);
-            if (d < bestDist) { bestDist = d; bestMesh = tm; }
-        });
-        
-        if (bestMesh && bestDist < 15) {
-            const num = bestMesh.userData.toothNumber;
-            console.log(`[ToothID] ~ NEAREST mesh (dist=${bestDist.toFixed(1)}) → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
-            const tc = toothCenters.find(tc => tc.num === num);
-            return { num, mesh: bestMesh, center: hitPoint, tc };
+            if (bestTC && bestDist < 25) {
+                const num = bestTC.num;
+                console.log(`[ToothID] 📐 TEMPLATE → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''} (dist=${bestDist.toFixed(1)}mm)`);
+                return { num, mesh: bestTC.mesh, center: hitPoint, tc: bestTC };
+            }
         }
         
-        // Last resort: angle-based estimation
+        // PRIORITY 3: Direct tooth mesh hit (if loaded)
+        const visibleTeeth = toothMeshes.filter(m => m.visible);
+        const toothHits = raycaster.intersectObjects(visibleTeeth);
+        if (toothHits.length > 0) {
+            const num = toothHits[0].object.userData.toothNumber;
+            if (num >= 1 && num <= 32) {
+                console.log(`[ToothID] ✓ MESH HIT → #${num}`);
+                const tc = toothCenters.find(tc => tc.num === num);
+                return { num, mesh: toothHits[0].object, center: toothHits[0].point, tc };
+            }
+        }
+        
+        // PRIORITY 4: Angle-based fallback
         const angle = Math.atan2(hitPoint.x, hitPoint.z);
         const absAngle = Math.abs(angle);
         const thresholds = [0.08, 0.18, 0.30, 0.42, 0.55, 0.72, 0.92, Math.PI];
@@ -2876,15 +3163,24 @@ function findToothFromRaycast(raycaster) {
         for (let i = 0; i < thresholds.length; i++) {
             if (absAngle < thresholds[i]) { pos = i; break; }
         }
-        
         let num;
         if (isUpper) { num = angle >= 0 ? 8 - pos : 9 + pos; }
         else { num = angle < 0 ? 24 - pos : 25 + pos; }
         num = Math.max(1, Math.min(32, num));
-        
-        console.log(`[ToothID] ⚠ ANGLE fallback → #${num} ${TOOTH_NAMES[num]?.split('(')[0]?.trim() || ''}`);
+        console.log(`[ToothID] ⚠ ANGLE → #${num}`);
         const tc = toothCenters.find(tc => tc.num === num);
         return { num, mesh: null, center: hitPoint, tc };
+    }
+    
+    // Also check direct tooth mesh hits even if scan miss
+    const visibleTeeth = toothMeshes.filter(m => m.visible);
+    const toothHits = raycaster.intersectObjects(visibleTeeth);
+    if (toothHits.length > 0) {
+        const num = toothHits[0].object.userData.toothNumber;
+        if (num >= 1 && num <= 32) {
+            const tc = toothCenters.find(tc => tc.num === num);
+            return { num, mesh: toothHits[0].object, center: toothHits[0].point, tc };
+        }
     }
     
     return null;
@@ -2945,11 +3241,53 @@ function onMouseClick(event) {
 
     raycaster.setFromCamera(mouse, camera);
     
+    // PAINT MODE: paint faces instead of selecting teeth
+    if (paintMode && !event.shiftKey) {
+        const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+        const hits = raycaster.intersectObjects(scanVisuals);
+        if (hits.length > 0) {
+            paintFacesAtPoint(hits[0].point, hits[0].object, hits[0].faceIndex);
+        }
+        return;
+    }
+    
     const result = findToothFromRaycast(raycaster);
     if (result) {
         selectToothByNumber(result.num, result.center);
     }
 }
+
+// Paint drag handlers
+renderer.domElement.addEventListener('mousedown', function(e) {
+    if (paintMode && !e.shiftKey) {
+        paintIsDragging = true;
+        controls.enableRotate = false;
+    } else if (paintMode && e.shiftKey) {
+        controls.enableRotate = true;
+    }
+});
+
+renderer.domElement.addEventListener('mouseup', function(e) {
+    paintIsDragging = false;
+    if (paintMode) {
+        controls.enableRotate = false;
+    }
+});
+
+renderer.domElement.addEventListener('mousemove', function(e) {
+    if (!paintMode || !paintIsDragging || e.shiftKey) return;
+    
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    
+    const scanVisuals = scanMeshes.filter(m => m.userData.isScanVisual);
+    const hits = raycaster.intersectObjects(scanVisuals);
+    if (hits.length > 0) {
+        paintFacesAtPoint(hits[0].point, hits[0].object, hits[0].faceIndex);
+    }
+});
 
 
 function onTouchStart(event) {

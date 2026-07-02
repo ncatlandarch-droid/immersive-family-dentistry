@@ -1,0 +1,8 @@
+# Core dependencies for segment_teeth.py  (Python 3.11+)
+numpy>=1.24
+scipy>=1.10
+trimesh>=4.0
+
+# Open3D is NOT required by this script (trimesh + scipy handle everything),
+# but if you want it available for your own experiments, uncomment:
+# open3d>=0.18
