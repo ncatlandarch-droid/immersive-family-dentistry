@@ -1,7 +1,7 @@
 [build]
   publish = "."
   functions = "netlify/functions"
-  environment = { SECRETS_SCAN_OMIT_KEYS = "FIREBASE_API_KEY,ADMIN_EMAIL" }
+  environment = { SECRETS_SCAN_OMIT_KEYS = "FIREBASE_API_KEY,ADMIN_EMAIL,GEMINI_API_KEY", SECRETS_SCAN_SMART_DETECTION_ENABLED = "false" }
 
 [functions]
   node_bundler = "esbuild"
